@@ -1,77 +1,54 @@
 {% comment %}
-  O corpo do resumo de um evento — tudo em `c-v2.fact`, a mesma peça
-  rótulo/valor do cartão de lista e do resumo de diárias. No legado eram
-  `pt-resumo-box`, um vocabulário que só esta tela usava, com três grades
-  próprias (`summary-grid--2`, `--3` e `--4`) para dizer o que a `fact-list` já
-  decide sozinha pelo número de fatos.
-
-  Três faixas, na ordem em que se lê um plano: o que é (número, destino,
-  quando), quem pediu e quem executa, e quanto custa.
-
-  Cada faixa tem NO MÍNIMO três fatos, e isso não é arranjo: a folha aumenta o
-  corpo do valor quando a faixa tem um ou dois (`--fact-value-size`), porque lá
-  a caixa inteira é deles. Numa faixa de duas, "PCPR NA COMUNIDADE" saía a 35px
-  e o resumo inteiro gritava. Com três ou mais vale o corpo padrão, que é o do
-  cartão de lista.
-
-  Efetivo e atividades ganham uma faixa de chip embaixo: são LISTAS, e o valor
-  de um fato é uma frase curta — "2 · Agente, 1 · Escrivão" numa linha só deixa
-  de se ler assim que o cargo tem duas palavras.
+  Três assuntos, três blocos do card de lista: coordenação, efetivo e execução.
+  Os dados não somem; apenas deixam de competir numa grade única de nove fatos.
 {% endcomment %}
-<div class="fact-list">
-  <c-v2.fact label="Número do plano" :value="numero" />
-  <c-v2.fact label="Destino" :value="ev.destino" />
-  {% with data_extenso=ev.data_evento_extenso|upper %}
-    <c-v2.fact label="Data do evento" :value="data_extenso" />
-  {% endwith %}
-  <c-v2.fact label="Horário de atendimento" :value="ev.horario" />
-</div>
-
-<div class="fact-list">
-  <c-v2.fact label="Solicitante" :value="ev.programa" />
-  <c-v2.fact label="Coordenador administrativo" :value="coordenador_adm_nome" :note="coordenador_adm_cargo" />
-  {% if ev.coordenador_op_presente %}
-    <c-v2.fact label="Coordenador operacional" :value="ev.coordenador_op" :note="ev.coordenador_op_cargo" />
-  {% endif %}
-  {% with efetivo_titulo=ev.efetivo_total|stringformat:"s"|add:" servidor(es)" %}
-    <c-v2.fact label="Efetivo" :value="efetivo_titulo" />
-  {% endwith %}
-</div>
-
-<div class="fact-chips">
-  {% comment %}
-    A UNIDADE entra no chip quando existe: duas linhas de efetivo podem ter o
-    mesmo cargo em unidades diferentes, e sem ela viram dois chips idênticos.
-    O presenter sempre a fornece (`_efetivo_itens`); quem a perdeu foi a
-    migração.
-  {% endcomment %}
-  {% for it in ev.efetivo_itens %}
-    {% with base_label=it.quantidade|stringformat:"s"|add:" · "|add:it.cargo %}
-      {% if it.unidade %}
-        {% with item_label=base_label|add:" · "|add:it.unidade %}
-          <c-v2.chip :label="item_label" tone="info" />
-        {% endwith %}
-      {% else %}
-        <c-v2.chip :label="base_label" tone="info" />
+<c-v2.form_block aria_label="Coordenação do evento" extra_class="plan-event-summary__block">
+  <c-slot name="body">
+    <div class="fact-list">
+      <c-v2.fact label="Solicitante" :value="ev.programa" />
+      <c-v2.fact label="Coordenador administrativo" :value="coordenador_adm_nome" :note="coordenador_adm_cargo" />
+      {% if ev.coordenador_op_presente %}
+        <c-v2.fact label="Coordenador operacional" :value="ev.coordenador_op" :note="ev.coordenador_op_cargo" />
       {% endif %}
+    </div>
+  </c-slot>
+</c-v2.form_block>
+
+<c-v2.form_block aria_label="Efetivo do evento" extra_class="plan-event-summary__block">
+  <c-slot name="body">
+    {% with efetivo_titulo=ev.efetivo_total|stringformat:"s"|add:" servidor(es)" %}
+      <c-v2.fact label="Efetivo" :value="efetivo_titulo" />
     {% endwith %}
-  {% empty %}
-    <c-v2.chip label="Nenhum efetivo informado" />
-  {% endfor %}
-</div>
+    <div class="fact-chips">
+      {% for it in ev.efetivo_itens %}
+        {% with base_label=it.quantidade|stringformat:"s"|add:" · "|add:it.cargo %}
+          {% if it.unidade %}
+            {% with item_label=base_label|add:" · "|add:it.unidade %}<c-v2.chip :label="item_label" tone="info" />{% endwith %}
+          {% else %}
+            <c-v2.chip :label="base_label" tone="info" />
+          {% endif %}
+        {% endwith %}
+      {% empty %}
+        <c-v2.chip label="Nenhum efetivo informado" />
+      {% endfor %}
+    </div>
+  </c-slot>
+</c-v2.form_block>
 
-<div class="fact-list">
-  <c-v2.fact label="Valor total" :value="ev.valor_total_display" :strong="True" />
-  <c-v2.fact label="Quantidade de diárias" :value="ev.diarias_composicao" />
-  {% with atividades_titulo=ev.atividades_count|stringformat:"s"|add:" selecionada(s)" %}
-    <c-v2.fact label="Atividades" :value="atividades_titulo" />
-  {% endwith %}
-</div>
-
-<div class="fact-chips">
-  {% for nome in ev.atividades %}
-    <c-v2.chip :label="nome" />
-  {% empty %}
-    <c-v2.chip label="Nenhuma atividade selecionada" />
-  {% endfor %}
-</div>
+<c-v2.form_block aria_label="Diárias e atividades do evento" extra_class="plan-event-summary__block">
+  <c-slot name="body">
+    <div class="fact-list">
+      <c-v2.fact label="Valor total" :value="ev.valor_total_display" :strong="True" note_label="Quantidade de diárias" :note="ev.diarias_composicao" />
+      {% with atividades_titulo=ev.atividades_count|stringformat:"s"|add:" selecionada(s)" %}
+        <c-v2.fact label="Atividades" :value="atividades_titulo" />
+      {% endwith %}
+    </div>
+    <div class="fact-chips">
+      {% for nome in ev.atividades %}
+        <c-v2.chip :label="nome" />
+      {% empty %}
+        <c-v2.chip label="Nenhuma atividade selecionada" />
+      {% endfor %}
+    </div>
+  </c-slot>
+</c-v2.form_block>

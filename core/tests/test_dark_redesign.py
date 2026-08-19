@@ -489,9 +489,11 @@ class DarkRedesignContractTests(SimpleTestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("Identificação", etapa1_body)
         self.assertIn("Motivo", etapa1_body)
-        # "Período e destinos" no v2: um bloco só para as datas e os locais, em
-        # vez de "Evento" + "Destino e período" em dois.
-        self.assertIn("Período e destinos", etapa1_body)
+        # Data e destinos são assuntos independentes e usam dois blocos split
+        # do v2, mantendo seus controles e motores próprios.
+        self.assertIn('title="Data do evento"', etapa1_body)
+        self.assertIn('title="Destinos"', etapa1_body)
+        self.assertEqual(etapa1_body.count(':split="True"'), 3)
         self.assertIn("Documentos vinculados", etapa1_body)
         # Scripts de página depois do shell.bundle (extra_js), senão
         # CV.locationRows ainda não existe e destinos/cidade quebram.

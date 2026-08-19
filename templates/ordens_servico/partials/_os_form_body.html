@@ -82,11 +82,8 @@
   </c-slot>
 </c-v2.form_block>
 
-<c-v2.form_block title="Equipe" description="Viajantes da ordem de serviço.">
-  <c-slot name="actions">
-    <c-v2.button label="Novo viajante" icon="plus" :href="servidor_create_url" />
-  </c-slot>
+<c-v2.form_block>
   <c-slot name="body">
-    {% include "ordens_servico/partials/_servidores_body.html" with form=form only %}
+    {% include "ordens_servico/partials/_servidores_body.html" with form=form servidor_create_url=servidor_create_url only %}
   </c-slot>
 </c-v2.form_block>

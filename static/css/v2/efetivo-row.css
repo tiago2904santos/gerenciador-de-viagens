@@ -14,7 +14,7 @@
   align-items: end;
   display: grid;
   gap: var(--gap);
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: var(--control-height) minmax(0, 1fr) var(--control-height);
   min-width: 0;
 }
 
@@ -41,12 +41,33 @@
   display: none;
 }
 
+:is(html[data-theme]) .efetivo-row__add[hidden],
+:is(html[data-theme]) .efetivo-row__remove[hidden] {
+  display: none;
+}
+
+/* As linhas seguintes repetem os rótulos no HTML para manter cada controle
+   acessível, mas só a primeira linha os mostra. O motor atualiza esta classe
+   depois de inserir ou remover linhas, inclusive quando a primeira é apagada. */
+:is(html[data-theme]) .efetivo-row--without-labels .field__label {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
 /* Os dois botões são o `button` do sistema na forma `--icon`. Só o que é
    POSIÇÃO fica aqui: o desenho é de `v2/button.css`, e uma segunda definição é
    como o sistema antigo chegou a dezoito variantes de botão. */
 :is(html[data-theme]) .efetivo-row__add,
 :is(html[data-theme]) .efetivo-row__remove {
-  margin-bottom: 2px;
+  align-self: end;
+  margin-bottom: 0;
 }
 
 :is(html[data-theme]) .efetivo-rows {

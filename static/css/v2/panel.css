@@ -52,6 +52,13 @@
   min-width: 0;
 }
 
+/* Cabeçalhos com ação de ícone alinham o conjunto título + descrição pelo
+   centro do botão, em vez de tentar compartilhar uma linha de base que o
+   botão circular não possui. */
+:is(html[data-theme]) .panel__header--centered {
+  align-items: center;
+}
+
 :is(html[data-theme]) .panel__title {
   color: var(--text-strong);
   font-size: var(--text-size-base);

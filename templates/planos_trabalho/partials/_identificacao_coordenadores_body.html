@@ -13,9 +13,9 @@
     {{ form.coordenador_adm_modo }}
     {{ form.coordenador_adm_nome_manual }}
     <div class="field-grid field-grid--cols-3">
-      <c-v2.form_field :field="form.coordenador_adm" label="Nome" />
+      <c-v2.form_field :field="form.coordenador_adm" label="Nome" :hide_label="True" />
       <c-v2.form_field :field="form.coordenador_adm_cargo_manual" label="Cargo" :action_url="cargos_url" action_label="Gerenciar cargos" />
-      <c-v2.form_field :field="form.coordenador_adm_genero" label="Gênero" />
+      <c-v2.form_field :field="form.coordenador_adm_genero" label="Gênero" :select="True" />
     </div>
   </div>
 
@@ -23,9 +23,9 @@
     {{ form.coordenador_op_modo }}
     {{ form.coordenador_op_nome_manual }}
     <div class="field-grid field-grid--cols-3">
-      <c-v2.form_field :field="form.coordenador_op" label="Nome" />
+      <c-v2.form_field :field="form.coordenador_op" label="Nome" :hide_label="True" />
       <c-v2.form_field :field="form.coordenador_op_cargo_manual" label="Cargo" :action_url="cargos_url" action_label="Gerenciar cargos" />
-      <c-v2.form_field :field="form.coordenador_op_genero" label="Gênero" />
+      <c-v2.form_field :field="form.coordenador_op_genero" label="Gênero" :select="True" />
     </div>
   </div>
 </div>

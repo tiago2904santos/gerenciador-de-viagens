@@ -10,6 +10,15 @@
   gap: var(--gap);
 }
 
+/* Na lista simples, o painel recebe as linhas dentro de um invólucro. Ele é a
+   grade que materializa o ritmo entre registros; sem isto o `gap` do painel
+   separava apenas o invólucro, e as linhas dentro dele ficavam coladas. */
+:is(html[data-theme]) .list-page__panel-rows {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+
 /* Header e rail são uma peça só — o rail já perde os cantos de cima quando
    encosta no header, e o vão da grade os separaria de novo. Puxá-lo de volta
    aqui é o que mantém a regra de forma e a de ritmo dizendo a mesma coisa. */

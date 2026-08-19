@@ -137,7 +137,7 @@
           documento". Um segundo diálogo com o mesmo comportamento seria a
           duplicação que este refactor existe para desfazer.
         {% endcomment %}
-        <c-v2.panel title="Documentos de solicitação" description="Ofícios solicitantes, convites, despachos ou imagens.">
+        <c-v2.panel title="Documentos de solicitação" description="Ofícios solicitantes, convites, despachos ou imagens." header_extra_class="panel__header--centered">
           <c-slot name="actions">
             <c-v2.attach_signed_button
               :url="anexar_solicitacao_url"
@@ -170,8 +170,27 @@
         </c-v2.panel>
 
         <c-v2.fab>
-          <c-v2.button label="Novo plano" icon="plus" :href="create_urls.plano" />
-          <c-v2.button label="Nova OS" variant="primary" icon="plus" :href="create_urls.ordem" />
+          <c-v2.button
+            label="Novo"
+            variant="primary"
+            icon="plus"
+            menu_id="evento-planejamento-create-menu"
+            aria_label="Criar planejamento ou autorização"
+          />
+          <c-v2.menu id="evento-planejamento-create-menu" aria_label="Criar planejamento ou autorização">
+            <c-v2.menu_item
+              :href="create_urls.ordem"
+              title="Ordem de Serviço"
+              description="Criar uma ordem de serviço para este evento."
+              icon="document"
+            />
+            <c-v2.menu_item
+              :href="create_urls.plano"
+              title="Plano de Trabalho"
+              description="Criar um plano de trabalho para este evento."
+              icon="clipboard-copy"
+            />
+          </c-v2.menu>
         </c-v2.fab>
       {% endif %}
 

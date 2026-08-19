@@ -51,6 +51,17 @@ class QuickAddComponentesV2SourceTests(SimpleTestCase):
             self.assertNotIn("<c-v2.form_block", source, relative)
             self.assertNotIn("<c-ui.forms.form_block", source, relative)
 
+    def test_section_nao_renderiza_legenda_duplicada(self):
+        section = (TEMPLATES / "cotton/v2/quick_add_section.html").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertNotIn("<legend", section)
+        self.assertIn('aria-label="{{ title }}', section)
+        self.assertNotIn("quick-add__section-copy", section)
+        self.assertNotIn("quick-add__section-title", section)
+        self.assertNotIn("quick-add__section-description", section)
+
     def test_hooks_do_usuario_ficam_nos_blocos_sem_wrappers_intermediarios(self):
         usuario = (TEMPLATES / "usuarios/partials/_quick_add_usuario_fields.html").read_text(
             encoding="utf-8"
@@ -237,6 +248,11 @@ class QuickAddComponentesV2RenderTests(TestCase):
         html = self._quick_add_html("usuarios:areas_index", "quick-add-area")
 
         self.assertEqual(html.count('class="quick-add__section"'), 1)
+        self.assertNotIn("<legend", html)
+        self.assertIn('aria-label="Dados da área — Nome e sigla da unidade"', html)
+        self.assertNotIn("quick-add__section-copy", html)
+        self.assertNotIn("quick-add__section-title", html)
+        self.assertNotIn("quick-add__section-description", html)
         self.assertNotIn('class="form-block--v2', html)
         self.assertNotIn("document-form-block", html)
         for field_name in ("area-nome", "area-sigla"):

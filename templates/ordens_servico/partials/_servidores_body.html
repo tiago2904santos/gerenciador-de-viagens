@@ -1,4 +1,13 @@
-<c-v2.picker :field="form.servidores" mode="multi" selected_title="Equipe da OS" />
+<c-v2.picker
+  :field="form.servidores"
+  mode="multi"
+  selected_title="Equipe da OS"
+  :action_href="servidor_create_url"
+  action_icon="plus"
+  action_aria_label="Novo viajante"
+  action_tooltip="Novo viajante"
+  :action_autosave="True"
+/>
 <section
   class="os-servidor-role-panel"
   data-os-model-fields="CAMINHAO MICROONIBUS CERIMONIAL_ANTECIPADO"

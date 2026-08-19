@@ -128,21 +128,21 @@ class PlanoIdentificacaoForm(forms.ModelForm):
             "contextualizacao": forms.Textarea(
                 attrs={
                     "rows": 4,
-                    **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
+                    **widget_attrs(WidgetStyle.INPUT_V2_TEXTAREA),
                     "placeholder": "Deixe em branco para gerar automaticamente a partir do destino e do programa.",
                 },
             ),
             "consideracao_final": forms.Textarea(
                 attrs={
                     "rows": 4,
-                    **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
+                    **widget_attrs(WidgetStyle.INPUT_V2_TEXTAREA),
                     "placeholder": "Deixe em branco para gerar automaticamente a partir do destino.",
                 },
             ),
             "coordenacao": forms.Textarea(
                 attrs={
                     "rows": 4,
-                    **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
+                    **widget_attrs(WidgetStyle.INPUT_V2_TEXTAREA),
                     "placeholder": "Deixe em branco para gerar automaticamente a partir dos coordenadores.",
                 },
             ),
@@ -543,7 +543,7 @@ class EfetivoPlanoForm(forms.ModelForm):
             ),
             "cargo": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT), "data-pt-efetivo-cargo": "true"}),
             "quantidade": forms.NumberInput(
-                attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "min": "1", "step": "1", "data-pt-efetivo-qtd": "true"},
+                attrs={**widget_attrs(WidgetStyle.INPUT_V2), "min": "1", "step": "1", "data-pt-efetivo-qtd": "true"},
             ),
         }
 
@@ -655,7 +655,7 @@ class EfetivoEventoForm(forms.ModelForm):
             ),
             "cargo": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT), "data-pt-efetivo-cargo": "true"}),
             "quantidade": forms.NumberInput(
-                attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "min": "1", "step": "1", "data-pt-efetivo-qtd": "true"},
+                attrs={**widget_attrs(WidgetStyle.INPUT_V2), "min": "1", "step": "1", "data-pt-efetivo-qtd": "true"},
             ),
         }
 

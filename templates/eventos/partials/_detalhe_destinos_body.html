@@ -1,0 +1,23 @@
+{% comment %}
+  Destinos do evento. O motor continua sob responsabilidade de
+  `eventos-detalhe.js`; por isso `managed=False` evita duas linhas por clique.
+  Os campos ocultos são o contrato persistido pelo formulário.
+{% endcomment %}
+<input type="hidden" name="destinos_json" id="id-destinos-json-d">
+<input type="hidden" name="destino_uf" value="{{ form.destino_uf.value|default:'' }}" data-location-state-output>
+<input type="hidden" name="destino_cidade" value="{{ form.destino_cidade.value|default:'' }}" data-location-city-output>
+
+<c-v2.destinations id="evento-wizard-destinos-d" template_id="tmpl-destino-extra-d" :managed="False">
+  <c-slot name="rows">
+    {% for linha in destino_rows %}
+      <c-v2.destination_row
+        :index="forloop.counter0"
+        :estado_selecionado="linha.estado_id"
+        :cidade_selecionada="linha.cidade_id"
+        :cidades="linha.cidades"
+        :city_disabled="linha.cidade_travada"
+        :removable="True"
+      />
+    {% endfor %}
+  </c-slot>
+</c-v2.destinations>

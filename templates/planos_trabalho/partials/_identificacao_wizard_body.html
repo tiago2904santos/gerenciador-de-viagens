@@ -7,14 +7,8 @@
   e quando, e por último os três textos do documento, que o
   `planos-trabalho-wizard.js` pré-preenche a partir dos anteriores.
 {% endcomment %}
-{% comment %}
-  Sem `split`: são DOIS campos lado a lado, e a coluna do cabeçalho do split tem
-  largura fixa de 200px com a descrição em uma linha só. "Programa que solicitou
-  a ação. Entra automaticamente na contextualização." não cabe ali — e a folha é
-  explícita em transbordar em vez de quebrar, para o desalinhamento entre blocos
-  não voltar em silêncio.
-{% endcomment %}
 <c-v2.form_block
+  :split="True"
   title="Programa solicitante"
   description="Programa que solicitou a ação. Entra automaticamente na contextualização."
 >

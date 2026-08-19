@@ -36,18 +36,23 @@ class IdentificacaoSplitLayoutTests(TestCase):
 
         ident_id = html.find(">Identificação<")
         motivo_id = html.find(">Motivo<")
-        dados_id = html.find(">Período e destinos<")
+        data_id = html.find(">Data do evento<")
+        destinos_id = html.find(">Destinos<", data_id)
         self.assertGreater(ident_id, -1, "bloco de identificação sumiu da etapa 1")
         self.assertGreater(motivo_id, ident_id)
-        self.assertGreater(dados_id, motivo_id)
+        self.assertGreater(data_id, motivo_id)
+        self.assertGreater(destinos_id, data_id)
 
         # A abertura da <section> do bloco vem antes do título dele.
         ident_start = html.rfind("<section", 0, ident_id)
         motivo_start = html.rfind("<section", 0, motivo_id)
-        dados_start = html.rfind("<section", 0, dados_id)
+        data_start = html.rfind("<section", 0, data_id)
+        destinos_start = html.rfind("<section", 0, destinos_id)
 
         ident_chunk = html[ident_start:motivo_start]
-        motivo_chunk = html[motivo_start:dados_start]
+        motivo_chunk = html[motivo_start:data_start]
+        data_chunk = html[data_start:destinos_start]
+        destinos_chunk = html[destinos_start:]
 
         self.assertIn("form-block--split", ident_chunk)
         self.assertIn('name="tipos"', ident_chunk)
@@ -57,3 +62,12 @@ class IdentificacaoSplitLayoutTests(TestCase):
         self.assertIn("modelo_motivo", motivo_chunk)
         self.assertIn('name="motivo"', motivo_chunk)
         self.assertNotIn('name="tipos"', motivo_chunk)
+
+        self.assertIn("form-block--split", data_chunk)
+        self.assertIn('name="data_inicio"', data_chunk)
+        self.assertIn('name="data_fim"', data_chunk)
+        self.assertNotIn("data-location-rows", data_chunk)
+
+        self.assertIn("form-block--split", destinos_chunk)
+        self.assertIn("data-location-rows", destinos_chunk)
+        self.assertIn('name="destinos_json"', destinos_chunk)

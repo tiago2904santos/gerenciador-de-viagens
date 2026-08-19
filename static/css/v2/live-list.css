@@ -12,24 +12,53 @@
   border-radius: var(--radius-field);
   display: grid;
   gap: var(--gap-tight);
+  max-height: 190px;
   min-width: 0;
+  overflow-y: auto;
   padding: var(--gap);
+  /* A mesma barra fina dos pickers, listboxes e áreas de texto do V2. */
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
 }
 
 /* Título e contagem na mesma linha, nas pontas: o número é a resposta curta, e
    ele fica onde o olho já para ao terminar de ler o título. */
 :is(html[data-theme]) .live-list__head {
   align-items: center;
-  display: flex;
+  display: grid;
   gap: var(--gap-tight);
-  justify-content: space-between;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 24px;
   min-width: 0;
 }
 
+:is(html[data-theme]) .live-list__head[hidden] {
+  display: none;
+}
+
 :is(html[data-theme]) .live-list__title {
+  align-items: center;
   color: var(--text-strong);
+  display: flex;
   font-size: var(--text-size-base);
   font-weight: var(--weight-strong);
+  line-height: 1.2;
+  min-height: 24px;
+}
+
+:is(html[data-theme]) .live-list__title[hidden] {
+  display: none;
+}
+
+:is(html[data-theme]) .live-list__count {
+  align-items: center;
+  display: flex;
+  min-height: 24px;
+}
+
+:is(html[data-theme]) .live-list__count[hidden] {
+  display: none;
 }
 
 :is(html[data-theme]) .live-list__items {

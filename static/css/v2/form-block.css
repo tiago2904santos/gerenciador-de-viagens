@@ -50,12 +50,34 @@
    páginas de catálogo carregam um perfil enxuto que conhece `.field-grid`, mas
    não seus modificadores de coluna; sem esta regra `--cols-2` virava uma grade
    de uma coluna justamente no desktop. */
-:is(html[data-theme]) .form-block--v2 .field-grid--cols-2 {
+:is(html[data-theme]) .form-block--v2 .field-grid--cols-2,
+:is(html[data-theme]) .form-block--v2 .field-grid--cols-3,
+:is(html[data-theme]) .form-block--v2 .field-grid--cols-4 {
   display: grid;
   gap: var(--gap);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   min-width: 0;
   width: 100%;
+}
+
+:is(html[data-theme]) .form-block--v2 .field-grid--cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+:is(html[data-theme]) .form-block--v2 .field-grid--cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+:is(html[data-theme]) .form-block--v2 .field-grid--cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+:is(html[data-theme]) .form-block--v2 .field-grid--cols-4[hidden] {
+  display: none;
+}
+
+:is(html[data-theme]) .form-block--v2 .field-grid__span-2 {
+  grid-column: span 2;
+  min-width: 0;
 }
 
 /* Corpo com TODOS os filhos ocultos não reserva trilha na grade. O bloco é
@@ -117,10 +139,24 @@
   :is(html[data-theme]) .form-block--v2.form-block--split {
     grid-template-columns: minmax(0, 1fr);
   }
+
+  :is(html[data-theme]) .form-block--v2 .field-grid--cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :is(html[data-theme]) .form-block--v2 .field-grid--cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 600px) {
-  :is(html[data-theme]) .form-block--v2 .field-grid--cols-2 {
+  :is(html[data-theme]) .form-block--v2 .field-grid--cols-2,
+  :is(html[data-theme]) .form-block--v2 .field-grid--cols-3,
+  :is(html[data-theme]) .form-block--v2 .field-grid--cols-4 {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  :is(html[data-theme]) .form-block--v2 .field-grid__span-2 {
+    grid-column: auto;
   }
 }

@@ -1,4 +1,5 @@
 {% cotton:vars aria_label extra_class steps %}
+{% load icones %}
 {% comment %}
   Stepper v2 — as etapas de um wizard. Par de `static/css/v2/stepper.css`.
 
@@ -20,7 +21,12 @@
           não só a palavra. Sem `url`, os mesmos elementos, sem envelope.
         {% endcomment %}
         {% if step.url %}<a class="stepper__link" href="{{ step.url }}">{% endif %}
-          <span class="stepper__marker" aria-hidden="true">{{ forloop.counter }}</span>
+          {% comment %}
+            Concluída mostra um CHECK, não o número: a posição importa enquanto
+            se caminha para a etapa; depois de feita, o que se procura na
+            fileira é o que já está resolvido.
+          {% endcomment %}
+          <span class="stepper__marker" aria-hidden="true">{% if step.state == "done" %}{% icone_svg "check" %}{% else %}{{ forloop.counter }}{% endif %}</span>
           <span class="stepper__copy">
             <strong class="stepper__label">{{ step.label }}</strong>
             {% if step.status %}<small class="stepper__status">{{ step.status }}</small>{% endif %}

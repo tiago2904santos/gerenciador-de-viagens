@@ -12,16 +12,16 @@
 
 <div class="efetivo-rows" aria-label="Efetivos adicionados" data-pt-efetivo-rows>
   {% for efetivo_form in formset %}
-    {% with removivel=forloop.first|yesno:",1" %}
-      {% if forloop.first and formset|length == 1 %}
-        <c-v2.efetivo_row :form="efetivo_form" :ordinal="forloop.counter" :cargos_url="cargos_url" :removable="False" />
-      {% else %}
-        <c-v2.efetivo_row :form="efetivo_form" :ordinal="forloop.counter" :cargos_url="cargos_url" :removable="True" />
-      {% endif %}
-    {% endwith %}
+    {% if forloop.first and formset|length == 1 %}
+      <c-v2.efetivo_row :form="efetivo_form" :ordinal="forloop.counter" :cargos_url="cargos_url" :removable="False" :show_labels="True" />
+    {% elif forloop.first %}
+      <c-v2.efetivo_row :form="efetivo_form" :ordinal="forloop.counter" :cargos_url="cargos_url" :removable="True" :show_labels="True" />
+    {% else %}
+      <c-v2.efetivo_row :form="efetivo_form" :ordinal="forloop.counter" :cargos_url="cargos_url" :removable="True" :show_labels="False" />
+    {% endif %}
   {% endfor %}
 </div>
 
 <template data-pt-efetivo-template>
-  <c-v2.efetivo_row :form="formset.empty_form" :ordinal="1" :cargos_url="cargos_url" :removable="True" />
+  <c-v2.efetivo_row :form="formset.empty_form" :ordinal="1" :cargos_url="cargos_url" :removable="True" :show_labels="False" />
 </template>

@@ -1,4 +1,4 @@
-{% cotton:vars control error error_id errors extra_class help help_id label label_for size_class %}
+{% cotton:vars control error error_id errors extra_class help help_id hide_label label label_for size_class %}
 {% comment %}
   Field v2 — rótulo, controle, ajuda e erro. Par de `static/css/v2/field.css`.
 
@@ -8,7 +8,7 @@
   `size_class` preserva os modificadores de largura que vêm dos formulários.
 {% endcomment %}
 <div class="field{% if error or errors %} field--invalid{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}{% if size_class %} {{ size_class }}{% endif %}">
-  {% if label %}<label class="field__label"{% if label_for %} for="{{ label_for }}"{% endif %}>{{ label }}</label>{% endif %}
+  {% if label %}<label class="field__label{% if hide_label %} sr-only{% endif %}"{% if label_for %} for="{{ label_for }}"{% endif %}>{{ label }}</label>{% endif %}
   {{ control }}
   {% if help %}<div class="field__help"{% if help_id %} id="{{ help_id }}"{% endif %}>{{ help|safe }}</div>{% endif %}
   {% if errors %}<p class="field__error"{% if error_id %} id="{{ error_id }}"{% endif %} role="alert">{% for item in errors %}{% if not forloop.first %} {% endif %}{{ item }}{% endfor %}</p>{% elif error %}<p class="field__error"{% if error_id %} id="{{ error_id }}"{% endif %} role="alert">{{ error }}</p>{% endif %}

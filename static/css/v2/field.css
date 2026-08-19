@@ -105,23 +105,3 @@
   border-color: var(--accent);
   color: var(--text-on-accent);
 }
-
-/* Campo com atalho de gerenciar ao lado: o controle come a sobra e o link fica
-   do tamanho do texto. Em tela estreita ele desce para a linha de baixo em vez
-   de espremer o campo. */
-:is(html[data-theme]) .field__control-row {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap-tight);
-  min-width: 0;
-}
-
-:is(html[data-theme]) .field__control-row > :not(.field__manage) {
-  flex: 1 1 220px;
-  min-width: 0;
-}
-
-:is(html[data-theme]) .field__manage {
-  flex: none;
-}

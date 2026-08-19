@@ -25,6 +25,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from django.contrib.auth import get_user_model
+from django.template.loader import render_to_string
 from django.test import TestCase
 from django.urls import reverse
 
@@ -37,6 +38,7 @@ from .helpers import criar_plano_maringa
 ROOT = Path(__file__).resolve().parents[2]
 TEMPLATES = ROOT / "templates" / "planos_trabalho"
 SCRIPT = ROOT / "static" / "js" / "pages" / "planos-trabalho-wizard.js"
+LIVE_LIST_CSS = ROOT / "static" / "css" / "v2" / "live-list.css"
 
 
 class WizardV2Tests(TestCase):
@@ -91,6 +93,50 @@ class WizardV2Tests(TestCase):
                 html = self._html(nome)
                 self.assertNotIn("data-travel-document-wizard-step1", html)
                 self.assertNotIn("data-travel-document-wizard-documentos", html)
+
+    def test_o_resumo_de_evento_usa_o_card_de_lista_v2(self):
+        card = (TEMPLATES / "partials" / "_resumo_evento_record.html").read_text(
+            encoding="utf-8"
+        )
+        corpo = (TEMPLATES / "partials" / "_resumo_evento_body.html").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn('<c-v2.record box="panel"', card)
+        self.assertNotIn("<c-v2.panel", card)
+        self.assertEqual(corpo.count('extra_class="plan-event-summary__block"'), 3)
+        self.assertIn('aria_label="Coordenação do evento"', corpo)
+        self.assertIn('aria_label="Efetivo do evento"', corpo)
+        self.assertIn('aria_label="Diárias e atividades do evento"', corpo)
+
+        html = render_to_string(
+            "planos_trabalho/partials/resumo_evento_card.html",
+            {
+                "ev": {
+                    "ordem": 1,
+                    "programa": "PROGRAMA PARANÁ EM AÇÃO",
+                    "destino": "ANTONINA/PR",
+                    "data_evento_extenso": "17 a 23 de agosto de 2026",
+                    "horario": "09:00 até 17:00",
+                    "coordenador_op_presente": False,
+                    "efetivo_total": 0,
+                    "efetivo_itens": [],
+                    "valor_total_display": "—",
+                    "diarias_composicao": "—",
+                    "atividades_count": 0,
+                    "atividades": [],
+                },
+                "numero": "32/2026/ASCOM",
+                "coordenador_adm_nome": "—",
+                "coordenador_adm_cargo": "",
+                "is_multi": True,
+                "total_eventos": 1,
+                "mostrar_acoes": False,
+            },
+        )
+        self.assertIn('class="record panel plan-event-summary"', html)
+        self.assertIn("Nº 32/2026/ASCOM · ANTONINA/PR", html)
+        self.assertEqual(html.count("plan-event-summary__block"), 3)
 
     # ---- etapa 1 ---------------------------------------------------------
 
@@ -158,6 +204,69 @@ class WizardV2Tests(TestCase):
         self.assertIn("data-cv-date-picker-start-value", html)
         self.assertIn("data-cv-date-picker-end-value", html)
 
+    def test_selects_com_gerenciamento_usam_o_componente_global(self):
+        html = self._html("planos_trabalho:wizard_identificacao")
+
+        self.assertEqual(html.count('data-entity-picker-renderer="select"'), 6)
+        self.assertNotIn('class="field__manage"', html)
+        self.assertIn('aria-label="Gerenciar programas"', html)
+        self.assertEqual(html.count('aria-label="Gerenciar cargos"'), 2)
+        self.assertIn('aria-label="Gerenciar horários"', html)
+        for field_id in ("id_coordenador_adm_genero", "id_coordenador_op_genero"):
+            inicio = html.index(f'id="{field_id}"')
+            wrapper = html.rfind('data-entity-picker-renderer="select"', 0, inicio)
+            self.assertGreater(wrapper, html.rfind("<div class=\"field\"", 0, inicio))
+        self.assertIn(
+            "cadastros/cargos/?next=%2Fplanos-trabalho%2F",
+            html,
+        )
+
+    def test_programa_solicitante_usa_form_block_split(self):
+        html = self._html("planos_trabalho:wizard_identificacao")
+        titulo = html.index('<h2 class="form-block__title">Programa solicitante</h2>')
+        abertura = html.rfind("<section", 0, titulo)
+        section = html[abertura : html.index(">", abertura) + 1]
+
+        self.assertIn("form-block--split", section)
+
+    def test_periodo_do_evento_usa_form_block_split(self):
+        html = self._html("planos_trabalho:wizard_identificacao")
+        titulo = html.index('<h2 class="form-block__title">Período do evento</h2>')
+        abertura = html.rfind("<section", 0, titulo)
+        section = html[abertura : html.index(">", abertura) + 1]
+
+        self.assertIn("form-block--split", section)
+
+    def test_textos_da_identificacao_usam_o_textarea_global(self):
+        html = self._html("planos_trabalho:wizard_identificacao")
+
+        campos = {
+            "id_contextualizacao": "Breve contextualização",
+            "id_coordenacao": "Coordenação do evento",
+            "id_consideracao_final": "Considerações finais",
+        }
+        for field_id, rotulo in campos.items():
+            inicio = html.index(f'id="{field_id}"')
+            tag = html[html.rfind("<textarea", 0, inicio) : html.index(">", inicio) + 1]
+            self.assertIn('class="input__control input__control--textarea"', tag)
+            self.assertNotIn("cv-field__control", tag)
+            self.assertIn(
+                f'class="field__label sr-only" for="{field_id}">{rotulo}</label>',
+                html,
+            )
+
+        input_css = (ROOT / "static" / "css" / "v2" / "input.css").read_text(encoding="utf-8")
+        regra_textarea = input_css[input_css.index(".input__control--textarea {") :]
+        regra_textarea = regra_textarea[: regra_textarea.index("}")]
+        self.assertIn("scrollbar-color: var(--text-muted) transparent", regra_textarea)
+        self.assertIn("scrollbar-width: thin", regra_textarea)
+
+    def test_pickers_de_coordenador_nao_repetem_o_rotulo_nome(self):
+        html = self._html("planos_trabalho:wizard_identificacao")
+
+        self.assertEqual(html.count('class="field__label sr-only"'), 2)
+        self.assertNotIn('class="field__label">Nome</label>', html)
+
     # ---- etapa 2 ---------------------------------------------------------
 
     def test_a_linha_de_efetivo_mantem_os_ganchos_do_formset(self):
@@ -184,6 +293,39 @@ class WizardV2Tests(TestCase):
         self.assertIn('class="number-stepper"', html)
         self.assertIn(".number-stepper", SCRIPT.read_text(encoding="utf-8"))
 
+    def test_datas_e_horas_do_deslocamento_ocupam_a_mesma_linha(self):
+        fonte = (TEMPLATES / "partials" / "_diarias_body.html").read_text(encoding="utf-8")
+
+        self.assertIn('class="field-grid field-grid--cols-4"', fonte)
+        self.assertIn('extra_class="field-grid__span-2"', fonte)
+        self.assertNotIn(
+            'class="field-grid field-grid--cols-2">\n  <c-v2.form_field :field="diarias_form.saida_sede_hora"',
+            fonte,
+        )
+
+    def test_efetivo_usa_select_com_acao_e_input_globais(self):
+        html = self._html("planos_trabalho:wizard_efetivo_diarias")
+
+        self.assertGreaterEqual(html.count('data-entity-picker-renderer="select"'), 2)
+        self.assertGreaterEqual(html.count('aria-label="Gerenciar cargos"'), 2)
+        inicio = html.index('id="id_efetivo-0-quantidade"')
+        tag = html[html.rfind("<input", 0, inicio) : html.index(">", inicio) + 1]
+        self.assertIn('class="input__control"', tag)
+        self.assertNotIn("cv-field__control", tag)
+        self.assertIn(
+            "cadastros/cargos/?next=%2Fplanos-trabalho%2F",
+            html,
+        )
+
+    def test_so_a_primeira_linha_de_efetivo_exibe_os_rotulos(self):
+        html = self._html("planos_trabalho:wizard_efetivo_diarias")
+        script = SCRIPT.read_text(encoding="utf-8")
+
+        # A linha existente mostra os rótulos; o molde das próximas já nasce
+        # compacto e o motor recalcula o estado após inserção ou remoção.
+        self.assertEqual(html.count("efetivo-row--without-labels"), 1)
+        self.assertIn('classList.toggle("efetivo-row--without-labels", index > 0)', script)
+
     def test_o_resultado_das_diarias_tem_onde_receber_o_calculo(self):
         html = self._html("planos_trabalho:wizard_efetivo_diarias")
         for gancho in (
@@ -198,6 +340,22 @@ class WizardV2Tests(TestCase):
         ):
             with self.subTest(gancho=gancho):
                 self.assertIn(gancho, html)
+
+    def test_o_resumo_das_diarias_usa_tres_paineis_v2(self):
+        html = self._html("planos_trabalho:wizard_efetivo_diarias")
+
+        self.assertIn('class="document-summary fact-list pt-diarias-summary"', html)
+        self.assertEqual(html.count("pt-diarias-summary__panel"), 3)
+        self.assertIn("Quantidade de diárias", html)
+        self.assertNotIn("Composição por servidor", html)
+
+    def test_o_aviso_das_diarias_fica_antes_do_resumo_financeiro(self):
+        html = self._html("planos_trabalho:wizard_efetivo_diarias")
+
+        self.assertLess(
+            html.index("data-pt-diarias-erros"),
+            html.index("data-pt-diarias-resultado"),
+        )
 
     def test_a_nota_de_cada_fato_de_diarias_existe_mesmo_sem_calculo(self):
         """A tela abre SEM cálculo, e é aí que o script mais precisa de onde escrever.
@@ -281,11 +439,43 @@ class WizardV2Tests(TestCase):
                 self.assertIn(gancho, html, f"{gancho} sumiu da tela")
                 self.assertIn(gancho, script, f"{gancho} não é mais procurado pelo script")
 
+    def test_a_barra_de_atividades_separa_busca_e_preset_com_acao(self):
+        html = self._html("planos_trabalho:wizard_atividades")
+
+        inicio = html.index("choice-grid__toolbar-start")
+        fim = html.index("choice-grid__toolbar-end")
+        self.assertLess(inicio, fim)
+        self.assertLess(html.index('id="pt-atividade-search"', inicio), fim)
+        self.assertLess(html.index("data-pt-activity-clear", inicio), fim)
+        self.assertIn('id="pt-atividade-preset"', html[fim:])
+        self.assertIn("field-with-action", html[fim:])
+        self.assertIn("Gerenciar presets", html[fim:])
+
+    def test_a_grade_de_atividades_tem_duas_colunas(self):
+        html = self._html("planos_trabalho:wizard_atividades")
+
+        self.assertIn('class="choice-grid"', html)
+        self.assertNotIn("choice-grid--dense", html)
+
     def test_o_texto_de_busca_de_cada_atividade_e_o_que_o_script_le(self):
         """O cartão de escolha do v2 publica o texto em `data-choice-filter`."""
         html = self._html("planos_trabalho:wizard_atividades")
         self.assertIn("data-choice-filter=", html)
         self.assertIn("choiceFilter", SCRIPT.read_text(encoding="utf-8"))
+
+    def test_metas_e_recursos_usam_o_mesmo_cabecalho_alinhado(self):
+        html = self._html("planos_trabalho:wizard_atividades")
+
+        self.assertEqual(html.count('class="live-list__head"'), 2)
+        self.assertEqual(html.count('class="live-list__count"'), 2)
+
+    def test_metas_e_recursos_possuem_teto_e_rolagem_v2(self):
+        css = LIVE_LIST_CSS.read_text(encoding="utf-8")
+
+        self.assertIn("max-height: 190px", css)
+        self.assertIn("overflow-y: auto", css)
+        self.assertIn("scrollbar-color: var(--text-muted) transparent", css)
+        self.assertIn("scrollbar-width: thin", css)
 
     # ---- rodapés ---------------------------------------------------------
 

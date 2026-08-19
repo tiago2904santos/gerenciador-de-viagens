@@ -365,7 +365,6 @@ class EventoForm(forms.ModelForm):
 class TipoEventoForm(forms.ModelForm):
     nome = forms.CharField(
         label="Nome",
-        help_text="Ex.: PCPR na Comunidade, Justiça no Bairro.",
         widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     class Meta:

@@ -483,6 +483,7 @@
     visibleRows.forEach(function (row, index) {
       var ord = row.querySelector("[data-pt-efetivo-ord]");
       if (ord) ord.textContent = String(index + 1);
+      row.classList.toggle("efetivo-row--without-labels", index > 0);
       var removeBtn = row.querySelector("[data-pt-efetivo-remove]");
       if (!removeBtn) return;
       removeBtn.hidden = visibleRows.length <= 1 && index === 0;

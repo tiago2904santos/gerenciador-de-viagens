@@ -1,0 +1,15 @@
+{% comment %}
+  A peça visual é o `record` de lista em modo painel: identificação compacta
+  no cabeçalho, três assuntos no miolo e ações no fechamento do card.
+{% endcomment %}
+{% with titulo_prefixo="Nº "|add:numero|add:" · " data_extenso=ev.data_evento_extenso|upper %}
+  {% with card_title=titulo_prefixo|add:ev.destino meta_periodo=data_extenso|add:" · "|add:ev.horario|add:" · " %}
+    {% with card_meta=meta_periodo|add:ev.programa %}
+      <c-v2.record box="panel" :eyebrow="card_eyebrow" :title="card_title" extra_class="plan-event-summary">
+        <c-slot name="meta">{{ card_meta }}</c-slot>
+        <c-slot name="body">{% include "planos_trabalho/partials/_resumo_evento_body.html" with coordenador_adm_cargo=coordenador_adm_cargo coordenador_adm_nome=coordenador_adm_nome ev=ev only %}</c-slot>
+        <c-slot name="actions">{% include "planos_trabalho/partials/_resumo_evento_header_actions.html" with ev=ev mostrar_acoes=mostrar_acoes only %}</c-slot>
+      </c-v2.record>
+    {% endwith %}
+  {% endwith %}
+{% endwith %}

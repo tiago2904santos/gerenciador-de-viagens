@@ -9,6 +9,8 @@ from core.autosave import AutosavePayloadError
 from core.autosave import autosave_json_response
 from core.autosave import filter_allowed_fields
 from core.autosave import parse_autosave_payload
+from core.retorno import com_next
+from core.retorno import daqui
 from .forms import PlanoIdentificacaoForm
 from .models import PlanoTrabalho
 from .identificacao_services import flags_automaticas
@@ -114,7 +116,7 @@ def _texto_auto_flag(form, plano, post_name, attr):
     return getattr(plano, attr)
 
 
-def _identificacao_context(*, form, plano):
+def _identificacao_context(*, form, plano, request):
     eventos_commitados = eventos_para_cards(plano)
     eventos_resumo = [apresentar_resumo_evento_card(e) for e in eventos_commitados]
     return {
@@ -124,7 +126,7 @@ def _identificacao_context(*, form, plano):
         "api_cidades_por_estado_url": reverse("roteiros:api_cidades_por_estado", kwargs={"estado_id": 0}),
         "evento_selected_dates_json": _evento_selected_dates_json(form),
         "evento_display": _evento_display_values(form),
-        "cargos_url": reverse("cadastros:cargos_index"),
+        "cargos_url": com_next(reverse("cadastros:cargos_index"), daqui(request)),
         "programas_url": reverse("planos_trabalho:programas_index"),
         "horarios_url": reverse("planos_trabalho:horarios_index"),
         "wizard_autosave_url": reverse("planos_trabalho:identificacao_autosave", args=[plano.pk]),
@@ -173,7 +175,7 @@ def wizard_identificacao(request, pk):
     return render(
         request,
         "planos_trabalho/wizard_identificacao.html",
-        _identificacao_context(form=form, plano=plano),
+        _identificacao_context(form=form, plano=plano, request=request),
     )
 
 

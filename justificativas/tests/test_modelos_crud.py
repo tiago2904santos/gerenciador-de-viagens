@@ -32,6 +32,10 @@ class ModelosJustificativaCrudTests(TestCase):
         self.assertContains(r, "Novo modelo")
         self.assertContains(r, 'name="nome"')
         self.assertContains(r, 'name="texto"')
+        self.assertNotContains(r, "Dados do modelo")
+        self.assertNotContains(r, "Nome e texto da justificativa")
+        self.assertNotContains(r, "quick-add__section-copy")
+        self.assertNotContains(r, "<legend")
         # `floating-action` era a classe do botão flutuante legado. A tela
         # migrou para o v2 em 2026-08-18 e a ação flutuante agora é
         # `list-page__action`; o que este teste protege — existe caminho de

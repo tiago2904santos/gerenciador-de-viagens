@@ -69,6 +69,15 @@ def _contexto_next(back_label: str):
     return montar
 
 
+def _contexto_cargos(_request, next_url: str) -> dict:
+    retorno_ao_servidor = next_url.startswith("/cadastros/servidores/")
+    return {
+        "back_url": next_url or None,
+        "back_label": "Voltar ao servidor" if retorno_ao_servidor else "Voltar ao formulário",
+        "next_url": next_url,
+    }
+
+
 ESTADOS = CatalogConfig(
     listar=listar_estados,
     get_by_id=get_estado_by_id,
@@ -216,7 +225,7 @@ unidades_index = index_view(
 unidade_update = edit_view(UNIDADES)
 unidade_delete = delete_view(UNIDADES)
 
-cargos_index = index_view(CARGOS, contexto_extra=_contexto_next("Voltar ao servidor"))
+cargos_index = index_view(CARGOS, contexto_extra=_contexto_cargos)
 cargo_update = edit_view(CARGOS)
 cargo_delete = delete_view(CARGOS)
 cargo_set_default = set_default_view(CARGOS)

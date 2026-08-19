@@ -25,7 +25,6 @@ class GlobalPeriodDestinationsSectionTests(SimpleTestCase):
     def test_operational_travel_forms_compose_only_v2(self):
         templates_root = Path(settings.BASE_DIR) / "templates"
         consumers = (
-            "eventos/partials/_detalhe_dados_body.html",
             "termos/partials/_termo_form_body.html",
             "ordens_servico/partials/_os_form_body.html",
             "planos_trabalho/partials/_identificacao_evento_body.html",
@@ -38,3 +37,14 @@ class GlobalPeriodDestinationsSectionTests(SimpleTestCase):
                 self.assertIn("<c-v2.destinations", source)
                 self.assertNotIn("<c-travel.", source)
                 self.assertNotIn("<c-ui.forms.date_picker", source)
+
+        evento_periodo = (
+            templates_root / "eventos/partials/_detalhe_periodo_body.html"
+        ).read_text(encoding="utf-8")
+        evento_destinos = (
+            templates_root / "eventos/partials/_detalhe_destinos_body.html"
+        ).read_text(encoding="utf-8")
+        self.assertIn("<c-v2.date_picker", evento_periodo)
+        self.assertNotIn("<c-v2.destinations", evento_periodo)
+        self.assertIn("<c-v2.destinations", evento_destinos)
+        self.assertNotIn("<c-v2.date_picker", evento_destinos)

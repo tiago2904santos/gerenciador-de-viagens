@@ -69,13 +69,15 @@
  * propriedades precisam estar na transição DAQUI — o JS só troca os valores.
  */
 :is(html[data-theme]) .notice-stack,
-:is(html[data-theme]) .alerts {
+:is(html[data-theme]) .alerts,
+:is(html[data-theme]) .alert-stack {
   margin-bottom: var(--gap);
   padding-bottom: var(--gap-tight);
 }
 
 :is(html[data-theme]) .notice-stack .notice,
-:is(html[data-theme]) .alerts .alert {
+:is(html[data-theme]) .alerts .alert,
+:is(html[data-theme]) .alert-stack .alert {
   transition:
     height var(--ease),
     margin var(--ease),
@@ -91,7 +93,8 @@
    isso. A remoção continua acontecendo no JS. */
 @media (prefers-reduced-motion: reduce) {
   :is(html[data-theme]) .notice-stack .notice,
-  :is(html[data-theme]) .alerts .alert {
+  :is(html[data-theme]) .alerts .alert,
+  :is(html[data-theme]) .alert-stack .alert {
     transition: none;
   }
 }

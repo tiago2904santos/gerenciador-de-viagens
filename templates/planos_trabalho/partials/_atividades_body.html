@@ -18,30 +18,37 @@
 {% if atividades_catalogo %}
   <div data-pt-activity>
     <c-v2.choice_grid
-      :dense="True"
       aria_label="Atividades disponíveis"
       empty_message="Nenhuma atividade encontrada para a busca informada."
       empty_hook="data-pt-activity-empty"
     >
       <c-slot name="toolbar">
-        <c-v2.select
-          select_id="pt-atividade-preset"
-          hook="data-pt-activity-preset"
-          name="pt_atividade_preset"
-          :options="atividades_presets_options"
-          :value="atividades_preset_padrao_id"
-          aria_label="Preset de atividades"
-        />
-        <c-v2.button label="Gerenciar presets" :href="presets_manager_url" :autosave_link="True" />
-        <c-v2.input
-          type="search"
-          icon="search"
-          input_id="pt-atividade-search"
-          hook="data-pt-activity-search"
-          placeholder="Filtrar atividades por nome"
-          aria_label="Filtrar atividades"
-        />
-        <c-v2.button label="Limpar seleção" icon="x" hook="data-pt-activity-clear" />
+        <div class="choice-grid__toolbar-start">
+          <c-v2.input
+            type="search"
+            icon="search"
+            input_id="pt-atividade-search"
+            hook="data-pt-activity-search"
+            placeholder="Filtrar atividades por nome"
+            aria_label="Filtrar atividades"
+          />
+          <c-v2.button label="Limpar seleção" icon="x" hook="data-pt-activity-clear" />
+        </div>
+        <div class="choice-grid__toolbar-end">
+          <c-v2.select_with_action
+            select_id="pt-atividade-preset"
+            hook="data-pt-activity-preset"
+            name="pt_atividade_preset"
+            :options="atividades_presets_options"
+            :value="atividades_preset_padrao_id"
+            aria_label="Preset de atividades"
+            :action_href="presets_manager_url"
+            action_icon="settings"
+            action_aria_label="Gerenciar presets"
+            action_tooltip="Gerenciar presets"
+            :action_autosave="True"
+          />
+        </div>
       </c-slot>
       <c-slot name="body">
         {% for atividade in atividades_catalogo %}

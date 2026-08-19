@@ -1,4 +1,4 @@
-{% cotton:vars action_aria_label action_autosave action_href action_icon action_tooltip aria_label extra_class field name options value %}
+{% cotton:vars action_aria_label action_autosave action_href action_icon action_tooltip aria_label extra_class field hook name options select_id value %}
 {% comment %}
   Select com uma ação secundária ao lado — escolher um modelo e ir gerenciá-los,
   escolher uma unidade e ir cadastrá-las.
@@ -27,7 +27,12 @@
     {% if field %}
       {{ field }}
     {% else %}
-      <select name="{{ name }}" aria-label="{{ aria_label }}">
+      <select
+        name="{{ name }}"
+        aria-label="{{ aria_label }}"
+        {% if select_id %}id="{{ select_id }}"{% endif %}
+        {% if hook %}{{ hook }}{% endif %}
+      >
         {% for opt in options %}
           <option value="{{ opt.value }}"{% if opt.value == value %} selected{% endif %}>{{ opt.label }}</option>
         {% endfor %}

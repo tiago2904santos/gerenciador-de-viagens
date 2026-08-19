@@ -2,9 +2,8 @@
   Etapa 1 do painel do evento: o que o evento É (tipo e motivo), QUANDO e ONDE
   acontece, e QUAIS documentos já existentes pertencem a ele.
 
-  Quatro blocos na ordem em que se preenche. Identificação usa `split` porque
-  tem um campo só — o cabeçalho à esquerda e o campo à direita evitam uma faixa
-  inteira para uma linha.
+  Cinco blocos na ordem em que se preenche. Identificação, data e destinos usam
+  o modelo `split`: o cabeçalho fica à esquerda e os controles à direita.
 {% endcomment %}
 <c-v2.form_block :split="True" title="Identificação" description="Escolha o tipo desta atividade.">
   <c-slot name="body">
@@ -18,9 +17,15 @@
   </c-slot>
 </c-v2.form_block>
 
-<c-v2.form_block title="Período e destinos" description="Datas da atividade e locais na ordem da visita.">
+<c-v2.form_block :split="True" title="Data do evento" description="Defina o início e o fim da atividade.">
   <c-slot name="body">
-    {% include "eventos/partials/_detalhe_dados_body.html" with form=form destino_rows=destino_rows only %}
+    {% include "eventos/partials/_detalhe_periodo_body.html" with form=form only %}
+  </c-slot>
+</c-v2.form_block>
+
+<c-v2.form_block :split="True" title="Destinos" description="Locais na ordem da visita.">
+  <c-slot name="body">
+    {% include "eventos/partials/_detalhe_destinos_body.html" with form=form destino_rows=destino_rows only %}
   </c-slot>
 </c-v2.form_block>
 

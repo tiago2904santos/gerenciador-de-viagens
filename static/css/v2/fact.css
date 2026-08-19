@@ -345,3 +345,27 @@
   margin-top: var(--gap-tight);
   min-width: 0;
 }
+
+/* Resumo do roteiro: três assuntos, três colunas. Cada coluna usa o mesmo
+   form-block dos demais resumos da etapa; a grade apenas define a relação
+   espacial entre trechos, valor e composição das diárias. */
+:is(html[data-theme]) .route-summary {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-width: 0;
+}
+
+:is(html[data-theme]) .route-summary__column {
+  min-width: 0;
+}
+
+:is(html[data-theme]) .route-summary__column--details .fact-list {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (max-width: 900px) {
+  :is(html[data-theme]) .route-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

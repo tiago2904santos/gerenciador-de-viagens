@@ -30,6 +30,7 @@
         <span class="file-list__actions">
           <c-v2.icon_button
             icon="eye"
+            extra_class="file-list__action"
             :href="anexo.url"
             target="_blank"
             aria_label="Visualizar arquivo"
@@ -37,7 +38,7 @@
           />
           <form method="post" action="{{ anexo.delete_url }}" class="file-list__form" data-confirm-submit data-confirm-message="Excluir este arquivo? A ação não pode ser desfeita.">
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-            <c-v2.icon_button icon="trash" type="submit" tone="danger" aria_label="Excluir arquivo" tooltip="Excluir" />
+            <c-v2.icon_button icon="trash" type="submit" tone="danger" extra_class="file-list__action" aria_label="Excluir arquivo" tooltip="Excluir" />
           </form>
         </span>
       </li>

@@ -559,6 +559,11 @@
     });
 
     function renderList(filterText) {
+      /* Selecionar um ofício reconstrói os cartões para atualizar o estado
+         ativo. Ao esvaziar uma lista rolada, o navegador limita `scrollTop` a
+         zero antes de os cartões voltarem e o usuário é jogado para o início.
+         Preserve a posição da própria lista durante essa troca de estado. */
+      var previousScrollTop = list.scrollTop;
       var emptyEl = form.querySelector("#os-oficio-lista-empty");
       var term = window.CV.util.normalize(filterText);
       var tokens = term.split(/\s+/).filter(Boolean);
@@ -589,6 +594,7 @@
         });
         list.appendChild(button);
       });
+      list.scrollTop = previousScrollTop;
     }
 
     form._osRenderOficioList = renderList;

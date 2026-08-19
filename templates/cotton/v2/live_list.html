@@ -21,7 +21,7 @@
 <section class="live-list{% if extra_class %} {{ extra_class }}{% endif %}">
   <header class="live-list__head">
     <span class="live-list__title">{{ title }}</span>
-    <span {% if count_hook %}{{ count_hook }}{% endif %}>
+    <span class="live-list__count" {% if count_hook %}{{ count_hook }}{% endif %}>
       <c-v2.chip :label="count" :tone="count_tone" />
     </span>
   </header>

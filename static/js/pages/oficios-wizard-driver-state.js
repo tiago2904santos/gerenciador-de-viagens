@@ -17,6 +17,7 @@
   var MOTORISTA_SEL  = 'select[name="motorista"]';
   var MODO_SEL       = 'input[name="motorista_modo"]';
   var EXTERNAL_CARD  = '[data-oficio-driver-external-card]';
+  var EXTRAS_PANEL   = '[data-oficio-motorista-extras]';
   var PANEL_SERVIDOR = '[data-oficio-motorista-servidor]';
   var PANEL_MANUAL   = '[data-oficio-motorista-manual]';
   var MODO_BTN       = '[data-oficio-motorista-modo-btn]';
@@ -42,6 +43,12 @@
     if (!panel) return;
     /* Inline style garante precedência sobre qualquer regra CSS */
     panel.style.display = visible ? '' : 'none';
+    panel.setAttribute('aria-hidden', visible ? 'false' : 'true');
+  }
+
+  function setExtrasVisible(panel, visible) {
+    if (!panel) return;
+    panel.hidden = !visible;
     panel.setAttribute('aria-hidden', visible ? 'false' : 'true');
   }
 
@@ -184,6 +191,7 @@
     var show = hasViatura(root) && !isDriverActive(root);
     var card  = root.querySelector(EXTERNAL_CARD);
     setCardVisible(card, show);
+    setExtrasVisible(card && card.querySelector(EXTRAS_PANEL), show);
 
     if (driverValue) {
       clearManualMotorista(card);

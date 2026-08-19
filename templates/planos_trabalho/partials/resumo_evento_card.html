@@ -1,42 +1,22 @@
 {% comment %}
-Card de resumo de um evento — usado na etapa 4 (resumo/documentos) e na etapa 1
-(eventos já salvos, multi-evento). Mesmo visual nos dois lugares.
-
-É um `c-v2.panel`: o resumo é uma SEÇÃO da página, na primeira camada, e o que
-vive dentro dele são fatos, não um formulário.
-
-Espera:
-  ev                     : dict do evento (apresentar_resumo_evento_card / _resumo_evento_de_plano)
-  numero                 : número do plano
-  coordenador_adm_nome   : nome do coordenador administrativo (nível plano)
-  coordenador_adm_cargo  : cargo do coordenador administrativo
-  is_multi               : bool — plano multi-evento
-  total_eventos          : total de eventos (subtítulo em multi)
-  mostrar_acoes          : bool — exibe editar/remover (usa ev.editar_url / ev.excluir_url)
+  Resumo de evento organizado como o card de lista V2. Este parcial apenas
+  resolve a identificação ordinal; título, metadados, miolo e ações ficam no
+  record compartilhado abaixo.
 {% endcomment %}
-{% if is_multi %}
-  {% with ordem=ev.ordem|stringformat:"s" %}
+{% with ordem=ev.ordem|stringformat:"s" %}
+  {% if is_multi %}
     {% if total_eventos %}
       {% with total=total_eventos|stringformat:"s" %}
-        {% with card_subtitle="Evento "|add:ordem|add:" de "|add:total|add:" · "|add:ev.programa card_label="Resumo do evento "|add:ordem %}
-          <c-v2.panel :title="card_label" :description="card_subtitle">
-            <c-slot name="actions">{% include "planos_trabalho/partials/_resumo_evento_header_actions.html" with ev=ev mostrar_acoes=mostrar_acoes only %}</c-slot>
-            <c-slot name="body">{% include "planos_trabalho/partials/_resumo_evento_body.html" with coordenador_adm_cargo=coordenador_adm_cargo coordenador_adm_nome=coordenador_adm_nome ev=ev numero=numero only %}</c-slot>
-          </c-v2.panel>
+        {% with card_eyebrow="Evento "|add:ordem|add:" de "|add:total %}
+          {% include "planos_trabalho/partials/_resumo_evento_record.html" with card_eyebrow=card_eyebrow coordenador_adm_cargo=coordenador_adm_cargo coordenador_adm_nome=coordenador_adm_nome ev=ev mostrar_acoes=mostrar_acoes numero=numero only %}
         {% endwith %}
       {% endwith %}
     {% else %}
-      {% with card_subtitle="Evento "|add:ordem|add:" · "|add:ev.programa card_label="Resumo do evento "|add:ordem %}
-        <c-v2.panel :title="card_label" :description="card_subtitle">
-          <c-slot name="actions">{% include "planos_trabalho/partials/_resumo_evento_header_actions.html" with ev=ev mostrar_acoes=mostrar_acoes only %}</c-slot>
-          <c-slot name="body">{% include "planos_trabalho/partials/_resumo_evento_body.html" with coordenador_adm_cargo=coordenador_adm_cargo coordenador_adm_nome=coordenador_adm_nome ev=ev numero=numero only %}</c-slot>
-        </c-v2.panel>
+      {% with card_eyebrow="Evento "|add:ordem %}
+        {% include "planos_trabalho/partials/_resumo_evento_record.html" with card_eyebrow=card_eyebrow coordenador_adm_cargo=coordenador_adm_cargo coordenador_adm_nome=coordenador_adm_nome ev=ev mostrar_acoes=mostrar_acoes numero=numero only %}
       {% endwith %}
     {% endif %}
-  {% endwith %}
-{% else %}
-  <c-v2.panel title="Resumo do plano" description="Dados utilizados para montar o documento.">
-    <c-slot name="actions">{% include "planos_trabalho/partials/_resumo_evento_header_actions.html" with ev=ev mostrar_acoes=mostrar_acoes only %}</c-slot>
-    <c-slot name="body">{% include "planos_trabalho/partials/_resumo_evento_body.html" with coordenador_adm_cargo=coordenador_adm_cargo coordenador_adm_nome=coordenador_adm_nome ev=ev numero=numero only %}</c-slot>
-  </c-v2.panel>
-{% endif %}
+  {% else %}
+    {% include "planos_trabalho/partials/_resumo_evento_record.html" with card_eyebrow="Resumo do plano" coordenador_adm_cargo=coordenador_adm_cargo coordenador_adm_nome=coordenador_adm_nome ev=ev mostrar_acoes=mostrar_acoes numero=numero only %}
+  {% endif %}
+{% endwith %}

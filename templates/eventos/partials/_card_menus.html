@@ -15,63 +15,67 @@ O presenter é o mesmo da lista, chamado com `menus_sob_demanda=False`.
 {% for menu in card.footer.danger_menus %}<c-v2.menu_body :menu="menu" :csrf_token="csrf_token" only />{% endfor %}
 {% for oficio in card.oficios %}
 <div
-              class="action-menu action-menu--rich action-menu--documents"
+              class="menu action-menu"
               id="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
+              data-menu-v2
+              data-overlay-panel
               role="menu"
               hidden
             >
               {% if oficio.protocolo %}
               {% else %}
               {% endif %}
-              <c-v2.menu_item :href="oficio.visualizar_url" title="Visualizar ofício" description="Abrir o documento no navegador" icon="eye" tone="preview" :target_blank="True" only />
+              <c-v2.menu_item :href="oficio.visualizar_url" title="Visualizar ofício" description="Abrir o documento no navegador" icon="eye" icon_tone="preview" :target_blank="True" only />
               {% if oficio.justificativa_pdf_url %}
-                <c-v2.menu_item :href="oficio.pdf_url" title="Baixar PDF" description="Inclui também a justificativa" icon="pdf" tone="pdf" :download="True" :extra_download_url="oficio.justificativa_pdf_url" only />
+                <c-v2.menu_item :href="oficio.pdf_url" title="Baixar PDF" description="Inclui também a justificativa" icon="pdf" icon_tone="pdf" :download="True" :extra_download_url="oficio.justificativa_pdf_url" only />
               {% else %}
-                <c-v2.menu_item :href="oficio.pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" :download="True" only />
+                <c-v2.menu_item :href="oficio.pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" icon_tone="pdf" :download="True" only />
               {% endif %}
-              <c-v2.menu_item :href="oficio.docx_url" title="Baixar DOCX" description="Arquivo editável do ofício" icon="docx" tone="docx" :download="True" only />
-              <c-v2.menu_item :href="oficio.editar_url" title="Editar ofício" description="Abrir o cadastro para alterações" icon="edit" tone="edit" only />
+              <c-v2.menu_item :href="oficio.docx_url" title="Baixar DOCX" description="Arquivo editável do ofício" icon="docx" icon_tone="docx" :download="True" only />
+              <c-v2.menu_item :href="oficio.editar_url" title="Editar ofício" description="Abrir o cadastro para alterações" icon="edit" icon_tone="edit" only />
             </div>
 {% endfor %}
 {% for doc in card.documentos %}
 <div
-              class="action-menu action-menu--rich action-menu--documents"
+              class="menu action-menu"
               id="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
+              data-menu-v2
+              data-overlay-panel
               role="menu"
               hidden
             >
               {% if doc.visualizar_url %}
-                <c-v2.menu_item :href="doc.visualizar_url" title="Visualizar documento" description="Abrir o arquivo no navegador" icon="eye" tone="preview" :target_blank="True" only />
+                <c-v2.menu_item :href="doc.visualizar_url" title="Visualizar documento" description="Abrir o arquivo no navegador" icon="eye" icon_tone="preview" :target_blank="True" only />
               {% endif %}
               {% if doc.pdf_url %}
-                <c-v2.menu_item :href="doc.pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" :download="True" only />
+                <c-v2.menu_item :href="doc.pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" icon_tone="pdf" :download="True" only />
               {% endif %}
               {% if doc.docx_url %}
-                <c-v2.menu_item :href="doc.docx_url" title="Baixar DOCX" description="Arquivo editável do documento" icon="docx" tone="docx" :download="True" only />
+                <c-v2.menu_item :href="doc.docx_url" title="Baixar DOCX" description="Arquivo editável do documento" icon="docx" icon_tone="docx" :download="True" only />
               {% endif %}
               {% if doc.editar_url %}
-                <c-v2.menu_item :href="doc.editar_url" title="Editar documento" description="Abrir o cadastro para alterações" icon="edit" tone="edit" only />
+                <c-v2.menu_item :href="doc.editar_url" title="Editar documento" description="Abrir o cadastro para alterações" icon="edit" icon_tone="edit" only />
               {% endif %}
             </div>
 {% endfor %}
 {% for oficio in card.oficios %}{% for s in oficio.servidores %}{% if s.has_termo %}
-<div class="action-menu action-menu--rich" id="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}" role="menu" hidden>
+<div class="menu action-menu" id="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}" data-menu-v2 data-overlay-panel role="menu" hidden>
             {% if s.termo_assinado %}
             {% else %}
             {% endif %}
             {% if s.termo_open_url %}
-              <c-v2.menu_item :href="s.termo_open_url" title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" :target_blank="True" only />
+              <c-v2.menu_item :href="s.termo_open_url" title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" icon_tone="preview" :target_blank="True" only />
             {% endif %}
             {% if s.termo_pdf_url %}
-              <c-v2.menu_item :href="s.termo_pdf_url" title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" :download="True" only />
+              <c-v2.menu_item :href="s.termo_pdf_url" title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" icon_tone="pdf" :download="True" only />
             {% endif %}
             {% if s.termo_docx_url %}
-              <c-v2.menu_item :href="s.termo_docx_url" title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" :download="True" only />
+              <c-v2.menu_item :href="s.termo_docx_url" title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" icon_tone="docx" :download="True" only />
             {% endif %}
             {% if s.termo_anexar_assinado_url %}
             <c-v2.button
               type="button"
-              class_name="action-menu__item action-menu__item--rich{% if s.termo_assinado %} is-assinado{% endif %}"
+              class_name="menu__item{% if s.termo_assinado %} is-assinado{% endif %}"
               role="menuitem"
               data-attach-signed-trigger
               data-attach-signed-url="{{ s.termo_anexar_assinado_url }}"
@@ -79,12 +83,12 @@ O presenter é o mesmo da lista, chamado com `menus_sob_demanda=False`.
               data-attach-signed-current-name="{{ s.termo_assinado_nome_original }}"
               data-attach-signed-current-view-url="{{ s.termo_assinado_view_url }}"
               data-attach-signed-current-remove-url="{{ s.termo_remover_assinado_url }}" only>
-              <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
+              <span class="menu__icon" data-tone="success" aria-hidden="true">
                 <c-ui.icons.icon icon="sign" only />
               </span>
-              <span class="action-menu__item-copy">
-                <strong>{% if s.termo_assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
-                <small>{% if s.termo_assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
+              <span class="menu__copy">
+                <strong class="menu__title">{% if s.termo_assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
+                <small class="menu__description">{% if s.termo_assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
               </span>
             </c-v2.button>
             {% endif %}

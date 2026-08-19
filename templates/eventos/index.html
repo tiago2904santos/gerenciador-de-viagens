@@ -27,7 +27,6 @@
   >
     <c-slot name="controls">
       <form method="get" action="{{ request.path }}" class="rail__form" role="search">
-        <input type="hidden" name="aba" value="{{ aba }}">
         <c-v2.input
           icon="search"
           name="q"
@@ -35,12 +34,17 @@
           placeholder="Buscar por título, destino ou responsável…"
           aria_label="Buscar eventos"
         />
+        <c-v2.select
+          name="aba"
+          :options="status_filter_options"
+          :multiple="True"
+          placeholder="Filtrar por situação"
+          aria_label="Filtrar eventos por situação"
+        />
         <c-v2.button type="submit" label="Buscar" icon="search" />
-        {% if q %}<c-v2.button label="Limpar" icon="x" :href="search_clear_url" />{% endif %}
+        {% if has_filters %}<c-v2.button label="Limpar" icon="x" :href="search_clear_url" />{% endif %}
       </form>
     </c-slot>
-
-    <c-slot name="tabs"><c-v2.toggle :items="abas" aria_label="Abas de eventos" /></c-slot>
 
     <c-slot name="rows">
       {% for card in cards %}

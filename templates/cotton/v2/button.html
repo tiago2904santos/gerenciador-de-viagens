@@ -1,4 +1,4 @@
-{% cotton:vars aria_label attrs autosave_link class_name confirm_message controls data_attach_signed_cancel data_autosave_link data_cancel_modal_cancel data_confirm_action_cancel data_delete_modal_cancel dialog dialog_label dialog_label_attr dialog_url dialog_url_attr disabled extra_class form formaction formnovalidate hidden hook href icon icon_after label link_rel link_target loading name size slot type value variant %}
+{% cotton:vars aria_label attrs autosave_link class_name confirm_message controls data_attach_signed_cancel data_autosave_link data_cancel_modal_cancel data_confirm_action_cancel data_delete_modal_cancel dialog dialog_label dialog_label_attr dialog_url dialog_url_attr disabled extra_class form formaction formnovalidate hidden hook href icon icon_after label link_rel link_target loading menu_id name size slot type value variant %}
 {% comment %}
   Button v2 — par de `static/css/v2/button.css`.
 
@@ -14,6 +14,9 @@
   `overlay.js` procura (`data-overlay-trigger`, `-kind`, `-target`) mais o
   `aria-haspopup`. Existe como parâmetro pelo mesmo motivo do `controls` — o
   `-target` leva VALOR, e valor dentro de `hook` sai escapado.
+
+  `menu_id` faz o mesmo contrato para menus V2, incluindo o estado expandido
+  que o `overlay.js` mantém sincronizado enquanto abre e fecha a lista.
 
   `form` é o `id` do `<form>` que um `type="submit"` fora dele envia. Sem isto o
   botão de rodapé de diálogo era um submit sem formulário: o atributo era passado e
@@ -86,6 +89,14 @@
       data-overlay-trigger
       data-overlay-kind="dialog"
       data-overlay-target="{{ dialog }}"
+    {% endif %}
+    {% if menu_id %}
+      aria-haspopup="true"
+      aria-expanded="false"
+      aria-controls="{{ menu_id }}"
+      data-overlay-trigger
+      data-overlay-kind="menu"
+      data-overlay-target="{{ menu_id }}"
     {% endif %}
     {% comment %}
       O `overlay.js` exige, NO GATILHO, a URL da ação e o nome do registro: sem eles

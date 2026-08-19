@@ -500,6 +500,9 @@
   min-height: 96px;
   padding: 10px 12px;
   resize: vertical;
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
 }
 
 /* ---- só leitura -------------------------------------------------------------
@@ -554,7 +557,10 @@
 :is(html[data-theme]) .field > .form-select:focus-visible,
 :is(html[data-theme]) .field > .cv-field__control:focus-visible {
   border-color: var(--focus-ring);
-  outline: none;
+  /* O legado aplica anel e sombra com `!important` a todo widget Django. No
+     field V2 o foco é a própria borda reservada, igual ao `input__control`. */
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 /* A estrela de "definir como padrão" é um formulário de um botão só; sem isto o
@@ -672,26 +678,6 @@
   border-color: var(--accent);
   color: var(--text-on-accent);
 }
-
-/* Campo com atalho de gerenciar ao lado: o controle come a sobra e o link fica
-   do tamanho do texto. Em tela estreita ele desce para a linha de baixo em vez
-   de espremer o campo. */
-:is(html[data-theme]) .field__control-row {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap-tight);
-  min-width: 0;
-}
-
-:is(html[data-theme]) .field__control-row > :not(.field__manage) {
-  flex: 1 1 220px;
-  min-width: 0;
-}
-
-:is(html[data-theme]) .field__manage {
-  flex: none;
-}
 /* <<< css/v2/field.css <<< */
 
 /* >>> css/v2/form-block.css >>> */
@@ -747,12 +733,34 @@
    páginas de catálogo carregam um perfil enxuto que conhece `.field-grid`, mas
    não seus modificadores de coluna; sem esta regra `--cols-2` virava uma grade
    de uma coluna justamente no desktop. */
-:is(html[data-theme]) .form-block--v2 .field-grid--cols-2 {
+:is(html[data-theme]) .form-block--v2 .field-grid--cols-2,
+:is(html[data-theme]) .form-block--v2 .field-grid--cols-3,
+:is(html[data-theme]) .form-block--v2 .field-grid--cols-4 {
   display: grid;
   gap: var(--gap);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   min-width: 0;
   width: 100%;
+}
+
+:is(html[data-theme]) .form-block--v2 .field-grid--cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+:is(html[data-theme]) .form-block--v2 .field-grid--cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+:is(html[data-theme]) .form-block--v2 .field-grid--cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+:is(html[data-theme]) .form-block--v2 .field-grid--cols-4[hidden] {
+  display: none;
+}
+
+:is(html[data-theme]) .form-block--v2 .field-grid__span-2 {
+  grid-column: span 2;
+  min-width: 0;
 }
 
 /* Corpo com TODOS os filhos ocultos não reserva trilha na grade. O bloco é
@@ -814,11 +822,25 @@
   :is(html[data-theme]) .form-block--v2.form-block--split {
     grid-template-columns: minmax(0, 1fr);
   }
+
+  :is(html[data-theme]) .form-block--v2 .field-grid--cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :is(html[data-theme]) .form-block--v2 .field-grid--cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 600px) {
-  :is(html[data-theme]) .form-block--v2 .field-grid--cols-2 {
+  :is(html[data-theme]) .form-block--v2 .field-grid--cols-2,
+  :is(html[data-theme]) .form-block--v2 .field-grid--cols-3,
+  :is(html[data-theme]) .form-block--v2 .field-grid--cols-4 {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  :is(html[data-theme]) .form-block--v2 .field-grid__span-2 {
+    grid-column: auto;
   }
 }
 /* <<< css/v2/form-block.css <<< */
@@ -938,6 +960,13 @@
 :is(html[data-theme]) .rail__form > .input {
   flex: 1 1 220px;
   min-width: 0;
+}
+
+/* Filtros select no rail conservam largura suficiente para o rótulo, mas
+   cedem espaço à busca e quebram para outra linha em telas estreitas. */
+:is(html[data-theme]) .rail__form > .select {
+  flex: 0 1 320px;
+  min-width: 240px;
 }
 
 /* O rail é o contêiner que segura as seções da página (os `form-block`), então
@@ -1722,6 +1751,13 @@
   min-width: 0;
 }
 
+/* Cabeçalhos com ação de ícone alinham o conjunto título + descrição pelo
+   centro do botão, em vez de tentar compartilhar uma linha de base que o
+   botão circular não possui. */
+:is(html[data-theme]) .panel__header--centered {
+  align-items: center;
+}
+
 :is(html[data-theme]) .panel__title {
   color: var(--text-strong);
   font-size: var(--text-size-base);
@@ -1824,13 +1860,15 @@
  * propriedades precisam estar na transição DAQUI — o JS só troca os valores.
  */
 :is(html[data-theme]) .notice-stack,
-:is(html[data-theme]) .alerts {
+:is(html[data-theme]) .alerts,
+:is(html[data-theme]) .alert-stack {
   margin-bottom: var(--gap);
   padding-bottom: var(--gap-tight);
 }
 
 :is(html[data-theme]) .notice-stack .notice,
-:is(html[data-theme]) .alerts .alert {
+:is(html[data-theme]) .alerts .alert,
+:is(html[data-theme]) .alert-stack .alert {
   transition:
     height var(--ease),
     margin var(--ease),
@@ -1846,7 +1884,8 @@
    isso. A remoção continua acontecendo no JS. */
 @media (prefers-reduced-motion: reduce) {
   :is(html[data-theme]) .notice-stack .notice,
-  :is(html[data-theme]) .alerts .alert {
+  :is(html[data-theme]) .alerts .alert,
+  :is(html[data-theme]) .alert-stack .alert {
     transition: none;
   }
 }
@@ -2405,6 +2444,35 @@
    por linha em vez de dividirem a faixa. */
 :is(html[data-theme]) :is(.prestacao-card__facts, .oficio-card__facts, .evento-card__docs) .form-block--v2 {
   grid-column: auto;
+}
+
+/* Ofícios e documentos podem crescer muito dentro do card do evento. Aqui a
+   lista volta a ser uma caixa de grade (fora daqui `person-list` é dissolvida)
+   para poder ter vão próprio e rolagem sem aumentar o card inteiro. */
+:is(html[data-theme]) .evento-card__docs .person-list {
+  display: grid;
+  gap: var(--gap-tight);
+  grid-template-columns: minmax(0, 1fr);
+  max-height: calc(3 * var(--control-height) + 4 * var(--gap-tight));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: var(--gap-tight);
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+/* As linhas deixam de participar da grade de seis colunas do record quando a
+   lista ganha caixa própria; cada item ocupa uma linha inteira dessa caixa. */
+:is(html[data-theme]) .evento-card__docs .person-list > .person-row,
+:is(html[data-theme]) .evento-card__docs .person-list > .person-row:last-child:nth-child(odd) {
+  grid-column: 1;
+}
+
+/* Nestes dois blocos a linha já está no degrau rail; repetir rail no botão o
+   fazia desaparecer. A ação usa field, como os demais controles sobre rail. */
+:is(html[data-theme]) .evento-card__docs .person-row__actions .icon-button {
+  background: var(--surface-field);
 }
 
 /* O formulário de uma ação só não quebra a fila de ações do rodapé. */
@@ -3137,10 +3205,11 @@
   color: var(--accent);
 }
 
-/* O anel de foco vai no CARTÃO, porque o `<input>` é invisível: sem isto quem
-   navega por teclado percorre as opções sem ver onde está. */
-:is(html[data-theme]) .os-model-card:focus-within,
-:is(html[data-theme]) .choice-card:focus-within {
+/* O anel vai no CARTÃO somente quando o navegador reconhece navegação por
+   teclado. `:focus-within` puro também acendia no clique e deixava o destaque
+   preso depois da escolha, competindo com o estado selecionado. */
+:is(html[data-theme]) .os-model-card:has(input:focus-visible),
+:is(html[data-theme]) .choice-card:has(input:focus-visible) {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
@@ -3202,6 +3271,40 @@
 
 :is(html[data-theme]) .choice-grid__toolbar > .select {
   flex: 0 1 240px;
+  min-width: 0;
+}
+
+/* Busca/limpeza ficam juntas à esquerda; o preset gerenciável ocupa o extremo
+   direito com o `select_with_action` global. */
+:is(html[data-theme]) .choice-grid__toolbar-start,
+:is(html[data-theme]) .choice-grid__toolbar-end {
+  align-items: center;
+  display: flex;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .choice-grid__toolbar-start[hidden],
+:is(html[data-theme]) .choice-grid__toolbar-end[hidden] {
+  display: none;
+}
+
+:is(html[data-theme]) .choice-grid__toolbar-start {
+  flex: 1 1 420px;
+}
+
+:is(html[data-theme]) .choice-grid__toolbar-start > .input {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .choice-grid__toolbar-end {
+  flex: 0 1 320px;
+  margin-left: auto;
+}
+
+:is(html[data-theme]) .choice-grid__toolbar-end > .field-with-action {
+  flex: 1 1 auto;
   min-width: 0;
 }
 /* <<< css/v2/choice-card.css <<< */
@@ -3488,6 +3591,255 @@
 
 :is(html[data-theme]) .stepper__link:hover .stepper__label {
   text-decoration: underline;
+}
+
+/* Header e stepper formam a navegação do wizard; o conteúdo da etapa começa
+   depois de um intervalo completo, sem colar a primeira lista ao rail. */
+:is(html[data-theme]) .wizard-page > .rail + * {
+  margin-top: var(--gap);
+}
+
+
+/* ══ TRÊS MODELOS EM PROVA (2026-08-19) ═════════════════════════════════════
+ *
+ * O stepper atual é quatro rótulos soltos numa linha: sem trilha, sem noção de
+ * quanto falta, e a única diferença entre "concluída" e "não iniciada" é a cor
+ * de um círculo de 28px. Estas três variantes existem para escolher — quando
+ * uma for aprovada, ela vira o padrão e as outras duas saem daqui junto com o
+ * painel de prova da galeria.
+ */
+
+/* ── A · trilha ────────────────────────────────────────────────────────────
+ *
+ * Marcador em cima, rótulo embaixo, e uma LINHA ligando os marcadores: é ela
+ * que transforma quatro etapas soltas num caminho com começo e fim.
+ *
+ * A cor diz o estado, e cada cor tem UM significado: verde é o que já foi
+ * feito — inclusive o trecho da trilha —, accent é onde se está agora, e o que
+ * falta fica na cor da régua. Com o caminho andado em accent, como estava na
+ * primeira prova, a cor da ação e a cor do passado eram a mesma.
+ *
+ * Colunas iguais (`1fr`) e não largura por conteúdo: com "Justificativa" e
+ * "Dados e viajantes" na mesma fileira, a distância entre marcadores mudava a
+ * cada etapa e a trilha saía torta.
+ */
+:is(html[data-theme]) .stepper--track .stepper__list {
+  display: grid;
+  gap: 0;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+}
+
+:is(html[data-theme]) .stepper--track .stepper__item {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  padding: 4px var(--gap-tight) 0;
+  position: relative;
+  text-align: center;
+}
+
+/* A linha vai de um centro ao outro, mas PARA antes do marcador: os 22px de
+   folga de cada lado são o raio do marcador mais o anel da etapa atual. Linha
+   encostada no círculo faz a fileira parecer uma corrente amassada. */
+:is(html[data-theme]) .stepper--track .stepper__item::before {
+  background: var(--line);
+  border-radius: var(--radius-pill);
+  content: "";
+  height: 2px;
+  left: calc(-50% + 22px);
+  position: absolute;
+  top: 18px;
+  width: calc(100% - 44px);
+}
+
+:is(html[data-theme]) .stepper--track .stepper__item:first-child::before {
+  display: none;
+}
+
+/* Verde até onde se chegou: o trecho ANTES da concluída e o que entra na atual
+   são caminho andado. */
+:is(html[data-theme]) .stepper--track .stepper__item[data-state="done"]::before,
+:is(html[data-theme]) .stepper--track .stepper__item[data-state="current"]::before {
+  background: var(--status-done);
+}
+
+/* O marcador da etapa que ainda não começou é um VAZIO com contorno, não um
+   disco cinza: disco cheio pesa igual ao das outras e a fileira fica com
+   quatro pesos iguais, sem hierarquia nenhuma. */
+:is(html[data-theme]) .stepper--track .stepper__marker {
+  /* A cor do PRÓPRIO fundo, não transparente: é ela que corta a trilha atrás do
+     marcador. Com `transparent` a linha atravessava o círculo vazio e as etapas
+     que faltam pareciam furadas. O fallback existe porque nem todo contêiner
+     declara `--surface` — em `v2/surface.css` quem declara são as camadas. */
+  background: var(--surface, var(--surface-rail));
+  border: 2px solid var(--line);
+  box-sizing: border-box;
+  color: var(--text-muted);
+  height: 32px;
+  position: relative;
+  width: 32px;
+  z-index: 1;
+}
+
+:is(html[data-theme]) .stepper--track .stepper__item[data-state="done"] .stepper__marker {
+  background: var(--status-done);
+  border-color: var(--status-done);
+  color: #ffffff;
+}
+
+:is(html[data-theme]) .stepper--track .stepper__item[data-state="done"] .stepper__marker svg {
+  height: 16px;
+  width: 16px;
+}
+
+/* O anel marca a atual sem aumentá-la: crescer o círculo empurraria a linha de
+   base e a trilha deixaria de ser reta. */
+:is(html[data-theme]) .stepper--track .stepper__item[data-state="current"] .stepper__marker {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--text-on-accent);
+}
+
+:is(html[data-theme]) .stepper--track .stepper__copy {
+  gap: 3px;
+  justify-items: center;
+}
+
+/* Só a atual tem nome em peso forte. As outras três são referência — lê-las com
+   o mesmo peso da atual é o que fazia a fileira parecer quatro títulos. */
+:is(html[data-theme]) .stepper--track .stepper__label {
+  font-size: var(--text-size-base);
+  line-height: 1.25;
+}
+
+:is(html[data-theme]) .stepper--track .stepper__item[data-state="current"] .stepper__label {
+  font-weight: var(--weight-strong);
+}
+
+:is(html[data-theme]) .stepper--track .stepper__status {
+  font-size: var(--text-size-eyebrow);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* O estado da atual repete a cor do marcador: as duas peças falam da mesma
+   etapa, e ler "EM ANDAMENTO" em cinza embaixo de um marcador em accent obriga
+   a juntar as duas metades. */
+:is(html[data-theme]) .stepper--track .stepper__item[data-state="current"] .stepper__status {
+  color: var(--accent);
+}
+
+:is(html[data-theme]) .stepper--track .stepper__item[data-state="done"] .stepper__status {
+  color: var(--status-done);
+}
+
+/* Numa tela estreita a trilha vira coluna: quatro rótulos lado a lado em 360px
+   quebram cada um em três linhas e a fileira perde a leitura horizontal. */
+@media (max-width: 720px) {
+  :is(html[data-theme]) .stepper--track .stepper__list {
+    grid-auto-flow: row;
+    gap: var(--gap-tight);
+  }
+
+  :is(html[data-theme]) .stepper--track .stepper__item {
+    grid-template-columns: auto 1fr;
+    justify-items: start;
+    text-align: left;
+  }
+
+  :is(html[data-theme]) .stepper--track .stepper__item::before {
+    display: none;
+  }
+}
+
+/* ── B · fita segmentada ───────────────────────────────────────────────────
+ *
+ * As etapas como segmentos de UMA faixa, no mesmo desenho do `toggle--fill`
+ * que o sistema já usa para escolher entre vistas. Serve ao wizard que é HUB —
+ * o painel do evento, onde as cinco etapas existem ao mesmo tempo e se clica
+ * na que interessa.
+ */
+:is(html[data-theme]) .stepper--fill .stepper__list {
+  background: var(--surface-contrast, var(--surface-field));
+  border-radius: var(--radius-field);
+  display: grid;
+  gap: 2px;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  padding: 3px;
+}
+
+:is(html[data-theme]) .stepper--fill .stepper__item {
+  border-radius: 6px;
+  gap: var(--gap-tight);
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 10px;
+}
+
+:is(html[data-theme]) .stepper--fill .stepper__item[data-state="current"] {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+
+:is(html[data-theme]) .stepper--fill .stepper__item[data-state="current"] .stepper__marker {
+  background: color-mix(in srgb, #000 18%, transparent);
+  color: inherit;
+}
+
+:is(html[data-theme]) .stepper--fill .stepper__item[data-state="done"] {
+  color: var(--text-strong);
+}
+
+:is(html[data-theme]) .stepper--fill .stepper__marker {
+  height: 22px;
+  width: 22px;
+}
+
+/* Dentro do segmento o texto é uma linha só: o status vira redundante quando o
+   próprio preenchimento já diz qual é a atual. */
+:is(html[data-theme]) .stepper--fill .stepper__status {
+  display: none;
+}
+
+/* ── C · compacto ──────────────────────────────────────────────────────────
+ *
+ * Uma linha: onde estou, de quantas, e uma barra fina com o quanto andou. Para
+ * tela estreita e para wizard longo, onde a trilha inteira come altura que o
+ * formulário precisa.
+ *
+ * Nesta prova as outras etapas somem por CSS — se este modelo for o escolhido,
+ * a contagem passa a ser montada no componente, porque esconder etapa com
+ * `display: none` também a esconde de quem usa leitor de tela.
+ */
+:is(html[data-theme]) .stepper--compact .stepper__list {
+  display: grid;
+  gap: var(--gap-tight);
+}
+
+:is(html[data-theme]) .stepper--compact .stepper__item:not([data-state="current"]) {
+  display: none;
+}
+
+:is(html[data-theme]) .stepper--compact .stepper__item[data-state="current"] {
+  color: var(--text-strong);
+}
+
+:is(html[data-theme]) .stepper--compact .stepper__list::after {
+  background: var(--line);
+  border-radius: var(--radius-pill);
+  content: "";
+  height: 4px;
+}
+
+/* A barra é pintada por uma variável que o chamador calcula: sem ela, o
+   progresso seria adivinhado pelo CSS. */
+:is(html[data-theme]) .stepper--compact .stepper__list::after {
+  background:
+    linear-gradient(to right, var(--accent) var(--stepper-progresso, 0%), transparent var(--stepper-progresso, 0%)),
+    var(--line);
 }
 /* <<< css/v2/stepper.css <<< */
 
@@ -5533,6 +5885,16 @@
   margin-left: auto;
 }
 
+/* A linha já usa a superfície de campo. As ações voltam ao degrau do painel
+   para continuarem visíveis, em vez de desaparecerem na mesma cor da linha. */
+:is(html[data-theme]) .file-list__action {
+  background: var(--surface-rail);
+}
+
+:is(html[data-theme]) .file-list__action:hover {
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface-rail));
+}
+
 /* O formulário existe só para carregar o POST do excluir; ele não pode ocupar
    espaço nem quebrar a fileira de botões. */
 :is(html[data-theme]) .file-list__form {
@@ -5651,38 +6013,13 @@
 }
 
 :is(html[data-theme]) .quick-add__section-layout--split {
-  grid-template-columns: 200px minmax(0, 1fr);
-}
-
-:is(html[data-theme]) .quick-add__section-copy {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-
-:is(html[data-theme]) .quick-add__section-title {
-  color: var(--text-strong);
-  font-size: var(--text-size-base);
-  font-weight: var(--weight-strong);
-  margin: 0;
-}
-
-:is(html[data-theme]) .quick-add__section-description {
-  color: var(--text-muted);
-  font-size: var(--text-size-eyebrow);
-  margin: 0;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 :is(html[data-theme]) .quick-add__section-body {
   display: grid;
   gap: var(--gap);
   min-width: 0;
-}
-
-@media (max-width: 720px) {
-  :is(html[data-theme]) .quick-add__section-layout--split {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 /* O GATILHO é a faixa que fecha o trilho: largura inteira, contorno só no topo,
@@ -5758,6 +6095,15 @@
 :is(html[data-theme]) .list-page {
   display: grid;
   gap: var(--gap);
+}
+
+/* Na lista simples, o painel recebe as linhas dentro de um invólucro. Ele é a
+   grade que materializa o ritmo entre registros; sem isto o `gap` do painel
+   separava apenas o invólucro, e as linhas dentro dele ficavam coladas. */
+:is(html[data-theme]) .list-page__panel-rows {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
 }
 
 /* Header e rail são uma peça só — o rail já perde os cantos de cima quando
@@ -6538,6 +6884,30 @@
   margin-top: var(--gap-tight);
   min-width: 0;
 }
+
+/* Resumo do roteiro: três assuntos, três colunas. Cada coluna usa o mesmo
+   form-block dos demais resumos da etapa; a grade apenas define a relação
+   espacial entre trechos, valor e composição das diárias. */
+:is(html[data-theme]) .route-summary {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-width: 0;
+}
+
+:is(html[data-theme]) .route-summary__column {
+  min-width: 0;
+}
+
+:is(html[data-theme]) .route-summary__column--details .fact-list {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (max-width: 900px) {
+  :is(html[data-theme]) .route-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 /* <<< css/v2/fact.css <<< */
 
 /* >>> css/v2/number-stepper.css >>> */
@@ -6611,7 +6981,7 @@
   align-items: end;
   display: grid;
   gap: var(--gap);
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: var(--control-height) minmax(0, 1fr) var(--control-height);
   min-width: 0;
 }
 
@@ -6638,12 +7008,33 @@
   display: none;
 }
 
+:is(html[data-theme]) .efetivo-row__add[hidden],
+:is(html[data-theme]) .efetivo-row__remove[hidden] {
+  display: none;
+}
+
+/* As linhas seguintes repetem os rótulos no HTML para manter cada controle
+   acessível, mas só a primeira linha os mostra. O motor atualiza esta classe
+   depois de inserir ou remover linhas, inclusive quando a primeira é apagada. */
+:is(html[data-theme]) .efetivo-row--without-labels .field__label {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
 /* Os dois botões são o `button` do sistema na forma `--icon`. Só o que é
    POSIÇÃO fica aqui: o desenho é de `v2/button.css`, e uma segunda definição é
    como o sistema antigo chegou a dezoito variantes de botão. */
 :is(html[data-theme]) .efetivo-row__add,
 :is(html[data-theme]) .efetivo-row__remove {
-  margin-bottom: 2px;
+  align-self: end;
+  margin-bottom: 0;
 }
 
 :is(html[data-theme]) .efetivo-rows {
@@ -6668,24 +7059,53 @@
   border-radius: var(--radius-field);
   display: grid;
   gap: var(--gap-tight);
+  max-height: 190px;
   min-width: 0;
+  overflow-y: auto;
   padding: var(--gap);
+  /* A mesma barra fina dos pickers, listboxes e áreas de texto do V2. */
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
 }
 
 /* Título e contagem na mesma linha, nas pontas: o número é a resposta curta, e
    ele fica onde o olho já para ao terminar de ler o título. */
 :is(html[data-theme]) .live-list__head {
   align-items: center;
-  display: flex;
+  display: grid;
   gap: var(--gap-tight);
-  justify-content: space-between;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 24px;
   min-width: 0;
 }
 
+:is(html[data-theme]) .live-list__head[hidden] {
+  display: none;
+}
+
 :is(html[data-theme]) .live-list__title {
+  align-items: center;
   color: var(--text-strong);
+  display: flex;
   font-size: var(--text-size-base);
   font-weight: var(--weight-strong);
+  line-height: 1.2;
+  min-height: 24px;
+}
+
+:is(html[data-theme]) .live-list__title[hidden] {
+  display: none;
+}
+
+:is(html[data-theme]) .live-list__count {
+  align-items: center;
+  display: flex;
+  min-height: 24px;
+}
+
+:is(html[data-theme]) .live-list__count[hidden] {
+  display: none;
 }
 
 :is(html[data-theme]) .live-list__items {

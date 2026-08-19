@@ -121,6 +121,16 @@ class SeletorDeOficioDaOrdemTests(TestCase):
 
         self.assertEqual(resposta.context["os_oficios_summary"], {})
 
+    def test_novo_viajante_e_acao_compacta_do_picker_de_equipe(self):
+        resposta = self.client.get(reverse("ordens_servico:nova"))
+
+        self.assertEqual(resposta.status_code, 200)
+        self.assertContains(resposta, 'class="picker__action field-with-action__action"')
+        self.assertContains(resposta, 'aria-label="Novo viajante"')
+        self.assertNotContains(resposta, "<span>Novo viajante</span>")
+        self.assertNotContains(resposta, '<h2 class="form-block__title">Equipe</h2>')
+        self.assertNotContains(resposta, "Viajantes da ordem de serviço.")
+
     def test_a_edicao_traz_no_blob_os_oficios_ja_vinculados(self):
         ordem = OrdemServico.objects.create(area=self.area)
         ordem.oficios.set(self.meus[:2])

@@ -47,6 +47,13 @@
   min-width: 0;
 }
 
+/* Filtros select no rail conservam largura suficiente para o rótulo, mas
+   cedem espaço à busca e quebram para outra linha em telas estreitas. */
+:is(html[data-theme]) .rail__form > .select {
+  flex: 0 1 320px;
+  min-width: 240px;
+}
+
 /* O rail é o contêiner que segura as seções da página (os `form-block`), então
    tem raio inteiro por padrão. Só quando encosta no header ele perde os cantos
    de cima, para os dois lerem como uma peça só — e perde a borda de cima junto:

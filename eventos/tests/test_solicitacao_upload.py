@@ -78,25 +78,35 @@ class UploadSolicitacaoViewTests(TestCase):
         anexo = EventoDocumentoSolicitacao.objects.get(evento=self.evento)
         self.assertTrue(anexo.arquivo.name.lower().endswith(".pdf"))
 
-    def test_etapa4_oferece_anexar_documento_e_os_dois_atalhos_de_criacao(self):
-        """As ações da etapa 4, agora no cabeçalho dos painéis (2026-08-18).
-
-        Elas moravam num menu "Mais ações" atrás de um botão flutuante. No v2, a
-        ação de um painel fica no cabeçalho DELE — mesmo lugar em toda tela do
-        sistema —, e o menu deixou de existir: eram três itens, dois dos quais
-        simples links de criar.
-
-        O anexar continua sendo o MESMO diálogo do anexar assinado, com a cópia
-        trocada pelos `data-attach-signed-*`.
-        """
+    def test_etapa4_oferece_anexar_documento_e_menu_unico_de_criacao(self):
+        """A etapa 4 concentra os dois fluxos de criação em um único FAB V2."""
         resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, 200)
         self.assertNotContains(resp, "evento-etapa4-actions-menu")
         self.assertContains(resp, "Anexar documento")
+        self.assertContains(resp, "panel__header panel__header--centered")
         self.assertContains(resp, "data-attach-signed-url")
         self.assertContains(resp, self.anexar_url)
-        self.assertContains(resp, "Novo plano")
-        self.assertContains(resp, "Nova OS")
+        self.assertContains(resp, 'data-overlay-target="evento-planejamento-create-menu"')
+        self.assertContains(resp, 'id="evento-planejamento-create-menu"')
+        self.assertContains(resp, "Ordem de Serviço")
+        self.assertContains(resp, "Plano de Trabalho")
+        self.assertContains(resp, resp.context["create_urls"]["ordem"])
+        self.assertContains(resp, resp.context["create_urls"]["plano"])
+        self.assertNotContains(resp, "Novo plano")
+        self.assertNotContains(resp, "Nova OS")
+
+    def test_acoes_do_arquivo_usam_a_superficie_do_painel(self):
+        EventoDocumentoSolicitacao.objects.create(
+            evento=self.evento,
+            arquivo=ContentFile(b"%PDF-1.4\n%%EOF\n", name="solicitacao.pdf"),
+            nome_original="solicitacao.pdf",
+        )
+
+        resp = self.client.get(self.url)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'class="icon-button file-list__action"', count=2)
 
 
 class SolicitacaoConteudoPrivadoTests(TestCase):

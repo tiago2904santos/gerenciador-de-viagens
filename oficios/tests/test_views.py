@@ -271,6 +271,8 @@ class OficioViewsTests(TestCase):
         # dizem depois.
         preview_start = html.index("Documentos para conferência")
         self.assertIn("Resumo do ofício", html[preview_start:])
+        self.assertEqual(html.count("document-summary__fact-panel--identity"), 4)
+        self.assertEqual(html.count("document-summary__fact-panel--vehicle"), 5)
         self.assertIn("Viajantes", html[preview_start:])
         self.assertIn("Viatura e condução", html[preview_start:])
         footer_start = html.index('<footer class="card-footer">', preview_start)
@@ -286,6 +288,17 @@ class OficioViewsTests(TestCase):
         self.assertNotIn("Justificativa PDF", footer)
         self.assertNotIn("Plano DOCX", footer)
         self.assertNotIn("Ordem", footer)
+
+    def test_resumo_do_roteiro_distribui_conteudo_em_tres_colunas(self):
+        source = Path(
+            "templates/oficios/partials/documentos/_route_summary_grid.html",
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("route-summary__column--legs", source)
+        self.assertIn("route-summary__column--value", source)
+        self.assertIn("route-summary__column--details", source)
+        self.assertLess(source.index("route-summary__column--legs"), source.index("route-summary__column--value"))
+        self.assertLess(source.index("route-summary__column--value"), source.index("route-summary__column--details"))
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "incomplete", "pendencias": ["Pendencia de teste"]})
@@ -573,7 +586,11 @@ class OficioViewsTests(TestCase):
         self.assertContains(list_response, 'id="quick-add-modelo-motivo"')
         self.assertContains(list_response, 'name="nome"')
         self.assertContains(list_response, 'name="texto"')
-        self.assertContains(list_response, "cv-field__control--textarea")
+        self.assertContains(
+            list_response,
+            'class="input__control input__control--textarea"',
+        )
+        self.assertNotContains(list_response, "cv-field__control--textarea")
 
         new_get = self.client.get(reverse("oficios:modelo_motivo_create"))
         self.assertEqual(new_get.status_code, 200)

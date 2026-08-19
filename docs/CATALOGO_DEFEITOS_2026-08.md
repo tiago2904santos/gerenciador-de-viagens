@@ -9271,3 +9271,364 @@ peças sem equivalente funcional v2: infraestrutura do shell e do fluxo, renderi
 primitiva de botão sem decoração, sprite/ícone e integração específica do Google Drive. A lista é
 fechada por teste de contrato; qualquer retorno de um arquivo removido ou nova exceção quebra a
 suíte. O inventário Cotton passou de 160 para 90 arquivos (76 v2 e 14 exceções justificadas).
+
+### NOVO-20260819-145524-c938f37c99e8 🟢 RESOLVIDO · `NOVO` Lista de Eventos usa abas para um recorte que precisa aceitar múltiplas situações · HT/UI · risco médio
+
+As quatro situações temporais da lista são mutuamente exclusivas no banco, mas a interface obriga
+o usuário a consultar uma por vez. O controle também fica fora do rail, embora funcione como filtro
+da busca. **Correção:** trocar as abas por um multiselect V2 no rail, combinar as situações por OR
+no servidor e preservar valores repetidos de `aba` na busca e na paginação.
+
+**Fechamento em 19/08/2026:** o toggle de abas saiu da lista de Eventos e o `c-v2.select` passou a
+aceitar seleção múltipla pelo renderer global. As opções, com suas contagens, ficam dentro do rail;
+o servidor combina os recortes escolhidos por OR e a paginação mantém cada `aba` na querystring.
+URLs antigas com uma única `aba` continuam válidas e a ausência do parâmetro mantém `futuras`.
+
+### NOVO-20260819-151046-ef6b2ec95635 🟢 RESOLVIDO · `NOVO` Menu dos termos no card de Evento ainda usa a caixa antiga e abre deslocado · HT/UI · risco médio
+
+O gatilho encontra o fragmento, mas as três famílias escritas à mão nele ainda usavam
+`action-menu--rich`/`action-menu__item--rich`. O cálculo global posicionava uma caixa com medidas
+diferentes das do menu V2, fazendo as ações aparecerem abaixo e sobrepostas ao card. **Correção:**
+manter o seletor técnico `action-menu` exigido pelo carregamento sob demanda, mas renderizar caixa,
+itens, textos e tons integralmente com `menu`, `menu__*` e `data-menu-v2`.
+
+### NOVO-20260819-151234-cec8409ae792 🟢 RESOLVIDO · `NOVO` Listas de ofícios e documentos no card de Evento não separam itens nem permitem rolagem · UI · risco baixo
+
+As `person-list` eram dissolvidas por `display: contents`; dentro dos dois blocos isso impedia a
+lista de possuir gap e scrollbar próprios. **Correção:** somente em `evento-card__docs`, restaurar
+a caixa como grade de uma coluna, limitar sua altura, separar itens por `--gap-tight` e aplicar a
+rolagem fina do V2.
+
+### NOVO-20260819-151415-36b948a36c38 🟢 RESOLVIDO · `NOVO` Botões dos blocos de ofícios e documentos repetem a superfície da linha · UI · risco baixo
+
+Dentro de `evento-card__docs`, a linha e seu botão de ação estavam ambos em `rail`, apagando a
+forma circular do controle. **Correção:** somente nesses dois blocos, o botão passa a usar
+`--surface-field`; as ações da equipe permanecem no modelo próprio da `person-row`.
+
+### NOVO-20260819-151520-34b848878bf8 🟢 RESOLVIDO · `NOVO` Widget Django dentro do field V2 ainda recebe o anel de foco legado · UI · risco baixo
+
+O input de nome do Tipo de Evento já era renderizado por `c-v2.form_field`, mas o foco global
+antigo, com maior prioridade, acrescentava outline e sombra sobre a borda V2. **Correção:** dentro
+de `.field`, widgets Django removem outline/sombra legados e conservam somente `--focus-ring` na
+borda reservada pelo componente.
+
+### NOVO-20260819-151643-a0565875cc5c 🟢 RESOLVIDO · `NOVO` Identificação da seção split do cadastro rápido fica presa ao topo · UI · risco baixo
+
+Em seções split, o título e a descrição ficavam alinhados ao topo enquanto o campo à direita
+incluía rótulo, controle e ajuda. **Correção:** centralizar verticalmente somente o bloco de cópia
+na largura desktop; no empilhamento móvel ele volta ao início da coluna.
+
+### NOVO-20260819-151759-09f49813dfad 🟢 RESOLVIDO · `NOVO` Campo de nome do Tipo de Evento exibe ajuda redundante · UI · risco baixo
+
+O exemplo abaixo do campo repetia nomes já visíveis na própria lista. **Correção:** remover o
+`help_text` do `TipoEventoForm`, preservando rótulo, validação e widget.
+
+### NOVO-20260819-151825-0a2671e52f89 🟢 RESOLVIDO · `NOVO` Conteúdo do wizard encosta no stepper · UI · risco baixo
+
+O primeiro painel da etapa começava imediatamente após o rail do stepper. **Correção:** o conteúdo
+diretamente posterior ao stepper recebe um intervalo `--gap`, mantendo header e navegação unidos.
+
+### NOVO-20260819-151844-f8a584585de9 🟢 RESOLVIDO · `NOVO` Registros das listas simples V2 ficam colados dentro do painel · UI · risco baixo
+
+O painel declarava gap, mas todas as linhas eram envolvidas por uma `div` neutra; assim o vão
+separava o invólucro e não seus filhos. **Correção:** o corpo das listas simples passa a usar
+`list-page__panel-rows`, uma grade com `--gap` entre registros, deixando a separação visível nos
+dois temas sem criar uma nova camada em torno de cada linha.
+
+### NOVO-20260819-152057-1d1d5d8e39a7 🟢 RESOLVIDO · `NOVO` Identificação do motorista externo permanece oculta após escolher a viatura · JS · risco baixo
+
+O card do motorista era aberto no navegador depois da escolha da viatura, mas o bloco de
+identificação conservava o `hidden` recebido na renderização inicial. **Correção:** a mesma
+sincronização que abre o card agora revela N° do Ofício e Protocolo, reutilizando os componentes
+V2 de identificação já empregados no topo da página.
+
+### NOVO-20260819-155704-88e80dbdb60d 🟢 RESOLVIDO · `NOVO` Quick-add repete título e descrição em uma legenda visível · HT · risco baixo
+
+O componente global emitia um `<legend class="sr-only">` com a mesma identificação já mostrada
+no corpo. Quando a utilidade antiga não era carregada, essa legenda aparecia como uma linha
+duplicada em todos os cadastros rápidos. **Correção:** remover o elemento repetido e nomear o
+`fieldset` diretamente com `aria-label`, preservando a identificação acessível sem conteúdo visual.
+
+### NOVO-20260819-155947-f5e6926d155c 🟢 RESOLVIDO · `NOVO` Quick-add repete título e descrição dentro da própria superfície · HT/UI · risco baixo
+
+Mesmo sem a legenda, cada seção ainda mostrava título e descrição antes dos campos, repetindo o
+contexto já fornecido pela página e pelo gatilho do cadastro rápido. **Correção:** deixar somente
+os controles na superfície e manter título e descrição exclusivamente no `aria-label` do grupo;
+seções antes marcadas como `split` passam a entregar os campos em largura total.
+
+### NOVO-20260819-160153-1b6a5614bb76 🟢 RESOLVIDO · `NOVO` Área de texto do modelo de motivo conserva classes do campo antigo · UI · risco baixo
+
+O quick-add já usava `c-v2.form_field`, mas o widget Django ainda emitia
+`cv-field__control--textarea`, ativando regras específicas e mais fortes da tela antiga. **Correção:**
+adicionar o estilo canônico `INPUT_V2_TEXTAREA` ao catálogo de widgets e aplicá-lo ao campo de
+texto do modelo de motivo, usando exatamente `input__control input__control--textarea`.
+
+### NOVO-20260819-160315-e472875f865e 🟢 RESOLVIDO · `NOVO` Data e destinos do evento dividem um único bloco genérico · HT/UI · risco baixo
+
+A etapa inicial reunia dois assuntos independentes em “Período e destinos”, sem usar a composição
+split adotada pelo V2. **Correção:** substituir o bloco por dois `form_block--split`, “Data do
+evento” e “Destinos”, cada um com seu corpo V2; nomes, ids e ganchos do calendário, do POST e do
+motor de cidades permanecem inalterados. O parcial composto antigo foi removido após busca de
+consumidores.
+
+### NOVO-20260819-160559-050f1e06b22a 🟢 RESOLVIDO · `NOVO` Mensagens Django ficam coladas ao cabeçalho e não desaparecem · UI/JS · risco baixo
+
+O descarte automático cobria `.notice-stack` e `.alerts`, mas o componente V2 das mensagens do
+Django usa `.alert-stack`; por isso confirmações como “Dados do evento atualizados” permaneciam na
+tela e encostavam no cabeçalho. **Correção:** incluir essa pilha no respiro global, na transição de
+altura/opacidade e no descarte após cinco segundos. Tons `warning`, `error` e `danger` continuam
+permanentes, inclusive quando informados por `data-tone`.
+
+### NOVO-20260819-160906-3ba9e35dfee1 🟢 RESOLVIDO · `NOVO` Número do ofício conserva a classe visual do input antigo · UI · risco baixo
+
+O `c-v2.document_number` já compunha número e ano, mas no modo simples recebia do formulário um
+`form-control`. Como esse input fica dentro da linha do número, e não diretamente sob o `field`,
+ele escapava da adaptação global e preservava o desenho anterior. **Correção:** o formulário V2
+passa a emitir `input__control` diretamente para `numero`, mantendo nome, id, tipo, valor e ganchos.
+
+### NOVO-20260819-161146-39a0d6abf87c 🟢 RESOLVIDO · `NOVO` Identificação do ofício empilha três campos que pertencem à mesma linha · UI · risco baixo
+
+Número, protocolo e custeio eram entregues a uma `field-grid` sem número explícito de colunas, e
+por isso apareciam empilhados no corpo split. **Correção:** usar a grade V2 de três colunas nesse
+grupo, com retorno automático para uma coluna em telas estreitas.
+
+### NOVO-20260819-161322-9e66ca584110 🟢 RESOLVIDO · `NOVO` Protocolo do ofício conserva a classe visual do input antigo · UI · risco baixo
+
+O campo de protocolo era renderizado pelo `c-v2.form_field`, mas ainda chegava do formulário como
+`form-control`. **Correção:** emitir diretamente o estilo canônico `input__control`, preservando o
+gancho `data-mask="protocolo"`, o nome, o id e todas as regras de validação e normalização.
+
+### NOVO-20260819-161420-cadea2af569c 🟢 RESOLVIDO · `NOVO` Descrição do ofício conserva as classes da área de texto antiga · UI · risco baixo
+
+A descrição já estava dentro de um field V2, mas o widget ainda emitia
+`cv-field__control cv-field__control--textarea`. **Correção:** aplicar diretamente
+`input__control input__control--textarea`, preservando linhas, redimensionamento e o gancho que
+preenche a descrição quando o usuário escolhe um modelo de motivo.
+
+### NOVO-20260819-161521-71b7cf3acac7 🟢 RESOLVIDO · `NOVO` Nome do motorista manual conserva a classe visual do input antigo · UI · risco baixo
+
+O campo de nome no modo manual ainda emitia `form-control` dentro do card V2 do motorista.
+**Correção:** aplicar `input__control` diretamente, preservando o placeholder, a máscara de
+maiúsculas e `data-oficio-motorista-manual`, usado na alternância entre servidor e preenchimento
+manual.
+
+### NOVO-20260819-161629-0907a84d3c56 🟢 RESOLVIDO · `NOVO` Bloco de viatura repete um cabeçalho de transporte sem acrescentar contexto · HT · risco baixo
+
+O seletor de viatura já possui rótulo próprio e aparecia imediatamente após a seção de equipe;
+mesmo assim, o bloco repetia “Transporte / Viatura utilizada” antes do controle. **Correção:**
+remover apenas esse cabeçalho do `form_block` V2, mantendo a superfície, o seletor, os ganchos e o
+card condicional do motorista.
+
+### NOVO-20260819-161721-dde196855b9a 🟢 RESOLVIDO · `NOVO` Bloco de servidores repete um cabeçalho de equipe sem acrescentar contexto · HT · risco baixo
+
+O próprio controle já identifica “Servidores” e explica a ação de adicionar à equipe, tornando
+“Equipe / Viajantes e motorista” uma camada textual repetida. **Correção:** remover somente o
+cabeçalho do `form_block` V2, preservando o seletor, os estados de motorista, os selos e os campos
+enviados pelo formulário.
+
+### NOVO-20260819-161811-481b3f6950ee 🟢 RESOLVIDO · `NOVO` Etapa de justificativa repete um cabeçalho de conteúdo dentro do painel · HT · risco baixo
+
+O painel já identifica a etapa como “Justificativa” e os dois campos possuem os rótulos “Modelo”
+e “Justificativa”. O cabeçalho interno “Conteúdo / Modelo e texto da justificativa” apenas repetia
+essa hierarquia. **Correção:** remover o cabeçalho do `form_block` V2, mantendo a superfície, os
+campos, a ação de gerenciar modelos e o rodapé do fluxo.
+
+### NOVO-20260819-161916-d697c6859943 🟢 RESOLVIDO · `NOVO` Cadastro rápido de modelos de justificativa ainda envia identificação interna redundante · HT · risco baixo
+
+O `quick_add_section` global já não desenha título, descrição ou legenda, mas este consumidor ainda
+enviava “Dados do modelo / Nome e texto da justificativa” como parâmetros de identificação.
+**Correção:** remover esses parâmetros da seção, deixando somente os campos Nome e Texto do modelo;
+o formulário e o botão “Novo modelo” continuam fornecendo o contexto da operação.
+
+### NOVO-20260819-162022-827ee2d3c99f 🟢 RESOLVIDO · `NOVO` Fatos administrativos do resumo não possuem superfícies próprias · UI/HT · risco baixo
+
+Número do ofício, protocolo, data de criação e custeio eram quatro fatos soltos diretamente no
+corpo do resumo. **Correção:** manter a grade de quatro colunas, mas colocar cada fato dentro de um
+`c-v2.form_block` próprio, com identificação acessível e a mesma superfície global V2.
+
+### NOVO-20260819-162142-dad0090739c8 🟢 RESOLVIDO · `NOVO` Dados da viatura não seguem a composição do resumo do ofício · UI/HT · risco baixo
+
+Placa, modelo, tipo, combustível e unidade lotada permaneciam como fatos soltos, enquanto a faixa
+administrativa já separava cada valor em uma superfície própria. **Correção:** aplicar à viatura a
+mesma composição `document-summary`: grade responsiva e um `c-v2.form_block` por fato. O bloco
+condicional de motorista externo segue a mesma regra quando existir.
+
+### NOVO-20260819-162257-7bfd9bcb787b 🟢 RESOLVIDO · `NOVO` Resumo do roteiro não separa trechos, valor e composição em colunas · UI/HT · risco baixo
+
+Os trechos ocupavam uma faixa inteira e os três fatos financeiros eram distribuídos em outra,
+sem refletir os três assuntos do resumo. **Correção:** compor uma grade de três `form_block` V2:
+lista de trechos na primeira coluna, valor total e valor por extenso na segunda, tipo de destino e
+quantidade de diárias na terceira. Em telas estreitas, as colunas são empilhadas.
+
+### NOVO-20260819-182146-46daee8fbeca 🟢 RESOLVIDO · `NOVO` Resumo de diárias do plano não separa os três assuntos em cartões · UI/HT · risco baixo
+
+Valor total, valor por servidor e composição eram fatos soltos na mesma superfície. **Correção:**
+usar uma grade responsiva de três `form_block` V2: valor total com extenso; valor por servidor com
+extenso; quantidade de diárias com efetivo total. Os ganchos do recálculo em tempo real foram
+preservados.
+
+### NOVO-20260819-182727-4a5babb4c0d0 🟢 RESOLVIDO · `NOVO` Aviso de cálculo aparece depois do resumo financeiro · HT · risco baixo
+
+As pendências de data, hora e efetivo eram exibidas depois dos cards calculados, longe dos campos
+que precisam ser corrigidos. **Correção:** posicionar o alerta imediatamente após os controles de
+deslocamento e antes do resumo financeiro, preservando o gancho usado pelo recálculo em tempo real.
+
+### NOVO-20260819-182913-79d88a7f46d8 🟢 RESOLVIDO · `NOVO` Barra de atividades mistura busca, preset e ações sem hierarquia · UI/HT · risco baixo
+
+Busca, preset e seus botões eram quatro controles independentes na mesma sequência. **Correção:**
+agrupar busca e limpeza à esquerda; posicionar à direita o preset usando o `select_with_action`
+global, com a ação de gerenciamento integrada. IDs, autosave e ganchos do motor de atividades
+foram preservados.
+
+### NOVO-20260819-183517-a76a2a5cc65c 🟢 RESOLVIDO · `NOVO` Grade de atividades usa quantidade variável de colunas · UI/HT · risco baixo
+
+A variante densa distribuía as atividades em até quatro colunas conforme a largura disponível.
+**Correção:** usar a grade padrão V2 de duas colunas, com o último cartão ímpar ocupando a largura
+inteira e empilhamento em uma coluna nas telas estreitas.
+
+### NOVO-20260819-183653-fbb450746222 🟢 RESOLVIDO · `NOVO` Cabeçalhos de Metas e Recursos não compartilham a mesma faixa · UI · risco baixo
+
+Título e contador dependiam das caixas de linha do conteúdo dentro de um flex, produzindo diferença
+visual entre as colunas. **Correção:** definir no `live_list` global uma grade explícita de título e
+contador, ambos centralizados em uma faixa de mesma altura.
+
+### NOVO-20260819-184005-d8ee0d11f1dd 🟢 RESOLVIDO · `NOVO` Listas de Metas e Recursos crescem sem limite · UI · risco baixo
+
+As duas colunas aumentavam conforme a quantidade de textos, empurrando o rodapé para fora da área
+visível. **Correção:** limitar cada `live_list` a 190px e ativar rolagem vertical com a barra fina,
+estável e semanticamente colorida do V2 quando o conteúdo ultrapassar esse teto.
+
+### NOVO-20260819-184240-6ec265897134 🟢 RESOLVIDO · `NOVO` Resumo de evento não segue a hierarquia do card de lista V2 · UI/HT · risco baixo
+
+O resumo usava um painel próprio com nove fatos e duas faixas de chips competindo pela atenção.
+**Correção:** adotar o `c-v2.record` em modo painel: evento como eyebrow, número e destino no título,
+período, horário e programa na meta; o miolo foi organizado em três `form_block` para coordenação,
+efetivo e diárias/atividades. Edição, remoção e todos os dados foram preservados.
+
+### NOVO-20260819-162552-d08fe177249e 🟢 RESOLVIDO · `NOVO` Cabeçalho de documentos de solicitação não alinha a cópia com a ação · UI · risco baixo
+
+O cabeçalho padrão alinha itens pela linha de base, mas o botão circular de anexar não possui uma
+linha textual equivalente; por isso ele ficava acima do conjunto título e descrição. **Correção:**
+aplicar ao painel a variante V2 `panel__header--centered`, centralizando verticalmente a cópia e a
+ação sem alterar os demais painéis.
+
+### NOVO-20260819-162732-dbc53dc99c91 🟢 RESOLVIDO · `NOVO` Ações da lista de arquivos repetem a superfície da própria linha · UI · risco baixo
+
+A linha do arquivo e os botões de visualizar e excluir usavam o mesmo degrau `field`, fazendo as
+ações desaparecerem dentro dela. **Correção:** identificar as ações do `c-v2.file_list` e usar nelas
+a superfície `rail`, correspondente ao painel que contém a lista, inclusive durante o hover.
+
+### NOVO-20260819-163006-30f36c4a238c 🟢 RESOLVIDO · `NOVO` Etapa de planejamento duplica a ação flutuante de criação · HT/JS · risco baixo
+
+Plano de trabalho e ordem de serviço eram apresentados como dois botões flutuantes independentes,
+ocupando duas linhas para uma única intenção. **Correção:** substituir os atalhos por um único botão
+V2 “Novo”, que abre o menu global V2 com as opções “Ordem de Serviço” e “Plano de Trabalho”,
+preservando as URLs de criação vinculadas ao evento.
+
+### NOVO-20260819-163450-1508c083bdbe 🟢 RESOLVIDO · `NOVO` Selecionar ofício no meio do picker reposiciona a lista no início · JS · risco baixo
+
+Cada seleção reconstruía todos os cartões para refletir o novo estado ativo. O esvaziamento
+intermediário reduzia a altura rolável a zero e fazia o navegador perder a posição atual.
+**Correção:** preservar o `scrollTop` do painel antes da reconstrução e restaurá-lo depois que os
+cartões retornam. O arquivo da página recebeu versão nova para evitar a execução da cópia em cache.
+
+### NOVO-20260819-163930-9e87ca8bf468 🟢 RESOLVIDO · `NOVO` Cartões de necessidade mantêm anel de foco após clique · UI · risco baixo
+
+O componente global usava `:focus-within`, que não distingue clique de navegação por teclado; por
+isso o cartão escolhido conservava um contorno adicional e competia com o estado selecionado.
+**Correção:** mostrar o anel no cartão somente quando o rádio interno estiver em `:focus-visible`.
+O clique mantém apenas a marcação de seleção, enquanto o teclado conserva indicação de posição.
+
+### NOVO-20260819-164051-f5317d771616 🟢 RESOLVIDO · `NOVO` Cadastro de viajante fica separado do picker da equipe da OS · HT · risco baixo
+
+A ação “Novo viajante” ocupava o cabeçalho inteiro do bloco, enquanto a etapa 1 do Ofício já usa a
+ação contextual do próprio picker. **Correção:** remover o botão textual do cabeçalho e passar a
+URL ao `c-v2.picker`, que posiciona o botão compacto de adicionar depois do campo de busca. O
+autosave e a URL de retorno permanecem ativos durante a navegação ao cadastro de servidor.
+
+### NOVO-20260819-164327-e17c26a5f4ce 🟢 RESOLVIDO · `NOVO` Picker da equipe repete um cabeçalho sem acrescentar contexto · HT · risco baixo
+
+O bloco mostrava “Equipe / Viajantes da ordem de serviço” imediatamente antes do campo “Adicionar
+à equipe”, repetindo a identificação já fornecida pelo próprio picker. **Correção:** remover título
+e descrição do `form_block`, preservando sua superfície, o campo, os viajantes selecionados e a
+ação contextual de cadastrar servidor.
+
+### NOVO-20260819-174306-315e5bc6f14a 🟢 RESOLVIDO · `NOVO` Selects gerenciáveis do plano ainda usam composição textual antiga · HT/UI · risco baixo
+
+Programa, horário e os dois cargos eram renderizados como select nativo acompanhado de um botão
+textual, embora exista um componente global para esse padrão. **Correção:** o ramo gerenciável do
+`c-v2.form_field` passa a usar `c-v2.select_with_action`, com renderer global de select, ação de
+engrenagem e autosave. As classes e regras da composição textual anterior foram removidas após a
+eliminação do último consumidor.
+
+### NOVO-20260819-174704-9518c7732d7f 🟢 RESOLVIDO · `NOVO` Textos da identificação do plano conservam textarea anterior ao V2 · UI · risco baixo
+
+Contextualização, coordenação e considerações finais ainda eram emitidas com
+`cv-field__control cv-field__control--textarea`, ativando o desenho anterior dentro dos blocos V2.
+**Correção:** aplicar aos três widgets o estilo canônico
+`input__control input__control--textarea`, sem alterar nomes, ids, linhas, placeholders ou os
+ganchos usados pela geração automática dos textos.
+
+### NOVO-20260819-174935-9a18f95508d1 🟢 RESOLVIDO · `NOVO` Linhas de efetivo do plano divergem do padrão V2 de coleção · UI/HT/JS · risco baixo
+
+A composição do efetivo ainda misturava quantidade com o controle anterior, ação textual no
+select de cargo, rótulos repetidos e botões desalinhados nas linhas adicionais. **Correção:**
+manter a anatomia do componente de destinos, usar o select global com ação de engrenagem e o
+input V2 dentro do stepper. Somente a primeira linha mostra os rótulos; as seguintes preservam
+os labels de forma acessível e o motor recalcula esse estado após cada inserção ou remoção.
+
+### NOVO-20260819-175903-427d7191c98e 🟢 RESOLVIDO · `NOVO` Pickers de coordenador repetem o rótulo genérico Nome · HT · risco baixo
+
+Cada picker já identifica visualmente “Coordenador administrativo” ou “Coordenador operacional
+(opcional)”, mas o field externo acrescentava “Nome” acima do mesmo controle. **Correção:** ocultar
+somente esses dois rótulos visuais pelo recurso acessível do field V2, mantendo a associação do
+label com o controle para leitores de tela e preservando os nomes, ids e ganchos do formulário.
+
+### NOVO-20260819-180230-94ba70b3f560 🟢 RESOLVIDO · `NOVO` Textareas V2 ainda exibem o scrollbar nativo do sistema · UI · risco baixo
+
+Contextualização, coordenação e considerações finais já usavam o textarea global, mas a rolagem
+interna continuava larga e com as cores do navegador. **Correção:** incorporar ao modelo global
+`input__control--textarea` o scrollbar fino e tokenizado dos pickers e listboxes V2, com trilho
+transparente e espaço estável nos dois temas.
+
+### NOVO-20260819-180440-c96afe3df568 🟢 RESOLVIDO · `NOVO` Gerenciador de cargos perde o formulário de origem · HT/BE · risco baixo
+
+Os atalhos “Gerenciar cargos” do Plano de Trabalho abriam o catálogo sem informar de onde o
+usuário saiu, embora o catálogo já suporte retorno contextual seguro por `next`. **Correção:**
+anexar a URL completa da etapa aos atalhos da identificação e do efetivo. Quando esse retorno
+existe, o catálogo mostra a ação flutuante “Voltar ao formulário”; acessos vindos do cadastro de
+servidor preservam o rótulo específico “Voltar ao servidor”, e acessos diretos não exibem retorno.
+
+### NOVO-20260819-180831-4700dbf83563 🟢 RESOLVIDO · `NOVO` Programa solicitante não usa a composição split do formulário V2 · HT/UI · risco baixo
+
+O bloco empilhava título e descrição sobre os campos Programa e Outro programa, consumindo altura
+e divergindo das demais identificações compactas. **Correção:** aplicar `form-block--split`, com a
+identificação na coluna esquerda e a grade de campos na direita, preservando o comportamento
+condicional de Outro programa e os atalhos de gerenciamento.
+
+### NOVO-20260819-181215-707ed3a785b9 🟢 RESOLVIDO · `NOVO` Blocos de texto repetem seus títulos sobre os textareas · HT · risco baixo
+
+Breve contextualização, Coordenação do evento e Considerações finais apareciam uma vez no
+cabeçalho do bloco e novamente como rótulo imediatamente acima do textarea. **Correção:** manter
+somente a identificação visual do `form-block` e ocultar os três labels internos pelo recurso
+acessível do field V2, preservando a associação de cada rótulo ao respectivo controle.
+
+### NOVO-20260819-181354-5e63eef4ebcd 🟢 RESOLVIDO · `NOVO` Período do evento permanece empilhado na identificação do plano · HT/UI · risco baixo
+
+O bloco colocava a identificação acima da grade de datas e horário, enquanto o bloco seguinte de
+destinos já usava a composição compacta do V2. **Correção:** aplicar `form-block--split` ao período,
+mantendo título e descrição na esquerda e calendário mais horário de atendimento na coluna direita.
+
+### NOVO-20260819-181532-a2bb386661a1 🟢 RESOLVIDO · `NOVO` Seletores de gênero usam o controle nativo no Plano de Trabalho · HT/UI · risco baixo
+
+Os campos de gênero administrativo e operacional eram emitidos diretamente pelo widget Django,
+sem o renderer global usado pelos demais selects da página. **Correção:** permitir que
+`c-v2.form_field` delegue selects sem ação ao `c-v2.select` e aplicar essa opção aos dois gêneros,
+preservando names, ids, valores e ganchos consumidos pelo motor de coordenadores.
+
+### NOVO-20260819-181708-d83520197699 🟢 RESOLVIDO · `NOVO` Datas e horas do deslocamento ocupam duas linhas separadas · HT/UI · risco baixo
+
+Saída e chegada eram divididas em uma grade de datas e outra grade de horas, apesar de formarem um
+único conjunto temporal. **Correção:** reunir o calendário de intervalo e os dois campos de hora
+em uma grade V2 de quatro colunas. O calendário ocupa as duas primeiras, uma por data, e as horas
+ocupam as duas restantes; a grade reduz para duas e depois uma coluna em larguras menores.

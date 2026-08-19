@@ -1,4 +1,4 @@
-{% cotton:vars aria_label attrs collection_filter extra_class fallback_first field filter hook name options select_id surface value %}
+{% cotton:vars aria_label attrs collection_filter extra_class fallback_first field filter hook multiple name options placeholder select_id surface value %}
 {% comment %}
   Select v2 — par de `static/css/v2/select.css`.
 
@@ -29,7 +29,8 @@
   class="select{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
   data-entity-picker
   data-entity-picker-renderer="select"
-  data-entity-picker-mode="single"
+  data-entity-picker-mode="{% if multiple %}multi{% else %}single{% endif %}"
+  {% if placeholder %}data-placeholder="{{ placeholder }}"{% endif %}
 >
   {% if field %}
     {{ field }}
@@ -37,13 +38,15 @@
     <select
       name="{{ name }}"
       aria-label="{{ aria_label }}"
+      {% if multiple %}multiple{% endif %}
+      {% if placeholder %}data-placeholder="{{ placeholder }}"{% endif %}
       {% if collection_filter_value %}data-collection-filter="{{ collection_filter_value }}"{% endif %}
       {% if select_id %}id="{{ select_id }}"{% endif %}
       {% if hook %}{{ hook }}{% endif %}
       {{ attrs }}
     >
       {% for opt in options %}
-        <option value="{{ opt.value }}"{% if opt.value == value or fallback_first and not value and forloop.first %} selected{% endif %}>{{ opt.label }}</option>
+        <option value="{{ opt.value }}"{% if opt.selected or opt.value == value or fallback_first and not value and forloop.first %} selected{% endif %}>{{ opt.label }}</option>
       {% endfor %}
     </select>
   {% endif %}

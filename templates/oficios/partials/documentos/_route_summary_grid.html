@@ -15,29 +15,38 @@
   (placa e modelo); no wizard, o que compõe a diária (tipo de destino e
   quantidade).
 {% endcomment %}
-{% if card.trechos %}
-  <c-v2.itinerary :legs="card.trechos" />
-{% endif %}
+<div class="route-summary">
+  <c-v2.form_block aria_label="Trechos" extra_class="route-summary__column route-summary__column--legs">
+    <c-slot name="body">
+      {% if card.trechos %}<c-v2.itinerary :legs="card.trechos" />{% endif %}
+    </c-slot>
+  </c-v2.form_block>
 
-<div class="fact-list">
-  <c-v2.fact
-    label="Valor total"
-    value="{% if card.diaria_vazio %}Não calculado{% elif card.diaria_moeda %}{{ card.diaria_moeda }}{% endif %}"
-    note_label="Valor por extenso"
-    :note="card.diaria_extenso"
-    :strong="True"
-  />
-  {% if col4_viatura %}
-    <c-v2.fact label="Placa" :value="viatura_placa" />
-    <c-v2.fact label="Modelo" :value="viatura_modelo" />
-  {% else %}
-    <c-v2.fact label="Tipo destino" :value="card.diaria_tipo_destino" />
-    {% comment %}
-      A composição da diária pode ter mais de uma linha ("2 integrais",
-      "1 parcial"). Elas viram uma frase só: o fato tem um valor e uma linha de
-      apoio, e uma lista dentro dele reabriria a grade que este arquivo acabou
-      de fechar.
-    {% endcomment %}
-    <c-v2.fact label="Quantidade de diárias" value="{{ card.diaria_composicao_linhas|join:' · ' }}" />
-  {% endif %}
+  <c-v2.form_block aria_label="Valor das diárias" extra_class="route-summary__column route-summary__column--value">
+    <c-slot name="body">
+      <div class="fact-list">
+        <c-v2.fact
+          label="Valor total"
+          value="{% if card.diaria_vazio %}Não calculado{% elif card.diaria_moeda %}{{ card.diaria_moeda }}{% endif %}"
+          note_label="Valor por extenso"
+          :note="card.diaria_extenso"
+          :strong="True"
+        />
+      </div>
+    </c-slot>
+  </c-v2.form_block>
+
+  <c-v2.form_block aria_label="Composição das diárias" extra_class="route-summary__column route-summary__column--details">
+    <c-slot name="body">
+      <div class="fact-list">
+        {% if col4_viatura %}
+          <c-v2.fact label="Placa" :value="viatura_placa" />
+          <c-v2.fact label="Modelo" :value="viatura_modelo" />
+        {% else %}
+          <c-v2.fact label="Tipo destino" :value="card.diaria_tipo_destino" />
+          <c-v2.fact label="Quantidade de diárias" value="{{ card.diaria_composicao_linhas|join:' · ' }}" />
+        {% endif %}
+      </div>
+    </c-slot>
+  </c-v2.form_block>
 </div>

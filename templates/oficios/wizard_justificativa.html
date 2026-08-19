@@ -15,7 +15,7 @@
 
     <c-v2.panel title="Justificativa" description="Use um modelo ou escreva o texto que fundamenta a necessidade da viagem.">
       <c-slot name="body">
-        <c-v2.form_block title="Conteúdo" description="Modelo e texto da justificativa">
+        <c-v2.form_block>
           <c-slot name="body">
             {% include "oficios/partials/justificativa/_fields.html" with form=form modelos_justificativa_url=modelos_justificativa_url only %}
           </c-slot>

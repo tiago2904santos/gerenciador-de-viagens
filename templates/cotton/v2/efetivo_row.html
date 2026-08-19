@@ -1,4 +1,4 @@
-{% cotton:vars cargos_url form ordinal removable %}
+{% cotton:vars cargos_url form ordinal removable show_labels %}
 {% comment %}
   Linha de efetivo v2 — unidade, cargo e quantidade, na composição da equipe do
   plano de trabalho. Par de `static/css/v2/efetivo-row.css`.
@@ -29,7 +29,7 @@
   isso depois é o motor, a cada linha adicionada ou removida.
 {% endcomment %}
 {% with oculta_remocao=removable|yesno:",1" %}
-<div class="efetivo-row{% if not removable %} efetivo-row--single{% endif %}" data-pt-efetivo-row>
+<div class="efetivo-row{% if not removable %} efetivo-row--single{% endif %}{% if not show_labels %} efetivo-row--without-labels{% endif %}" data-pt-efetivo-row>
   <div hidden>
     {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
     {{ form.DELETE }}

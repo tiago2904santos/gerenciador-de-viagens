@@ -226,6 +226,17 @@ class CargosCatalogoCaracterizacaoTests(_CatalogosCadastrosMixin, TestCase):
             "Cargo definido como padrão com sucesso.", self._mensagens(response)
         )
 
+    def test_acesso_por_formulario_exibe_retorno_contextual(self):
+        destino = "/planos-trabalho/32/identificacao/"
+
+        response = self.client.get(
+            reverse("cadastros:cargos_index"), {"next": destino}
+        )
+
+        self.assertEqual(response.context["back_url"], destino)
+        self.assertEqual(response.context["back_label"], "Voltar ao formulário")
+        self.assertContains(response, "Voltar ao formulário")
+
     def test_criacao_edicao_invalida_e_exclusao_avisam(self):
         response = self.client.post(
             reverse("cadastros:cargos_index"), {"nome": "Analista"}

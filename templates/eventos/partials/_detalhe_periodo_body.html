@@ -1,0 +1,15 @@
+{% comment %}
+  Datas do evento no calendário global de intervalo. Os `BoundField` mantêm os
+  nomes e ids reais (`data_inicio` e `data_fim`) usados pelo POST.
+{% endcomment %}
+<c-v2.date_picker
+  mode="range"
+  picker_id="evento-date-picker-d"
+  :start_field="form.data_inicio"
+  :end_field="form.data_fim"
+  start_input_id="id_data_inicio_display_d"
+  end_input_id="id_data_fim_display_d"
+  placeholder_start="Data de início"
+  placeholder_end="Data de fim"
+  aria_label="Período do evento"
+/>

@@ -257,11 +257,11 @@ class OficioDadosViajantesForm(OficioForm):
             "servidores_termo_autorizacao",
         ]
         widgets = {
-            "numero": forms.NumberInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "min": "1", "data-oficio-numero-field": "true"}),
-            "protocolo": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "data-mask": "protocolo"}),
+            "numero": forms.NumberInput(attrs={**widget_attrs(WidgetStyle.INPUT_V2), "min": "1", "data-oficio-numero-field": "true"}),
+            "protocolo": forms.TextInput(attrs={**widget_attrs(WidgetStyle.INPUT_V2), "data-mask": "protocolo"}),
             "motivo": forms.Textarea(
                 attrs={
-                    **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
+                    **widget_attrs(WidgetStyle.INPUT_V2_TEXTAREA),
                     "rows": 4,
                     "data-motivo-textarea": "true",
                 },
@@ -461,7 +461,7 @@ class OficioTransporteForm(forms.ModelForm):
             ),
             "motorista_manual_nome": forms.TextInput(
                 attrs={
-                    **widget_attrs(WidgetStyle.FORM_CONTROL),
+                    **widget_attrs(WidgetStyle.INPUT_V2),
                     "data-mask": "upper",
                     "data-oficio-motorista-manual": "true",
                     "placeholder": "Digite o nome do motorista",
@@ -600,7 +600,7 @@ class ModeloMotivoOficioForm(forms.ModelForm):
     texto = forms.CharField(
         label="Texto do modelo",
         help_text="Este texto será copiado para o motivo do ofício e poderá ser editado antes de salvar.",
-        widget=forms.Textarea(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA), "rows": 4}),
+        widget=forms.Textarea(attrs={**widget_attrs(WidgetStyle.INPUT_V2_TEXTAREA), "rows": 4}),
     )
     is_padrao = forms.BooleanField(
         label="Modelo padrão",

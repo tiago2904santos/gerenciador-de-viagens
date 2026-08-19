@@ -135,10 +135,11 @@
   color: var(--accent);
 }
 
-/* O anel de foco vai no CARTÃO, porque o `<input>` é invisível: sem isto quem
-   navega por teclado percorre as opções sem ver onde está. */
-:is(html[data-theme]) .os-model-card:focus-within,
-:is(html[data-theme]) .choice-card:focus-within {
+/* O anel vai no CARTÃO somente quando o navegador reconhece navegação por
+   teclado. `:focus-within` puro também acendia no clique e deixava o destaque
+   preso depois da escolha, competindo com o estado selecionado. */
+:is(html[data-theme]) .os-model-card:has(input:focus-visible),
+:is(html[data-theme]) .choice-card:has(input:focus-visible) {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
@@ -200,5 +201,39 @@
 
 :is(html[data-theme]) .choice-grid__toolbar > .select {
   flex: 0 1 240px;
+  min-width: 0;
+}
+
+/* Busca/limpeza ficam juntas à esquerda; o preset gerenciável ocupa o extremo
+   direito com o `select_with_action` global. */
+:is(html[data-theme]) .choice-grid__toolbar-start,
+:is(html[data-theme]) .choice-grid__toolbar-end {
+  align-items: center;
+  display: flex;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .choice-grid__toolbar-start[hidden],
+:is(html[data-theme]) .choice-grid__toolbar-end[hidden] {
+  display: none;
+}
+
+:is(html[data-theme]) .choice-grid__toolbar-start {
+  flex: 1 1 420px;
+}
+
+:is(html[data-theme]) .choice-grid__toolbar-start > .input {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .choice-grid__toolbar-end {
+  flex: 0 1 320px;
+  margin-left: auto;
+}
+
+:is(html[data-theme]) .choice-grid__toolbar-end > .field-with-action {
+  flex: 1 1 auto;
   min-width: 0;
 }

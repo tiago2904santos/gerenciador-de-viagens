@@ -58,38 +58,13 @@
 }
 
 :is(html[data-theme]) .quick-add__section-layout--split {
-  grid-template-columns: 200px minmax(0, 1fr);
-}
-
-:is(html[data-theme]) .quick-add__section-copy {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-
-:is(html[data-theme]) .quick-add__section-title {
-  color: var(--text-strong);
-  font-size: var(--text-size-base);
-  font-weight: var(--weight-strong);
-  margin: 0;
-}
-
-:is(html[data-theme]) .quick-add__section-description {
-  color: var(--text-muted);
-  font-size: var(--text-size-eyebrow);
-  margin: 0;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 :is(html[data-theme]) .quick-add__section-body {
   display: grid;
   gap: var(--gap);
   min-width: 0;
-}
-
-@media (max-width: 720px) {
-  :is(html[data-theme]) .quick-add__section-layout--split {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 /* O GATILHO é a faixa que fecha o trilho: largura inteira, contorno só no topo,

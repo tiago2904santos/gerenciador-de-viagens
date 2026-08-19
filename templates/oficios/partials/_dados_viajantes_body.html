@@ -20,13 +20,13 @@
   </c-slot>
 </c-v2.form_block>
 
-<c-v2.form_block title="Equipe" description="Viajantes e motorista">
+<c-v2.form_block>
   <c-slot name="body">
     {% include "oficios/partials/step1/_team_fields.html" with form=form servidor_create_url=servidor_create_url only %}
   </c-slot>
 </c-v2.form_block>
 
-<c-v2.form_block title="Transporte" description="Viatura utilizada">
+<c-v2.form_block>
   <c-slot name="body">
     {% include "oficios/partials/step1/_transport_fields.html" with form=form viatura_create_url=viatura_create_url only %}
   </c-slot>

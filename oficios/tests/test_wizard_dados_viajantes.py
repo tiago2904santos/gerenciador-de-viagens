@@ -93,15 +93,22 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, "Cadastro de ofício")
         self.assertContains(response, "Dados e viajantes")
         self.assertNotContains(response, "Etapa 2 Transporte")
+        self.assertNotContains(response, "Viatura utilizada")
+        self.assertNotRegex(response.content.decode(), r">\s*Transporte\s*</h2>")
         self.assertContains(response, "Roteiro e diárias")
         self.assertContains(response, "Justificativa")
         self.assertContains(response, "Documentos")
         self.assertContains(response, "N° do Ofício")
         self.assertContains(response, f'name="numero" value="{oficio.numero}"')
+        html = response.content.decode()
+        self.assertRegex(html, r'<input[^>]+name="numero"[^>]+class="input__control"[^>]+id="id_numero"')
+        self.assertNotRegex(html, r'<input[^>]+name="numero"[^>]+class="form-control"')
+        self.assertRegex(html, r'<input[^>]+name="protocolo"[^>]+class="input__control"[^>]+data-mask="protocolo"[^>]+id="id_protocolo"')
+        self.assertNotRegex(html, r'<input[^>]+name="protocolo"[^>]+class="form-control"')
         self.assertContains(response, f"/ {oficio.ano}")
         self.assertNotContains(response, "Data criação:")
         self.assertContains(response, "form-block--v2")
-        self.assertContains(response, "field-grid")
+        self.assertContains(response, "field-grid field-grid--cols-3")
         self.assertNotContains(response, "DOCX")
         self.assertContains(response, "Avançar")
         self.assertNotContains(response, "Gerado automaticamente ao salvar.")
@@ -122,10 +129,18 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, 'data-entity-picker="true"')
         self.assertContains(response, 'data-picker-variant="detailed"')
         self.assertContains(response, 'data-picker-term-control="true"')
+        self.assertRegex(
+            html,
+            r'<input[^>]+name="motorista_manual_nome"[^>]+class="input__control"[^>]+data-mask="upper"[^>]+data-oficio-motorista-manual="true"',
+        )
+        self.assertNotRegex(
+            html,
+            r'<input[^>]+name="motorista_manual_nome"[^>]+class="form-control"',
+        )
         self.assertContains(response, "panel")
-        self.assertContains(response, "Equipe")
+        self.assertNotContains(response, "Viajantes e motorista")
+        self.assertNotRegex(html, r">\s*Equipe\s*</h2>")
         self.assertNotContains(response, "Selecione os viajantes; um deles pode ser o motorista")
-        html = response.content.decode()
         self.assertEqual(len(re.findall(r"<main\b", html)), 1)
         # No v2 a hierarquia é h1 (identidade da página) → h2 (painel) → h2
         # (bloco). Os dois níveis de caixa compartilham o h2 porque o sistema
@@ -163,7 +178,9 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, 'name="modelo_motivo"')
         self.assertContains(response, 'data-texto-motivo="Texto padrão ativo"')
         self.assertContains(response, 'name="motivo"')
-        self.assertContains(response, "cv-field__control cv-field__control--textarea")
+        self.assertContains(response, "input__control input__control--textarea")
+        self.assertNotContains(response, "cv-field__control cv-field__control--textarea")
+        self.assertContains(response, 'data-motivo-textarea="true"')
         self.assertContains(response, 'rows="4"')
         # `form-block--resource` era a variante que punha uma ação no cabeçalho
         # do bloco. No v2 a ação de gerenciar mora dentro do próprio controle
@@ -667,6 +684,17 @@ class OficioWizardDadosViajantesTests(TestCase):
             self.assertNotIn('href="#"', content)
             self.assertNotIn('style="', content)
             self.assertIsNone(re.search(r"<script(?![^>]+src=)", content))
+
+    def test_script_exibe_identificacao_quando_card_motorista_externo_abre(self):
+        content = Path("static/js/pages/oficios-wizard-driver-state.js").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("'[data-oficio-motorista-extras]'", content)
+        self.assertIn(
+            "setExtrasVisible(card && card.querySelector(EXTRAS_PANEL), show);",
+            content,
+        )
 
     def test_modelos_motivo_aparecem_no_select(self):
         response = self.client.get(self._novo_rascunho_url())

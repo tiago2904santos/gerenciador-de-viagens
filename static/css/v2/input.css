@@ -88,6 +88,9 @@
   min-height: 96px;
   padding: 10px 12px;
   resize: vertical;
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
 }
 
 /* ---- só leitura -------------------------------------------------------------
@@ -142,7 +145,10 @@
 :is(html[data-theme]) .field > .form-select:focus-visible,
 :is(html[data-theme]) .field > .cv-field__control:focus-visible {
   border-color: var(--focus-ring);
-  outline: none;
+  /* O legado aplica anel e sombra com `!important` a todo widget Django. No
+     field V2 o foco é a própria borda reservada, igual ao `input__control`. */
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 /* A estrela de "definir como padrão" é um formulário de um botão só; sem isto o

@@ -304,6 +304,35 @@
   grid-column: auto;
 }
 
+/* Ofícios e documentos podem crescer muito dentro do card do evento. Aqui a
+   lista volta a ser uma caixa de grade (fora daqui `person-list` é dissolvida)
+   para poder ter vão próprio e rolagem sem aumentar o card inteiro. */
+:is(html[data-theme]) .evento-card__docs .person-list {
+  display: grid;
+  gap: var(--gap-tight);
+  grid-template-columns: minmax(0, 1fr);
+  max-height: calc(3 * var(--control-height) + 4 * var(--gap-tight));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: var(--gap-tight);
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+/* As linhas deixam de participar da grade de seis colunas do record quando a
+   lista ganha caixa própria; cada item ocupa uma linha inteira dessa caixa. */
+:is(html[data-theme]) .evento-card__docs .person-list > .person-row,
+:is(html[data-theme]) .evento-card__docs .person-list > .person-row:last-child:nth-child(odd) {
+  grid-column: 1;
+}
+
+/* Nestes dois blocos a linha já está no degrau rail; repetir rail no botão o
+   fazia desaparecer. A ação usa field, como os demais controles sobre rail. */
+:is(html[data-theme]) .evento-card__docs .person-row__actions .icon-button {
+  background: var(--surface-field);
+}
+
 /* O formulário de uma ação só não quebra a fila de ações do rodapé. */
 :is(html[data-theme]) .prestacao-card__inline-action {
   display: contents;

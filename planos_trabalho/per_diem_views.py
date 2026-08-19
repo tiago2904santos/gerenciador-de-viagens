@@ -11,6 +11,8 @@ from core.autosave import AutosavePayloadError
 from core.autosave import autosave_json_response
 from core.autosave import filter_allowed_fields
 from core.autosave import parse_autosave_payload
+from core.retorno import com_next
+from core.retorno import daqui
 from .efetivo_services import salvar_efetivo_do_autosave
 from .efetivo_services import salvar_efetivo_e_diarias
 from .forms import EfetivoPlanoFormSet
@@ -50,7 +52,7 @@ def _diarias_selected_dates_json(form):
     return json.dumps(dates)
 
 
-def _efetivo_diarias_context(*, formset, diarias_form, plano, resultado=None):
+def _efetivo_diarias_context(*, formset, diarias_form, plano, request, resultado=None):
     resultado = resultado or calcular_diarias_plano(plano)
     return {
         "page_title": "Plano de Trabalho",
@@ -60,7 +62,7 @@ def _efetivo_diarias_context(*, formset, diarias_form, plano, resultado=None):
         "diarias_display": _diarias_display_values(diarias_form),
         "diarias_selected_dates_json": _diarias_selected_dates_json(diarias_form),
         "diarias_resultado": resultado,
-        "cargos_url": reverse("cadastros:cargos_index"),
+        "cargos_url": com_next(reverse("cadastros:cargos_index"), daqui(request)),
         "api_calcular_diarias_url": reverse("planos_trabalho:api_calcular_diarias", args=[plano.pk]),
         "wizard_autosave_url": reverse("planos_trabalho:efetivo_diarias_autosave", args=[plano.pk]),
         "wizard_autosave_step": "efetivo_diarias",
@@ -163,7 +165,7 @@ def wizard_efetivo_diarias(request, pk):
     return render(
         request,
         "planos_trabalho/wizard_efetivo_diarias.html",
-        _efetivo_diarias_context(formset=formset, diarias_form=diarias_form, plano=plano),
+        _efetivo_diarias_context(formset=formset, diarias_form=diarias_form, plano=plano, request=request),
     )
 
 

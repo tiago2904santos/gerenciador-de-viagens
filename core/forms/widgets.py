@@ -19,6 +19,7 @@ class WidgetStyle(StrEnum):
 
     UNSTYLED = ""
     INPUT_V2 = "input__control"
+    INPUT_V2_TEXTAREA = "input__control input__control--textarea"
     AUTH_FIELD_INPUT = "auth-field-input"
     FORM_CONTROL = "form-control"
     FORM_SELECT = "form-select"

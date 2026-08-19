@@ -76,6 +76,16 @@
   margin-left: auto;
 }
 
+/* A linha já usa a superfície de campo. As ações voltam ao degrau do painel
+   para continuarem visíveis, em vez de desaparecerem na mesma cor da linha. */
+:is(html[data-theme]) .file-list__action {
+  background: var(--surface-rail);
+}
+
+:is(html[data-theme]) .file-list__action:hover {
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface-rail));
+}
+
 /* O formulário existe só para carregar o POST do excluir; ele não pode ocupar
    espaço nem quebrar a fileira de botões. */
 :is(html[data-theme]) .file-list__form {

@@ -204,6 +204,16 @@ class EventosMenusTests(RedeDeMenusSobDemanda, TestCase):
         Oficio.all_objects.create(**oficio)
         return evento
 
+    def test_fragmento_manual_usa_exatamente_a_caixa_de_menu_v2(self):
+        html = self._fragmento().content.decode()
+
+        self.assertIn('class="menu action-menu"', html)
+        self.assertIn("data-menu-v2", html)
+        self.assertIn("data-overlay-panel", html)
+        self.assertIn('class="menu__item"', html)
+        self.assertNotIn("action-menu--rich", html)
+        self.assertNotIn("action-menu__item--rich", html)
+
 
 # Termos saiu desta rede em 2026-08-18: o cartão perdeu o menu "Documentos" —
 # era um segundo caminho para o mesmo download que o seletor da linha já faz — e

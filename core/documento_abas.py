@@ -45,6 +45,15 @@ def normalizar_aba(aba):
     return aba if aba in ABAS_VALIDAS else ABA_PADRAO
 
 
+def normalizar_abas(valores):
+    """Normaliza uma seleção múltipla preservando a ordem visual canônica."""
+    if isinstance(valores, str):
+        valores = [valores]
+    escolhidas = {(valor or "").strip() for valor in (valores or [])}
+    normalizadas = [chave for chave, _label in ABA_LABELS if chave in escolhidas]
+    return normalizadas or [ABA_PADRAO]
+
+
 def anotar_finalizacao(queryset, prestacoes_todas, prestacoes_pendentes):
     """Anota ``_tem_prestacao`` e ``_tem_prestacao_pendente`` (booleanos via EXISTS).
 
@@ -82,6 +91,18 @@ def q_da_aba(aba, *, date_field, cancelado_q):
     return ativo_pendente & (
         Q(**{f"{date_field}__lte": hoje}) | Q(**{f"{date_field}__isnull": True})
     )
+
+
+def q_das_abas(abas, *, date_field, cancelado_q):
+    """Combina por OR os recortes exclusivos escolhidos no multiselect."""
+    filtros = [
+        q_da_aba(aba, date_field=date_field, cancelado_q=cancelado_q)
+        for aba in normalizar_abas(abas)
+    ]
+    combinado = filtros[0]
+    for filtro in filtros[1:]:
+        combinado |= filtro
+    return combinado
 
 
 def contar_por_aba(base_qs, *, date_field, cancelado_q):

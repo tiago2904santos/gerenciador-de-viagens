@@ -69,7 +69,7 @@ def index(request):
     from core import documento_abas as tabs
 
     q = request.GET.get("q", "").strip()
-    aba = tabs.normalizar_aba(request.GET.get("aba", ""))
+    abas_selecionadas = tabs.normalizar_abas(request.GET.getlist("aba"))
     viagem_de = request.GET.get("viagem_de", "").strip()
     viagem_ate = request.GET.get("viagem_ate", "").strip()
     sort = request.GET.get("sort", "").strip()
@@ -83,13 +83,24 @@ def index(request):
 
     cancelado_q = Q(status=Evento.STATUS_CANCELADO)
     date_field = "data_inicio"
-    lista = eventos.filter(tabs.q_da_aba(aba, date_field=date_field, cancelado_q=cancelado_q))
-    contagem = tabs.contar_por_aba(eventos, date_field=date_field, cancelado_q=cancelado_q)
-    abas = tabs.build_abas(
-        reverse("eventos:index"), aba, contagem,
-        preserved={"q": q, "sort": sort, "viagem_de": viagem_de, "viagem_ate": viagem_ate},
+    lista = eventos.filter(
+        tabs.q_das_abas(
+            abas_selecionadas,
+            date_field=date_field,
+            cancelado_q=cancelado_q,
+        )
     )
-    has_filters = any([q, viagem_de, viagem_ate, sort])
+    contagem = tabs.contar_por_aba(eventos, date_field=date_field, cancelado_q=cancelado_q)
+    abas_escolhidas = set(abas_selecionadas)
+    status_filter_options = [
+        {
+            "value": chave,
+            "label": f"{label} ({contagem.get(chave, 0)})",
+            "selected": chave in abas_escolhidas,
+        }
+        for chave, label in tabs.ABA_LABELS
+    ]
+    has_filters = any([q, viagem_de, viagem_ate, sort]) or abas_selecionadas != [tabs.ABA_PADRAO]
     paginacao = contexto_paginacao(lista, request, 20)
     page_obj = paginacao["page_obj"]
     cards = [apresentar_evento_list_card(evento) for evento in page_obj.object_list]
@@ -101,8 +112,8 @@ def index(request):
             "page_title": "Eventos",
             "page_description": "Agrupadores opcionais para organizar documentos relacionados.",
             "q": q,
-            "aba": aba,
-            "abas": abas,
+            "abas_selecionadas": abas_selecionadas,
+            "status_filter_options": status_filter_options,
             "viagem_de": viagem_de,
             "viagem_ate": viagem_ate,
             "sort": sort,
@@ -111,7 +122,7 @@ def index(request):
             "cards": cards,
             **paginacao,
             "novo_url": reverse("eventos:novo"),
-            "search_clear_url": f"{reverse('eventos:index')}?aba={aba}",
+            "search_clear_url": reverse("eventos:index"),
             "sort_options": [
                 {"value": "criacao_desc", "label": "Criação: mais recente"},
                 {"value": "criacao_asc", "label": "Criação: mais antiga"},

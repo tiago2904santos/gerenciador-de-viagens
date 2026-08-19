@@ -3552,14 +3552,15 @@ document.documentElement.dataset.appReady = "true";
 (function () {
   "use strict";
 
-  var SELETOR = ".notice-stack .notice, .alerts .alert";
+  var SELETOR = ".notice-stack .notice, .alerts .alert, .alert-stack .alert";
   var PERMANENTES = /(notice|alert)--?(danger|error|warning)\b/;
   var ESPERA = 5000; // ms na tela antes de começar a sair
   var SAIDA = 280;   // ms de animação, casado com `--ease` da folha
   var MARCA = "data-auto-dismiss-armado";
 
   function ehPermanente(aviso) {
-    return PERMANENTES.test(aviso.className);
+    var tom = aviso.getAttribute("data-tone") || "";
+    return PERMANENTES.test(aviso.className) || /^(danger|error|warning)$/.test(tom);
   }
 
   function menosMovimento() {

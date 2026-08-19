@@ -506,3 +506,11 @@ igualmente na `main`. Os avisos deste recorte foram de 253 para 239.
   repositório inteiro e sem alterar campos, URLs, regras de negócio ou ganchos de JavaScript.
   Fechamento: 298 chamadas substituíveis eliminadas, 70 arquivos antigos apagados e 14 peças de
   infraestrutura sem equivalente v2 preservadas em lista de exceções testada.
+
+## Filtro múltiplo da lista de eventos (19/08/2026)
+
+- [x] `NOVO-20260819-145524-c938f37c99e8` — substituir as abas temporais da lista de Eventos
+  por um multiselect V2 dentro do rail, permitindo combinar situações sem perder busca,
+  contagens, paginação ou compatibilidade com o parâmetro `aba` existente. Fechamento: o select
+  múltiplo preserva valores repetidos na URL, combina os quatro recortes por OR e mantém
+  `futuras` como padrão quando nenhum valor é enviado.
