@@ -164,6 +164,19 @@
       <c-v2.menu_item href="#" icon="download" title="Baixar documento" description="Gera o PDF assinado." />
       <c-v2.menu_item href="#" icon="x" title="Excluir" description="Remove em definitivo." tone="late" />
       {% comment %}
+        O item que EXECUTA em vez de navegar: abrir todos os documentos do grupo
+        de uma vez. É `<button>`, e não link, porque não leva a lugar nenhum —
+        como link ele precisaria de um destino falso. Na linha ele é
+        indistinguível dos vizinhos, e é isso que se confere aqui.
+      {% endcomment %}
+      <c-v2.menu_button
+        title="Visualizar termos"
+        description="Abrir todos os documentos disponíveis."
+        icon="eye"
+        icon_tone="info"
+        hook="data-open-all-termos"
+      />
+      {% comment %}
         O item que abre o diálogo do assinado. Os cinco ganchos dele são contrato
         do `attach-signed-modal.js` e moram num componente próprio justamente
         para não serem redigitados a cada menu.

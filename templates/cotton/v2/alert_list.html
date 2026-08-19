@@ -1,0 +1,30 @@
+{% cotton:vars extra_class items lead title tone %}
+{% comment %}
+  Alerta com LISTA — o aviso que enumera o que falta antes de uma etapa fechar.
+  Par de `static/css/v2/alert.css`, na mesma caixa e no mesmo vocabulário de tom
+  do `c-v2.alert`.
+
+  Existe separado do `alert` porque aquele é um `<p>`: uma pendência é um item
+  de lista, e enfiar cinco frases num parágrafo só obriga a ler tudo para
+  descobrir quantas são. Aqui a contagem é visível antes da leitura.
+
+  Traduz `cotton/ui/feedback/pendencias_card.html` sem herdar o desenho: o
+  legado tinha caixa, marcador e título próprios (`.pendencias*`), que eram um
+  quarto jeito de dizer "atenção" na mesma tela onde já existiam o alerta, o
+  selo e o erro de campo.
+
+  `tone` nomeia o ESTADO (`error`, `warning`, `info`), nunca a cor — o CSS
+  traduz, como no chip e no alerta.
+{% endcomment %}
+<section
+  class="alert alert--list{% if extra_class %} {{ extra_class }}{% endif %}"
+  data-tone="{{ tone|default:'error' }}"
+  role="status"
+  aria-live="polite"
+>
+  <strong class="alert__title">{{ title|default:"Pendências encontradas" }}</strong>
+  {% if lead %}<p class="alert__lead">{{ lead }}</p>{% endif %}
+  <ul class="alert__items">
+    {% for item in items %}<li>{{ item }}</li>{% endfor %}
+  </ul>
+</section>

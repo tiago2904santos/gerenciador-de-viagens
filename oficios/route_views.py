@@ -231,6 +231,12 @@ def wizard_roteiro(request, pk):
             "wizard_back_url": _oficio_back_url(oficio),
             "wizard_back_label": _oficio_back_label(oficio),
             "roteiro_editor_oficio": True,
+            # `roteiro_editor_oficio` NÃO serve para distinguir as duas telas: a
+            # página avulsa de roteiro também o recebe True
+            # (`roteiros/presenters.py`), e usá-lo como discriminador punha a
+            # marca do wizard numa tela que não é wizard. Este é o marcador da
+            # ETAPA, e só a etapa o tem.
+            "roteiro_editor_wizard": True,
             "wizard_use_outer_form": False,
             **_wizard_footer_ctx(oficio),
         }

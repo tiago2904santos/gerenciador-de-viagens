@@ -219,6 +219,13 @@
       <c-slot name="body">
         <c-v2.os_role_toggle aria_label="Função dos servidores no caminhão" />
         <c-v2.evento_doc_toggle />
+        {% comment %}
+          O do MOTORISTA fica com eles: são todos a mesma peça — segmentos de
+          uma escolha só, com o valor num `data-*` que o script da tela lê. Lado
+          a lado é onde se vê que continuam sendo a mesma coisa em três
+          tamanhos.
+        {% endcomment %}
+        <c-v2.driver_mode_toggle mode="SERVIDOR" />
       </c-slot>
     </c-v2.panel>
 
@@ -230,6 +237,22 @@
     <c-v2.panel title="Campo de formulário do Django" description="Rótulo, widget e erro a partir de um BoundField.">
       <c-slot name="body">
         <c-v2.form_field :field="v2_campo_exemplo" />
+      </c-slot>
+    </c-v2.panel>
+
+    {% comment %}
+      Sugestões — a faixa nasce OCULTA e vazia, e é assim que ela aparece aqui:
+      o que a preenche é o script da tela, a partir do que já foi escolhido nos
+      outros campos. Mostrar chips de mentira faria a vitrine prometer um estado
+      que a tela real só alcança depois de o formulário ter dados.
+
+      O que se confere aqui é o oposto do costume: que ela NÃO ocupe espaço
+      enquanto não houver o que sugerir.
+    {% endcomment %}
+    <c-v2.panel title="Sugestões" description="A faixa de atalhos do formulário. Nasce oculta; o script da tela injeta os chips.">
+      <c-slot name="body">
+        <c-v2.suggestions hook="data-lab-sugestoes" list_hook="data-lab-sugestoes-chips" />
+        <p class="field__help">Sem sugestões a faixa não é renderizada — é o estado desta prévia.</p>
       </c-slot>
     </c-v2.panel>
 

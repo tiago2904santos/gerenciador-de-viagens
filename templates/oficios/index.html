@@ -83,7 +83,12 @@
     </c-slot>
   </c-v2.list_page>
 
-  <c-ui.modals.delete_confirm_modal delete_modal_title="Excluir ofício?" delete_modal_entity="este ofício" />
-  <c-ui.modals.cancel_reason_modal cancel_modal_title="Cancelar ofício?" cancel_modal_entity="este ofício" cancel_modal_hint="Ele deixa de gerar prestação de contas e não poderá mais ser usado em novas Ordens de Serviço." />
-  <c-ui.modals.attach_signed_modal />
+  {% comment %}
+    Os três diálogos da lista, no v2. Um de cada por página: quem os abre é o
+    `overlay.js`, a partir do gatilho do cartão, e é o gatilho que traz o nome do
+    registro e a URL da ação — por isso não há título variável aqui.
+  {% endcomment %}
+  <c-v2.delete_modal entity="este ofício" />
+  <c-v2.cancel_modal entity="este ofício" hint="Ele deixa de gerar prestação de contas e não poderá mais ser usado em novas Ordens de Serviço." />
+  <c-v2.attach_signed_modal />
 {% endblock %}

@@ -732,29 +732,28 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertFalse((Path(settings.BASE_DIR) / "static" / "css" / "documentos-viewer.css").exists())
 
     def test_wizard_transport_uses_canonical_section_and_action_contracts(self):
-        source = (
-            Path(settings.BASE_DIR) / "templates" / "oficios" / "wizard_transporte.html"
-        ).read_text(encoding="utf-8")
-        card = (
-            Path(settings.BASE_DIR) / "templates" / "cotton" / "form" / "card.html"
-        ).read_text(encoding="utf-8")
-        header_actions = (
-            Path(settings.BASE_DIR)
-            / "templates"
-            / "oficios"
-            / "partials"
-            / "_transporte_header_actions.html"
-        ).read_text(encoding="utf-8")
+        """A etapa de transporte não desenha caixa nem botão próprios.
 
-        # `H-05`: o casco do card veio de `cotton/form/card.html`; a página
-        # só aponta o include. O contrato visual continua no componente canônico.
-        self.assertIn('<c-form.card', source)
-        self.assertIn("form-section-card", card)
-        self.assertIn("cv-form-section-header", card)
-        self.assertIn("form-section-body", card)
-        self.assertIn("button button--secondary", header_actions)
+        O `H-05` guardava isto contra `cotton/form/card.html`, o cartão do
+        sistema antigo. Com a migração de Ofícios para o v2
+        (`NOVO-20260818-213853-fab772ef1b6e`) o casco passou a ser o
+        `c-v2.panel`, e o rodapé o `c-v2.card_footer` — o contrato é o mesmo,
+        muda o componente canônico que o cumpre.
+        """
+        templates = Path(settings.BASE_DIR) / "templates"
+        source = (templates / "oficios" / "wizard_transporte.html").read_text(encoding="utf-8")
+        panel = (templates / "cotton" / "v2" / "panel.html").read_text(encoding="utf-8")
+
+        self.assertIn("<c-v2.panel", source)
+        self.assertIn("<c-v2.card_footer", source)
+        self.assertIn('class="panel', panel)
+        self.assertIn("panel__header", panel)
+        self.assertIn("panel__empty", panel)
+        # Nada do vocabulário anterior volta pela porta dos fundos.
+        self.assertNotIn("<c-form.card", source)
         self.assertNotIn("form-section app-form-section", source)
         self.assertNotIn("btn btn-secondary", source)
+        self.assertNotIn("<button", source)
 
     def test_dashboard_uses_global_header_summary_and_module_cards(self):
         templates = Path(settings.BASE_DIR) / "templates"

@@ -30,9 +30,15 @@
 
     A página deixou de estender `cotton/page/flow_base.html`: casca, blocos,
     campos e rodapé vêm do pacote do v2. O corpo está em
-    `roteiros/includes/_roteiro_editor_v2.html` — o legado
-    (`_roteiro_editor.html`) segue intocado porque a etapa de roteiro do wizard
-    de ofício ainda o usa, e ofícios é a última tela da fila.
+    `roteiros/includes/_roteiro_editor_v2.html`, que desde
+    `NOVO-20260818-213853-fab772ef1b6e` serve TAMBÉM à etapa de roteiro do
+    wizard de ofício — a última tela da fila. O que muda entre as duas é
+    `roteiro_editor_wizard`, e só isso.
+
+    Com as duas telas no mesmo editor, o legado (`_roteiro_editor.html`) e a
+    árvore de parciais sob ele ficaram sem consumidor. A poda deles é a
+    `NOVO-20260818-223102-58bda2a28945`, e não este PR: ela cascateia por ~20
+    arquivos e por dois componentes `c-travel.*`.
 
     O `initialTrechosData` fica ANTES do formulário porque `editor/index.js` o lê
     ao iniciar, para reconstruir os trechos já salvos.

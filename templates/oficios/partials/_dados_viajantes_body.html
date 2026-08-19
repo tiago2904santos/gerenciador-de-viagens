@@ -1,9 +1,35 @@
-<c-ui.forms.form_block title="Identificação" description="Número, protocolo e custeio" section_id="travel-document-identity-title" :heading_level="3" variant="split" extra_class="travel-document-block" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :element_id="element_id" :shell="shell"><c-slot name="body">{% include "oficios/partials/step1/_identity_fields.html" with form=form mostrar_custeio_observacao=mostrar_custeio_observacao oficio_numero_ano_hint=oficio_numero_ano_hint outra_instituicao_custeio_value=outra_instituicao_custeio_value only %}</c-slot></c-ui.forms.form_block>
+{% comment %}
+  Miolo da etapa 1 — quatro blocos e a seção condicional do motorista externo.
 
-<c-ui.forms.form_block title="Finalidade" description="Motivo e descrição da viagem" section_id="travel-document-purpose-title" :heading_level="3" extra_class="travel-document-block" body_extra_class="form-stack" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_id="body_id" :data_hook="data_hook" :element_id="element_id" :shell="shell" :variant="variant"><c-slot name="body">{% include "oficios/partials/step1/_purpose_fields.html" with form=form modelos_motivo_url=modelos_motivo_url tem_modelos_motivo=tem_modelos_motivo only %}</c-slot></c-ui.forms.form_block>
+  Os quatro são `c-v2.form_block`, filhos diretos do painel: é a mesma
+  composição do cadastro de servidor e do formulário de OS. O legado precisava
+  de `variant="split"` e `variant="resource"` para dizer a mesma coisa; no v2 só
+  a Identificação é `split` (o bloco com rótulo à esquerda), e "resource" virou
+  o que ele sempre foi na prática — uma ação de gerenciar ao lado do CAMPO, que
+  o `picker` e o `select_with_action` já carregam por dentro.
+{% endcomment %}
+<c-v2.form_block :split="True" title="Identificação" description="Número, protocolo e custeio">
+  <c-slot name="body">
+    {% include "oficios/partials/step1/_identity_fields.html" with form=form mostrar_custeio_observacao=mostrar_custeio_observacao oficio_numero_ano_hint=oficio_numero_ano_hint outra_instituicao_custeio_value=outra_instituicao_custeio_value only %}
+  </c-slot>
+</c-v2.form_block>
 
-<c-ui.forms.form_block title="Equipe" description="Viajantes e motorista" section_id="travel-document-wizard-equipe-title" :heading_level="3" variant="resource" extra_class="travel-document-block" action_label="Novo viajante" :action_url="servidor_create_url" :action_autosave="True" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :element_id="element_id" :shell="shell"><c-slot name="body">{% include "oficios/partials/step1/_team_fields.html" with form=form only %}</c-slot></c-ui.forms.form_block>
+<c-v2.form_block title="Finalidade" description="Motivo e descrição da viagem">
+  <c-slot name="body">
+    {% include "oficios/partials/step1/_purpose_fields.html" with form=form modelos_motivo_url=modelos_motivo_url tem_modelos_motivo=tem_modelos_motivo only %}
+  </c-slot>
+</c-v2.form_block>
 
-<c-ui.forms.form_block title="Transporte" description="Viatura utilizada" section_id="travel-document-wizard-viatura-title" :heading_level="3" variant="resource" extra_class="travel-document-block" action_label="Nova viatura" :action_url="viatura_create_url" :action_autosave="True" data_hook="oficio-viatura-card" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :element_id="element_id" :shell="shell"><c-slot name="body">{% include "oficios/partials/step1/_transport_fields.html" with form=form only %}</c-slot></c-ui.forms.form_block>
+<c-v2.form_block title="Equipe" description="Viajantes e motorista">
+  <c-slot name="body">
+    {% include "oficios/partials/step1/_team_fields.html" with form=form servidor_create_url=servidor_create_url only %}
+  </c-slot>
+</c-v2.form_block>
 
-{% include "oficios/partials/wizard_dados_card_motorista_externo.html" with motorista_compact_widget=motorista_compact_widget motorista_oficio_ano=motorista_oficio_ano motorista_oficio_numero_inicial=motorista_oficio_numero_inicial show_motorista_card=show_motorista_card transporte_form=transporte_form only %}
+<c-v2.form_block title="Transporte" description="Viatura utilizada">
+  <c-slot name="body">
+    {% include "oficios/partials/step1/_transport_fields.html" with form=form viatura_create_url=viatura_create_url only %}
+  </c-slot>
+</c-v2.form_block>
+
+{% include "oficios/partials/wizard_dados_card_motorista_externo.html" with motorista_compact_widget=motorista_compact_widget motorista_extras_visivel=motorista_extras_visivel motorista_oficio_ano=motorista_oficio_ano motorista_oficio_numero_inicial=motorista_oficio_numero_inicial show_motorista_card=show_motorista_card transporte_form=transporte_form only %}

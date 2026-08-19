@@ -1,193 +1,152 @@
+{% comment %}
+  Conferência — os documentos gerados, abertos na própria página.
+
+  Três cartões `c-v2.document_inline`: ofício, justificativa e o GRUPO de termos,
+  que reúne um cartão por servidor. Antes, os três eram `<details>` escritos à
+  mão com o mesmo cabeçalho copiado quatro vezes — 193 linhas para dizer o que
+  agora são três chamadas e os menus de cada uma.
+
+  Os menus ficam ao lado do cartão que abrem, e não no fim do arquivo: o gatilho
+  é achado pelo `id`, e mantê-los juntos é o que impede um `id` de sobrar quando
+  o cartão sai.
+{% endcomment %}
 {% with di=documentos_ctx.documentos_inline %}
-  <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
-    <summary class="document-inline-card__header">
-      <span class="document-inline-card__title">{{ di.oficio.titulo }}</span>
-      {% if di.oficio.disponivel %}
-        <span class="document-inline-card__header-end">
-          <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
-            <c-ui.buttons.button class_name="icon-btn icon-btn--settings" type="button"
-                    aria_label="Abrir ações do ofício"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                    aria-controls="wizard-oficio-document-menu"
-                    data-tooltip="Visualizar e baixar"
-                    data-overlay-trigger data-overlay-kind="menu"
-                    data-overlay-target="wizard-oficio-document-menu" only>
-              <c-ui.icons.icon icon="folder" only />
-            </c-ui.buttons.button>
-            <div class="action-menu action-menu--rich" id="wizard-oficio-document-menu" role="menu" hidden>
-              <c-ui.menus.rich_menu_header :title="di.oficio.titulo" subtitle="Documento do ofício" icon="folder" only />
-              <c-ui.menus.rich_menu_link :href="di.oficio.url" title="Visualizar documento" description="Abrir o PDF no navegador" icon="eye" tone="preview" :target_blank="True" only />
-              <c-ui.menus.rich_menu_link :href="di.oficio.download_pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" :download="True" only />
-              <c-ui.menus.rich_menu_link :href="di.oficio.download_docx_url" title="Baixar DOCX" description="Arquivo editável do ofício" icon="docx" tone="docx" :download="True" only />
-            </div>
-          </span>
-        </span>
-      {% endif %}
-    </summary>
-    <div class="document-inline-card__body">
-      {% if di.oficio.disponivel %}
-        <div class="document-inline-viewer">
-          <iframe
-            class="document-inline-viewer__frame"
-            data-src="{{ di.oficio.url }}"
-            title="Visualização do ofício em PDF"
-            loading="lazy"
-          ></iframe>
-        </div>
-      {% else %}
-        <p class="document-inline-empty">{{ di.oficio.mensagem }}</p>
-      {% endif %}
-    </div>
-  </details>
+  <c-v2.document_inline
+    :title="di.oficio.titulo"
+    :src="di.oficio.src"
+    frame_title="Visualização do ofício em PDF"
+    :empty_message="di.oficio.mensagem"
+    actions_label="Ações do documento"
+  >
+    {% if di.oficio.disponivel %}
+      <c-slot name="actions">
+        <c-v2.icon_button
+          icon="folder"
+          menu_id="wizard-oficio-document-menu"
+          aria_label="Abrir ações do ofício"
+          tooltip="Visualizar e baixar"
+        />
+      </c-slot>
+    {% endif %}
+  </c-v2.document_inline>
 
-  <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
-    <summary class="document-inline-card__header">
-      <span class="document-inline-card__title">{{ di.justificativa.titulo }}</span>
-      {% if di.justificativa.disponivel %}
-        <span class="document-inline-card__header-end">
-          <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
-            <c-ui.buttons.button class_name="icon-btn icon-btn--settings" type="button"
-                    aria_label="Abrir ações da justificativa"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                    aria-controls="wizard-justificativa-document-menu"
-                    data-tooltip="Visualizar e baixar"
-                    data-overlay-trigger data-overlay-kind="menu"
-                    data-overlay-target="wizard-justificativa-document-menu" only>
-              <c-ui.icons.icon icon="folder" only />
-            </c-ui.buttons.button>
-            <div class="action-menu action-menu--rich" id="wizard-justificativa-document-menu" role="menu" hidden>
-              <c-ui.menus.rich_menu_header :title="di.justificativa.titulo" subtitle="Documento de justificativa" icon="folder" only />
-              <c-ui.menus.rich_menu_link :href="di.justificativa.url" title="Visualizar documento" description="Abrir o PDF no navegador" icon="eye" tone="preview" :target_blank="True" only />
-              <c-ui.menus.rich_menu_link :href="di.justificativa.download_pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" :download="True" only />
-              <c-ui.menus.rich_menu_link :href="di.justificativa.download_docx_url" title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" tone="docx" :download="True" only />
-            </div>
-          </span>
-        </span>
-      {% endif %}
-    </summary>
-    <div class="document-inline-card__body">
-      {% if di.justificativa.disponivel %}
-        <div class="document-inline-viewer">
-          <iframe
-            class="document-inline-viewer__frame"
-            data-src="{{ di.justificativa.url }}"
-            title="Visualização da justificativa em PDF"
-            loading="lazy"
-          ></iframe>
-        </div>
-      {% else %}
-        <p class="document-inline-empty">{{ di.justificativa.mensagem }}</p>
-      {% endif %}
-    </div>
-  </details>
+  {% if di.oficio.disponivel %}
+    <c-v2.menu id="wizard-oficio-document-menu" extra_class="action-menu" aria_label="Documentos do ofício">
+      <c-v2.menu_item :href="di.oficio.url" title="Visualizar documento" description="Abrir o PDF no navegador" icon="eye" icon_tone="info" :target_blank="True" />
+      <c-v2.menu_item :href="di.oficio.download_pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" icon_tone="late" :download="True" />
+      <c-v2.menu_item :href="di.oficio.download_docx_url" title="Baixar DOCX" description="Arquivo editável do ofício" icon="docx" icon_tone="progress" :download="True" />
+    </c-v2.menu>
+  {% endif %}
 
-  <details class="document-inline-card document-inline-card--termos">
-    <summary class="document-inline-card__header">
-      <span class="document-inline-card__title">Termos de Autorização</span>
-      {% if not di.termos_vazio and di.termos|length > 1 %}
-        <span class="document-inline-card__header-end">
-          <span class="document-inline-actions document-inline-actions--header" aria-label="Ações dos termos">
-            <c-ui.buttons.button class_name="icon-btn icon-btn--settings" type="button"
-                    aria_label="Abrir ações dos termos"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                    aria-controls="wizard-termos-document-menu"
-                    data-tooltip="Visualizar e baixar"
-                    data-overlay-trigger data-overlay-kind="menu"
-                    data-overlay-target="wizard-termos-document-menu" only>
-              <c-ui.icons.icon icon="folder" only />
-            </c-ui.buttons.button>
-            <div class="action-menu action-menu--rich" id="wizard-termos-document-menu" role="menu" hidden>
-              <c-ui.menus.rich_menu_header title="Termos de autorização" subtitle="Todos os servidores" icon="folder" only />
-              <c-ui.buttons.button class_name="action-menu__item action-menu__item--rich" type="button" data-open-all-termos role="menuitem" only>
-                <span class="action-menu__item-icon action-menu__item-icon--preview" aria-hidden="true">
-                  <c-ui.icons.icon icon="eye" only />
-                </span>
-                <span class="action-menu__item-copy"><strong>Visualizar termos</strong><small>Abrir todos os documentos disponíveis</small></span>
-              </c-ui.buttons.button>
-              <c-ui.menus.rich_menu_link :href="di.termos_download_todos_pdf_url" title="Baixar PDFs" description="Salvar todos os termos em PDF" icon="pdf" tone="pdf" :download="True" :data_download_all_termos="True" only />
-              <c-ui.menus.rich_menu_link :href="di.termos_download_todos_docx_url" title="Baixar DOCXs" description="Salvar todos os arquivos editáveis" icon="docx" tone="docx" :download="True" only />
-            </div>
-          </span>
-        </span>
-      {% endif %}
-    </summary>
-    <div class="document-inline-card__body document-inline-card__body--termos">
-      {% if di.termos_vazio %}
-        <p class="document-inline-empty">{{ di.termos_empty_message }}</p>
-      {% else %}
-        {% for t in di.termos %}
-          <details class="document-inline-card document-inline-card--nested document-inline-card--lazy" data-lazy-inline data-termo-inline-url="{{ t.inline_url }}" data-termo-download-pdf-url="{{ t.download_pdf_url }}">
-            <summary class="document-inline-card__header">
-              <span class="document-inline-card__title">
-                {{ t.titulo }}
-              </span>
-              <span class="document-inline-card__header-end">
-                <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do termo — {{ t.servidor_nome }}">
-                  <c-ui.buttons.button
-                    class_name="icon-btn icon-btn--settings{% if t.assinado %} is-assinado{% endif %}"
-                    type="button"
-                    aria_label="Abrir ações do termo de {{ t.servidor_nome }}"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                    aria-controls="wizard-termo-document-menu-{{ forloop.counter }}"
-                    data-tooltip="{% if t.assinado %}Termo assinado — ações{% else %}Visualizar, baixar e anexar{% endif %}"
-                    data-overlay-trigger data-overlay-kind="menu"
-                    data-overlay-target="wizard-termo-document-menu-{{ forloop.counter }}" only><c-ui.icons.icon icon="folder" only /></c-ui.buttons.button>
-                  <div class="action-menu action-menu--rich" id="wizard-termo-document-menu-{{ forloop.counter }}" role="menu" hidden>
-                    {% if t.assinado %}
-                      <c-ui.menus.rich_menu_header title="Termo assinado" :subtitle="t.titulo" icon="sign" only />
-                    {% else %}
-                      <c-ui.menus.rich_menu_header title="Termo de autorização" :subtitle="t.titulo" icon="folder" only />
-                    {% endif %}
-                    {% if t.disponivel %}
-                      <c-ui.menus.rich_menu_link :href="t.inline_url" title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" :target_blank="True" only />
-                      <c-ui.menus.rich_menu_link :href="t.download_pdf_url" title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" :download="True" only />
-                      <c-ui.menus.rich_menu_link :href="t.download_docx_url" title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" :download="True" only />
-                    {% endif %}
-                    {% if t.anexar_assinado_url %}
-                      <c-ui.buttons.button
-                        type="button"
-                        class_name="action-menu__item action-menu__item--rich{% if t.assinado %} is-assinado{% endif %}"
-                        role="menuitem"
-                        data-attach-signed-trigger
-                        data-attach-signed-url="{{ t.anexar_assinado_url }}"
-                        data-attach-signed-doc-label="Termo de {{ t.servidor_nome }}"
-                        data-attach-signed-current-name="{{ t.assinado_nome_original }}"
-                        data-attach-signed-current-view-url="{{ t.assinado_view_url }}"
-                        data-attach-signed-current-remove-url="{{ t.remover_assinado_url }}" only>
-                        <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
-                          <c-ui.icons.icon icon="sign" only />
-                        </span>
-                        <span class="action-menu__item-copy">
-                          <strong>{% if t.assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
-                          <small>{% if t.assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
-                        </span>
-                      </c-ui.buttons.button>
-                    {% endif %}
-                  </div>
-                </span>
-              </span>
-            </summary>
-            <div class="document-inline-card__body">
-              {% if t.disponivel %}
-                <div class="document-inline-viewer">
-                  <iframe
-                    class="document-inline-viewer__frame"
-                    data-src="{{ t.inline_url }}"
-                    title="Termo de autorização — {{ t.servidor_nome }}"
-                    loading="lazy"
-                  ></iframe>
-                </div>
-              {% else %}
-                <p class="document-inline-empty">{{ di.mensagem_indisponivel }}</p>
-              {% endif %}
-            </div>
-          </details>
-        {% endfor %}
-      {% endif %}
-    </div>
-  </details>
+  <c-v2.document_inline
+    :title="di.justificativa.titulo"
+    :src="di.justificativa.src"
+    frame_title="Visualização da justificativa em PDF"
+    :empty_message="di.justificativa.mensagem"
+    actions_label="Ações do documento"
+  >
+    {% if di.justificativa.disponivel %}
+      <c-slot name="actions">
+        <c-v2.icon_button
+          icon="folder"
+          menu_id="wizard-justificativa-document-menu"
+          aria_label="Abrir ações da justificativa"
+          tooltip="Visualizar e baixar"
+        />
+      </c-slot>
+    {% endif %}
+  </c-v2.document_inline>
+
+  {% if di.justificativa.disponivel %}
+    <c-v2.menu id="wizard-justificativa-document-menu" extra_class="action-menu" aria_label="Documentos da justificativa">
+      <c-v2.menu_item :href="di.justificativa.url" title="Visualizar documento" description="Abrir o PDF no navegador" icon="eye" icon_tone="info" :target_blank="True" />
+      <c-v2.menu_item :href="di.justificativa.download_pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" icon_tone="late" :download="True" />
+      <c-v2.menu_item :href="di.justificativa.download_docx_url" title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" icon_tone="progress" :download="True" />
+    </c-v2.menu>
+  {% endif %}
+
+  {% comment %}
+    O cartão de GRUPO só ganha menu com DOIS termos ou mais: com um só, "baixar
+    todos" e "baixar" são a mesma ação, e o menu do filho já a oferece.
+  {% endcomment %}
+  <c-v2.document_inline :group="True" title="Termos de Autorização" :empty_message="di.termos_empty_message" actions_label="Ações dos termos">
+    {% if not di.termos_vazio and di.termos|length > 1 %}
+      <c-slot name="actions">
+        <c-v2.icon_button
+          icon="folder"
+          menu_id="wizard-termos-document-menu"
+          aria_label="Abrir ações dos termos"
+          tooltip="Visualizar e baixar"
+        />
+      </c-slot>
+    {% endif %}
+
+    <c-slot name="body">
+      {% for t in di.termos %}
+        {% comment %}
+          O contador vira TEXTO antes de entrar no `add`. O filtro tenta
+          `int(valor) + int(arg)`, falha no prefixo, tenta `valor + arg`, e
+          somar `str` com `int` falha também — o `add` então devolve string
+          VAZIA, sem erro. Com o id vazio o `icon_button` não emite os atributos
+          de overlay e o menu nasce sem `id` e sem `hidden`: o botão fica inerte
+          e a lista de ações aparece cravada na página. Medido no template.
+        {% endcomment %}
+        {% with contador=forloop.counter|stringformat:"s" %}
+        {% with menu_id="wizard-termo-document-menu-"|add:contador rotulo_termo="Termo de "|add:t.servidor_nome %}
+          <c-v2.document_inline
+            :nested="True"
+            :title="t.titulo"
+            :src="t.inline_src"
+            :frame_title="rotulo_termo"
+            :empty_message="di.mensagem_indisponivel"
+            :open_url="t.inline_url"
+            :download_url="t.download_pdf_url"
+            :actions_label="rotulo_termo"
+          >
+            <c-slot name="actions">
+              <c-v2.icon_button
+                icon="folder"
+                :menu_id="menu_id"
+                :aria_label="rotulo_termo"
+                tooltip="{% if t.assinado %}Termo assinado — ações{% else %}Visualizar, baixar e anexar{% endif %}"
+              />
+            </c-slot>
+          </c-v2.document_inline>
+
+          <c-v2.menu :id="menu_id" extra_class="action-menu" :aria_label="rotulo_termo">
+            {% if t.disponivel %}
+              <c-v2.menu_item :href="t.inline_url" title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" icon_tone="info" :target_blank="True" />
+              <c-v2.menu_item :href="t.download_pdf_url" title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" icon_tone="late" :download="True" />
+              <c-v2.menu_item :href="t.download_docx_url" title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" icon_tone="progress" :download="True" />
+            {% endif %}
+            {% if t.anexar_assinado_url %}
+              <c-v2.menu_attach_signed
+                :url="t.anexar_assinado_url"
+                :doc_label="rotulo_termo"
+                :signed="t.assinado"
+                :current_name="t.assinado_nome_original"
+                :current_view_url="t.assinado_view_url"
+                :current_remove_url="t.remover_assinado_url"
+              />
+            {% endif %}
+          </c-v2.menu>
+        {% endwith %}
+        {% endwith %}
+      {% endfor %}
+    </c-slot>
+  </c-v2.document_inline>
+
+  {% if not di.termos_vazio and di.termos|length > 1 %}
+    <c-v2.menu id="wizard-termos-document-menu" extra_class="action-menu" aria_label="Termos de autorização">
+      <c-v2.menu_button
+        title="Visualizar termos"
+        description="Abrir todos os documentos disponíveis"
+        icon="eye"
+        icon_tone="info"
+        hook="data-open-all-termos"
+      />
+      <c-v2.menu_item :href="di.termos_download_todos_pdf_url" title="Baixar PDFs" description="Salvar todos os termos em PDF" icon="pdf" icon_tone="late" :download="True" />
+      <c-v2.menu_item :href="di.termos_download_todos_docx_url" title="Baixar DOCXs" description="Salvar todos os arquivos editáveis" icon="docx" icon_tone="progress" :download="True" />
+    </c-v2.menu>
+  {% endif %}
 {% endwith %}

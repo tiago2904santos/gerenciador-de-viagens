@@ -9086,3 +9086,81 @@ Os dois são a mesma causa do `NOVO-20260818-213938-228adea09e1d` — cor litera
 trabalho visual de agosto — e devem ser fechados no mesmo corte de token, medindo os três
 auditores juntos: mexer em `hex_color_outside_tokens` sem olhar `audit_paleta` troca um teto pelo
 outro.
+
+### NOVO-20260818-213853-fab772ef1b6e ✅ RESOLVIDO · `NOVO` Telas de Ofícios ainda são as últimas do sistema fora do v2 · HT/UI · 1,5 d
+
+A lista de Ofícios e o cartão dela já eram v2, mas as **cinco etapas do wizard** continuavam no
+sistema anterior: casca com cabeçalho grudente próprio (`wizard-sticky-scope`), cartão
+`c-form.card`, blocos `c-ui.forms.form_block`, rodapés `card_footer_section` e três diálogos
+`c-ui.modals.*`. Medido no início do corte: **119 ocorrências de namespace legado** em
+`templates/oficios/` contra 57 do v2 — o pior índice do repositório depois de Prestações. No fim,
+**zero**.
+
+A etapa de roteiro era o caso mais caro: ela mantinha uma **segunda cópia da mesma tela**
+(`roteiros/includes/_roteiro_editor.html`), com um `{% include %}` de 90 atributos, enquanto a
+tela avulsa de roteiro já rodava no editor v2.
+
+Quatro peças do sistema não tinham par no v2 e por isso a migração parava: o cartão de documento
+inline (cuja folha `v2/document-inline.css` já viajava no bundle **sem componente** — a marcação
+era copiada à mão em nove telas), a pendência de etapa (um QUARTO desenho de "atenção", com caixa
+e marcador próprios), o campo NÚMERO/ANO (último campo a desenhar a própria moldura em vez de usar
+o `field`) e a faixa de sugestões de viatura, cujos dois ganchos se separavam quando escritos
+soltos no template.
+
+**Corte.** As cinco etapas passaram ao `c-v2.wizard_page`; o miolo de cada uma é `c-v2.panel` com
+`c-v2.form_block` dentro, e os rodapés são `c-v2.card_footer` com `c-v2.button` de `name`/`value`.
+A etapa de roteiro passou a incluir o **mesmo** `_roteiro_editor_v2.html` da tela avulsa, agora com
+os dois modos no mesmo arquivo. Entraram seis componentes — `document_inline`, `alert_list`,
+`document_number`, `suggestions`, `driver_mode_toggle` e `menu_button` — e todos aparecem na
+galeria do UI Lab, que é o consumidor de produção que o repositório exige. O `c-v2.button` ganhou
+`name`/`value` (submit nomeado do wizard) e `autosave_link` (o "Voltar" que não pode custar o
+rascunho); o `c-v2.confirm_delete_page` ganhou a prévia do texto, que a exclusão de modelo de
+motivo mostrava e teria perdido.
+
+**Consertos que vieram junto.** `test_todo_componente_v2_aparece_na_galeria` e o inventário de
+componentes estavam VERMELHOS desde o commit anterior (`quick_add_section` sem consumidor na
+vitrine, contagem em 147 para 148 arquivos): as duas pontas foram fechadas. Os pickers de equipe,
+viatura e motorista não levavam `data-picker-v2` e por isso a lista de resultados caía no desenho
+anterior mesmo numa tela migrada. O `oficios-transporte.js` escondia painéis pela classe
+`form-field--hidden`, que mora nas folhas de página que saíram do wizard — passou a usar a
+propriedade `hidden`. E `.alert--list` declara a própria grade: a folha legada dá a `.alert` duas
+colunas mais um marcador em `::before`, feitos para um parágrafo só, e com três filhos o título ia
+para a coluna do marcador (medido na etapa de documentos).
+
+**Apagados, com prova de grep no PR.** `cotton/ui/segment_toggle.html` (sem consumidor depois do
+`driver_mode_toggle`), treze parciais de Ofícios substituídas pela composição v2, e três órfãos
+que já estavam mortos antes do corte: `assinatura_central_documento.html`,
+`assinatura_etiqueta_actions.html` e `roteiros/partials/roteiro_form.html` — zero referências em
+`templates/`, `static/js/`, `static/css/` e `*.py`.
+
+**Validação.** Suíte global 2.368 testes com as **mesmas 3 falhas preexistentes** (eram 5: as duas
+da galeria foram consertadas aqui). Auditor frontend em **4 erros e 303 avisos**, idêntico à linha
+de base — a catraca não subiu. Bundles em dia. As cinco etapas, a lista e a galeria foram
+conferidas no navegador a 1440px nos dois temas.
+
+### NOVO-20260818-223102-58bda2a28945 🔴 ABERTO · `NOVO` Editor de roteiro legado ficou sem consumidor · HT · 0,5 d
+
+Com a etapa de roteiro do ofício migrada para `_roteiro_editor_v2.html`
+(`NOVO-20260818-213853-fab772ef1b6e`), o editor anterior perdeu o último `{% include %}`:
+`roteiros/includes/_roteiro_editor.html` não é renderizado por template nem por view nenhuma.
+
+A poda **não** cabia naquele PR e não é de um arquivo só. Sob ele vivem
+`roteiros/partials/roteiro/_editor_oficio_body.html`, `source.html`, `bate_volta.html`,
+`actions.html` e mais dezesseis parciais, além de `roteiros/includes/mapa_rota.html` e dos
+componentes `c-travel.route_segments` e `c-travel.travel_allowance_calculator` — estes dois
+caem no guarda de órfão (`test_componentes_sem_orfao`) e mudam o inventário. Cada um exige a
+prova de grep de repositório inteiro que o `AGENTS.md` §3.6 pede, e o CSS que os veste sai junto.
+
+O corte é uma etapa de Roteiros, não de Ofícios.
+
+### NOVO-20260818-223721-606d293c1180 ⚪ DUPLICADO · `NOVO` Teste de JS do painel de Eventos ficou no gancho anterior ao `related_picker` · JS/QA
+
+**Mesmo defeito que o `NOVO-20260818-215126-4bbdd8f7e848`, e resolvido por ele** (PR #411,
+commits `e37f802`/`2dcdf73`). Os dois foram abertos na mesma noite, em branches paralelas, sobre a
+mesma evidência: `npm test` vermelho em 2 de 52 casos, derrubando o job de CI no passo do Vitest
+antes de qualquer gate Python rodar.
+
+O diagnóstico bateu nos dois lados — `46da62d` migrou `js/pages/eventos-detalhe.js` para os ganchos
+do `c-v2.related_picker` e removeu o botão de limpar, e `eventos-detalhe.test.js` ficou no fixture
+anterior. A linha fica aqui, marcada, porque o ID já viajou num commit desta branch; o registro que
+manda é o outro.

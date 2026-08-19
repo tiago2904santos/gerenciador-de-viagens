@@ -36,6 +36,14 @@ APAGADOS_COM_OS_CADASTROS = (
 )
 
 
+# Migração de Ofícios para o v2 (NOVO-20260818-213853-fab772ef1b6e): o segment
+# toggle legado perdeu o último consumidor quando o par SERVIDOR × MANUAL do
+# motorista virou `c-v2.driver_mode_toggle`. Prova de grep no PR: zero
+# ocorrências de `segment_toggle` e `c-ui.segment_toggle` em `templates/`,
+# `static/js/` e `*.py`.
+APAGADOS_COM_OS_OFICIOS = ("ui/segment_toggle.html",)
+
+
 APAGADOS_COM_O_LAB = (
     "ui/buttons/field_action_button.html",
     "ui/buttons/floating_primary_action.html",
@@ -225,7 +233,32 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # mão em `<button>` cru, contra o `HT-08`. Mora em componente pela razão
         # de sempre: `data-route-id` carrega VALOR, e valor no `hook` do
         # `c-v2.button` sai escapado.
-        self.assertEqual(len(self.components()), 149)
+        #
+        # 155 (NOVO-20260818-213853-fab772ef1b6e): as seis peças que faltavam
+        # para Ofícios não chamar mais nada de fora do v2.
+        #
+        # Quatro são de conteúdo: `v2/document_inline.html` (o PDF aberto na
+        # própria página — a folha `v2/document-inline.css` já viajava no bundle
+        # SEM componente, e a marcação era copiada à mão em nove telas),
+        # `v2/alert_list.html` (a pendência de etapa, que no sistema anterior era
+        # um QUARTO desenho de "atenção", com caixa e marcador próprios),
+        # `v2/document_number.html` (o par número/ano — último campo a desenhar a
+        # própria moldura em vez de usar o `field`) e `v2/suggestions.html` (a
+        # faixa de atalhos do formulário, cujos dois ganchos se separavam quando
+        # escritos soltos no template).
+        #
+        # Duas são de ação, e existem pela razão de sempre — `<button>` cru com
+        # `data-*` só é permitido dentro de `templates/cotton/`:
+        # `v2/driver_mode_toggle.html` (o segmento SERVIDOR × MANUAL do
+        # motorista, escrito à mão em duas etapas do ofício, irmão do
+        # `os_role_toggle` e do `route_mode_toggle`) e `v2/menu_button.html` (o
+        # item de menu que EXECUTA em vez de navegar — "Visualizar termos"; como
+        # link ele precisaria de um destino falso).
+        #
+        # 154 (mesmo corte): saiu `ui/segment_toggle.html`. Era o último
+        # componente do sistema anterior vivo em Ofícios, e o `toggle` do v2 já
+        # fazia as duas variantes dele.
+        self.assertEqual(len(self.components()), 154)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.
@@ -243,6 +276,11 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         """A lista padrão legada e o alternador de abas, sem consumidor."""
         voltaram = [rel for rel in APAGADOS_COM_OS_CADASTROS if (COTTON / rel).exists()]
         self.assertEqual(voltaram, [], "componente apagado com os cadastros voltou")
+
+    def test_os_apagados_com_os_oficios_nao_voltaram(self):
+        """O segment toggle legado, sem consumidor depois do `driver_mode_toggle`."""
+        voltaram = [rel for rel in APAGADOS_COM_OS_OFICIOS if (COTTON / rel).exists()]
+        self.assertEqual(voltaram, [], "componente apagado com os ofícios voltou")
 
     def test_os_apagados_da_cascata_do_be25_nao_voltaram(self):
         """Idem para a cascata do `NOVO-44` e para o que caiu com o UI Lab (PR #247)."""
@@ -266,6 +304,7 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
             set(APAGADOS_PELO_HT06)
             | set(APAGADOS_COM_O_LAB)
             | set(APAGADOS_COM_OS_CADASTROS)
+            | set(APAGADOS_COM_OS_OFICIOS)
         )
         vivos = {str(path.relative_to(COTTON)) for path in self.components()}
         self.assertEqual(nomeados & vivos, set())

@@ -1,5 +1,3 @@
 {% if documentos_ctx.roteiro_card.status_chip_label %}
-  {% with sc_tone=documentos_ctx.roteiro_card.status_chip_class|cut:"status-chip--"|default:"muted" %}
-    <c-ui.badges.status_badge :label="documentos_ctx.roteiro_card.status_chip_label" :variant="sc_tone" extra_class="oficio-documentos-route-section__status-chip" only />
-  {% endwith %}
+  <c-v2.chip :label="documentos_ctx.roteiro_card.status_chip_label" :tone="documentos_ctx.roteiro_card.status_chip_tone_v2" />
 {% endif %}

@@ -274,6 +274,11 @@ class OficioDadosViajantesForm(OficioForm):
                 attrs={
                     **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                     "data-entity-picker": "true",
+                    # O dropdown é transplantado para o `<body>` e perde os
+                    # ancestrais: sem esta marca NO PRÓPRIO campo, a lista de
+                    # resultados cai no desenho anterior ao v2 mesmo numa tela
+                    # migrada. Foi o defeito medido nos relacionais da Viatura.
+                    "data-picker-v2": "true",
                     "data-entity-picker-mode": "single",
                     "data-picker-variant": "detailed",
                     "data-picker-presentation": "vehicle",
@@ -289,6 +294,7 @@ class OficioDadosViajantesForm(OficioForm):
                 attrs={
                     **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                     "data-entity-picker": "true",
+                    "data-picker-v2": "true",
                     "data-entity-picker-mode": "multi",
                     "data-picker-variant": "detailed",
                     "data-picker-presentation": "people",
@@ -444,6 +450,7 @@ class OficioTransporteForm(forms.ModelForm):
                 attrs={
                     **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                     "data-entity-picker": "true",
+                    "data-picker-v2": "true",
                     "data-entity-picker-mode": "single",
                     "data-picker-variant": "detailed",
                     "data-empty-selected": "Nenhum motorista selecionado.",

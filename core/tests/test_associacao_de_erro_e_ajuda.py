@@ -366,11 +366,15 @@ class ContratoDosChamadoresTests(SimpleTestCase):
         2026-08-18: **36**. As telas migradas para o v2 passaram a usar
         `c-v2.form_field`, que embute o erro no próprio campo — o chamador não
         desapareceu, mudou de dono.
+
+        2026-08-18, migração de Ofícios (`NOVO-20260818-213853-fab772ef1b6e`):
+        **33**. Saíram os três chamadores da etapa 1 — identificação, finalidade
+        e motorista externo —, pelo mesmo motivo: o campo do v2 já traz o erro.
         """
         achados = list(chamadores_de_field_error())
 
-        self.assertGreaterEqual(len(achados), 36)
-        self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 36)
+        self.assertGreaterEqual(len(achados), 33)
+        self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 33)
 
 
 class DicaEscritaAMaoTests(SimpleTestCase):

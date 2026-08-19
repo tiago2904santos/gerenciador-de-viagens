@@ -1,4 +1,4 @@
-{% cotton:vars back_url message object_label primary_label title %}
+{% cotton:vars back_url message object_label preview_label preview_text primary_label title %}
 {% comment %}
   Confirmação de exclusão em PÁGINA. É o caminho de fallback para quem chega
   por URL direta; nas listas, a mesma ação continua no `c-v2.delete_modal`.
@@ -6,6 +6,11 @@
   Estado, Servidor e Viatura repetiam esta composição em três templates. A
   página é uma só; cada domínio informa apenas o registro, a consequência e o
   rótulo da ação.
+
+  `preview_text` mostra o CONTEÚDO do que será apagado, quando o nome não basta
+  para reconhecê-lo: dois modelos de motivo podem se chamar parecido e dizer
+  coisas diferentes, e é o texto que a pessoa reconhece. Vem como fato, com
+  rótulo próprio, e não como mais um parágrafo solto no meio do aviso.
 {% endcomment %}
 <div class="form-page confirm-delete-page">
   <c-v2.header :title="title" />
@@ -18,6 +23,12 @@
           Você está prestes a excluir <strong>{{ object_label }}</strong>.
         </p>
         {% if message %}<p class="alert" data-tone="error">{{ message }}</p>{% endif %}
+
+        {% if preview_text %}
+          <div class="fact-list">
+            <c-v2.fact :label="preview_label" :value="preview_text" />
+          </div>
+        {% endif %}
 
         <c-v2.card_footer>
           <c-slot name="secondary">

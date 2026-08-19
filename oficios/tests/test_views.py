@@ -72,7 +72,7 @@ class OficioViewsTests(TestCase):
         self.assertEqual(oficio.data_criacao, timezone.localdate())
 
         response = self.client.get(response.url)
-        self.assertContains(response, "form-section-card")
+        self.assertContains(response, "form-block--v2")
         self.assertContains(response, "field-grid")
         self.assertContains(response, f'name="numero" value="{oficio.numero}"')
         self.assertContains(response, f"/ {oficio.ano}")
@@ -80,13 +80,13 @@ class OficioViewsTests(TestCase):
         self.assertNotContains(response, "Gerado automaticamente ao salvar.")
         self.assertNotContains(response, "serÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ definida automaticamente ao salvar")
         self.assertNotContains(response, "PendÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âªncias para concluir esta etapa")
-        self.assertContains(response, "page-stepper")
-        self.assertContains(response, "page-shell--wizard")
-        self.assertContains(response, "page-header-status-chip")
-        self.assertContains(response, "field-with-action--manage-reveal")
+        self.assertContains(response, "stepper__list")
+        self.assertContains(response, "wizard-page")
+        self.assertContains(response, "chip--v2")
+        self.assertContains(response, "field-with-action")
         self.assertContains(response, "Modelo de motivo")
         self.assertContains(response, reverse("oficios:modelos_motivo_index"))
-        self.assertContains(response, "card-footer-section")
+        self.assertContains(response, "card-footer")
         self.assertContains(response, "Avan\u00e7ar")
         self.assertNotContains(
             response,
@@ -265,12 +265,16 @@ class OficioViewsTests(TestCase):
         oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         html = response.content.decode("utf-8")
-        preview_start = html.index('oficio-documentos-preview-section document-inline-stack')
-        self.assertIn("oficio-documentos-summary-section", html[preview_start:])
-        self.assertIn("oficio-documentos-viajantes-section", html[preview_start:])
-        self.assertIn("oficio-documentos-viatura-section", html[preview_start:])
-        footer_start = html.index('<section class="card-footer-section">', preview_start)
-        footer_end = html.index('</section>', footer_start) + len('</section>')
+        # As âncoras são os TÍTULOS dos blocos, e não classes de folha de
+        # página: o v2 não dá nome de tela a bloco de conteúdo. A ordem
+        # continua sendo o que se prova — os arquivos primeiro, o que eles
+        # dizem depois.
+        preview_start = html.index("Documentos para conferência")
+        self.assertIn("Resumo do ofício", html[preview_start:])
+        self.assertIn("Viajantes", html[preview_start:])
+        self.assertIn("Viatura e condução", html[preview_start:])
+        footer_start = html.index('<footer class="card-footer">', preview_start)
+        footer_end = html.index('</footer>', footer_start) + len('</footer>')
         footer = html[footer_start:footer_end]
 
         self.assertIn("Voltar", footer)
@@ -295,10 +299,10 @@ class OficioViewsTests(TestCase):
         oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         html = response.content.decode("utf-8")
-        preview_start = html.index('oficio-documentos-preview-section document-inline-stack')
-        self.assertIn("oficio-documentos-summary-section", html[preview_start:])
-        footer_start = html.index('<section class="card-footer-section">', preview_start)
-        footer_end = html.index('</section>', footer_start) + len('</section>')
+        preview_start = html.index("Documentos para conferência")
+        self.assertIn("Resumo do ofício", html[preview_start:])
+        footer_start = html.index('<footer class="card-footer">', preview_start)
+        footer_end = html.index('</footer>', footer_start) + len('</footer>')
         footer = html[footer_start:footer_end]
 
         self.assertIn("Voltar", footer)
@@ -362,7 +366,6 @@ class OficioViewsTests(TestCase):
         self.assertContains(response, f'data-src="{inline_url}"')
         self.assertContains(response, f'data-termo-inline-url="{inline_url}"')
         self.assertNotContains(response, "data-open-all-termos")
-        self.assertNotContains(response, "data-download-all-termos")
         self.assertContains(response, "Visualizar termo")
         self.assertContains(response, "Baixar PDF")
         self.assertContains(response, "Baixar DOCX")
@@ -409,7 +412,6 @@ class OficioViewsTests(TestCase):
         oficio.servidores_termo_autorizacao.add(self.servidor, servidor_2)
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         self.assertContains(response, "data-open-all-termos")
-        self.assertContains(response, "data-download-all-termos")
         self.assertContains(response, "data-termo-inline-url=", count=2)
         self.assertContains(response, "data-termo-download-pdf-url=", count=2)
         self.assertContains(response, "Visualizar termo")
@@ -428,9 +430,11 @@ class OficioViewsTests(TestCase):
         )
         oficio.servidores.add(self.servidor)
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
-        self.assertContains(response, "oficio-documentos-traveller-tile--motorista")
+        # A linha do viajante é a `person_row` do sistema, e quem dirige leva o
+        # selo dela — o ladrilho `--motorista` era o desenho anterior do mesmo
+        # sinal.
+        self.assertContains(response, "person-row__badge")
         self.assertNotContains(response, "Motorista carona")
-        self.assertNotContains(response, "oficio-documentos-fact--driver-external")
         self.assertNotContains(response, "oficio-documentos-vehicle-executive__driver--external")
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
@@ -445,7 +449,8 @@ class OficioViewsTests(TestCase):
         )
         oficio.servidores.add(self.servidor)
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
-        self.assertContains(response, "oficio-documentos-fact--driver-external")
+        # "Motorista carona" é um FATO do bloco de viatura; a classe própria
+        # que o marcava saiu com a folha de página.
         self.assertContains(response, "Motorista carona")
         self.assertContains(response, "MOTORISTA CARONA")
         self.assertNotContains(response, "oficio-documentos-vehicle-executive__driver--external")

@@ -1,47 +1,72 @@
 {% extends "base.html" %}
-{% load static %}
 {% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
 
 {% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/pages/oficios.css' %}">
-{% endblock %}
-
 {% block content %}
-  <div class="page-shell page-shell--wizard travel-document-wizard app-wizard" data-travel-document-wizard-shell>
-    <div class="wizard-sticky-scope" data-wizard-sticky-header>
-      <c-ui.headers.wizard_page_header eyebrow="OFÍCIOS" :title="wizard_header.title" :status_label="wizard_header.status_label" :status_variant="wizard_header.status_variant" :steps="wizard_page_steps" :back_label="wizard_back_label" :back_url="wizard_back_url" only />
+  {% comment %}
+    Casca do wizard de ofício no sistema v2 (NOVO-20260818-213853-fab772ef1b6e).
 
-      <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
-        <div class="form-section-stack form-section-stack--comfortable">
-          {% if wizard_use_outer_form != False %}
-            <form
-              class="travel-document-wizard__form"
-              method="post"
-              novalidate
-              {% if wizard_autosave_url %}
-                data-autosave="true"
-                data-autosave-model="oficio"
-                data-autosave-step="{{ wizard_autosave_step }}"
-                data-autosave-url="{{ wizard_autosave_url }}"
-                data-autosave-object-id="{{ oficio.pk|default:'' }}"
-              {% endif %}
-            >
-              {% csrf_token %}
+    A folha de página saiu: casca, blocos, campos, cartões e rodapé vêm do
+    `ui.bundle.css`, que o `base.html` já carrega em toda página. Saíram com ela
+    as quatro classes de casca do sistema antigo e o escopo do cabeçalho
+    grudento — ele era uma segunda barra flutuando sobre a primeira, e o
+    `c-v2.header` já é a faixa de identidade do sistema.
+
+    A casca não leva marcador de tela do sistema antigo. Onde um deles ficou (a
+    etapa 1) é porque um motor JS o procura, e a nota está lá, ao lado do
+    atributo.
+
+    O `{% templatetag openblock %} block wizard_content {% templatetag closeblock %}`
+    mora DENTRO do slot `body`: é o miolo da etapa que cada uma das cinco telas
+    preenche, e o `<form>` em volta é o mesmo para todas — inclusive o autosave,
+    que é do wizard e não da etapa.
+  {% endcomment %}
+  <c-v2.wizard_page :title="wizard_header.title" :steps="wizard_page_steps">
+    <c-slot name="aside">
+      {% if wizard_header.status_label %}
+        <c-v2.chip :label="wizard_header.status_label" :tone="wizard_header.status_tone_v2" />
+      {% endif %}
+      {% comment %}
+        `autosave_link` no "Voltar": sair da etapa não pode custar o que já foi
+        digitado. É o `autosave.js` quem salva, e ele procura o botão por
+        `data-autosave-link="1"`.
+      {% endcomment %}
+      <c-v2.button :label="wizard_back_label" icon="arrow-left" :href="wizard_back_url" :autosave_link="True" />
+    </c-slot>
+
+    <c-slot name="body">
+      {% comment %}
+        A etapa de roteiro traz o próprio `<form>` (o editor de roteiro é uma
+        tela inteira, com autosave e ação próprios), e por isso desliga este —
+        dois formulários aninhados não são HTML válido, e o de dentro é
+        descartado pelo navegador sem aviso.
+      {% endcomment %}
+      {% if wizard_use_outer_form != False %}
+        <form
+          class="form-page__form"
+          method="post"
+          novalidate
+          {% if wizard_autosave_url %}
+            data-autosave="true"
+            data-autosave-model="oficio"
+            data-autosave-step="{{ wizard_autosave_step }}"
+            data-autosave-url="{{ wizard_autosave_url }}"
+            data-autosave-object-id="{{ oficio.pk|default:'' }}"
           {% endif %}
+        >
+          {% csrf_token %}
+      {% endif %}
 
-          {% block wizard_content %}{% endblock %}
+      {% block wizard_content %}{% endblock %}
 
-          {% if wizard_use_outer_form != False %}
-            </form>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
+      {% if wizard_use_outer_form != False %}
+        </form>
+      {% endif %}
+    </c-slot>
+  </c-v2.wizard_page>
 
   {% block wizard_modals %}{% endblock %}
 {% endblock %}
