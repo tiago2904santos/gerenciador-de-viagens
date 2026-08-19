@@ -1,8 +1,0 @@
-{% cotton:vars messages %}
-{% if messages %}
-  <div class="notice-stack alerts">
-    {% for message in messages %}
-      <div class="notice notice--{{ message.tags|default:'info' }} alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
-    {% endfor %}
-  </div>
-{% endif %}

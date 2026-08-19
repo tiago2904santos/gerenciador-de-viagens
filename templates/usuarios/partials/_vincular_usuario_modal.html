@@ -1,56 +1,22 @@
-<div
-  id="vincular-usuario-modal"
-  class="cv-dialog cv-dialog--document delete-confirm-modal vincular-usuario-modal"
-  data-vincular-usuario-modal
-  data-overlay-panel
-  hidden
->
-  <div class="cv-dialog__backdrop delete-confirm-modal__backdrop" data-overlay-close></div>
-  <section
-    class="cv-dialog__panel cv-dialog__panel--sm delete-confirm-modal__dialog vincular-usuario-modal__dialog"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="vincular-usuario-title"
-    aria-describedby="vincular-usuario-description"
-    tabindex="-1"
-  >
-    <c-ui.modals.dialog_header icon="link" tone="document" eyebrow="Administração" title="Vincular usuário" title_id="vincular-usuario-title" :data_cancel_modal_cancel="True" only />
-
-    <form method="post" class="cv-dialog__form vincular-usuario-modal__form" data-vincular-usuario-form>
+<c-v2.modal :own_form="True" modal_id="vincular-usuario-modal" hook="data-vincular-usuario-modal" title="Vincular usuário" title_id="vincular-usuario-title" extra_class="vincular-usuario-modal">
+  <c-slot name="body">
+    <form method="post" class="vincular-usuario-modal__form" data-vincular-usuario-form>
       {% csrf_token %}
       {{ vincular_form.usuario }}
-      <div class="cv-dialog__body vincular-usuario-modal__body">
-        <p class="cv-dialog__message vincular-usuario-modal__intro" id="vincular-usuario-description">
-          <c-ui.icons.icon icon="link" only />
-          <span>
-            Escolha a área e o perfil de
-            <strong data-vincular-usuario-label>este usuário</strong>.
-          </span>
-        </p>
-
-        <c-ui.feedback.form_errors :form="vincular_form" only />
-
-        <div
-          class="vincular-usuario-modal__fields form-stack document-form-page"
-          data-travel-document-wizard-step1
-        >
-          <c-ui.forms.field :field="vincular_form.area" size_class="field-size-1" only />
-          <c-ui.forms.field :field="vincular_form.papel" size_class="field-size-1" only />
-        </div>
+      <p class="modal__message" id="vincular-usuario-description">
+        Escolha a área e o perfil de <strong data-vincular-usuario-label>este usuário</strong>.
+      </p>
+      <c-v2.form_errors :form="vincular_form" />
+      <div class="form-stack">
+        <c-v2.form_field :field="vincular_form.area" size_class="field-size-1" />
+        <c-v2.field :label="vincular_form.papel.label" :label_for="vincular_form.papel.id_for_label" :error="vincular_form.papel.errors.0" extra_class="field-size-1">
+          <c-slot name="control"><c-v2.select :field="vincular_form.papel" /></c-slot>
+        </c-v2.field>
       </div>
-      <div class="cv-dialog__footer vincular-usuario-modal__footer form-card__footer">
-        <section class="card-footer-section">
-          <div class="card-footer-section__divider" aria-hidden="true"></div>
-          <footer class="card-footer">
-            <div class="card-footer__secondary">
-              <c-ui.buttons.button label="Cancelar" variant="secondary" type="button" icon="arrow-left" :data_cancel_modal_cancel="True" only />
-            </div>
-            <div class="card-footer__primary">
-              <c-ui.buttons.button label="Salvar vínculo" variant="primary" type="submit" icon="arrow-right" :icon_after="True" only />
-            </div>
-          </footer>
-        </section>
-      </div>
+      <c-v2.card_footer>
+        <c-slot name="secondary"><c-v2.button label="Cancelar" icon="arrow-left" hook="data-overlay-close" /></c-slot>
+        <c-slot name="primary"><c-v2.button label="Salvar vínculo" variant="primary" type="submit" icon="arrow-right" :icon_after="True" /></c-slot>
+      </c-v2.card_footer>
     </form>
-  </section>
-</div>
+  </c-slot>
+</c-v2.modal>

@@ -25,10 +25,10 @@
     </div>
     <div class="doc-pdf-toolbar__right">
       {% if is_demo %}
-        <c-ui.buttons.button label="Abrir PDF" variant="preview" href="#" only />
-        <c-ui.buttons.button label="Baixar" variant="pdf" href="#" only />
+        <c-v2.button label="Abrir PDF" variant="preview" href="#" only />
+        <c-v2.button label="Baixar" variant="pdf" href="#" only />
       {% else %}
-        <c-ui.buttons.button label="Abrir PDF" variant="preview" :href="pdf_url" link_target="_blank" link_rel="noopener" only />
+        <c-v2.button label="Abrir PDF" variant="preview" :href="pdf_url" link_target="_blank" link_rel="noopener" only />
         <a class="cv-btn cv-btn--pdf cv-btn--sm doc-pdf-toolbar__btn" href="{{ pdf_url }}" download="{{ filename }}">Baixar</a>
       {% endif %}
       <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm doc-pdf-toolbar__btn" id="doc-pdf-print"{% if is_demo %} disabled{% endif %}>Imprimir</button>

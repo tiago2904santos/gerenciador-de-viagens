@@ -6,7 +6,7 @@
     <div class="card-footer__primary">
       <form method="post" action="{% url 'core:logout' %}">
         {% csrf_token %}
-        <c-ui.buttons.button label="Sair do sistema" variant="secondary" type="submit" only />
+        <c-v2.button label="Sair do sistema" variant="secondary" type="submit" only />
       </form>
     </div>
   </footer>

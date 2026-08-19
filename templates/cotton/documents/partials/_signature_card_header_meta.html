@@ -1,8 +1,0 @@
-{% cotton:vars signature %}
-{% if signature.assinada %}
-  <c-ui.badges.status_badge label="Assinado" variant="success" only />
-{% elif signature.link_ativo %}
-  <c-ui.badges.status_badge label="Aguardando assinatura" variant="info" only />
-{% else %}
-  <c-ui.badges.status_badge label="Pendente" variant="warning" only />
-{% endif %}

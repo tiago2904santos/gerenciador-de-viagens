@@ -1,4 +1,4 @@
-{% cotton:vars aria_label autosave_link confirm_message controls dialog dialog_label dialog_label_attr dialog_url dialog_url_attr disabled extra_class form formaction formnovalidate hidden hook href icon icon_after label name size slot type value variant %}
+{% cotton:vars aria_label attrs autosave_link class_name confirm_message controls data_attach_signed_cancel data_autosave_link data_cancel_modal_cancel data_confirm_action_cancel data_delete_modal_cancel dialog dialog_label dialog_label_attr dialog_url dialog_url_attr disabled extra_class form formaction formnovalidate hidden hook href icon icon_after label link_rel link_target loading name size slot type value variant %}
 {% comment %}
   Button v2 — par de `static/css/v2/button.css`.
 
@@ -59,11 +59,15 @@
 {% load icones %}
 {% if href %}
   <a
-    class="button button--{{ variant|default:'secondary' }}{% if size %} button--{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    class="{% if class_name %}{{ class_name }}{% else %}button button--{{ variant|default:'secondary' }}{% if size %} button--{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}{% if loading %} is-loading{% endif %}{% endif %}"
     href="{{ href }}"
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
-    {% if autosave_link %}data-autosave-link="1"{% endif %}
-    {% if disabled %}aria-disabled="true" tabindex="-1"{% endif %}
+    {% if autosave_link or data_autosave_link %}data-autosave-link="1"{% endif %}
+    {% if disabled or loading %}aria-disabled="true" tabindex="-1"{% endif %}
+    {% if loading %}aria-busy="true"{% endif %}
+    {% if link_target %}target="{{ link_target }}"{% endif %}
+    {% if link_rel %}rel="{{ link_rel }}"{% endif %}
+    {{ attrs }}
   >
     {% if icon and not icon_after %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
     {% if slot %}{{ slot }}{% elif label %}<span>{{ label }}</span>{% endif %}
@@ -71,10 +75,11 @@
   </a>
 {% else %}
   <button
-    class="button button--{{ variant|default:'secondary' }}{% if size %} button--{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    class="{% if class_name %}{{ class_name }}{% else %}button button--{{ variant|default:'secondary' }}{% if size %} button--{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}{% if loading %} is-loading{% endif %}{% endif %}"
     type="{{ type|default:'button' }}"
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
-    {% if disabled %}disabled{% endif %}
+    {% if disabled or loading %}disabled{% endif %}
+    {% if loading %}aria-busy="true"{% endif %}
     {% if controls %}aria-controls="{{ controls }}" aria-expanded="false"{% endif %}
     {% if dialog %}
       aria-haspopup="dialog"
@@ -96,8 +101,11 @@
     {% if formaction %}formaction="{{ formaction }}"{% endif %}
     {% if formnovalidate %}formnovalidate{% endif %}
     {% if confirm_message %}data-confirm-submit data-confirm-message="{{ confirm_message }}"{% endif %}
+    {% if data_cancel_modal_cancel or data_delete_modal_cancel or data_confirm_action_cancel %}data-overlay-close{% endif %}
+    {% if data_attach_signed_cancel %}data-attach-signed-cancel{% endif %}
     {% if hidden %}hidden{% endif %}
     {% if hook %}{{ hook }}{% endif %}
+    {{ attrs }}
   >
     {% if icon and not icon_after %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
     {% if slot %}{{ slot }}{% elif label %}<span>{{ label }}</span>{% endif %}

@@ -1,10 +1,10 @@
-{% cotton:vars errors extra_class %}
+{% cotton:vars errors extra_class field_id %}
 {% comment %}
   Erro de campo avulso — para quando o controle não passa pelo `field`, que já
   traz o erro embutido. Mesma aparência, para os dois caminhos não divergirem.
 {% endcomment %}
 {% if errors %}
   {% for erro in errors %}
-    <p class="field__error{% if extra_class %} {{ extra_class }}{% endif %}">{{ erro }}</p>
+    <p class="field__error{% if extra_class %} {{ extra_class }}{% endif %}"{% if field_id %} id="{{ field_id }}_error"{% endif %} role="alert">{{ erro }}</p>
   {% endfor %}
 {% endif %}

@@ -1,4 +1,4 @@
-{% cotton:vars aria_label extra_class field filter hook name options select_id surface value %}
+{% cotton:vars aria_label attrs collection_filter extra_class fallback_first field filter hook name options select_id surface value %}
 {% comment %}
   Select v2 — par de `static/css/v2/select.css`.
 
@@ -24,6 +24,7 @@
   `select_id` é o `id` do controle, para o `<label for>` de fora e para o script
   que o procura por nome.
 {% endcomment %}
+{% firstof filter collection_filter as collection_filter_value %}
 <div
   class="select{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
   data-entity-picker
@@ -36,12 +37,13 @@
     <select
       name="{{ name }}"
       aria-label="{{ aria_label }}"
-      {% if filter %}data-collection-filter="{{ filter }}"{% endif %}
+      {% if collection_filter_value %}data-collection-filter="{{ collection_filter_value }}"{% endif %}
       {% if select_id %}id="{{ select_id }}"{% endif %}
       {% if hook %}{{ hook }}{% endif %}
+      {{ attrs }}
     >
       {% for opt in options %}
-        <option value="{{ opt.value }}"{% if opt.value == value %} selected{% endif %}>{{ opt.label }}</option>
+        <option value="{{ opt.value }}"{% if opt.value == value or fallback_first and not value and forloop.first %} selected{% endif %}>{{ opt.label }}</option>
       {% endfor %}
     </select>
   {% endif %}

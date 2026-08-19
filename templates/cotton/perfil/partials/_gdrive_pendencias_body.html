@@ -6,7 +6,7 @@
         <div class="record-row__heading">
           <span class="record-row__title">{{ p.titulo }}</span>
           <span class="record-row__badges">
-            <c-ui.badges.chip tone="muted" :label="p.tipo_label" size="compact" only />
+            <c-v2.chip tone="muted" :label="p.tipo_label" size="compact" only />
           </span>
         </div>
 
@@ -44,6 +44,6 @@
 <div class="perfil-block-actions">
   <form method="post" action="{% url 'google_drive:reprocessar_pendencias' %}">
     {% csrf_token %}
-    <c-ui.buttons.button label="Tentar novamente agora" variant="primary" icon="arrow-right" :icon_after="True" type="submit" only />
+    <c-v2.button label="Tentar novamente agora" variant="primary" icon="arrow-right" :icon_after="True" type="submit" only />
   </form>
 </div>

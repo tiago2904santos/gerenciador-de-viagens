@@ -1,9 +1,0 @@
-{% cotton:vars action_autosave action_label action_url action_variant aria_label data_hook element_id heading_level retorno_state %}
-{# Segmentos da rota e retorno final. #}
-<div class="roteiro-editor__section--trechos roteiro-trechos-host" data-route-segments>
-  <div id="trechos-date-picker-park" class="roteiro-trechos-date-picker-park" hidden>
-    {% include "roteiros/partials/roteiro/_trechos_actions.html" only %}
-  </div>
-  {% include "roteiros/partials/roteiro/_trechos_gerados_body.html" only %}
-</div>
-<c-ui.forms.form_block shell="" variant="resource" extra_class="roteiro-editor__section--retorno route-section-block" section_id="sec-retorno" title="Retorno" description="Último deslocamento até a sede." body_id="retorno-card" body_extra_class="roteiro-editor__retorno-body" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :data_hook="data_hook" :element_id="element_id" :heading_level="heading_level"><c-slot name="body">{% include "roteiros/partials/roteiro/_retorno_body.html" with retorno_state=retorno_state only %}</c-slot></c-ui.forms.form_block>

@@ -1,2 +1,8 @@
-<c-lists.simple_list :rows="rows" empty_message="Nenhum usuário vinculado a esta área." :hide_realtime_count="True" empty_variant="compact"  :empty_action_label="empty_action_label" :empty_action_url="empty_action_url" />
-<c-ui.lists.pagination :page_obj="page_obj" :pagination_pages="pagination_pages" only />
+{% if rows %}
+  <div class="record-list" role="list" data-collection-container>
+    {% for row in rows %}<c-v2.catalog_row :row="row" :csrf_token="csrf_token" />{% endfor %}
+  </div>
+{% else %}
+  <c-v2.panel empty_title="Nenhum usuário vinculado" empty_message="Nenhum usuário vinculado a esta área." />
+{% endif %}
+<c-v2.pagination :page_obj="page_obj" :pages="pagination_pages" />

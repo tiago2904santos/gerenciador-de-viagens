@@ -1,4 +1,4 @@
-{% cotton:vars actions body data_hook description extra_class split surface title %}
+{% cotton:vars action_autosave action_label action_url action_variant actions aria_label body body_extra_class body_id data_hook description element_id extra_class footer heading_level section_id split surface title variant %}
 {% comment %}
   Form block v2 — cabeçalho e corpo. Par de `static/css/v2/form-block.css`.
 
@@ -9,15 +9,29 @@
   `split` põe o cabeçalho à esquerda e o corpo à direita, na mesma linha — para
   o bloco de um controle só, onde empilhar gasta uma linha à toa.
 {% endcomment %}
-<section class="form-block--v2{% if split %} form-block--split{% endif %}{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if data_hook %} {{ data_hook }}{% endif %}>
-  {% if title or description or actions %}
+<section
+  class="form-block--v2{% if split or variant == 'split' %} form-block--split{% endif %}{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+  {% if element_id %}id="{{ element_id }}"{% endif %}
+  {% if section_id %}aria-labelledby="{{ section_id }}"{% elif aria_label %}aria-label="{{ aria_label }}"{% endif %}
+  {% if data_hook %}data-{{ data_hook }}{% endif %}
+>
+  {% if title or description or actions or action_label %}
     <header class="form-block__header">
       <div>
-        {% if title %}<h2 class="form-block__title">{{ title }}</h2>{% endif %}
+        {% if title %}
+          {% if heading_level == 3 %}<h3 class="form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h3>
+          {% elif heading_level == 4 %}<h4 class="form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h4>
+          {% else %}<h2 class="form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h2>{% endif %}
+        {% endif %}
         {% if description %}<p class="form-block__description">{{ description }}</p>{% endif %}
       </div>
-      {% if actions %}<div>{{ actions }}</div>{% endif %}
+      {% if actions or action_label %}
+        <div class="form-block__actions">
+          {% if actions %}{{ actions }}{% else %}{% with variante_acao=action_variant|default:"secondary" %}<c-v2.button :href="action_url" :label="action_label" :variant="variante_acao" :autosave_link="action_autosave" />{% endwith %}{% endif %}
+        </div>
+      {% endif %}
     </header>
   {% endif %}
-  <div class="form-block__body">{{ body }}</div>
+  <div class="form-block__body{% if body_extra_class %} {{ body_extra_class }}{% endif %}"{% if body_id %} id="{{ body_id }}"{% endif %}>{{ body }}</div>
+  {{ footer }}
 </section>

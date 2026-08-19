@@ -116,7 +116,12 @@ class PaginacaoTests(SimpleTestCase):
         self.assertEqual(render("{% cotton v2.pagination only / %}").strip(), "")
 
     def test_a_pagina_atual_nao_e_link(self):
-        html = render("{% cotton v2.pagination :page_obj=p only / %}", p=pagina())
+        page = pagina()
+        html = render(
+            "{% cotton v2.pagination :page_obj=p :pages=r only / %}",
+            p=page,
+            r=page.paginator.page_range,
+        )
         atual = html[html.index("pagination__page--current") :]
         self.assertIn('aria-current="page"', atual[: atual.index(">")])
         self.assertNotIn("<a", atual[: atual.index("</span>")])
@@ -128,9 +133,11 @@ class PaginacaoTests(SimpleTestCase):
         o filtro cair, e um `assertIn` num link só não pega o vizinho — foi
         exatamente o que a primeira versão deste teste deixou passar.
         """
+        page = pagina()
         html = render(
-            '{% cotton v2.pagination :page_obj=p page_querystring="q=curitiba" only / %}',
-            p=pagina(),
+            '{% cotton v2.pagination :page_obj=p :pages=r page_querystring="q=curitiba" only / %}',
+            p=page,
+            r=page.paginator.page_range,
         )
         self.assertIn("?q=curitiba&page=3", html)
         self.assertNotIn('href="?page=', html)
@@ -147,7 +154,12 @@ class PaginacaoTests(SimpleTestCase):
 
     def test_seta_sem_destino_mantem_a_caixa(self):
         """Some o alvo, não o lugar: senão a fileira encolhe na última página."""
-        html = render("{% cotton v2.pagination :page_obj=p only / %}", p=pagina(1))
+        page = pagina(1)
+        html = render(
+            "{% cotton v2.pagination :page_obj=p :pages=r only / %}",
+            p=page,
+            r=page.paginator.page_range,
+        )
         self.assertIn('class="pagination__nav" aria-disabled="true"', html)
 
 

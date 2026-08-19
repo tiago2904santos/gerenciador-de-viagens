@@ -101,7 +101,8 @@ class PickerContractTests(SimpleTestCase):
         self.assertIn("data-entity-picker", sources)
         self.assertIn('data-entity-picker-renderer="select"', sources)
         self.assertIn('data-entity-picker-mode="single"', sources)
-        self.assertIn('data-entity-picker-mode="multi"', sources)
+        self.assertIn('data-entity-picker-mode="{{ mode|default:\'single\' }}"', sources)
+        self.assertIn('mode="multi"', sources)
 
         base = (templates / "base.html").read_text(encoding="utf-8")
         form_bundle = (

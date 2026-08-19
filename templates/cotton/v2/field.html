@@ -1,16 +1,15 @@
-{% cotton:vars control error error_id extra_class help help_id label label_for %}
+{% cotton:vars control error error_id errors extra_class help help_id label label_for size_class %}
 {% comment %}
   Field v2 — rótulo, controle, ajuda e erro. Par de `static/css/v2/field.css`.
 
   O controle vem por slot (`control`): o campo não sabe se dentro dele há um
   input, um select ou um picker, e não deve saber.
 
-  A folha só vale dentro de `.form-block--v2` enquanto o `.field` legado (33
-  usos) existir — sem esse escopo, repintaria tela não migrada.
+  `size_class` preserva os modificadores de largura que vêm dos formulários.
 {% endcomment %}
-<div class="field{% if error %} field--invalid{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
+<div class="field{% if error or errors %} field--invalid{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}{% if size_class %} {{ size_class }}{% endif %}">
   {% if label %}<label class="field__label"{% if label_for %} for="{{ label_for }}"{% endif %}>{{ label }}</label>{% endif %}
   {{ control }}
-  {% if help %}<div class="field__help"{% if help_id %} id="{{ help_id }}"{% endif %}>{{ help }}</div>{% endif %}
-  {% if error %}<p class="field__error"{% if error_id %} id="{{ error_id }}"{% endif %}>{{ error }}</p>{% endif %}
+  {% if help %}<div class="field__help"{% if help_id %} id="{{ help_id }}"{% endif %}>{{ help|safe }}</div>{% endif %}
+  {% if errors %}<p class="field__error"{% if error_id %} id="{{ error_id }}"{% endif %} role="alert">{% for item in errors %}{% if not forloop.first %} {% endif %}{{ item }}{% endfor %}</p>{% elif error %}<p class="field__error"{% if error_id %} id="{{ error_id }}"{% endif %} role="alert">{{ error }}</p>{% endif %}
 </div>

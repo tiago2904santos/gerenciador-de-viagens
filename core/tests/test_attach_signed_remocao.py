@@ -41,8 +41,7 @@ MODAL = (
     Path(settings.BASE_DIR)
     / "templates"
     / "cotton"
-    / "ui"
-    / "modals"
+    / "v2"
     / "attach_signed_modal.html"
 )
 

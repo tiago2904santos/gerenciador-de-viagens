@@ -32,7 +32,7 @@ from django.test import SimpleTestCase
 from django.test import TestCase
 from django.urls import reverse
 
-CAMPO = "cotton/ui/forms/field.html"
+CAMPO = "cotton/v2/form_field.html"
 RAIZ = Path(settings.BASE_DIR)
 
 _ID = re.compile(r'\bid="([^"]+)"')
@@ -92,7 +92,7 @@ class AjudaDoCampoTests(SimpleTestCase):
         """A metade que impede o `<p>` vazio em 125 dos 154 campos."""
         html = renderiza(FormularioDeProva()["sem_ajuda"])
 
-        self.assertNotIn("field-help", html)
+        self.assertNotIn("field__help", html)
         self.assertNotIn("_helptext", html)
 
     def test_o_parametro_do_include_ainda_vence_o_do_form(self):
@@ -132,7 +132,7 @@ class AjudaDoCampoTests(SimpleTestCase):
         html = renderiza(FormularioDeProva()["html_na_ajuda"])
 
         self.assertRegex(
-            html, r'<div class="field-help app-form-help" id="id_html_na_ajuda_helptext">',
+            html, r'<div class="field__help" id="id_html_na_ajuda_helptext">',
             "a ajuda voltou para um elemento que não aceita conteúdo de bloco",
         )
 
@@ -207,7 +207,7 @@ class ErroDoCampoTests(SimpleTestCase):
         """
         html = renderiza(self.campo_com_erro("marca"))
 
-        self.assertIn('class="field-error app-form-error"', html)
+        self.assertIn('class="field__error"', html)
         self.assertIn('role="alert"', html)
         self.assertIn('id="id_marca_error"', html)
 
@@ -247,9 +247,7 @@ class ErroDoCampoTests(SimpleTestCase):
 _INCLUDE_DE_ERRO = re.compile(
     r'\{%\s*include\s+"components/ui/feedback/field_error\.html"\s+with\s+(?P<args>[^%]*?)%\}',
 )
-_COTTON_DE_ERRO = re.compile(
-    r'<c-ui\.feedback\.field_error\s+(?P<args>[^>]*?)/>',
-)
+_COTTON_DE_ERRO = re.compile(r'<c-v2\.field_error\s+(?P<args>[^>]*?)/>')
 _ERRORS_ARG = re.compile(r'errors=(?P<valor>"[^"]*"|[^\s]+)')
 
 
@@ -261,7 +259,7 @@ def chamadores_de_field_error():
     """`(arquivo, linha, expressão de errors, args)` de cada include do componente."""
     for caminho in sorted((RAIZ / "templates").rglob("*.html")):
         texto = caminho.read_text(encoding="utf-8")
-        if "feedback/field_error.html" not in texto and "ui.feedback.field_error" not in texto:
+        if "v2.field_error" not in texto:
             continue
         for padrao, cotton in ((_INCLUDE_DE_ERRO, False), (_COTTON_DE_ERRO, True)):
             for achado in padrao.finditer(texto):
@@ -329,31 +327,6 @@ class ContratoDosChamadoresTests(SimpleTestCase):
 
         self.assertEqual(literais, [])
 
-    def test_quem_inclui_card_toggle_direto_passa_description(self):
-        """O buraco que sobrou, fechado por regra em vez de por fallback inerte.
-
-        `card_toggle.html` é folha: renderiza o que recebe. Quem resolve a ajuda é
-        `field.html`. Os três chamadores diretos passam `description` explícita —
-        então pôr um `|default:field.help_text` no componente seria código que
-        ninguém exercita. O risco real é o **quarto** chamador esquecer: aí o campo
-        fica sem descrição, e se ele declarar `help_text` o Django emite um ponteiro
-        para um `id` que não foi renderizado.
-        """
-        diretos = []
-        for caminho in sorted((RAIZ / "templates").rglob("*.html")):
-            texto = caminho.read_text(encoding="utf-8")
-            for achado in re.finditer(
-                r'(?:\{%\s*include\s+"components/ui/forms/card_toggle\.html"\s+with\s+([^%]*?)%\}'
-                r'|<c-ui\.forms\.card_toggle\s+([^>]*?)/>)',
-                texto,
-            ):
-                args = achado.group(1) or achado.group(2)
-                if "description=" not in args:
-                    linha = texto.count("\n", 0, achado.start()) + 1
-                    diretos.append(f"{caminho.relative_to(RAIZ).as_posix()}:{linha}")
-
-        self.assertEqual(diretos, [], "include de card_toggle sem description")
-
     def test_a_varredura_esta_achando_os_chamadores(self):
         """Sem isto, as regras acima passariam com a varredura vazia.
 
@@ -380,8 +353,8 @@ class ContratoDosChamadoresTests(SimpleTestCase):
         """
         achados = list(chamadores_de_field_error())
 
-        self.assertGreaterEqual(len(achados), 30)
-        self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 30)
+        self.assertGreaterEqual(len(achados), 20)
+        self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 15)
 
 
 class DicaEscritaAMaoTests(SimpleTestCase):

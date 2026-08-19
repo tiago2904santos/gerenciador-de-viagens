@@ -148,9 +148,7 @@ class ComponenteDeMenuTests(TestCase):
             [entity_cards.menu_link("/x/", "Item", "Descrição", "eye", "preview")],
         )
 
-        html = render_to_string(
-            "cotton/ui/lists/entity_card_menu.html", {"menu": menu}
-        )
+        html = render_to_string("cotton/v2/menu_body.html", {"menu": menu})
 
         self.assertIn('id="menu-teste"', html)
         self.assertIn("/x/", html)
@@ -166,9 +164,12 @@ class ComponenteDeMenuTests(TestCase):
             src="/menus/",
         )
 
-        html = render_to_string(
-            "cotton/ui/lists/entity_card_menu.html", {"menu": menu}
-        )
+        from django.template import Context, Template
+
+        html = Template(
+            "{% load cotton %}{% cotton v2.icon_button icon='more' "
+            "aria_label='Ações' menu_id='menu-teste' menu_src='/menus/' only / %}"
+        ).render(Context())
 
         self.assertIn('data-overlay-src="/menus/"', html)
         self.assertNotIn("/x/", html)

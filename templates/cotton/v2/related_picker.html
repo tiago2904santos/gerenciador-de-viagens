@@ -1,4 +1,4 @@
-{% cotton:vars aria_label empty_id empty_text field input_id list_id placeholder rows %}
+{% cotton:vars aria_label empty_id empty_text field input_aria_label input_id input_placeholder list_extra_class list_id panel_aria_label panel_extra_class placeholder root_extra_class rows %}
 {% comment %}
   Picker de documento vinculado — o do ofício no termo, e o mesmo desenho serve
   ordem de serviço e justificativa.
@@ -25,9 +25,11 @@
   `field` é o `<select>` do formulário — é ele que carrega o valor no POST. Sem
   ele o componente é uma lista bonita que não salva nada.
 {% endcomment %}
+{% firstof placeholder input_placeholder "Buscar" as search_placeholder %}
+{% firstof aria_label input_aria_label placeholder input_placeholder "Buscar" as search_aria_label %}
 <div class="picker picker--related">
   <div
-    class="search-picker search-picker--single search-picker--related"
+    class="search-picker search-picker--single search-picker--related{% if root_extra_class %} {{ root_extra_class }}{% endif %}"
     data-related-picker-root
     data-related-picker-presentation="card"
   >
@@ -44,8 +46,8 @@
           type="search"
           class="search-picker__input"
           {% if input_id %}id="{{ input_id }}"{% endif %}
-          placeholder="{{ placeholder|default:'Buscar' }}"
-          aria-label="{{ aria_label|default:placeholder|default:'Buscar' }}"
+          placeholder="{{ search_placeholder }}"
+          aria-label="{{ search_aria_label }}"
           data-related-picker-search
           autocomplete="off"
           role="searchbox"
@@ -56,13 +58,14 @@
     {% if field %}
       {{ field }}
       {% if field.errors %}
-        <c-v2.field_error :errors="field.errors" />
+        <c-v2.field_error :errors="field.errors" :field_id="field.auto_id" />
       {% endif %}
     {% endif %}
 
     <div
-      class="search-picker__selected-list related-route-list"
+      class="search-picker__selected-list related-route-list{% if panel_extra_class %} {{ panel_extra_class }}{% endif %}{% if list_extra_class %} {{ list_extra_class }}{% endif %}"
       {% if list_id %}id="{{ list_id }}"{% endif %}
+      {% if panel_aria_label %}aria-label="{{ panel_aria_label }}"{% endif %}
       data-related-picker-list
     >{{ rows }}</div>
 

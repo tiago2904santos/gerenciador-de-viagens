@@ -1,10 +1,10 @@
 <div class="field-grid field-grid--cols-4 rt-custeios-grid">
   {% for item in campos_custeio %}
     <div class="rt-cost-field-group{% if item.uses_other %} rt-cost-field-group--select{% endif %}">
-      <c-ui.forms.field :field="item.field" :label="item.label" only />
+      <c-v2.form_field :field="item.field" :label="item.label" only />
       {% if item.uses_other %}
         <div class="rt-cost-field__other" data-rt-other-wrapper="{{ item.campo }}" hidden>
-          {% with cotton_attr_label="Informe "|add:item.label|lower %}<c-ui.forms.field :field="item.other" :label="cotton_attr_label" only />{% endwith %}
+          {% with cotton_attr_label="Informe "|add:item.label|lower %}<c-v2.form_field :field="item.other" :label="cotton_attr_label" only />{% endwith %}
         </div>
       {% endif %}
     </div>

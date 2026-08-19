@@ -2,14 +2,14 @@
   <div class="card-footer-section__divider" aria-hidden="true"></div>
   <footer class="card-footer">
     <div class="card-footer__secondary">
-      <c-ui.buttons.button :href="rt_url" label="Voltar ao Relatório Técnico" variant="secondary" icon="arrow-left" only />
+      <c-v2.button :href="rt_url" label="Voltar ao Relatório Técnico" variant="secondary" icon="arrow-left" only />
     </div>
     <div class="card-footer__primary">
       {% if trechos %}
-        <c-ui.buttons.button label="Gerar XLSX" variant="secondary" icon="download" :icon_after="True" type="submit" name="action" value="download_xlsx" only />
-        <c-ui.buttons.button label="Gerar PDF" variant="secondary" icon="download" :icon_after="True" type="submit" name="action" value="download_pdf" only />
+        <c-v2.button label="Gerar XLSX" variant="secondary" icon="download" :icon_after="True" type="submit" name="action" value="download_xlsx" only />
+        <c-v2.button label="Gerar PDF" variant="secondary" icon="download" :icon_after="True" type="submit" name="action" value="download_pdf" only />
       {% endif %}
-      <c-ui.buttons.button :href="documentos_url" label="Ir para Documentos" variant="primary" icon="arrow-right" :icon_after="True" only />
+      <c-v2.button :href="documentos_url" label="Ir para Documentos" variant="primary" icon="arrow-right" :icon_after="True" only />
     </div>
   </footer>
 </section>

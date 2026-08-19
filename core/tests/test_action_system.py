@@ -37,12 +37,8 @@ class GlobalActionSystemTests(SimpleTestCase):
         self.assertIn(".delete-confirm-modal__dialog {", self.css)
         self.assertIn(".attach-signed-modal__dialog {", self.css)
 
-        header = render_to_string(
-            "cotton/ui/menus/rich_menu_header.html",
-            {"title": "Documentos", "subtitle": "Ofício 1/2026", "icon": "folder"},
-        )
         item = render_to_string(
-            "cotton/ui/menus/rich_menu_link.html",
+            "cotton/v2/menu_item.html",
             {
                 "href": "/documento.pdf",
                 "title": "Baixar PDF",
@@ -52,9 +48,8 @@ class GlobalActionSystemTests(SimpleTestCase):
                 "download": True,
             },
         )
-        self.assertIn("action-menu__heading", header)
-        self.assertIn("Ofício 1/2026", header)
-        self.assertIn("action-menu__item--rich", item)
+        self.assertIn("menu__item", item)
+        self.assertIn("Documento pronto para impressão", item)
         self.assertIn("download", item)
 
     def test_document_action_tones_are_distinct_and_motion_can_be_reduced(self):
@@ -63,23 +58,18 @@ class GlobalActionSystemTests(SimpleTestCase):
             self.assertIn(f".action-menu__item-icon--{tone} {{", self.css)
         self.assertIn("@media (prefers-reduced-motion: reduce)", self.css)
 
-    def test_simple_list_document_menu_accepts_dictionary_without_pk(self):
+    def test_menu_item_does_not_require_a_model_pk(self):
         html = render_to_string(
-            "cotton/lists/simple_list_row.html",
+            "cotton/v2/menu_item.html",
             {
-                "row_index": 7,
-                "row": {
-                    "avatar": "TM",
-                    "title": "Destino não informado",
-                    "badges": [],
-                    "meta": [],
-                    "pdf_url": "/termos/7/pdf/",
-                    "docx_url": "/termos/7/docx/",
-                    "edit_url": "/termos/7/editar/",
-                },
+                "href": "/termos/7/pdf/",
+                "title": "Destino não informado",
+                "description": "PDF do termo",
+                "icon": "pdf",
             },
         )
-        self.assertIn("simple-row-document-menu-destino-nao-informado-7", html)
+        self.assertIn('href="/termos/7/pdf/"', html)
+        self.assertIn("Destino não informado", html)
 
     def test_base_loads_action_system_after_the_legacy_button_styles(self):
         root = Path(settings.BASE_DIR)

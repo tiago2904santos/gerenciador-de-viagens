@@ -50,7 +50,23 @@
         data-tooltip="Vincular a uma área"
       >{% icone_svg "link" %}</button>
     {% endif %}
-    {% if row.edit_fields_json %}
+    {% if row.edit_modal %}
+      {% comment %}
+        Edição de vínculo dentro do diálogo da página. Os atributos com valor
+        ficam aqui porque são o contrato de `usuarios-area-form.js` e não podem
+        viajar pelo `hook` genérico sem serem escapados.
+      {% endcomment %}
+      <button
+        type="button"
+        class="icon-button"
+        data-row-edit-modal="{{ row.edit_modal }}"
+        data-edit-url="{{ row.edit_url }}"
+        data-edit-fields="{{ row.edit_fields_json }}"
+        data-edit-label="{{ row.title }}"
+        aria-label="Editar {{ row.title }}"
+        data-tooltip="Editar"
+      >{% icone_svg "edit" %}</button>
+    {% elif row.edit_fields_json %}
       <c-v2.quick_edit_button :url="row.edit_url" :fields_json="row.edit_fields_json" :label="row.title" />
     {% elif row.edit_url %}
       <c-v2.icon_button icon="edit" :href="row.edit_url" aria_label="Editar" tooltip="Editar" />

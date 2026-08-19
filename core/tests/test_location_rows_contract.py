@@ -67,13 +67,18 @@ class LocationRowsContractTests(SimpleTestCase):
             self.root
             / "templates"
             / "cotton"
-            / "travel"
-            / "destinations"
-            / "state_select.html"
+            / "v2"
+            / "destination_row.html"
         ).read_text(encoding="utf-8")
-        self.assertIn('value="{{ estado.pk }}"', source)
-        self.assertIn("data-location-state-code", source)
-        self.assertNotIn('value="{{ estado.sigla }}"', source)
+        self.assertIn("{% destinos_opcoes_estado estados estado_selecionado %}", source)
+        self.assertIn("data-location-state", source)
+
+        options = (
+            self.root / "templates" / "includes" / "destinos" / "opcoes_de_estado.html"
+        ).read_text(encoding="utf-8")
+        self.assertIn('value="{{ estado.pk }}"', options)
+        self.assertIn("data-location-state-code", options)
+        self.assertNotIn('value="{{ estado.sigla }}"', options)
 
         event_partials = self.root / "templates" / "eventos" / "partials"
         self.assertFalse(list(event_partials.glob("_destino_*_state*.html")))

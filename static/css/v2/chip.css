@@ -43,3 +43,22 @@
 :is(html[data-theme]) .chip--v2[data-tone="info"] {
   --chip-tone: var(--status-info);
 }
+
+:is(html[data-theme]) .chip--v2[data-tone="success"] {
+  --chip-tone: var(--status-done);
+}
+
+:is(html[data-theme]) .chip--v2[data-tone="pending"] {
+  --chip-tone: var(--status-progress);
+}
+
+:is(html[data-theme]) .chip--v2[data-tone="warning"],
+:is(html[data-theme]) .chip--v2[data-tone="danger"] {
+  --chip-tone: var(--status-late);
+}
+
+:is(html[data-theme]) .chip--v2[data-tone="entity"],
+:is(html[data-theme]) .chip--v2[data-tone="neutral"],
+:is(html[data-theme]) .chip--v2[data-tone="muted"] {
+  --chip-tone: var(--text-muted);
+}

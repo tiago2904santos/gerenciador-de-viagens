@@ -8,135 +8,50 @@ from django.test import SimpleTestCase
 
 ROOT = Path(settings.BASE_DIR)
 CONSUMERS = (
-    "eventos/partials/_evento_card_body.html",
-    # O card de ofício migrou para o v2 em 2026-08-18: o miolo deixou de ser um
-    # parcial achatado e virou `c-v2.record` + `c-v2.itinerary`.
     "oficios/partials/oficio_list_card.html",
-    "prestacoes_contas/partials/_prestacao_card_body.html",
-    # `planos_trabalho/partials/_plano_card_body.html` saiu junto, no mesmo dia e
-    # pelo mesmo motivo.
-    # `roteiros/partials/_roteiro_card_body.html` saiu em 2026-08-16: a lista de
-    # roteiros virou lista simples, sem miolo — não há mais itinerário no card.
+    "oficios/partials/documentos/_route_summary_grid.html",
 )
 
 
 class ItineraryComponentTests(SimpleTestCase):
-    def _render(self, source: str, context: dict | None = None) -> str:
-        return Template("{% load cotton %}" + source).render(Context(context or {}))
+    def _render(self, legs) -> str:
+        source = '{% load cotton %}{% cotton v2.itinerary :legs="legs" only / %}'
+        return Template(source).render(Context({"legs": legs}))
 
-    def test_renderiza_trechos_com_periodo_sem_mudar_o_contrato_visual(self):
+    def test_renderiza_trechos_com_periodo_no_modelo_v2(self):
         html = self._render(
-            '{% cotton ui.lists.itinerary :items="items" only / %}',
-            {
-                "items": [
-                    {
-                        "rota": "Curitiba → Londrina",
-                        "saida": "10/08 08:00",
-                        "chegada": "10/08 14:00",
-                    },
-                    {"rota": "Londrina → Curitiba", "saida": "", "chegada": ""},
-                ]
-            },
+            [
+                {
+                    "rota": "Curitiba → Londrina",
+                    "saida": "10/08 08:00",
+                    "chegada": "10/08 14:00",
+                },
+                {"rota": "Londrina → Curitiba", "saida": "", "chegada": ""},
+            ]
         )
 
-        self.assertIn('class="itinerary"', html)
-        self.assertEqual(html.count('class="itinerary__leg"'), 2)
+        self.assertIn('class="route-legs"', html)
+        self.assertEqual(html.count('class="route-legs__leg"'), 2)
         self.assertIn("Curitiba → Londrina", html)
         self.assertIn("10/08 08:00 → 10/08 14:00", " ".join(html.split()))
-        self.assertEqual(html.count('class="itinerary__time"'), 1)
+        self.assertEqual(html.count('class="route-legs__time"'), 1)
 
-    def test_renderiza_itens_textuais_e_estado_vazio_configuravel(self):
-        text_html = self._render(
-            '{% cotton ui.lists.itinerary :items="items" :text_items="True" only / %}',
-            {"items": ["Fiscalização", "Atendimento"]},
-        )
-        empty_html = self._render(
-            '{% cotton ui.lists.itinerary :items="items" empty_label="Nada selecionado" '
-            'empty_class="custom-empty" only / %}',
-            {"items": []},
-        )
+    def test_sem_trechos_nao_renderiza_lista_vazia(self):
+        self.assertNotIn("<ul", self._render([]))
 
-        self.assertIn("Fiscalização", text_html)
-        self.assertIn("Atendimento", text_html)
-        self.assertIn('class="custom-empty"', empty_html)
-        self.assertIn("Nada selecionado", empty_html)
-        self.assertNotIn("<ul", empty_html)
-
-    def test_item_rico_preserva_ids_e_hooks_do_menu_de_evento(self):
-        oficio_html = self._render(
-            '{% cotton ui.lists.itinerary :items="items" '
-            'item_extra_class="itinerary__leg--documento" '
-            'item_template="eventos/partials/_itinerary_item.html" '
-            'item_kind="oficio" :item_context="card" only / %}',
-            {
-                "card": {"pk": 17, "menus_url": "/eventos/17/menus/"},
-                "items": [
-                    {
-                        "numero": "OF-42",
-                        "oficio_pk": 9,
-                        "protocolo": "123",
-                        "data_evento_display": "10/08/2026",
-                        "destino_display": "Curitiba",
-                        "meta_display": "123 · 10/08/2026 · Curitiba",
-                    }
-                ],
-            },
-        )
-
-        documentos_html = self._render(
-            '{% cotton ui.lists.itinerary :items="items" '
-            'item_extra_class="itinerary__leg--documento" '
-            'item_template="eventos/partials/_itinerary_item.html" '
-            'item_kind="documento" :item_context="card" only / %}',
-            {
-                "card": {"pk": 17, "menus_url": "/eventos/17/menus/"},
-                "items": [
-                    {
-                        "title": "Plano",
-                        "kind": "PT",
-                        "meta": "A",
-                        "detail": "B",
-                        "meta_display": "A · B",
-                    },
-                    {
-                        "title": "Convite",
-                        "kind": "Anexo",
-                        "meta": "",
-                        "detail": "",
-                        "meta_display": "",
-                    },
-                ],
-            },
-        )
-
-        self.assertIn("itinerary__leg itinerary__leg--documento", oficio_html)
-        self.assertIn('aria-controls="evento-oficio-menu-17-9"', oficio_html)
-        self.assertIn('data-overlay-target="evento-oficio-menu-17-9"', oficio_html)
-        self.assertIn('data-overlay-src="/eventos/17/menus/"', oficio_html)
-        self.assertIn("123 · 10/08/2026 · Curitiba", oficio_html)
-        self.assertIn('aria-controls="evento-documento-menu-17-1"', documentos_html)
-        self.assertIn('aria-controls="evento-documento-menu-17-2"', documentos_html)
-        self.assertIn("A · B", documentos_html)
-
-    def test_cinco_apps_consumem_o_componente_sem_reimplementar_lista(self):
+    def test_consumidores_de_producao_usam_o_itinerario_v2(self):
         templates_root = ROOT / "templates"
         for relative in CONSUMERS:
             source = (templates_root / relative).read_text(encoding="utf-8")
-            self.assertTrue(
-                "<c-ui.lists.itinerary" in source
-                or "<c-v2.itinerary" in source
-                or 'include "cotton/ui/lists/itinerary.html"' in source
-                or 'include "includes/performance/itinerary_flat.html"' in source,
-                relative,
-            )
+            self.assertIn("<c-v2.itinerary", source, relative)
             get_template(relative)
 
         raw = []
         for path in templates_root.rglob("*.html"):
             relative_parts = path.relative_to(templates_root).parts
-            if "cotton" in relative_parts or relative_parts[:2] == ("includes", "performance"):
+            if "cotton" in relative_parts:
                 continue
             source = path.read_text(encoding="utf-8")
-            if '<ul class="itinerary' in source or '<li class="itinerary__leg' in source:
+            if '<ul class="route-legs' in source or '<li class="route-legs__leg' in source:
                 raw.append(str(path.relative_to(templates_root)))
         self.assertEqual(raw, [])

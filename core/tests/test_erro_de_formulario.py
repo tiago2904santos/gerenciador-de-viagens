@@ -30,7 +30,7 @@ from django.test import SimpleTestCase
 from django.test import TestCase
 from django.urls import reverse
 
-RESUMO = "cotton/ui/feedback/form_errors.html"
+RESUMO = "cotton/v2/form_errors.html"
 RAIZ = Path(settings.BASE_DIR)
 
 GENERICA = "Revise os campos destacados antes de continuar."
@@ -77,7 +77,9 @@ class ResumoDeErroTests(SimpleTestCase):
 
         html = self.renderiza(form=form)
 
-        self.assertIn("Primeira falha. Segunda falha.", html)
+        self.assertIn("Primeira falha.", html)
+        self.assertIn("Segunda falha.", html)
+        self.assertIn("</li><li>", html)
 
     def test_so_erro_de_campo_cai_na_frase_generica(self):
         """Sem `non_field_errors` não há o que dizer além de "olhe os campos"."""
@@ -145,8 +147,8 @@ class AlertNaoInterpretaMarcacaoTests(SimpleTestCase):
 
     def test_message_crua_com_marcacao_sai_escapada(self):
         html = render_to_string(
-            "cotton/ui/feedback/alert.html",
-            {"variant": "danger", "message": "<img src=x onerror=alert(1)>"},
+            "cotton/v2/alert.html",
+            {"tone": "error", "message": "<img src=x onerror=alert(1)>"},
         )
 
         self.assertNotIn("<img", html)
@@ -154,8 +156,8 @@ class AlertNaoInterpretaMarcacaoTests(SimpleTestCase):
 
     def test_title_cru_com_marcacao_sai_escapado(self):
         html = render_to_string(
-            "cotton/ui/feedback/alert.html",
-            {"variant": "danger", "title": "<b>x</b>", "message": "ok"},
+            "cotton/v2/alert.html",
+            {"tone": "error", "title": "<b>x</b>", "message": "ok"},
         )
 
         self.assertNotIn("<b>x</b>", html)

@@ -1,4 +1,4 @@
-{% cotton:vars extra_class label tone %}
+{% cotton:vars count extra_class label tone variant %}
 {% comment %}
   Chip v2 — selo de estado. Par de `static/css/v2/chip.css`.
 
@@ -10,4 +10,4 @@
   decisão que é do sistema — e era a proliferação de classe-por-cor que produzia
   as 18 variantes do botão legado, das quais 8 morreram sem uso.
 {% endcomment %}
-<span class="chip--v2{% if extra_class %} {{ extra_class }}{% endif %}"{% if tone %} data-tone="{{ tone }}"{% endif %}>{{ label }}</span>
+<span class="chip--v2{% if extra_class %} {{ extra_class }}{% endif %}"{% if tone %} data-tone="{{ tone }}"{% elif variant %} data-tone="{{ variant }}"{% endif %}>{{ label }}{% if count %} <span aria-label="{{ count }}">{{ count }}</span>{% endif %}</span>

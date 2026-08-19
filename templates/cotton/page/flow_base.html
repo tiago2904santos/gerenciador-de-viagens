@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% cotton:vars flow_back_label flow_back_url flow_eyebrow flow_stepper_aria_label page_title wizard_page_steps %}
+{% cotton:vars flow_back_label flow_back_url flow_stepper_aria_label page_title wizard_page_steps %}
 {% comment %}
   Shell único das páginas de fluxo documental (`H-02`).
 
@@ -32,7 +32,10 @@
   <div class="page-shell cv-page {% block flow_shell_modifier %}page-shell--wizard cv-page--flow{% endblock %} travel-document-wizard app-wizard{% block flow_shell_extra %}{% endblock %}"{% block flow_shell_attrs %}{% endblock %}>
     <div class="wizard-sticky-scope" data-wizard-sticky-header>
       {% block flow_header %}
-        <c-ui.headers.wizard_page_header :eyebrow="flow_eyebrow" :title="page_title" :steps="wizard_page_steps" :stepper_aria_label="flow_stepper_aria_label" :back_label="flow_back_label" :back_url="flow_back_url" only />
+        <c-v2.header :title="page_title">
+          {% if flow_back_url %}<c-slot name="aside"><c-v2.button :href="flow_back_url" :label="flow_back_label" icon="arrow-left" /></c-slot>{% endif %}
+        </c-v2.header>
+        {% if wizard_page_steps %}<c-v2.stepper :steps="wizard_page_steps" :aria_label="flow_stepper_aria_label" />{% endif %}
       {% endblock %}
 
       {% block flow_stepper %}{% endblock %}

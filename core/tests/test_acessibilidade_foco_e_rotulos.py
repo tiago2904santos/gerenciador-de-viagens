@@ -122,9 +122,10 @@ class NomeAcessivelDoSeletorTests(SimpleTestCase):
 
     def test_o_rotulo_sobrevive_como_sr_only_no_campo_de_busca(self):
         """Era omitido de vez; agora sai da tela mas fica na árvore de acessibilidade."""
-        html = ler("templates/cotton/ui/forms/field.html")
+        html = ler("templates/cotton/v2/form_field.html")
 
-        self.assertIn('<label class="sr-only" for="{{ field.id_for_label }}">', html)
+        self.assertIn(':label_for="field.id_for_label"', html)
+        self.assertIn(':label="rotulo"', html)
 
     def test_o_picker_associa_o_rotulo_ao_input(self):
         js = ler("static/js/components/picker.js")

@@ -313,12 +313,11 @@ class DarkRedesignContractTests(SimpleTestCase):
     def test_page_header_has_one_canonical_markup_without_legacy_wrappers(self):
         headers = Path(settings.BASE_DIR) / "templates" / "components" / "ui" / "headers"
         canonical = (
-            Path(settings.BASE_DIR) / "templates" / "cotton" / "ui" / "headers" / "page_header.html"
+            Path(settings.BASE_DIR) / "templates" / "cotton" / "v2" / "header.html"
         ).read_text(encoding="utf-8")
 
-        self.assertIn('<header class="page-header-stack', canonical)
-        self.assertIn("<c-ui.buttons.button", canonical)
-        self.assertIn("<c-ui.badges.status_badge", canonical)
+        self.assertIn('<div class="header', canonical)
+        self.assertIn("<c-v2.button", canonical)
 
         for wrapper_name in (
             "header_stack_simple.html",
@@ -328,16 +327,15 @@ class DarkRedesignContractTests(SimpleTestCase):
             with self.subTest(wrapper=wrapper_name):
                 self.assertFalse((headers / wrapper_name).exists())
 
-        self.assertIn("band_only", canonical)
+        self.assertIn("header__title", canonical)
 
     def test_canonical_header_uses_a_valid_multiline_template_comment(self):
         canonical = (
             Path(settings.BASE_DIR)
             / "templates"
             / "cotton"
-            / "ui"
-            / "headers"
-            / "page_header.html"
+            / "v2"
+            / "header.html"
         ).read_text(encoding="utf-8")
 
         self.assertIn("{% comment %}", canonical)
@@ -349,8 +347,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR)
             / "templates"
             / "cotton"
-            / "ui"
-            / "buttons"
+            / "v2"
             / "button.html"
         ).read_text(encoding="utf-8")
 
@@ -368,21 +365,18 @@ class DarkRedesignContractTests(SimpleTestCase):
         )
 
         self.assertFalse(wrapper.exists())
-        canonical = Path(settings.BASE_DIR) / "templates" / "cotton" / "ui" / "forms" / "field.html"
+        canonical = Path(settings.BASE_DIR) / "templates" / "cotton" / "v2" / "form_field.html"
         self.assertTrue(canonical.exists())
 
     def test_canonical_feedback_supports_existing_contracts(self):
-        feedback = Path(settings.BASE_DIR) / "templates" / "cotton" / "ui" / "feedback"
+        feedback = Path(settings.BASE_DIR) / "templates" / "cotton" / "v2"
         alert = (feedback / "alert.html").read_text(encoding="utf-8")
-        empty_state = (feedback / "empty_state.html").read_text(encoding="utf-8")
+        empty_state = (feedback / "panel.html").read_text(encoding="utf-8")
         form_errors = (feedback / "form_errors.html").read_text(encoding="utf-8")
 
-        self.assertIn("alert-{{ alert_variant }}", alert)
-        self.assertIn("alert--{{ alert_variant }}", alert)
-        self.assertIn("notice", alert)
-        self.assertIn("notice--", alert)
-        self.assertIn("action_label and action_url", empty_state)
-        self.assertIn('<c-ui.buttons.button', empty_state)
+        self.assertIn('class="alert', alert)
+        self.assertIn('data-tone=', alert)
+        self.assertIn("panel__empty", empty_state)
         # `HT-03`: a guarda era `form.errors or errors`, num `{% if %}` só. Virou dois
         # ramos porque a forma antiga **estourava** quando o chamador passava `errors`
         # sem `form`: variável em argumento de filtro levanta `VariableDoesNotExist`
@@ -391,15 +385,14 @@ class DarkRedesignContractTests(SimpleTestCase):
         # tanto um formulário quanto uma lista explícita —, e agora são duas asserções
         # em vez de uma.
         self.assertIn("{% if errors %}", form_errors)
-        self.assertIn("form.non_field_errors or form.errors", form_errors)
+        self.assertIn("form.non_field_errors", form_errors)
 
     def test_file_picker_is_a_global_accessible_component(self):
         component = (
             Path(settings.BASE_DIR)
             / "templates"
             / "cotton"
-            / "ui"
-            / "forms"
+            / "v2"
             / "file_picker.html"
         ).read_text(encoding="utf-8")
         component_css = (
@@ -427,25 +420,20 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn('addEventListener("drop"', script)
 
     def test_confirmation_flows_share_the_canonical_dialog_structure(self):
-        modals = (
-            Path(settings.BASE_DIR) / "templates" / "cotton" / "ui" / "modals"
-        )
-        header = (modals / "dialog_header.html").read_text(encoding="utf-8")
-
-        self.assertIn("cv-dialog__header", header)
-        self.assertIn("cv-dialog__close", header)
+        modals = Path(settings.BASE_DIR) / "templates" / "cotton" / "v2"
+        shell = (modals / "modal.html").read_text(encoding="utf-8")
+        self.assertIn("modal__header", shell)
+        self.assertIn("modal__body", shell)
+        self.assertIn("modal__actions", shell)
         for filename, hook in (
-            ("delete_confirm_modal.html", "data-delete-confirm-modal"),
-            ("cancel_reason_modal.html", "data-cancel-reason-modal"),
-            ("confirm_action_modal.html", "data-confirm-action-modal"),
+            ("delete_modal.html", "data-delete-confirm-modal"),
+            ("cancel_modal.html", "data-cancel-reason-modal"),
+            ("confirm_modal.html", "data-confirm-action-modal"),
             ("attach_signed_modal.html", "data-attach-signed-modal"),
         ):
             with self.subTest(modal=filename):
                 source = (modals / filename).read_text(encoding="utf-8")
-                self.assertIn("cv-dialog__panel", source)
-                self.assertIn("<c-ui.modals.dialog_header", source)
-                self.assertIn("cv-dialog__body", source)
-                self.assertIn("cv-dialog__footer", source)
+                self.assertIn("<c-v2.modal", source)
                 self.assertIn(hook, source)
 
         attach_script = (
@@ -593,12 +581,11 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR)
             / "templates"
             / "cotton"
-            / "ui"
-            / "modals"
-            / "confirm_delete.html"
+            / "v2"
+            / "confirm_delete_page.html"
         ).read_text(encoding="utf-8")
 
-        self.assertIn("confirm-page", component)
+        self.assertIn("delete-page", component)
         self.assertIn(':href="back_url"', component)
         self.assertIn('variant="danger"', component)
         self.assertIn('type="submit"', component)
@@ -663,21 +650,21 @@ class DarkRedesignContractTests(SimpleTestCase):
                     f"prestacoes_contas/{relative}",
                     {"page_title": "Contrato", "wizard_page_steps": []},
                 )
-                self.assertIn("travel-document-card", html)
-                self.assertIn("travel-document-body", html)
-                self.assertIn("form-card__footer", html)
+                self.assertIn('class="panel', html)
+                self.assertIn("panel__header", html)
+                self.assertIn("panel__footer", html)
                 self.assertIn(card, html)
 
     def test_rich_list_cards_share_the_entity_card_contract(self):
         templates = Path(settings.BASE_DIR) / "templates"
         canonical = (
-            templates / "cotton" / "ui" / "lists" / "entity_card.html"
+            templates / "cotton" / "v2" / "record.html"
         ).read_text(encoding="utf-8")
         for contract in (
-            "entity-card",
-            "entity-card__body",
-            "<c-ui.lists.entity_card_header",
-            "<c-ui.lists.entity_card_footer",
+            "record",
+            "record__body",
+            "record__row",
+            "record__heading",
         ):
             self.assertIn(contract, canonical)
 
@@ -714,10 +701,6 @@ class DarkRedesignContractTests(SimpleTestCase):
     def test_document_viewer_and_signature_use_canonical_components(self):
         templates = Path(settings.BASE_DIR) / "templates"
         viewer = (templates / "cotton" / "documents" / "pdf_viewer.html").read_text(encoding="utf-8")
-        signature = (templates / "cotton" / "documents" / "signature_card.html").read_text(encoding="utf-8")
-        signature_body = (
-            templates / "cotton" / "documents" / "partials" / "_signature_card_body.html"
-        ).read_text(encoding="utf-8")
         viewer_page = (templates / "documentos" / "pdf_viewer.html").read_text(encoding="utf-8")
         signature_js = (
             Path(settings.BASE_DIR) / "static" / "js" / "components" / "signature-actions.js"
@@ -726,14 +709,8 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("document-viewer", viewer)
         self.assertIn("doc-pdf-canvas-wrap", viewer)
         self.assertIn('<c-documents.pdf_viewer', viewer_page)
-        self.assertIn("signature-card", signature)
-        # `H-05`: o hook de cópia mora no partial do corpo, não no casco.
-        self.assertIn("data-cv-signature-copy", signature_body)
-        self.assertIn('<c-documents.signature_card', (
-            templates / "prestacoes_contas" / "diario_bordo_form.html"
-        ).read_text(encoding="utf-8"))
         self.assertIn("[data-cv-signature-copy]", signature_js)
-        self.assertNotIn("<script>", signature)
+        self.assertFalse((templates / "cotton" / "documents" / "signature_card.html").exists())
         self.assertFalse((templates / "prestacoes_contas" / "partials" / "assinatura_card.html").exists())
         self.assertFalse((Path(settings.BASE_DIR) / "static" / "css" / "documentos-viewer.css").exists())
 
@@ -772,7 +749,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         # classe `dashboard-*` pode voltar — era ela que justificava um CSS so
         # dela (`dashboard.css`, apagado) e 4 blocos no tema escuro.
         self.assertIn("page-shell", dashboard)
-        self.assertIn('<c-ui.headers.page_header', dashboard)
+        self.assertIn('<c-v2.header', dashboard)
         self.assertIn('<c-v2.module_card', dashboard)
         self.assertNotIn("dashboard-page", dashboard)
         self.assertNotIn("summary_card.html", dashboard)

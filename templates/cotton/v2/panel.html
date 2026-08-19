@@ -1,4 +1,4 @@
-{% cotton:vars actions body description empty_message empty_title extra_class filter_empty_message filter_empty_title surface title %}
+{% cotton:vars actions actions_bare actions_extra_class aria_label body body_extra_class copy_extra_class data_hook description empty_message empty_title extra_class eyebrow filter_empty_message filter_empty_title footer footer_data_hook footer_extra_class footer_id header_extra_class heading_level meta meta_extra_class surface title title_id %}
 {% comment %}
   Panel v2 — a caixa de uma seção de página: o que fica na PRIMEIRA camada,
   direto sobre o fundo. Par de `static/css/v2/panel.css`.
@@ -19,19 +19,25 @@
   Com `{% if body %}` a lista vazia entrava pelo ramo do conteúdo e a mensagem
   de "nada cadastrado" nunca aparecia — em nenhuma tela.
 {% endcomment %}
-<div class="panel{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
-  {% if title or description or actions %}
-    <header class="panel__header">
-      <div>
-        {% if title %}<h2 class="panel__title">{{ title }}</h2>{% endif %}
+<section class="panel{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if aria_label %} aria-label="{{ aria_label }}"{% elif title_id %} aria-labelledby="{{ title_id }}"{% endif %}{% if data_hook %} data-{{ data_hook }}{% endif %}>
+  {% if title or description or actions or meta %}
+    <header class="panel__header{% if header_extra_class %} {{ header_extra_class }}{% endif %}">
+      <div{% if copy_extra_class %} class="{{ copy_extra_class }}"{% endif %}>
+        {% if eyebrow %}<span class="header__eyebrow">{{ eyebrow }}</span>{% endif %}
+        {% if title %}
+          {% if heading_level == 1 %}<h1 class="panel__title"{% if title_id %} id="{{ title_id }}"{% endif %}>{{ title }}</h1>
+          {% elif heading_level == 3 %}<h3 class="panel__title"{% if title_id %} id="{{ title_id }}"{% endif %}>{{ title }}</h3>
+          {% else %}<h2 class="panel__title"{% if title_id %} id="{{ title_id }}"{% endif %}>{{ title }}</h2>{% endif %}
+        {% endif %}
         {% if description %}<p class="panel__description">{{ description }}</p>{% endif %}
       </div>
-      {% if actions %}<div class="panel__actions">{{ actions }}</div>{% endif %}
+      {% if actions %}{% if actions_bare %}{{ actions }}{% else %}<div class="panel__actions{% if actions_extra_class %} {{ actions_extra_class }}{% endif %}">{{ actions }}</div>{% endif %}{% endif %}
+      {% if meta %}<div class="{% if meta_extra_class %}{{ meta_extra_class }}{% else %}panel__meta{% endif %}">{{ meta }}</div>{% endif %}
     </header>
   {% endif %}
 
   {% if body.strip %}
-    {{ body }}
+    <div{% if body_extra_class %} class="{{ body_extra_class }}"{% endif %}>{{ body }}</div>
     <div class="panel__empty" data-collection-empty hidden>
       <h2 class="panel__empty-title">{{ filter_empty_title|default:'Nenhum registro para este filtro' }}</h2>
       <p>{{ filter_empty_message|default:'Ajuste a busca ou limpe os filtros.' }}</p>
@@ -42,4 +48,5 @@
       {% if empty_message %}<p>{{ empty_message }}</p>{% endif %}
     </div>
   {% endif %}
-</div>
+  {% if footer %}<div class="panel__footer{% if footer_extra_class %} {{ footer_extra_class }}{% endif %}"{% if footer_id %} id="{{ footer_id }}"{% endif %}{% if footer_data_hook %} data-{{ footer_data_hook }}{% endif %}>{{ footer }}</div>{% endif %}
+</section>

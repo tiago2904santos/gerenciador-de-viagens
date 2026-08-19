@@ -75,7 +75,7 @@
       campos destacados" e nenhum campo destacado. O `errors.html` da seção
       legada fazia exatamente isto.
     {% endcomment %}
-    <c-v2.field_error :errors="form.destino_estado.errors" />
-    <c-v2.field_error :errors="form.destino_cidade.errors" />
+    <c-v2.field_error :errors="form.destino_estado.errors" :field_id="form.destino_estado.auto_id" />
+    <c-v2.field_error :errors="form.destino_cidade.errors" :field_id="form.destino_cidade.auto_id" />
   </c-slot>
 </c-v2.form_block>

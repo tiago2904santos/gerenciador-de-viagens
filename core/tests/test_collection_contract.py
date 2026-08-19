@@ -38,15 +38,9 @@ class CollectionContractTests(SimpleTestCase):
                     self.assertNotIn(hook, source)
 
     def test_list_components_declare_exactly_one_mode(self):
-        components = Path(settings.BASE_DIR) / "templates" / "cotton" / "lists"
-        for filename in (
-            "list_page_cards.html",
-            "list_page_quick_add.html",
-            # `list_page_standard.html` saiu em 2026-08-18: servidores e
-            # viaturas, seus dois últimos consumidores, migraram para o
-            # `c-v2.list_page`.
-        ):
-            with self.subTest(component=filename):
-                source = (components / filename).read_text(encoding="utf-8")
-                self.assertEqual(source.count("data-collection-mode="), 1)
-                self.assertIn('data-collection-mode="server"', source)
+        component = (
+            Path(settings.BASE_DIR) / "templates" / "cotton" / "v2" / "list_page.html"
+        )
+        source = component.read_text(encoding="utf-8")
+        self.assertEqual(source.count("data-collection-mode="), 1)
+        self.assertIn('data-collection-mode="{{ filter_mode|default:', source)

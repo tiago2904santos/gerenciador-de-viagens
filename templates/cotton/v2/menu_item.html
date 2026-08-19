@@ -1,4 +1,4 @@
-{% cotton:vars description download extra_class href icon icon_tone target_blank title tone %}
+{% cotton:vars description download extra_class extra_download_url href icon icon_tone target_blank title tone %}
 {% comment %}
   Item do menu v2. O ícone é opcional; a descrição também.
 
@@ -17,6 +17,7 @@
   role="menuitem"
   {% if tone %}data-tone="{{ tone }}"{% endif %}
   {% if download %}download{% endif %}
+  {% if extra_download_url %}data-extra-download-url="{{ extra_download_url }}"{% endif %}
   {% if target_blank %}target="_blank" rel="noopener"{% endif %}
 >
   {% if icon %}<span class="menu__icon"{% if icon_tone %} data-tone="{{ icon_tone }}"{% endif %} aria-hidden="true">{% icone_svg icon %}</span>{% endif %}

@@ -1,4 +1,5 @@
 {% cotton:vars actions actions_label body download_url empty_message extra_class frame_title group nested open_url src title %}
+{% firstof frame_title title as viewer_title %}
 {% comment %}
   Documento inline — o cartão que abre e mostra o PDF na própria página. Par de
   `static/css/v2/document-inline.css`, que já estava no bundle do v2 sem ter
@@ -53,7 +54,7 @@
         <iframe
           class="document-inline-viewer__frame"
           data-src="{{ src }}"
-          title="{{ frame_title|default:title }}"
+          title="{{ viewer_title }}"
           loading="lazy"
         ></iframe>
       </div>

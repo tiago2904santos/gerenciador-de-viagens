@@ -368,14 +368,6 @@ class TipoEventoForm(forms.ModelForm):
         help_text="Ex.: PCPR na Comunidade, Justiça no Bairro.",
         widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL)}),
     )
-    ativo = forms.BooleanField(
-        label="Ativo",
-        required=False,
-        initial=True,
-        help_text="Desmarque para ocultar este tipo da seleção sem apagar eventos já vinculados.",
-        widget=forms.CheckboxInput(attrs={**widget_attrs(WidgetStyle.CARD_TOGGLE)}),
-    )
-
     class Meta:
         model = TipoEvento
-        fields = ["nome", "ativo"]
+        fields = ["nome"]

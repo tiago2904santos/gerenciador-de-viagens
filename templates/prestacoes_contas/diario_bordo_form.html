@@ -25,7 +25,7 @@
     {% csrf_token %}
     {{ formset.management_form }}
 
-    <c-ui.feedback.form_errors :errors="formset.non_form_errors" only />
+    <c-v2.form_errors :errors="formset.non_form_errors" only />
 
     {% if diaria_info.alterada %}
       <div class="notice notice--warning diario-diaria-alert" role="alert">
@@ -36,12 +36,8 @@
     {% endif %}
 
     <div data-travel-document-wizard-diario data-travel-document-wizard-documentos>
-      <c-form.card title="Diário de bordo" description="Resumo do ofício, trechos do roteiro e pré-visualização" title_id="diario-wizard-title" extra_class="diario-wizard-card" body_extra_class="diario-wizard-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "prestacoes_contas/partials/_diario_wizard_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook element_id=element_id heading_level=heading_level section_id=section_id shell=shell trechos=trechos variant=variant equipe_body_template=equipe_body_template form_block_heading_level=form_block_heading_level identificacao=identificacao diaria_info=diaria_info editar_motorista_url=editar_motorista_url editar_roteiro_url=editar_roteiro_url motorista_resumo=motorista_resumo preview_inline_url=preview_inline_url preview_pdf_url=preview_pdf_url preview_xlsx_url=preview_xlsx_url servidor=servidor only %}</c-slot><c-slot name="footer">{% include "prestacoes_contas/partials/_diario_footer.html" with documentos_url=documentos_url rt_url=rt_url trechos=trechos only %}</c-slot></c-form.card>
+      <c-v2.panel title="Diário de bordo" description="Resumo do ofício, trechos do roteiro e pré-visualização" title_id="diario-wizard-title" extra_class="diario-wizard-card" body_extra_class="diario-wizard-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "prestacoes_contas/partials/_diario_wizard_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook element_id=element_id heading_level=heading_level section_id=section_id shell=shell trechos=trechos variant=variant equipe_body_template=equipe_body_template form_block_heading_level=form_block_heading_level identificacao=identificacao diaria_info=diaria_info editar_motorista_url=editar_motorista_url editar_roteiro_url=editar_roteiro_url motorista_resumo=motorista_resumo preview_inline_url=preview_inline_url preview_pdf_url=preview_pdf_url preview_xlsx_url=preview_xlsx_url servidor=servidor only %}</c-slot><c-slot name="footer">{% include "prestacoes_contas/partials/_diario_footer.html" with documentos_url=documentos_url rt_url=rt_url trechos=trechos only %}</c-slot></c-v2.panel>
     </div>
 
-    {# Assinatura eletrônica temporariamente oculta (fluxo indisponível). #}
-    {% comment %}
-    <c-documents.signature_card :signature="assinatura" :next_url="assinatura_next_url" only />
-    {% endcomment %}
   </form>
 {% endblock %}

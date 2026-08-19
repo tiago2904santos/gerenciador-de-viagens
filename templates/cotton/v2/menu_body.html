@@ -28,7 +28,7 @@
   especificidade.
 {% endcomment %}
 {% load icones %}
-<div class="menu action-menu" id="{{ menu.id }}" data-menu-v2 role="menu" hidden>
+<div class="menu action-menu" id="{{ menu.id }}" data-menu-v2 data-overlay-panel role="menu" hidden>
   {% for item in menu.items %}
     {% if item.type == "link" %}
       <a

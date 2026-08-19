@@ -32,11 +32,10 @@ class FormularioDeSonda(forms.Form):
     marcado = forms.BooleanField(label="Marcado", required=False)
 
 
-CONTAINER_ESPERADO = {"field", "app-form-field", "cv-field"}
-ROTULO_ESPERADO = {"app-form-label", "cv-field__label"}
+CONTAINER_ESPERADO = {"field"}
+ROTULO_ESPERADO = {"field__label"}
 
-# `checkbox` sai por `card_toggle.html`: contrato deliberadamente diferente.
-CAMPOS_EM_GRADE = ["texto", "numero", "data", "escolha", "varias"]
+CAMPOS_EM_GRADE = ["texto", "numero", "data", "escolha", "varias", "marcado"]
 
 
 def _classes(html, marcador):
@@ -56,7 +55,7 @@ class ContratoDeClasseDoFieldTests(SimpleTestCase):
 
     def _render(self, nome):
         return render_to_string(
-            "cotton/ui/forms/field.html",
+            "cotton/v2/form_field.html",
             {"field": self.form[nome], "label": self.form[nome].label},
         )
 
@@ -76,7 +75,7 @@ class ContratoDeClasseDoFieldTests(SimpleTestCase):
         contratos = {}
         for nome in CAMPOS_EM_GRADE:
             html = self._render(nome)
-            contratos[nome] = _classes(html, "app-form-label") & ROTULO_ESPERADO
+            contratos[nome] = _classes(html, "field__label") & ROTULO_ESPERADO
 
         self.assertEqual(
             contratos,
@@ -84,19 +83,19 @@ class ContratoDeClasseDoFieldTests(SimpleTestCase):
             "tipos de widget diferentes ainda emitem contratos de rótulo diferentes",
         )
 
-    def test_o_checkbox_segue_por_card_toggle_e_fica_fora_do_contrato(self):
-        """Documentado, não esquecido: cartão clicável não é campo em grade."""
+    def test_o_checkbox_segue_o_mesmo_contrato_v2(self):
         html = self._render("marcado")
 
-        self.assertIn("app-card-toggle", html)
-        self.assertNotIn("cv-field__label", html)
+        self.assertIn('class="field"', html)
+        self.assertIn('class="field__label"', html)
+        self.assertNotIn("app-card-toggle", html)
 
     def test_o_size_class_continua_indo_para_o_container(self):
         """`size_class` é como as páginas controlam largura na grade — não pode sumir."""
         for nome in CAMPOS_EM_GRADE:
             with self.subTest(campo=nome):
                 html = render_to_string(
-                    "cotton/ui/forms/field.html",
+                    "cotton/v2/form_field.html",
                     {"field": self.form[nome], "size_class": "field-size-4"},
                 )
                 self.assertIn("field-size-4", html)

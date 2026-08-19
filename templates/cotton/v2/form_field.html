@@ -1,4 +1,4 @@
-{% cotton:vars action_label action_url extra_class field help label %}
+{% cotton:vars action_label action_url extra_class field help help_text label size_class %}
 {% comment %}
   Campo de formulário a partir de um `BoundField` do Django — rótulo, widget,
   ajuda e erro, no desenho do v2.
@@ -30,15 +30,16 @@
   de servidor apareceram só com o texto de exemplo. Resolvido aqui, o atributo
   recebe uma variável simples.
 {% endcomment %}
-{% with rotulo=label|default:field.label ajuda=help|default:field.help_text erro=field.errors.0 ajuda_id=field.id_for_label|add:"_helptext" erro_id=field.id_for_label|add:"_error" %}
+{% firstof label field.label as rotulo %}
+{% with erros=field.errors ajuda_id=field.id_for_label|add:"_helptext" erro_id=field.id_for_label|add:"_error" %}
 <c-v2.field
   :label="rotulo"
   :label_for="field.id_for_label"
-  :help="ajuda"
   :help_id="ajuda_id"
-  :error="erro"
+  :errors="erros"
   :error_id="erro_id"
   :extra_class="extra_class"
+  :size_class="size_class"
 >
   <c-slot name="control">
     {% if action_url %}
@@ -54,5 +55,6 @@
       {{ field }}
     {% endif %}
   </c-slot>
+  {% if help %}<c-slot name="help">{{ help|safe }}</c-slot>{% elif help_text %}<c-slot name="help">{{ help_text|safe }}</c-slot>{% elif field.help_text %}<c-slot name="help">{{ field.help_text|safe }}</c-slot>{% endif %}
 </c-v2.field>
 {% endwith %}

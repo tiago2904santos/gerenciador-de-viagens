@@ -57,6 +57,104 @@ APAGADOS_COM_O_LAB = (
     "cards/document_card.html",
 )
 
+# NOVO-20260819-024829-01844001d431: componentes substituídos pelo v2.
+APAGADOS_NA_ERRADICACAO_V2 = (
+    "documents/partials/_signature_card_body.html",
+    "documents/partials/_signature_card_header_meta.html",
+    "documents/signature_card.html",
+    "feedback/alerts.html",
+    "feedback/confirm_delete_block.html",
+    "feedback/module_placeholder.html",
+    "form/card.html",
+    "lists/list_empty.html",
+    "lists/list_page_cards.html",
+    "lists/list_page_quick_add.html",
+    "lists/list_tabs.html",
+    "lists/simple_list.html",
+    "lists/simple_list_row.html",
+    "travel/destination_row.html",
+    "travel/destination_section.html",
+    "travel/destinations/city_select.html",
+    "travel/destinations/errors.html",
+    "travel/destinations/row_template.html",
+    "travel/destinations/rows.html",
+    "travel/destinations/state_select.html",
+    "travel/period_destinations_section.html",
+    "travel/route_segments.html",
+    "travel/travel_allowance_calculator.html",
+    "ui/badges/chip.html",
+    "ui/badges/status_badge.html",
+    "ui/buttons/button.html",
+    "ui/buttons/field_manage_button.html",
+    "ui/buttons/floating_action.html",
+    "ui/buttons/icon_button.html",
+    "ui/feedback/alert.html",
+    "ui/feedback/empty_state.html",
+    "ui/feedback/field_error.html",
+    "ui/feedback/form_errors.html",
+    "ui/feedback/pendencias_card.html",
+    "ui/forms/_date_picker_icon.html",
+    "ui/forms/_field_control.html",
+    "ui/forms/card_toggle.html",
+    "ui/forms/date_picker.html",
+    "ui/forms/document_number_field.html",
+    "ui/forms/field.html",
+    "ui/forms/file_picker.html",
+    "ui/forms/form_block.html",
+    "ui/forms/multiselect.html",
+    "ui/forms/related_picker.html",
+    "ui/header.html",
+    "ui/headers/filter_page_header.html",
+    "ui/headers/page_header.html",
+    "ui/headers/wizard_page_header.html",
+    "ui/input.html",
+    "ui/layouts/card_footer_actions.html",
+    "ui/layouts/card_footer_section.html",
+    "ui/lists/entity_card.html",
+    "ui/lists/entity_card_footer.html",
+    "ui/lists/entity_card_header.html",
+    "ui/lists/entity_card_menu.html",
+    "ui/lists/entity_card_menu_body.html",
+    "ui/lists/file_list.html",
+    "ui/lists/itinerary.html",
+    "ui/lists/pagination.html",
+    "ui/menus/rich_menu_header.html",
+    "ui/menus/rich_menu_link.html",
+    "ui/modals/attach_signed_modal.html",
+    "ui/modals/cancel_reason_modal.html",
+    "ui/modals/confirm_action_modal.html",
+    "ui/modals/confirm_delete.html",
+    "ui/modals/delete_confirm_modal.html",
+    "ui/modals/dialog_header.html",
+    "ui/navigation/page_stepper.html",
+    "ui/select.html",
+    "ui/sub_header.html",
+)
+
+# Não são componentes antigos com substituto visual disponível. São as
+# fronteiras que continuam fora de `v2/`: infraestrutura do shell/fluxo,
+# renderização de PDF, primitiva sem decoração, sprite de ícones e a integração
+# específica com o Google Drive. A igualdade exata impede que um novo namespace
+# paralelo volte a crescer silenciosamente.
+SEM_EQUIVALENTE_V2 = frozenset(
+    {
+        "create_draft.html",
+        "documents/pdf_viewer.html",
+        "layout/sidebar.html",
+        "page/flow_base.html",
+        "partials/_create_draft_body.html",
+        "perfil/partials/_gdrive_card_body.html",
+        "perfil/partials/_gdrive_conta_actions.html",
+        "perfil/partials/_gdrive_conta_body.html",
+        "perfil/partials/_gdrive_diretorio_body.html",
+        "perfil/partials/_gdrive_pendencias_body.html",
+        "perfil/partials/_gdrive_pendencias_meta.html",
+        "ui/buttons/plain_button.html",
+        "ui/icons/_sprite.html",
+        "ui/icons/icon.html",
+    }
+)
+
 
 def _sources() -> list[Path]:
     ignored = {".git", ".venv", "__pycache__"}
@@ -275,7 +373,18 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # O aviso de pendências do wizard NÃO é uma sétima peça: é o
         # `v2/alert_list.html` que Ofícios trouxe no mesmo dia. Nasceram em
         # paralelo com o mesmo contrato, e sobrou o que já estava no `main`.
-        self.assertEqual(len(self.components()), 160)
+        # 90 = 160 - 70 implementações antigas substituídas por componentes v2.
+        # As 14 folhas restantes fora de v2 não possuem equivalente: shell de
+        # fluxo, sidebar, PDF, ícones/sprite, assinatura e integração Drive.
+        self.assertEqual(len(self.components()), 90)
+
+    def test_fora_do_v2_so_restam_pecas_sem_equivalente(self):
+        fora_do_v2 = {
+            path.relative_to(COTTON).as_posix()
+            for path in self.components()
+            if path.relative_to(COTTON).parts[0] != "v2"
+        }
+        self.assertEqual(fora_do_v2, SEM_EQUIVALENTE_V2)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.
@@ -304,6 +413,10 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         voltaram = [rel for rel in APAGADOS_COM_O_LAB if (COTTON / rel).exists()]
         self.assertEqual(voltaram, [], "componente apagado com o lab voltou")
 
+    def test_os_apagados_na_erradicacao_v2_nao_voltaram(self):
+        voltaram = [rel for rel in APAGADOS_NA_ERRADICACAO_V2 if (COTTON / rel).exists()]
+        self.assertEqual(voltaram, [], "componente legado substituído pelo v2 voltou")
+
     def test_as_travas_nomeadas_pegam_o_que_o_guarda_de_orfao_nao_ve(self):
         """O buraco do `NOVO-80` foi medido, não suposto.
 
@@ -322,6 +435,7 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
             | set(APAGADOS_COM_O_LAB)
             | set(APAGADOS_COM_OS_CADASTROS)
             | set(APAGADOS_COM_OS_OFICIOS)
+            | set(APAGADOS_NA_ERRADICACAO_V2)
         )
         vivos = {str(path.relative_to(COTTON)) for path in self.components()}
         self.assertEqual(nomeados & vivos, set())

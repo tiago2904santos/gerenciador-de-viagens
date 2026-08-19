@@ -44,10 +44,9 @@ EDITOR_DIR = Path(settings.BASE_DIR) / "static" / "js" / "pages" / "roteiros" / 
 TRECHOS_PARTIAL = (
     Path(settings.BASE_DIR)
     / "templates"
-    / "roteiros"
-    / "partials"
-    / "roteiro"
-    / "_trechos_gerados_body.html"
+    / "cotton"
+    / "v2"
+    / "route_segments.html"
 )
 
 
@@ -116,7 +115,7 @@ class EstimativaDeTrechoAvisaQuandoFalhaTests(SimpleTestCase):
         self.assertIn("hidden", markup)
         self.assertIn('role="alert"', markup)
         # Design system, não o Bootstrap legado que o HT-03 vai varrer.
-        self.assertIn("notice", markup)
+        self.assertIn('data-tone="warning"', markup)
         self.assertNotIn("alert alert-", markup)
 
         fonte = _fonte_do_editor()

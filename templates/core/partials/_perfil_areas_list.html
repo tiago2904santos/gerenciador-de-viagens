@@ -16,12 +16,12 @@
         </div>
         {% if vinculo.area_padrao %}
           <div class="record-row__actions">
-            <c-ui.badges.chip tone="info" label="Padrão" size="compact" only />
+            <c-v2.chip tone="info" label="Padrão" size="compact" only />
           </div>
         {% endif %}
       </div>
     {% endfor %}
   </div>
 {% else %}
-  <c-ui.feedback.empty_state title="Nenhuma área vinculada" message="Solicite a um administrador o acesso a uma área de trabalho." variant="compact" only />
+  <c-v2.panel empty_title="Nenhuma área vinculada" empty_message="Solicite a um administrador o acesso a uma área de trabalho." />
 {% endif %}

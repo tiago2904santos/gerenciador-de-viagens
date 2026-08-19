@@ -1,4 +1,4 @@
-{% cotton:vars entity %}
+{% cotton:vars delete_modal_entity delete_modal_title entity title %}
 {% comment %}
   Modal de EXCLUSÃO. Sobre o `c-v2.modal`. É o quarto e último diálogo de ação —
   os outros três (cancelar com motivo, confirmar ação, anexar assinado) já são v2.
@@ -25,18 +25,20 @@
   A frase sobre vínculos não é enfeite: a exclusão é bloqueada quando há
   referências, e dizê-lo ANTES evita o erro que só apareceria depois do clique.
 {% endcomment %}
+{% firstof entity delete_modal_entity "este registro" as entidade %}
+{% firstof title delete_modal_title "Excluir registro?" as titulo %}
 <c-v2.modal
   :own_form="True"
   hook="data-delete-confirm-modal"
   modal_id="delete-confirm-modal"
-  title="Excluir registro?"
+  :title="titulo"
   title_class="delete-confirm-modal__title"
   extra_class="modal--delete"
 >
   <c-slot name="body">
     <div>
       <p class="modal__message">
-        Você está prestes a excluir <strong data-delete-confirm-label>{{ entity|default:"este registro" }}</strong>.
+        Você está prestes a excluir <strong data-delete-confirm-label>{{ entidade }}</strong>.
         Se houver vínculos com outros registros, a exclusão será bloqueada.
       </p>
 

@@ -5,6 +5,6 @@
 
 {% block content %}
 <div class="page-shell cv-page page-shell--standard-simple cv-page--narrow">
-  <c-form.card :title="page_title" :description="page_description" title_id="create-draft-title" :heading_level="1" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :body_extra_class="body_extra_class" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :extra_class="extra_class" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :meta_extra_class="meta_extra_class"><c-slot name="body"><c-partials._create_draft_body :back_url="back_url" :confirm_label="confirm_label" /></c-slot></c-form.card>
+  <c-v2.panel :title="page_title" :description="page_description" title_id="create-draft-title" :heading_level="1" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :body_extra_class="body_extra_class" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :extra_class="extra_class" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :meta_extra_class="meta_extra_class"><c-slot name="body"><c-partials._create_draft_body :back_url="back_url" :confirm_label="confirm_label" /></c-slot></c-v2.panel>
 </div>
 {% endblock %}

@@ -30,20 +30,16 @@ def render(source: str, **contexto) -> str:
 
 
 class MarcacaoTests(SimpleTestCase):
-    def test_o_componente_delega_ao_partial_global(self):
-        """Recriar o markup aqui reintroduz a divergência que o partial evita.
-
-        Foi o que a primeira versão deste componente fez, e o
-        `test_calendar_markup_exists_only_in_the_global_partial` pegou.
-        """
+    def test_o_componente_v2_e_o_unico_dono_da_marcacao(self):
+        """A marcação global foi absorvida pelo v2 antes de apagar o legado."""
         fonte = COMPONENTE.read_text(encoding="utf-8")
-        self.assertIn("<c-ui.forms.date_picker", fonte)
-        self.assertNotIn("data-cv-date-picker-days", fonte)
-        self.assertNotIn("data-cv-date-picker-panel", fonte)
+        self.assertNotIn("<c-ui.forms.date_picker", fonte)
+        self.assertIn("data-cv-date-picker-days", fonte)
+        self.assertIn("data-cv-date-picker-panel", fonte)
 
     def test_o_involucro_v2_existe(self):
         """`.date-field` é a raiz que a folha v2 usa para não alcançar o legado."""
-        self.assertIn('class="date-field"', render("{% cotton v2.date_picker only / %}"))
+        self.assertIn("date-field", render("{% cotton v2.date_picker only / %}"))
 
     def test_modo_intervalo_entrega_os_dois_campos(self):
         html = render('{% cotton v2.date_picker mode="range" only / %}')

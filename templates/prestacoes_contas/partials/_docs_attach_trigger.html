@@ -3,7 +3,7 @@
    documentos que este gatilho pode anexar. Era um include de 37 linhas com 30
    atributos `data-*` nomeados por ordinal latino (`primary`…`quinary`) —
    acrescentar um sexto documento exigia editar template, JS e modal. {% endcomment %}
-<c-ui.buttons.button
+<c-v2.button
   type="button"
   class_name="icon-btn icon-btn--sign{% if doc.assinado %} is-assinado{% endif %}"
   aria_label="{% if doc.assinado %}Gerenciar {{ title }}{% else %}Anexar {{ title }}{% endif %}"
@@ -16,4 +16,4 @@
   data-attach-signed-file-description="um arquivo em PDF, PNG ou JPEG"
   data-attach-signed-file-help="Selecione um único arquivo em PDF, PNG, JPG ou JPEG."
   data-attach-signed-choose-label="Escolher arquivo"
-  data-attach-signed-upload-label="Anexar arquivo" only><c-ui.icons.icon icon="sign" only /></c-ui.buttons.button>
+  data-attach-signed-upload-label="Anexar arquivo" only><c-ui.icons.icon icon="sign" only /></c-v2.button>

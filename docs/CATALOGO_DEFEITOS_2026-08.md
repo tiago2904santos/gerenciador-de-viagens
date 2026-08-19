@@ -9251,3 +9251,23 @@ visual, por isso não entrou no PR da migração.
 Vale IGUAL para o resumo de diárias do roteiro (`c-v2.travel_allowance`), que tem a mesma forma e
 o mesmo `valor por extenso` na nota — o defeito não é da tela de Plano de Trabalho, é do par
 `fact__note` + texto por extenso.
+
+### NOVO-20260819-024829-01844001d431 🟢 RESOLVIDO · `NOVO` Componentes anteriores ao v2 continuam vivos mesmo quando o v2 já cobre o contrato · HT/UI · risco alto
+
+O inventário de 19/08 encontrou **298 chamadas reais** a 47 tipos anteriores ao v2 em templates
+de aplicação (as 364 tags `c-slot` não são componentes legados). A dívida está concentrada em
+Prestações de Contas, mas também há consumidores isolados em autenticação, documentos, modelos e
+páginas de exclusão. Parte desses componentes já possui par direto no v2; outra parte exige
+composição de peças v2 sem mudar POST, URL ou gancho JavaScript.
+
+**Correção:** migrar todos os consumidores cobertos pelo v2, provar zero referências no
+repositório inteiro antes de apagar cada arquivo e preservar somente os componentes para os quais
+não existe equivalente funcional real. A lista preservada deve ficar explícita no fechamento;
+renomear o legado sem trocar marcação e comportamento não conta como migração.
+
+**Fechamento em 19/08/2026:** as 298 chamadas substituíveis foram migradas para composição v2 e
+70 arquivos de componentes antigos perderam o último consumidor e foram removidos. Restaram 14
+peças sem equivalente funcional v2: infraestrutura do shell e do fluxo, renderizador de PDF,
+primitiva de botão sem decoração, sprite/ícone e integração específica do Google Drive. A lista é
+fechada por teste de contrato; qualquer retorno de um arquivo removido ou nova exceção quebra a
+suíte. O inventário Cotton passou de 160 para 90 arquivos (76 v2 e 14 exceções justificadas).

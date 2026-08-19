@@ -57,7 +57,7 @@ Isso está conferido no navegador, não deduzido.
           despacho — mesmo modal, mesmo nome, documento diferente (H-03). O
           payload agora vem do presenter, com chave semântica.
         {% endcomment %}
-        <c-ui.buttons.button
+        <c-v2.button
           type="button"
           class_name="action-menu__item action-menu__item{% if servidor.rt_assinado.assinado or servidor.diario_assinado.assinado or servidor.comprovante_anexo.assinado %} is-assinado{% endif %}"
           role="menuitem"
@@ -76,7 +76,7 @@ Isso está conferido no navegador, não deduzido.
             <strong>{% if servidor.rt_assinado.assinado or servidor.diario_assinado.assinado or servidor.comprovante_anexo.assinado %}Gerenciar documentos assinados{% else %}Anexar documentos assinados{% endif %}</strong>
             <small>RT, diário ou comprovante</small>
           </span>
-        </c-ui.buttons.button>
+        </c-v2.button>
         <a class="action-menu__item action-menu__item"
            href="{{ servidor.pacote_url }}"
            download
@@ -97,23 +97,23 @@ Isso está conferido no navegador, não deduzido.
             <small>Escolha como enviar</small>
           </span>
         </div>
-        <c-ui.buttons.button type="button" class_name="action-menu__item action-menu__item action-menu__item--wa" role="menuitem" data-diaria-wa-send data-wa-app="normal" only>
+        <c-v2.button type="button" class_name="action-menu__item action-menu__item action-menu__item--wa" role="menuitem" data-diaria-wa-send data-wa-app="normal" only>
           <span class="action-menu__item-icon action-menu__item-icon--wa">
             <c-ui.icons.icon icon="whatsapp-modern" only />
           </span>
           <span><strong>WhatsApp</strong><small>Abrir no aplicativo pessoal</small></span>
-        </c-ui.buttons.button>
-        <c-ui.buttons.button type="button" class_name="action-menu__item action-menu__item action-menu__item--wa" role="menuitem" data-diaria-wa-send data-wa-app="business" only>
+        </c-v2.button>
+        <c-v2.button type="button" class_name="action-menu__item action-menu__item action-menu__item--wa" role="menuitem" data-diaria-wa-send data-wa-app="business" only>
           <span class="action-menu__item-icon action-menu__item-icon--business">
             <c-ui.icons.icon icon="whatsapp-business" only />
           </span>
           <span><strong>WhatsApp Business</strong><small>Abrir no aplicativo profissional</small></span>
-        </c-ui.buttons.button>
-        <c-ui.buttons.button type="button" class_name="action-menu__item action-menu__item" role="menuitem" data-diaria-wa-copy only>
+        </c-v2.button>
+        <c-v2.button type="button" class_name="action-menu__item action-menu__item" role="menuitem" data-diaria-wa-copy only>
           <span class="action-menu__item-icon action-menu__item-icon--copy">
             <c-ui.icons.icon icon="copy-modern" only />
           </span>
           <span><strong>Copiar mensagem</strong><small>Copiar o texto para a área de transferência</small></span>
-        </c-ui.buttons.button>
+        </c-v2.button>
       </div>
 {% endfor %}

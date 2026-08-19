@@ -1,4 +1,4 @@
-{% cotton:vars actions aria_label body extra_class hook modal_id own_form title title_class %}
+{% cotton:vars actions aria_label body extra_class hook modal_id own_form title title_class title_id vinculo_mode %}
 {% comment %}
   Modal v2 — diálogo. Par de `static/css/v2/modal.css`.
 
@@ -27,7 +27,8 @@
   formulário recebia a `action` e o rótulo era preenchido, porque esses são
   buscados DENTRO do que ele achou. Abria tudo, menos o diálogo.
 {% endcomment %}
-<dialog class="modal{% if extra_class %} {{ extra_class }}{% endif %}" id="{{ modal_id }}" aria-label="{{ aria_label|default:title }}"{% if hook %} {{ hook }}{% endif %}>
+{% firstof aria_label title as modal_aria_label %}
+<dialog class="modal{% if extra_class %} {{ extra_class }}{% endif %}" id="{{ modal_id }}" aria-label="{{ modal_aria_label }}"{% if hook %} {{ hook }}{% endif %}{% if vinculo_mode %} data-vinculo-mode="{{ vinculo_mode }}"{% endif %}>
   {% comment %}
     A casca é `<form method="dialog">` por padrão: assim o botão de fechar é um
     `submit` e o próprio navegador fecha o diálogo, sem JS.
@@ -47,7 +48,7 @@
         `.delete-confirm-modal__title`. Sem ela o diálogo abre com o título fixo do
         template e ninguém acusa — o JS só não acha onde escrever.
       {% endcomment %}
-      <h2 class="modal__title{% if title_class %} {{ title_class }}{% endif %}">{{ title }}</h2>
+      <h2 class="modal__title{% if title_class %} {{ title_class }}{% endif %}"{% if title_id %} id="{{ title_id }}"{% endif %}>{{ title }}</h2>
     </header>
     <div class="modal__body">{{ body }}</div>
     {% if actions %}<footer class="modal__actions">{{ actions }}</footer>{% endif %}

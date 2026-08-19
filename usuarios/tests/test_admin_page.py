@@ -211,7 +211,7 @@ class UsuariosAdminPageTests(TestCase):
 
         self.assertEqual(len(response.context["rows"]), 5)
         self.assertEqual(response.context["page_obj"].paginator.num_pages, 2)
-        self.assertContains(response, "pagination-shell")
+        self.assertContains(response, "pagination__controls")
 
         response = self.client.get(reverse("usuarios:area_update", args=[area.pk]), {"page": 2})
 
@@ -232,7 +232,7 @@ class UsuariosAdminPageTests(TestCase):
         response = self.client.get(reverse("usuarios:area_update", args=[area.pk]))
 
         self.assertEqual(len(response.context["rows"]), 5)
-        self.assertNotContains(response, "pagination-shell")
+        self.assertNotContains(response, "pagination__controls")
 
     def test_renderiza_cv_pickers_single_nos_formularios(self):
         self.client.force_login(self.admin)
@@ -243,8 +243,8 @@ class UsuariosAdminPageTests(TestCase):
         self.assertContains(response, 'data-entity-picker="true"', count=2)
         self.assertContains(response, 'id="quick-add-usuario"')
         self.assertContains(response, 'id="vincular-usuario-modal"')
-        self.assertContains(response, "vincular-usuario-modal__fields")
-        self.assertContains(response, "vincular-usuario-modal__intro")
+        self.assertContains(response, "form-stack")
+        self.assertContains(response, "modal__message")
         self.assertContains(response, 'id="id_vinculo-area"')
         self.assertContains(response, 'id="id_vinculo-papel"')
         self.assertContains(response, "Buscar área...")

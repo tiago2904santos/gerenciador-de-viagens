@@ -497,3 +497,12 @@ igualmente na `main`. Os avisos deste recorte foram de 253 para 239.
   do `fact` nem no piso de 9px do `fit-text`; medido em 86 caracteres contra 346px. Atinge
   igualmente o resumo de diárias do roteiro. Decidir onde o extenso mora é mudança de desenho de
   componente global, e portanto corte próprio.
+
+## Erradicação dos componentes anteriores ao v2 (19/08/2026)
+
+- [x] `NOVO-20260819-024829-01844001d431` — migrar todos os consumidores que já possuem
+  equivalente funcional no namespace `c-v2.*`, preservar somente as peças sem equivalente real
+  no v2 e apagar cada componente legado que perder o último consumidor, com prova de busca no
+  repositório inteiro e sem alterar campos, URLs, regras de negócio ou ganchos de JavaScript.
+  Fechamento: 298 chamadas substituíveis eliminadas, 70 arquivos antigos apagados e 14 peças de
+  infraestrutura sem equivalente v2 preservadas em lista de exceções testada.

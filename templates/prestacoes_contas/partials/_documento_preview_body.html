@@ -3,15 +3,15 @@
     <span class="document-inline-card__title">{{ preview_doc_title|default:"Documento" }}</span>
     <span class="document-inline-card__header-end">
       <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
-        <c-ui.buttons.icon_button :href="preview_inline_url" action="preview" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" only />
+        <c-v2.icon_button :href="preview_inline_url" action="preview" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" only />
         {% if preview_pdf_url %}
-          <c-ui.buttons.icon_button :href="preview_pdf_url" action="pdf" aria_label="Baixar PDF" tooltip="Baixar PDF" only />
+          <c-v2.icon_button :href="preview_pdf_url" action="pdf" aria_label="Baixar PDF" tooltip="Baixar PDF" only />
         {% endif %}
         {% if preview_docx_url %}
-          <c-ui.buttons.icon_button :href="preview_docx_url" action="docx" aria_label="Baixar DOCX" tooltip="Baixar DOCX" only />
+          <c-v2.icon_button :href="preview_docx_url" action="docx" aria_label="Baixar DOCX" tooltip="Baixar DOCX" only />
         {% endif %}
         {% if preview_xlsx_url %}
-          <c-ui.buttons.icon_button :href="preview_xlsx_url" action="download" aria_label="Baixar XLSX" tooltip="Baixar XLSX" only />
+          <c-v2.icon_button :href="preview_xlsx_url" action="download" aria_label="Baixar XLSX" tooltip="Baixar XLSX" only />
         {% endif %}
       </span>
     </span>

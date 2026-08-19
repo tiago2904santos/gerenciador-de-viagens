@@ -1,4 +1,4 @@
-{% cotton:vars aside description extra_class title %}
+{% cotton:vars aside back_label back_url description extra_class title %}
 {% comment %}
   Header v2 — a faixa de identidade. Par de `static/css/v2/header.css`.
 
@@ -15,5 +15,10 @@
     <h1 class="header__title">{{ title }}</h1>
     {% if description %}<p class="header__description">{{ description }}</p>{% endif %}
   </div>
-  {% if aside %}<div class="header__aside">{{ aside }}</div>{% endif %}
+  {% if aside or back_url %}
+    <div class="header__aside">
+      {{ aside }}
+      {% if back_url %}{% with rotulo_voltar=back_label|default:"Voltar" %}<c-v2.button :href="back_url" :label="rotulo_voltar" variant="secondary" icon="arrow-left" />{% endwith %}{% endif %}
+    </div>
+  {% endif %}
 </div>

@@ -147,3 +147,5 @@ python manage.py runserver 0.0.0.0:8000
 
 Ambiente: Django + PostgreSQL, `requirements/lock.txt` pinado com hash. CI em
 `.github/workflows/tests.yml` — leia-o antes de propor qualquer gate novo.
+
+## Imported Claude Cowork project instructions

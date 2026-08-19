@@ -19,7 +19,7 @@ from core.pagination import contexto_paginacao
 
 
 ALERTA = "Paginação indisponível"
-COMPONENTE = "cotton/ui/lists/pagination.html"
+COMPONENTE = "cotton/v2/pagination.html"
 
 # Toda lista que usa o shell de cards — nenhuma pode renderizar o alerta.
 LISTAS_EM_CARDS = [
@@ -47,7 +47,7 @@ def _page(total, por_pagina=20, numero=1):
 
 class PaginationComponentContractTests(TestCase):
     def test_sem_page_obj_e_com_contrato_declarado_denuncia_na_tela(self):
-        html = render_to_string(COMPONENTE, {"paginacao_obrigatoria": True})
+        html = render_to_string(COMPONENTE, {"required": True})
 
         self.assertIn(ALERTA, html)
         self.assertIn('role="alert"', html)
@@ -62,7 +62,7 @@ class PaginationComponentContractTests(TestCase):
         # valor-verdade da página, senão toda lista vazia acusaria falha.
         html = render_to_string(
             COMPONENTE,
-            {"page_obj": _page(0), "paginacao_obrigatoria": True},
+            {"page_obj": _page(0), "required": True},
         )
 
         self.assertNotIn(ALERTA, html)
@@ -71,7 +71,7 @@ class PaginationComponentContractTests(TestCase):
     def test_pagina_unica_nao_renderiza_navegacao(self):
         html = render_to_string(
             COMPONENTE,
-            {"page_obj": _page(12), "paginacao_obrigatoria": True},
+            {"page_obj": _page(12), "required": True},
         )
 
         self.assertNotIn(ALERTA, html)
@@ -82,9 +82,9 @@ class PaginationComponentContractTests(TestCase):
             COMPONENTE,
             {
                 "page_obj": _page(300, numero=2),
-                "pagination_pages": [1, 2, 3, "...", 15],
+                "pages": [1, 2, 3, "...", 15],
                 "page_querystring": "aba=atuais&q=teste",
-                "paginacao_obrigatoria": True,
+                "required": True,
             },
         )
 

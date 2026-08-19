@@ -11,7 +11,7 @@ class RawButtonComponentTests(SimpleTestCase):
 
     def test_preserva_classe_conteudo_e_atributos_html(self):
         html = self._render(
-            '{% cotton ui.buttons.button class_name="legacy-toggle" type="button" '
+            '{% cotton v2.button class_name="legacy-toggle" type="button" '
             'id="legacy-id" aria-pressed="false" data-state-trigger only %}'
             'Texto <em>original</em>'
             "{% endcotton %}"
@@ -30,7 +30,7 @@ class RawButtonComponentTests(SimpleTestCase):
 
     def test_botao_vazio_nao_ganha_span_artificial(self):
         html = self._render(
-            '{% cotton ui.buttons.button class_name="sidebar-scrim" type="button" only %}'
+            '{% cotton v2.button class_name="sidebar-scrim" type="button" only %}'
             "{% endcotton %}"
         )
 
@@ -38,7 +38,7 @@ class RawButtonComponentTests(SimpleTestCase):
 
     def test_api_visual_existente_permanece_inalterada(self):
         html = self._render(
-            '{% cotton ui.buttons.button label="Salvar" variant="primary" icon="check" '
+            '{% cotton v2.button label="Salvar" variant="primary" icon="check" '
             'type="submit" only / %}'
         )
 
@@ -49,7 +49,7 @@ class RawButtonComponentTests(SimpleTestCase):
 
     def test_atributo_booleano_condicional_so_aparece_quando_verdadeiro(self):
         source = (
-            '{% cotton ui.buttons.button class_name="remove" '
+            '{% cotton v2.button class_name="remove" '
             ':hidden="{% if should_hide %}True{% else %}False{% endif %}" only %}'
             "Remover{% endcotton %}"
         )
@@ -86,6 +86,6 @@ class RawButtonComponentTests(SimpleTestCase):
 
     def test_templates_migrados_compilam(self):
         for path in migrar_botoes_cotton.targets():
-            if "<c-ui.buttons.button" not in path.read_text(encoding="utf-8"):
+            if "<c-v2.button" not in path.read_text(encoding="utf-8"):
                 continue
             get_template(path.relative_to(migrar_botoes_cotton.ROOT / "templates").as_posix())

@@ -58,6 +58,6 @@
   </span>
 </label>
 {% if field %}
-  <c-v2.field_error :errors="field.errors" />
+  <c-v2.field_error :errors="field.errors" :field_id="field.auto_id" />
 </div>
 {% endif %}

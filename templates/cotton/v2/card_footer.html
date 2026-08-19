@@ -1,4 +1,4 @@
-{% cotton:vars extra_class primary secondary %}
+{% cotton:vars extra_class primary primary_action primary_extra_class primary_icon primary_label primary_link_rel primary_link_target primary_url primary_variant secondary secondary_action secondary_extra_class secondary_icon secondary_label secondary_link_rel secondary_link_target secondary_url secondary_variant %}
 {% comment %}
   Rodapé de card/formulário v2 — a faixa de ações que fecha um bloco.
 
@@ -6,6 +6,20 @@
   sempre no mesmo canto, em todas as telas.
 {% endcomment %}
 <footer class="card-footer{% if extra_class %} {{ extra_class }}{% endif %}">
-  <div class="card-footer__side">{{ secondary }}</div>
-  <div class="card-footer__side">{{ primary }}</div>
+  <div class="card-footer__side">
+    {% if secondary %}{{ secondary }}{% elif secondary_label %}
+      {% with variante=secondary_variant|default:"secondary" icone=secondary_icon|default:"arrow-left" %}
+        {% if secondary_url %}<c-v2.button :href="secondary_url" :label="secondary_label" :variant="variante" :icon="icone" :link_target="secondary_link_target" :link_rel="secondary_link_rel" />
+        {% else %}{% with acao=secondary_action|default:"wizard_back" %}<c-v2.button :label="secondary_label" :variant="variante" :icon="icone" type="submit" :extra_class="secondary_extra_class" name="wizard_action" :value="acao" />{% endwith %}{% endif %}
+      {% endwith %}
+    {% endif %}
+  </div>
+  <div class="card-footer__side">
+    {% if primary %}{{ primary }}{% elif primary_label %}
+      {% with variante=primary_variant|default:"primary" icone=primary_icon|default:"arrow-right" %}
+        {% if primary_url %}<c-v2.button :href="primary_url" :label="primary_label" :variant="variante" :icon="icone" :icon_after="True" :link_target="primary_link_target" :link_rel="primary_link_rel" />
+        {% else %}<c-v2.button :label="primary_label" :variant="variante" :icon="icone" :icon_after="True" type="submit" :extra_class="primary_extra_class" name="wizard_action" :value="primary_action" />{% endif %}
+      {% endwith %}
+    {% endif %}
+  </div>
 </footer>
