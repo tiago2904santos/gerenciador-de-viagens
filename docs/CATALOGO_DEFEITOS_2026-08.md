@@ -9142,3 +9142,29 @@ Resolvido: o parcial percorre as opções e monta um `c-v2.choice_grid` de `c-v2
 `name` e a seleção vindos do próprio `BoundWidget`. A classe morta saiu do formulário e o
 `WidgetStyle.PT_PRESET_ACTIVITY_GRID` saiu do enum, com prova de grep (zero referências fora do
 comentário que registra a saída).
+
+### NOVO-20260819-003112-c680a0ffdb8e 🔴 ABERTO · `NOVO` O valor por extenso não cabe numa nota de fato, e o piso do `fit-text` não alcança · UI · 0,3 d
+
+`fact__note` é uma linha só (`white-space: nowrap` + `text-overflow: ellipsis`) com piso de 9px no
+`fit-text.js`. O valor por extenso de um total alto passa de 86 caracteres, e numa coluna de 346px
+— que é a de três fatos no painel do wizard — ele não cabe nem no piso. Medido no navegador:
+
+| valor | nota | corta sem refit | corta com refit |
+|---|---|---|---|
+| `R$4.009,62` | 48 caracteres | não | não |
+| `R$14.009,62` | 51 caracteres | não | não |
+| `R$144.987,23` | 86 caracteres | **sim** | **sim** (12px → 9px) |
+
+Chamar `CV.fitText.ajustar()` depois de escrever — que é o certo e foi feito no
+`NOVO-20260818-223338-aa3c31f87b9d` — resolve a faixa do meio e NÃO resolve esta: o motor desce ao
+piso e o `text-overflow` assume mesmo assim.
+
+A nota do `fact` foi desenhada para o apoio CURTO do cartão de lista (o modelo da viatura, o
+motorista de carona), não para uma frase. O corte é decidir onde o valor por extenso mora — nota
+que quebra em duas linhas neste contexto, fato próprio de largura inteira (`fact--wide`), ou fora
+do bloco de fatos. Qualquer um deles muda desenho de componente global e precisa de aprovação
+visual, por isso não entrou no PR da migração.
+
+Vale IGUAL para o resumo de diárias do roteiro (`c-v2.travel_allowance`), que tem a mesma forma e
+o mesmo `valor por extenso` na nota — o defeito não é da tela de Plano de Trabalho, é do par
+`fact__note` + texto por extenso.

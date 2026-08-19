@@ -464,3 +464,8 @@ Quatro delas ganharam teste de regressão.
 O gate do auditor de front continua vermelho por causa dos quatro ERROS já medidos e abertos acima
 (`NOVO-20260818-213938-228adea09e1d` e `NOVO-20260818-214024-f57647d8c996`), que reprovam
 igualmente na `main`. Os avisos deste recorte foram de 253 para 239.
+
+- [ ] `NOVO-20260819-003112-c680a0ffdb8e` — o valor por extenso de um total alto não cabe na nota
+  do `fact` nem no piso de 9px do `fit-text`; medido em 86 caracteres contra 346px. Atinge
+  igualmente o resumo de diárias do roteiro. Decidir onde o extenso mora é mudança de desenho de
+  componente global, e portanto corte próprio.

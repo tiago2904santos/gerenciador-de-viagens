@@ -526,7 +526,22 @@
 
   function setText(scope, selector, value) {
     var el = scope.querySelector(selector);
-    if (el) el.textContent = value;
+    if (!el) return;
+    el.textContent = value;
+    /* Reajusta o corpo depois de trocar o texto.
+     *
+     * `fit-text.js` observa RESIZE do elemento, e estas células de grade não
+     * mudam de tamanho quando o conteúdo muda: o corpo continuaria o que foi
+     * medido com o traço da abertura. Sem isto, um valor mais longo que o
+     * inicial é cortado pelo `text-overflow` em vez de encolher.
+     *
+     * Não resolve o caso extremo: o valor por extenso de um total alto passa de
+     * 86 caracteres e não cabe em 346px nem no piso de 9px do próprio motor
+     * (medido). Esse é o `NOVO-20260819-003112-c680a0ffdb8e`, e vale igual para
+     * o resumo de diárias do roteiro. */
+    if (window.CV && window.CV.fitText && el.hasAttribute("data-fit-text")) {
+      window.CV.fitText.ajustar(el);
+    }
   }
 
   function runCalc(scope) {
