@@ -9821,3 +9821,34 @@ lista rola (centrado, o primeiro trecho ficava inalcançável) e `scroll-snap` p
 trecho inteiro. **(3)** `veiculo_placa_display` escrevia "Não informado" como VALOR, e a frase saía
 no corpo de uma placa, em negrito, com o mesmo peso de um ofício que tem viatura — o `c-v2.fact` já
 diz isso em itálico apagado quando o valor não vem. **Correção:** o presenter entrega vazio.
+
+### NOVO-20260819-230328-38fc53d4d340 🟢 RESOLVIDO · `NOVO` O gate do `ruff` está vermelho no `main` e impede a suíte de rodar em qualquer PR · QA · risco baixo
+
+`oficios/tests/test_menus_sob_demanda.py:158-165` tem duas violações do conjunto selecionado em
+`ruff.toml`, que está em zero e **é para ficar em zero**:
+
+```
+F401  `django.template.loader.render_to_string` importado e não usado
+F841  variável local `menu` atribuída e nunca usada
+```
+
+Vieram do commit `1c9f901` ("Refactor templates to use new component structure"), aplicado direto no
+`main`. São sobra da cópia do teste imediatamente acima: `test_com_src_o_corpo_nao_vai_junto` monta
+um `entity_cards.menu(...)` que nunca chega a lugar nenhum, porque quem renderiza é o `icon_button`
+e ele recebe `menu_src` por atributo, não o objeto.
+
+**Por que isto não é cosmético.** "Block Python lint regressions (QA-07)" é o **passo 9** do job
+`django`, e é o primeiro gate de propósito — roda antes do banco e antes do Django. Com ele
+vermelho, os **20 passos seguintes são pulados**: migrações, os seis auditores de front e back, as
+travas de segurança e **a suíte completa com cobertura**. Ou seja, nenhum PR aberto contra este
+`main` consegue ser verificado pelo CI, e a falha aparece para o autor como se fosse dele. Medido:
+`tests.yml` reprova no `main` há 8 execuções seguidas, desde 18/08.
+
+**Correção:** apagar as três linhas mortas e os dois imports que ficaram órfãos com elas. Nenhuma
+asserção muda — os 9 testes do arquivo continuam passando.
+
+**Observação registrada, sem correção neste PR.** Com o objeto fora, fica exposto que
+`self.assertNotIn("/x/", html)` é uma asserção fraca: `/x/` só existia dentro do `menu` que nunca
+foi passado ao render, então ela passaria de qualquer jeito. Quem guarda o comportamento de fato é
+`assertEqual(CORPO_DE_MENU.findall(html), [])`, na linha seguinte. Reescrever a asserção é decisão
+de desenho de teste do dono do arquivo, e não cabe num PR cujo objetivo é destravar a catraca.
