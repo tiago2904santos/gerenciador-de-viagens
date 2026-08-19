@@ -155,15 +155,10 @@ class ComponenteDeMenuTests(TestCase):
         self.assertNotIn("data-overlay-src", html)
 
     def test_com_src_o_corpo_nao_vai_junto(self):
-        from django.template.loader import render_to_string
-        from core import entity_cards
-
-        menu = entity_cards.menu(
-            "menu-teste", "Título", "Subtítulo",
-            [entity_cards.menu_link("/x/", "Item", "Descrição", "eye", "preview")],
-            src="/menus/",
-        )
-
+        # O `entity_cards.menu(...)` que ficava aqui era sobra da cópia do teste
+        # acima: ele era montado e nunca chegava a lugar nenhum, porque quem
+        # renderiza abaixo é o `icon_button`, e ele recebe `menu_src` por
+        # atributo, não o objeto. Com ele iam junto dois imports órfãos.
         from django.template import Context, Template
 
         html = Template(
