@@ -1,15 +1,63 @@
-<c-ui.forms.form_block element_id="pt-card-programa" section_id="pt-programa-title" variant="split" extra_class="travel-document-block document-form-block" title="Programa solicitante" description="Programa que solicitou a ação. Entra automaticamente na contextualização." body_extra_class="termo-block__body" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_id="body_id" :data_hook="data_hook" :heading_level="heading_level" :shell="shell"><c-slot name="body">{% include "planos_trabalho/partials/_identificacao_programa_body.html" with form=form programas_url=programas_url only %}</c-slot></c-ui.forms.form_block>
+{% comment %}
+  Os blocos da etapa 1 do plano de trabalho. Cada um é um `form_block` v2 dentro
+  do painel da página — a escada de cor faz o resto: painel no `rail`, bloco no
+  `field`, campo de volta no `rail`.
 
-<c-ui.forms.form_block element_id="pt-card-coordenadores" section_id="pt-coordenadores-title" variant="split" extra_class="travel-document-block document-form-block" title="Coordenação" description="Coordenadores administrativo e operacional do plano." body_extra_class="termo-block__body" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_id="body_id" :data_hook="data_hook" :heading_level="heading_level" :shell="shell"><c-slot name="body">{% include "planos_trabalho/partials/_identificacao_coordenadores_body.html" with cargos_url=cargos_url form=form only %}</c-slot></c-ui.forms.form_block>
+  A ordem é a do preenchimento: primeiro quem pediu e quem coordena, depois onde
+  e quando, e por último os três textos do documento, que o
+  `planos-trabalho-wizard.js` pré-preenche a partir dos anteriores.
+{% endcomment %}
+{% comment %}
+  Sem `split`: são DOIS campos lado a lado, e a coluna do cabeçalho do split tem
+  largura fixa de 200px com a descrição em uma linha só. "Programa que solicitou
+  a ação. Entra automaticamente na contextualização." não cabe ali — e a folha é
+  explícita em transbordar em vez de quebrar, para o desalinhamento entre blocos
+  não voltar em silêncio.
+{% endcomment %}
+<c-v2.form_block
+  title="Programa solicitante"
+  description="Programa que solicitou a ação. Entra automaticamente na contextualização."
+>
+  <c-slot name="body">{% include "planos_trabalho/partials/_identificacao_programa_body.html" with form=form programas_url=programas_url only %}</c-slot>
+</c-v2.form_block>
 
-<c-ui.forms.form_block element_id="pt-card-evento" section_id="pt-evento-title" extra_class="travel-document-block document-form-block" title="Evento" description="Destino e período — obrigatórios quando não vierem do ofício." body_extra_class="form-stack termo-evento-body" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_id="body_id" :data_hook="data_hook" :heading_level="heading_level" :shell="shell" :variant="variant"><c-slot name="body">{% include "planos_trabalho/partials/_identificacao_evento_body.html" with add_button_evento=add_button_evento add_button_evento_d=add_button_evento_d add_button_os=add_button_os add_button_termo=add_button_termo destination_extra_class=destination_extra_class destination_title=destination_title end_hidden_id=end_hidden_id end_hidden_name=end_hidden_name end_hidden_value=end_hidden_value end_label=end_label form=form initial_date=initial_date period_extra_class=period_extra_class picker_open_all=picker_open_all start_hidden_id=start_hidden_id start_hidden_name=start_hidden_name start_hidden_value=start_hidden_value start_label=start_label cotton_attr_description=cotton_attr_description cotton_attr_end_label=cotton_attr_end_label cotton_attr_end_placeholder=cotton_attr_end_placeholder cotton_attr_start_label=cotton_attr_start_label cotton_attr_start_placeholder=cotton_attr_start_placeholder cotton_attr_title=cotton_attr_title city_field=city_field data_index=data_index destino_index=destino_index has_data_index=has_data_index has_destino_index=has_destino_index horarios_url=horarios_url remove_hidden=remove_hidden row_extra_class=row_extra_class row_single=row_single show_drag_handle=show_drag_handle state_field=state_field estados=estados evento=evento location_city_value=location_city_value location_legacy_event=location_legacy_event location_state_code=location_state_code location_state_id=location_state_id row=row row_index=row_index only %}</c-slot></c-ui.forms.form_block>
+<c-v2.form_block
+  title="Coordenação"
+  description="Coordenadores administrativo e operacional do plano."
+>
+  <c-slot name="body">{% include "planos_trabalho/partials/_identificacao_coordenadores_body.html" with form=form cargos_url=cargos_url only %}</c-slot>
+</c-v2.form_block>
 
+{% include "planos_trabalho/partials/_identificacao_evento_body.html" with form=form horarios_url=horarios_url only %}
+
+{% comment %}
+  Os três sinalizadores dizem se o texto abaixo ainda é o gerado ou se a pessoa
+  o editou. `data-pt-texto-auto-flag` é contrato do `planos-trabalho-wizard.js`:
+  enquanto o sinalizador vale 1, cada mudança de programa ou destino reescreve o
+  texto; depois da primeira edição manual ele vira 0 e o texto para de ser
+  substituído.
+{% endcomment %}
 <input type="hidden" name="contextualizacao_auto" value="{% if contextualizacao_auto %}1{% else %}0{% endif %}" data-pt-texto-auto-flag="contextualizacao">
 <input type="hidden" name="coordenacao_auto" value="{% if coordenacao_auto %}1{% else %}0{% endif %}" data-pt-texto-auto-flag="coordenacao">
 <input type="hidden" name="consideracao_auto" value="{% if consideracao_auto %}1{% else %}0{% endif %}" data-pt-texto-auto-flag="consideracao_final">
 
-<c-ui.forms.form_block element_id="pt-texto-contextualizacao" section_id="pt-texto-contextualizacao-title" variant="split" extra_class="travel-document-block document-form-block pt-texto-block" title="Breve contextualização" description="Texto que abre o documento a partir do programa e do destino." body_extra_class="termo-block__body" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_id="body_id" :data_hook="data_hook" :heading_level="heading_level" :shell="shell"><c-slot name="body">{% include "planos_trabalho/partials/_identificacao_texto_contextualizacao_body.html" with form=form only %}</c-slot></c-ui.forms.form_block>
+<c-v2.form_block
+  title="Breve contextualização"
+  description="Texto que abre o documento a partir do programa e do destino."
+>
+  <c-slot name="body">{% include "planos_trabalho/partials/_identificacao_texto_contextualizacao_body.html" with form=form only %}</c-slot>
+</c-v2.form_block>
 
-<c-ui.forms.form_block element_id="pt-texto-coordenacao" section_id="pt-texto-coordenacao-title" variant="split" extra_class="travel-document-block document-form-block pt-texto-block" title="Coordenação do evento" description="Designação dos coordenadores (gerada e editável)." body_extra_class="termo-block__body" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_id="body_id" :data_hook="data_hook" :heading_level="heading_level" :shell="shell"><c-slot name="body">{% include "planos_trabalho/partials/_identificacao_texto_coordenacao_body.html" with form=form only %}</c-slot></c-ui.forms.form_block>
+<c-v2.form_block
+  title="Coordenação do evento"
+  description="Designação dos coordenadores (gerada e editável)."
+>
+  <c-slot name="body">{% include "planos_trabalho/partials/_identificacao_texto_coordenacao_body.html" with form=form only %}</c-slot>
+</c-v2.form_block>
 
-<c-ui.forms.form_block element_id="pt-texto-consideracao" section_id="pt-texto-consideracao-title" variant="split" extra_class="travel-document-block document-form-block pt-texto-block" title="Considerações finais" description="Fechamento do documento." body_extra_class="termo-block__body" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_id="body_id" :data_hook="data_hook" :heading_level="heading_level" :shell="shell"><c-slot name="body">{% include "planos_trabalho/partials/_identificacao_texto_consideracao_body.html" with form=form only %}</c-slot></c-ui.forms.form_block>
+<c-v2.form_block
+  title="Considerações finais"
+  description="Fechamento do documento."
+>
+  <c-slot name="body">{% include "planos_trabalho/partials/_identificacao_texto_consideracao_body.html" with form=form only %}</c-slot>
+</c-v2.form_block>

@@ -50,6 +50,56 @@
     </c-v2.panel>
 
     {% comment %}
+      As duas colunas que um JS reescreve a cada clique na grade de escolha —
+      metas e recursos de um plano de trabalho. Aqui elas aparecem com conteúdo e
+      vazias, que é o estado em que a etapa abre.
+    {% endcomment %}
+    <c-v2.panel title="Lista viva" description="O que a escolha de cima produz, contado e listado. As três peças (contagem, lista e vazio) recebem gancho próprio porque quem as reescreve é o script da tela.">
+      <c-slot name="body">
+        <div class="live-list-pair">
+          {% with total_metas=v2_metas|length total_recursos=v2_recursos|length %}
+            <c-v2.live_list
+              title="Metas"
+              :count="total_metas"
+              count_tone="warning"
+              :items="v2_metas"
+              empty_title="Sem metas ainda"
+              empty_message="Selecione uma atividade para ver a meta correspondente."
+            />
+            <c-v2.live_list
+              title="Recursos"
+              :count="total_recursos"
+              count_tone="info"
+              :items="v2_recursos"
+              empty_title="Sem recursos ainda"
+              empty_message="O recurso é opcional — algumas atividades podem não ter um."
+            />
+          {% endwith %}
+        </div>
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Lista viva · vazia" description="O vazio é duas frases: o estado, e o que fazer a respeito.">
+      <c-slot name="body">
+        <div class="live-list-pair">
+          <c-v2.live_list
+            title="Metas"
+            count="0"
+            count_tone="warning"
+            empty_title="Sem metas ainda"
+            empty_message="Selecione uma atividade para ver a meta correspondente."
+          />
+          <c-v2.live_list
+            title="Recursos"
+            count="0"
+            count_tone="info"
+            empty_title="Sem recursos ainda"
+            empty_message="O recurso é opcional — algumas atividades podem não ter um."
+          />
+        </div>
+      </c-slot>
+    </c-v2.panel>
+    {% comment %}
       Documento inline — o cartão que abre e mostra o PDF na própria página.
       Três estados, porque são três coisas diferentes na tela real: o documento
       pronto (com o visualizador), o que ainda não foi gerado (com o motivo) e o

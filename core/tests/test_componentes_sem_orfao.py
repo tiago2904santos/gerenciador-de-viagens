@@ -258,7 +258,24 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # 154 (mesmo corte): saiu `ui/segment_toggle.html`. Era o último
         # componente do sistema anterior vivo em Ofícios, e o `toggle` do v2 já
         # fazia as duas variantes dele.
-        self.assertEqual(len(self.components()), 154)
+        #
+        # 160 (NOVO-20260818-223338-aa3c31f87b9d): as seis peças que faltavam
+        # para o wizard de Plano de Trabalho ser v2 de ponta a ponta. Quatro são
+        # do SISTEMA, e nasceram aqui porque nenhuma tela tinha por onde
+        # dizê-las sem reinventar o desenho: `v2/choice_card.html` e
+        # `v2/choice_grid.html` (a opção que ocupa uma caixa clicável e a grade
+        # delas — o desenho já existia em `v2/choice-card.css`, vestindo a
+        # marcação que a OS escreve à mão), `v2/number_stepper.html` (o campo com
+        # "−" e "+") e `v2/live_list.html` (a coluna que um JS reescreve, com
+        # contagem e vazio). As outras duas são de DOMÍNIO, como `prestacao_card`
+        # e `route_segments`: `v2/efetivo_row.html`, a linha de coleção ordenada
+        # da equipe — irmã da linha de destino —, e `v2/document_preview.html`, o
+        # cartão que abre o PDF na própria página.
+        #
+        # O aviso de pendências do wizard NÃO é uma sétima peça: é o
+        # `v2/alert_list.html` que Ofícios trouxe no mesmo dia. Nasceram em
+        # paralelo com o mesmo contrato, e sobrou o que já estava no `main`.
+        self.assertEqual(len(self.components()), 160)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.

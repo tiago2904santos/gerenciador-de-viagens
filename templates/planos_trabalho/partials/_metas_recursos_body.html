@@ -1,37 +1,34 @@
-<div class="pt-live" data-pt-live>
-  <section class="pt-live-col pt-live-col--metas">
-    <header class="pt-live-col__head">
-      <span class="pt-live-col__title">Metas</span>
-      <span data-pt-live-metas-count>
-        {% with cotton_attr_label=metas_preview|length %}<c-ui.badges.chip tone="warning" size="compact" :label="cotton_attr_label" only />{% endwith %}
-      </span>
-    </header>
-    <ul class="pt-live-list" data-pt-live-metas-list>
-      {% for meta in metas_preview %}
-        <li class="pt-live-entry"><span class="pt-live-entry-text">{{ meta }}</span></li>
-      {% endfor %}
-    </ul>
-    <div class="pt-live-empty" data-pt-live-metas-empty {% if metas_preview %}hidden{% endif %}>
-      <strong>Sem metas ainda</strong>
-      <span>Selecione uma atividade para ver a meta correspondente.</span>
-    </div>
-  </section>
+{% comment %}
+  As duas colunas que a seleção de atividades alimenta. Quem as reescreve a cada
+  clique é `js/pages/planos-trabalho-wizard.js`, pelos ganchos de cada
+  `c-v2.live_list`.
+{% endcomment %}
+<div class="live-list-pair" data-pt-live>
+  {% with total_metas=metas_preview|length %}
+    <c-v2.live_list
+      title="Metas"
+      :count="total_metas"
+      count_tone="warning"
+      count_hook="data-pt-live-metas-count"
+      list_hook="data-pt-live-metas-list"
+      empty_hook="data-pt-live-metas-empty"
+      :items="metas_preview"
+      empty_title="Sem metas ainda"
+      empty_message="Selecione uma atividade para ver a meta correspondente."
+    />
+  {% endwith %}
 
-  <section class="pt-live-col pt-live-col--recursos">
-    <header class="pt-live-col__head">
-      <span class="pt-live-col__title">Recursos</span>
-      <span data-pt-live-recursos-count>
-        {% with cotton_attr_label=recursos_preview|length %}<c-ui.badges.chip tone="info" size="compact" :label="cotton_attr_label" only />{% endwith %}
-      </span>
-    </header>
-    <ul class="pt-live-list" data-pt-live-recursos-list>
-      {% for recurso in recursos_preview %}
-        <li class="pt-live-entry"><span class="pt-live-entry-text">{{ recurso }}</span></li>
-      {% endfor %}
-    </ul>
-    <div class="pt-live-empty" data-pt-live-recursos-empty {% if recursos_preview %}hidden{% endif %}>
-      <strong>Sem recursos ainda</strong>
-      <span>O recurso é opcional — algumas atividades podem não ter um.</span>
-    </div>
-  </section>
+  {% with total_recursos=recursos_preview|length %}
+    <c-v2.live_list
+      title="Recursos"
+      :count="total_recursos"
+      count_tone="info"
+      count_hook="data-pt-live-recursos-count"
+      list_hook="data-pt-live-recursos-list"
+      empty_hook="data-pt-live-recursos-empty"
+      :items="recursos_preview"
+      empty_title="Sem recursos ainda"
+      empty_message="O recurso é opcional — algumas atividades podem não ter um."
+    />
+  {% endwith %}
 </div>

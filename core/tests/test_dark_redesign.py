@@ -611,6 +611,13 @@ class DarkRedesignContractTests(SimpleTestCase):
         # trava de órfãos reprovou antes do merge — o que o `NOVO-44` só
         # descobriu depois. O vocabulário `metric` não morreu com ele; segue
         # vivo em `planos_trabalho`, que é o que este teste continua medindo.
+        #
+        # 2026-08-18: o resumo do evento migrou para o v2. O casco é o
+        # `c-v2.panel` e o corpo é `c-v2.fact` — o vocabulário `summary-card` /
+        # `summary-grid--4` saiu junto com a folha de página que o pintava. O que
+        # este teste guarda continua sendo o mesmo: o resumo usa peças GLOBAIS, e
+        # não um desenho próprio, e o corpo é responsivo por definição de grade,
+        # não por um `@media` escrito só para ele.
         plan_summary = (
             Path(settings.BASE_DIR)
             / "templates"
@@ -625,18 +632,17 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "partials"
             / "_resumo_evento_body.html"
         ).read_text(encoding="utf-8")
-        component_css = (
-            Path(settings.BASE_DIR)
-            / "static"
-            / "css"
-            / "lists"
-            / "content-cards.css"
+        fact_css = (
+            Path(settings.BASE_DIR) / "static" / "css" / "v2" / "fact.css"
         ).read_text(encoding="utf-8")
 
-        self.assertIn("summary-card", plan_summary)
+        self.assertIn("<c-v2.panel", plan_summary)
         # `H-05`: o grid saiu do casco e vive no partial do corpo.
-        self.assertIn("summary-grid--4", plan_summary_body)
-        self.assertIn("@media (max-width: 640px)", component_css)
+        self.assertIn('class="fact-list"', plan_summary_body)
+        self.assertNotIn('class="summary-grid', plan_summary_body)
+        # A `fact-list` decide o número de colunas pelo número de fatos, sem que
+        # a tela escolha uma grade — é o que substitui o `summary-grid--N`.
+        self.assertIn(".fact-list", fact_css)
 
         # As classes do card mestre das 4 telas de prestação são medidas no HTML
         # **renderizado**, não no texto-fonte do arquivo da página.

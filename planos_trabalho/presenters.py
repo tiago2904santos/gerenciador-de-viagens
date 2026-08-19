@@ -254,27 +254,33 @@ def _step_state_class(step: dict) -> str:
     return "is-pending"
 
 
-def _step_marker(step: dict) -> tuple[str, bool]:
-    state = step.get("state") or step.get("completion_state") or "not_started"
-    if state == "complete":
-        return "✓", True
-    return str(step.get("number") or ""), False
-
-
 def apresentar_plano_wizard_page_steps(steps):
+    """As etapas no vocabulário do ``c-v2.stepper``: ``label``, ``state``, ``status``.
+
+    O wizard de plano de trabalho é LINEAR, ao contrário do painel do evento:
+    pular adiante deixaria o documento pela metade. Por isso nenhuma etapa
+    carrega ``url`` — sem ele o passo é indicador, e não link.
+
+    ``state`` só conhece três valores no v2 (``current``, ``done`` e vazio). O
+    ciclo de vida daqui tem cinco (``locked``, ``incomplete``…), e a diferença
+    entre eles continua sendo dita por ``status``, que é TEXTO e chega a quem
+    usa leitor de tela — a cor sozinha nunca disse nada.
+    """
     page_steps = []
     for step in steps or []:
         state_class = _step_state_class(step)
-        marker, marker_hidden = _step_marker(step)
         page_steps.append(
             {
-                "url": step.get("url") or "",
-                "state_class": state_class,
-                "step_label": f"Etapa {step.get('number', '')}",
-                "title": step.get("title") or "",
+                "label": step.get("title") or "",
+                "state": (
+                    "current"
+                    if state_class == "is-current"
+                    else ("done" if state_class == "is-complete" else "")
+                ),
                 "status": step.get("state_label") or "",
-                "marker": marker,
-                "marker_aria_hidden": marker_hidden,
+                # `title` e `aria_current` continuam porque a descrição do
+                # cabeçalho e os testes de navegação leem os dois.
+                "title": step.get("title") or "",
                 "aria_current": "step" if state_class == "is-current" else "",
             }
         )

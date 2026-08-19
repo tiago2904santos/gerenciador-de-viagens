@@ -1,0 +1,39 @@
+{% cotton:vars count count_hook count_tone empty_hook empty_message empty_title extra_class items list_hook title %}
+{% comment %}
+  Lista viva v2 — o que a escolha de cima produz, contado e listado. Par de
+  `static/css/v2/live-list.css`.
+
+  É a coluna de "Metas" e a de "Recursos" do plano de trabalho: o servidor manda
+  a primeira versão e, a cada atividade marcada ou desmarcada, o
+  `js/pages/planos-trabalho-wizard.js` reescreve a lista, o contador e o vazio.
+  Por isso as três peças recebem gancho próprio (`count_hook`, `list_hook`,
+  `empty_hook`): o motor procura cada uma por NOME, e um nome trocado deixa a
+  coluna na tela mostrando o resultado de antes, sem erro nenhum.
+
+  O contador é o `chip` do sistema, e não um número solto: ele responde "quantos"
+  de relance, que é a pergunta que a coluna existe para responder antes de alguém
+  ler item por item.
+
+  O vazio é DUAS frases — o que falta e como resolver. "Sem metas ainda" sozinho
+  informa o estado e deixa a pessoa sem o próximo passo, que aqui é marcar uma
+  atividade na grade logo acima.
+{% endcomment %}
+<section class="live-list{% if extra_class %} {{ extra_class }}{% endif %}">
+  <header class="live-list__head">
+    <span class="live-list__title">{{ title }}</span>
+    <span {% if count_hook %}{{ count_hook }}{% endif %}>
+      <c-v2.chip :label="count" :tone="count_tone" />
+    </span>
+  </header>
+
+  <ul class="live-list__items" {% if list_hook %}{{ list_hook }}{% endif %}>
+    {% for item in items %}
+      <li class="live-list__item"><span class="live-list__text">{{ item }}</span></li>
+    {% endfor %}
+  </ul>
+
+  <div class="live-list__empty" {% if empty_hook %}{{ empty_hook }}{% endif %}{% if items %} hidden{% endif %}>
+    <strong>{{ empty_title }}</strong>
+    <span>{{ empty_message }}</span>
+  </div>
+</section>

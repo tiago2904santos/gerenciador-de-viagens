@@ -457,3 +457,43 @@ Prestações de Contas passa a ser a maior dívida visual do repositório (**134
 do v2), seguida de Planos de Trabalho (**83** contra 48). As peças que faltavam para Ofícios — o documento inline e a
 pendência de etapa — são exatamente as que essas duas telas mais repetem à mão, então boa parte do
 trabalho de componente já está paga.
+
+## Planos de Trabalho no v2 (18/08/2026)
+
+O último app inteiro fora do sistema v2. Vinte e quatro templates — as quatro etapas do wizard, a
+lista, os quatro catálogos e os parciais — passaram a usar exclusivamente `c-v2.*`, e nenhuma
+chamada anterior ao v2 pode voltar sem reprovar `planos_trabalho/tests/test_wizard_v2.py`.
+
+- [x] `NOVO-20260818-223338-aa3c31f87b9d` — as 63 chamadas de `c-ui.`, `c-form.card`,
+  `c-feedback.` e `c-travel.` saem; entram seis componentes que faltavam ao v2 (`choice_card`,
+  `choice_grid`, `number_stepper`, `live_list`, `efetivo_row`, `document_preview`), todos
+  publicados na vitrine, e o inventário reconcilia em 160. O aviso de pendências do wizard NÃO
+  virou peça nova: nasceu aqui como `pending_card` e no mesmo dia como `alert_list` no corte de
+  Ofícios, com contrato idêntico — ficou o que já estava na `main`, e o `pending_card` foi
+  apagado antes de chegar lá. Saem
+  também as duas folhas de página do app (49,4 KB, com prova de grep) e os marcadores
+  `data-travel-document-wizard-*`, que carregam o tema legado para dentro da tela nova. Os 22
+  ganchos `data-pt-*` foram preservados; cinco nomes internos mudaram dos dois lados no mesmo
+  corte.
+- [x] `NOVO-20260818-223339-bba28c52707d` — o `autoManage` do `location-rows.js` passa a ler a
+  rota de cidades da própria seção. A seção que "busca os próprios dados" dependia de a tela
+  repetir o atributo no `<form>`, e sem ele o motor LIMPAVA o select: a cidade escolhida sumia
+  da tela e voltava vazia no POST.
+- [x] `NOVO-20260818-223340-738ebc1515e4` — a grade de atividades do cadastro rápido de presets
+  chegava ao navegador sem folha de estilo; vira `c-v2.choice_grid` de `c-v2.choice_card`, e a
+  `WidgetStyle` morta sai do enum com prova de grep.
+
+Sete regressões da própria migração foram apontadas na revisão e fechadas no mesmo PR, cada uma
+com o motivo registrado no template: o `data-autosave-link` do "voltar", o tipo do valor da opção
+do preset, a unidade no chip de efetivo, a nota do `fact` que só nascia com texto, a associação da
+ajuda na grade de escolha, os erros dos campos de destino e o fato que nascia no desenho de vazio.
+Quatro delas ganharam teste de regressão.
+
+O gate do auditor de front continua vermelho por causa dos quatro ERROS já medidos e abertos acima
+(`NOVO-20260818-213938-228adea09e1d` e `NOVO-20260818-214024-f57647d8c996`), que reprovam
+igualmente na `main`. Os avisos deste recorte foram de 253 para 239.
+
+- [ ] `NOVO-20260819-003112-c680a0ffdb8e` — o valor por extenso de um total alto não cabe na nota
+  do `fact` nem no piso de 9px do `fit-text`; medido em 86 caracteres contra 346px. Atinge
+  igualmente o resumo de diárias do roteiro. Decidir onde o extenso mora é mudança de desenho de
+  componente global, e portanto corte próprio.

@@ -1,0 +1,82 @@
+{% cotton:vars cargos_url form ordinal removable %}
+{% comment %}
+  Linha de efetivo v2 — unidade, cargo e quantidade, na composição da equipe do
+  plano de trabalho. Par de `static/css/v2/efetivo-row.css`.
+
+  Irmã da `destination_row`: mesma forma de linha de coleção ordenada — o "+"
+  que insere uma abaixo, os campos no meio, o "×" que remove na ponta. A
+  estrutura é fixa e é isso que o componente garante; o comportamento é do
+  `js/pages/planos-trabalho-wizard.js`, e cada gancho abaixo é contrato dele:
+
+  - `data-pt-efetivo-row` na raiz — é por ele que o motor acha cada linha, conta
+    o efetivo e decide quais "×" ficam visíveis;
+  - `data-pt-efetivo-add` no "+", que clona o `<template>` da seção;
+  - `data-pt-efetivo-ord`, onde o motor reescreve o número da posição depois de
+    cada remoção. Fica `sr-only`: numa linha com três campos rotulados o número
+    não ajuda o olho, mas ele é o que diz "terceira de cinco" a quem ouve;
+  - `data-pt-efetivo-remove` no "×". Ele NÃO tira a linha do DOM — marca o
+    `DELETE` do formset e esconde. Arrancá-la deixaria `TOTAL_FORMS` maior que o
+    número de prefixos enviados, e o Django montaria uma linha fantasma no POST;
+  - `data-pt-quantidade-delta` nos dois botões do stepper, emitido pelo
+    `c-v2.number_stepper`.
+
+  Os campos ocultos e o `DELETE` moram num `<div hidden>` porque a linha é uma
+  grade: soltos, cada um vira uma coluna vazia e desloca os três campos que
+  importam.
+
+  `removable` é falso na PRIMEIRA linha quando ela é a única — não há o que
+  remover, e um "×" que não faz nada é um botão que ensina errado. Quem atualiza
+  isso depois é o motor, a cada linha adicionada ou removida.
+{% endcomment %}
+{% with oculta_remocao=removable|yesno:",1" %}
+<div class="efetivo-row{% if not removable %} efetivo-row--single{% endif %}" data-pt-efetivo-row>
+  <div hidden>
+    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+    {{ form.DELETE }}
+  </div>
+
+  <c-v2.button
+    variant="primary"
+    icon="plus"
+    extra_class="button--icon efetivo-row__add"
+    aria_label="Adicionar efetivo abaixo"
+    hook="data-pt-efetivo-add"
+  />
+
+  <span class="sr-only" data-pt-efetivo-ord aria-hidden="true">{{ ordinal|default:1 }}</span>
+
+  <div class="efetivo-row__fields">
+    <c-v2.form_field :field="form.unidade" label="Unidade (opcional)" />
+    <c-v2.form_field :field="form.cargo" :action_url="cargos_url" action_label="Gerenciar cargos" />
+
+    {% with erro_quantidade=form.quantidade.errors.0 erro_quantidade_id=form.quantidade.id_for_label|add:"_error" %}
+      <c-v2.field
+        label="Quantidade"
+        :label_for="form.quantidade.id_for_label"
+        :error="erro_quantidade"
+        :error_id="erro_quantidade_id"
+      >
+        <c-slot name="control">
+          <c-v2.number_stepper
+            hook="data-pt-quantidade-delta"
+            aria_label="Quantidade de servidores"
+            decrease_label="Diminuir quantidade"
+            increase_label="Aumentar quantidade"
+          >
+            <c-slot name="control">{{ form.quantidade }}</c-slot>
+          </c-v2.number_stepper>
+        </c-slot>
+      </c-v2.field>
+    {% endwith %}
+  </div>
+
+  <c-v2.button
+    variant="danger"
+    icon="x"
+    extra_class="button--icon efetivo-row__remove"
+    aria_label="Remover efetivo"
+    hook="data-pt-efetivo-remove"
+    :hidden="oculta_remocao"
+  />
+</div>
+{% endwith %}

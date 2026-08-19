@@ -1,55 +1,79 @@
-<div class="form-subsection pt-diarias-linha" aria-label="Datas e horários do deslocamento">
-  <c-ui.forms.date_picker mode="range" picker_id="pt-diarias-date-picker" extra_class="termo-date-picker pt-diarias-linha__dates" :start_field="diarias_form.saida_sede_data" :end_field="diarias_form.chegada_sede_data" start_label="Data de saída da sede" end_label="Data de chegada na sede" start_input_id="id_pt_saida_sede_data_display" end_input_id="id_pt_chegada_sede_data_display" :show_summary="False" only />
-  <c-ui.forms.field :field="diarias_form.saida_sede_hora" label="Hora de saída" size_class="pt-diarias-hora-saida" only />
-  <c-ui.forms.field :field="diarias_form.chegada_sede_hora" label="Hora de chegada" size_class="pt-diarias-hora-chegada" only />
+{% comment %}
+  Deslocamento e resultado do cálculo de diárias.
+
+  Os quatro números são `c-v2.fact`, a mesma peça do cartão de lista e do resumo
+  do evento — no legado eram `summary-item` com `summary-value--principal`, um
+  vocabulário que só esta tela usava. Cada um leva o gancho que
+  `js/pages/planos-trabalho-wizard.js` procura (`data-pt-resultado-*`) para
+  reescrever o valor a cada mudança de data, hora ou efetivo; o valor por extenso
+  vai na NOTA do fato, porque explica o número que acabou de ser lido.
+{% endcomment %}
+<c-v2.date_picker
+  mode="range"
+  picker_id="pt-diarias-date-picker"
+  :start_field="diarias_form.saida_sede_data"
+  :end_field="diarias_form.chegada_sede_data"
+  start_input_id="id_pt_saida_sede_data_display"
+  end_input_id="id_pt_chegada_sede_data_display"
+  placeholder_start="Data de saída da sede"
+  placeholder_end="Data de chegada na sede"
+  :show_summary="False"
+  aria_label="Deslocamento até a sede"
+/>
+
+{% comment %}
+  As duas horas em DUAS colunas, e as datas na linha de cima: o calendário de
+  intervalo já ocupa a largura inteira com dois campos, e um terceiro campo ao
+  lado dele deixaria cada um com um terço da linha.
+{% endcomment %}
+<div class="field-grid field-grid--cols-2">
+  <c-v2.form_field :field="diarias_form.saida_sede_hora" label="Hora de saída" />
+  <c-v2.form_field :field="diarias_form.chegada_sede_hora" label="Hora de chegada" />
 </div>
 
-<section class="form-subsection pt-diarias-resultado" aria-labelledby="pt-diarias-resultado-title">
-  <header class="form-subsection__header">
-    <div class="form-subsection__copy">
-      <h4 class="form-subsection__title" id="pt-diarias-resultado-title">Resultado do cálculo</h4>
-    </div>
-  </header>
-  <div class="pt-diarias-summary-grid" data-pt-diarias-resultado>
-    <div class="summary-item summary-item--principal pt-diarias-summary-card pt-diarias-summary-card--principal">
-      <span class="summary-label">Valor total do plano</span>
-      <div class="summary-value summary-value--principal" data-pt-resultado-total>
-        {% if diarias_resultado.ok %}R${{ diarias_resultado.valor_total_display }}{% else %}—{% endif %}
-      </div>
-      <span class="summary-label">Valor por extenso</span>
-      <div class="pt-diarias-summary-extenso" data-pt-resultado-total-extenso>
-        {% if diarias_resultado.ok %}{{ diarias_resultado.valor_total_extenso }}{% else %}—{% endif %}
-      </div>
-    </div>
+{% comment %}
+  O resumo tem a MESMA forma do resumo de diárias do roteiro (`c-v2.travel_allowance`):
+  uma faixa de três fatos, com um valor em destaque e dois de apoio. Quatro fatos
+  numa faixa deixavam cada coluna com 257px, e "R$4.009,62" no corpo do valor em
+  destaque não cabe nessa largura — o `fit-text.js` encolhe até o limite e o resto
+  vira reticências, justamente no número que a etapa existe para mostrar.
 
-    <div class="summary-item summary-item--secondary pt-diarias-summary-card pt-diarias-summary-card--unitario">
-      <span class="summary-label">Valor por servidor</span>
-      <div class="summary-value" data-pt-resultado-unitario>
-        {% if diarias_resultado.ok %}R${{ diarias_resultado.valor_unitario_display }}{% else %}—{% endif %}
-      </div>
-      <span class="summary-label">Valor por extenso</span>
-      <div class="pt-diarias-summary-extenso" data-pt-resultado-unitario-extenso>
-        {% if diarias_resultado.ok %}{{ diarias_resultado.valor_unitario_extenso }}{% else %}—{% endif %}
-      </div>
-    </div>
+  O efetivo total entra como NOTA da composição porque é o que a explica: "2 x
+  100% + 1 x 30%" é a composição de cada servidor, e "6 servidor(es)" diz sobre
+  quantos ela incide.
 
-    <div class="pt-diarias-summary-secondary-stack">
-      <div class="summary-item summary-item--secondary pt-diarias-summary-card">
-        <span class="summary-label">Composição por servidor</span>
-        <div class="summary-value" data-pt-resultado-composicao>
-          {% if diarias_resultado.ok %}{{ diarias_resultado.composicao }}{% else %}—{% endif %}
-        </div>
-      </div>
+  Cada valor e cada nota leva o gancho que `js/pages/planos-trabalho-wizard.js`
+  procura (`data-pt-resultado-*`) para reescrever o número a cada mudança de
+  data, hora ou efetivo.
+{% endcomment %}
+<div class="fact-list" data-pt-diarias-resultado>
+  {% if diarias_resultado.ok %}
+    {% with valor_total="R$"|add:diarias_resultado.valor_total_display valor_unitario="R$"|add:diarias_resultado.valor_unitario_display efetivo_total=diarias_resultado.quantidade_servidores|stringformat:"s"|add:" servidor(es)" %}
+      <c-v2.fact label="Valor total do plano" :value="valor_total" :strong="True" value_hook="data-pt-resultado-total" note_label="Valor por extenso" :note="diarias_resultado.valor_total_extenso" note_hook="data-pt-resultado-total-extenso" />
+      <c-v2.fact label="Valor por servidor" :value="valor_unitario" value_hook="data-pt-resultado-unitario" note_label="Valor por extenso" :note="diarias_resultado.valor_unitario_extenso" note_hook="data-pt-resultado-unitario-extenso" />
+      <c-v2.fact label="Composição por servidor" :value="diarias_resultado.composicao" value_hook="data-pt-resultado-composicao" note_label="Efetivo total" :note="efetivo_total" note_hook="data-pt-resultado-efetivo" />
+    {% endwith %}
+  {% else %}
+    {% comment %}
+      Sem cálculo, os três fatos continuam na tela — e com um TRAÇO, não com o
+      vazio do próprio `fact`. É o que o `c-v2.travel_allowance` do roteiro já
+      fazia, e pela mesma razão: o estado vazio pinta `fact__value--empty`
+      (apagado, itálico, sem `--strong` e sem `data-fit-text`), e o
+      `runCalc()` só troca o `textContent` — o total chegaria certo e continuaria
+      com a cara de "não informado". Com o traço, o elemento já nasce sendo o
+      valor que ele vai virar.
+    {% endcomment %}
+    <c-v2.fact label="Valor total do plano" value="—" :strong="True" value_hook="data-pt-resultado-total" note_label="Valor por extenso" note="—" note_hook="data-pt-resultado-total-extenso" />
+    <c-v2.fact label="Valor por servidor" value="—" value_hook="data-pt-resultado-unitario" note_label="Valor por extenso" note="—" note_hook="data-pt-resultado-unitario-extenso" />
+    <c-v2.fact label="Composição por servidor" value="—" value_hook="data-pt-resultado-composicao" note_label="Efetivo total" note="—" note_hook="data-pt-resultado-efetivo" />
+  {% endif %}
+</div>
 
-      <div class="summary-item summary-item--secondary pt-diarias-summary-card">
-        <span class="summary-label">Efetivo total</span>
-        <div class="summary-value" data-pt-resultado-efetivo>
-          {% if diarias_resultado.ok %}{{ diarias_resultado.quantidade_servidores }} servidor(es){% else %}—{% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
-  <p class="field-help" data-pt-diarias-erros>
-    {% if not diarias_resultado.ok %}{{ diarias_resultado.erros|join:" " }}{% endif %}
-  </p>
-</section>
+{% comment %}
+  A faixa de erro do cálculo. Ela nasce com o que o servidor apurou e é
+  reescrita pelo script; o alerta global é a mesma caixa de qualquer outra falha
+  da tela.
+{% endcomment %}
+{% with erros_do_calculo=diarias_resultado.erros|join:" " %}
+  <c-v2.alert tone="warning" :message="erros_do_calculo" hook="data-pt-diarias-erros" />
+{% endwith %}

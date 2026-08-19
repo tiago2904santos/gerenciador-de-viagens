@@ -95,19 +95,31 @@ class PlanoWizardViewsTests(TestCase):
             self.assertEqual(response.status_code, 200, msg=name)
 
     def test_resumo_de_diarias_usa_hierarquia_financeira_de_roteiros(self):
+        """O resumo é `c-v2.fact`, com um valor em destaque e três de apoio.
+
+        Antes eram `summary-item--principal`/`--secondary` e três grades
+        (`pt-diarias-summary-*`), vocabulário que só esta tela usava. A
+        hierarquia que o teste guarda é a mesma — UM valor grita, os outros três
+        acompanham —, agora dita pela peça que o cartão de lista e o resumo do
+        evento também usam.
+
+        Os quatro ganchos `data-pt-resultado-*` continuam, um por número:
+        `js/pages/planos-trabalho-wizard.js` procura cada um por nome para
+        reescrever o valor a cada recálculo.
+        """
         plano = criar_plano_maringa(self.maringa)
         response = self.client.get(
             reverse("planos_trabalho:wizard_efetivo_diarias", args=[plano.pk])
         )
 
-        self.assertContains(response, 'class="pt-diarias-summary-grid"')
-        self.assertContains(response, "summary-item--principal")
-        self.assertContains(response, "pt-diarias-summary-secondary-stack")
-        self.assertContains(response, "summary-item--secondary", count=3)
-        self.assertContains(response, "pt-diarias-summary-card--unitario")
+        self.assertContains(response, 'class="fact-list" data-pt-diarias-resultado')
+        self.assertContains(response, "fact__value--strong", count=1)
         self.assertContains(response, "data-pt-resultado-total")
+        self.assertContains(response, "data-pt-resultado-total-extenso")
         self.assertContains(response, "data-pt-resultado-unitario")
+        self.assertContains(response, "data-pt-resultado-unitario-extenso")
         self.assertContains(response, "data-pt-resultado-composicao")
+        self.assertContains(response, "data-pt-resultado-efetivo")
 
     def test_get_identificacao_pre_preenche_textos_padrao(self):
         plano = criar_plano_maringa(self.maringa)

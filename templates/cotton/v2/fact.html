@@ -1,4 +1,4 @@
-{% cotton:vars extra_class label note note_id note_label strong value value_id %}
+{% cotton:vars extra_class label note note_hook note_id note_label strong value value_hook value_id %}
 {% comment %}
   Fato v2 — rótulo miúdo em cima, valor embaixo. Par de `static/css/v2/fact.css`.
 
@@ -33,16 +33,25 @@
 
   `strong` é para o fato que a lista existe para comparar — o valor total das
   diárias. Um por cartão: se dois gritam, nenhum grita.
+
+  `value_hook`/`note_hook` são o mesmo que `value_id`/`note_id`, para o motor que
+  procura por ATRIBUTO e não por `id`. Como o `value_id`, o `note_hook` vale
+  TAMBÉM no estado vazio: a nota nasce mesmo sem texto, porque é justamente na
+  tela que abre sem cálculo que o script precisa de onde escrever quando o
+  resultado chegar. Sem isso o valor por extenso das diárias nunca aparecia num
+  plano que ainda não tinha datas. O cálculo de diárias do plano de trabalho
+  escreve em `[data-pt-resultado-total]`, e o mesmo fato aparece em duas etapas —
+  `id` repetido seria documento inválido, e o segundo nunca receberia o número.
 {% endcomment %}
 {% if label %}
   <div class="fact{% if extra_class %} {{ extra_class }}{% endif %}">
     <span class="fact__label">{{ label }}</span>
     {% if value %}
-      <div class="fact__value{% if strong %} fact__value--strong{% endif %}"{% if value_id %} id="{{ value_id }}"{% endif %} data-fit-text>{{ value }}</div>
+      <div class="fact__value{% if strong %} fact__value--strong{% endif %}"{% if value_id %} id="{{ value_id }}"{% endif %}{% if value_hook %} {{ value_hook }}{% endif %} data-fit-text>{{ value }}</div>
     {% else %}
-      <div class="fact__value fact__value--empty"{% if value_id %} id="{{ value_id }}"{% endif %}>Não informado</div>
+      <div class="fact__value fact__value--empty"{% if value_id %} id="{{ value_id }}"{% endif %}{% if value_hook %} {{ value_hook }}{% endif %}>Não informado</div>
     {% endif %}
     {% if note_label %}<span class="fact__label fact__label--note">{{ note_label }}</span>{% endif %}
-    {% if note %}<span class="fact__note"{% if note_id %} id="{{ note_id }}"{% endif %} data-fit-text data-fit-text-min="9">{{ note }}</span>{% endif %}
+    {% if note or note_hook %}<span class="fact__note"{% if note_id %} id="{{ note_id }}"{% endif %}{% if note_hook %} {{ note_hook }}{% endif %} data-fit-text data-fit-text-min="9">{{ note }}</span>{% endif %}
   </div>
 {% endif %}

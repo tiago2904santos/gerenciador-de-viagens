@@ -1,0 +1,91 @@
+/* Lista viva — o que a escolha de cima produz, contado e listado.
+ * Depende de `v2/tokens.css`.
+ *
+ * A coluna é um bloco de conteúdo dentro do bloco de formulário, então ela
+ * pinta com o degrau seguinte da escada (`--surface-rail` dentro do
+ * `--surface-field` do bloco) e usa o raio de campo, não o de painel: quem está
+ * dentro nunca tem o arredondamento de quem está fora.
+ */
+
+:is(html[data-theme]) .live-list {
+  background: var(--surface-rail);
+  border-radius: var(--radius-field);
+  display: grid;
+  gap: var(--gap-tight);
+  min-width: 0;
+  padding: var(--gap);
+}
+
+/* Título e contagem na mesma linha, nas pontas: o número é a resposta curta, e
+   ele fica onde o olho já para ao terminar de ler o título. */
+:is(html[data-theme]) .live-list__head {
+  align-items: center;
+  display: flex;
+  gap: var(--gap-tight);
+  justify-content: space-between;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .live-list__title {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+}
+
+:is(html[data-theme]) .live-list__items {
+  display: grid;
+  gap: var(--gap-tight);
+  list-style: none;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+/* Cada item é uma caixa própria, e não uma linha de lista com marcador: são
+   frases inteiras — a meta de uma atividade —, e com marcador a segunda linha
+   de cada uma começava desalinhada da primeira. */
+:is(html[data-theme]) .live-list__item {
+  background: var(--surface-field);
+  border-radius: var(--radius-field);
+  min-width: 0;
+  padding: var(--gap-tight) var(--gap);
+}
+
+:is(html[data-theme]) .live-list__text {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  overflow-wrap: anywhere;
+}
+
+/* O vazio é duas linhas: o estado, e o que fazer a respeito. */
+:is(html[data-theme]) .live-list__empty {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .live-list__empty strong {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+}
+
+:is(html[data-theme]) .live-list__empty span {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+}
+
+/* Duas colunas, ou uma. É o par metas/recursos do plano de trabalho: são listas
+   irmãs, e empilhadas em tela larga a segunda só aparece depois de rolar. */
+:is(html[data-theme]) .live-list-pair {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  :is(html[data-theme]) .live-list-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

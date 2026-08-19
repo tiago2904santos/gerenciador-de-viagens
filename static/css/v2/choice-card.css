@@ -1,9 +1,11 @@
 /* Cartão de escolha — o rádio que ocupa uma caixa, com título e explicação.
  * Depende de `v2/tokens.css`.
  *
- * Veste a marcação que a Ordem de Serviço já emite (`os-model-card`). Ela ainda
- * não é um componente do v2; quando virar, esta folha troca de seletor e não de
- * desenho.
+ * Duas marcações, UMA declaração: `.choice-card`/`.choice-grid` são o
+ * componente do v2 (`c-v2.choice_card`, `c-v2.choice_grid`); `os-model-card` é a
+ * marcação que a Ordem de Serviço ainda escreve à mão e que o componente vai
+ * absorver. Enquanto as duas existem elas dividem os MESMOS blocos de regra —
+ * duplicar o desenho é como ele passa a ter dois donos e começa a divergir.
  *
  * SEM hover: aqui o cartão inteiro é o alvo do clique, e um realce que segue o
  * cursor pela grade compete com a marca do que está de fato escolhido. Numa
@@ -22,7 +24,8 @@
   padding: 0;
 }
 
-:is(html[data-theme]) .os-model-picker__grid {
+:is(html[data-theme]) .os-model-picker__grid,
+:is(html[data-theme]) .choice-grid {
   display: grid;
   gap: var(--gap-tight);
   /* DUAS colunas, ou uma. `auto-fit` com mínimo estreito deixava a grade cair
@@ -34,17 +37,20 @@
 
 /* Em número ímpar, o último ocupa a linha inteira. Sozinho em meia largura ele
    fica ao lado de um vazio, e o vazio se lê como opção faltando. */
-:is(html[data-theme]) .os-model-picker__grid > .os-model-card:last-child:nth-child(odd) {
+:is(html[data-theme]) .os-model-picker__grid > .os-model-card:last-child:nth-child(odd),
+:is(html[data-theme]) .choice-grid:not(.choice-grid--dense) > .choice-card:last-child:nth-child(odd) {
   grid-column: 1 / -1;
 }
 
 @media (max-width: 720px) {
-  :is(html[data-theme]) .os-model-picker__grid {
+  :is(html[data-theme]) .os-model-picker__grid,
+  :is(html[data-theme]) .choice-grid:not(.choice-grid--dense) {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
-:is(html[data-theme]) .os-model-card {
+:is(html[data-theme]) .os-model-card,
+:is(html[data-theme]) .choice-card {
   /* `center`: a marca do rádio acompanha o bloco de texto inteiro, e não a
      primeira linha dele. Alinhada ao topo, ela ficava solta acima da explicação
      nos cartões de duas ou três linhas. */
@@ -65,7 +71,14 @@
 
 /* O `<input>` de verdade fica invisível mas continua no fluxo do teclado: quem
    navega por Tab precisa alcançá-lo, e `display: none` o tiraria da ordem. */
-:is(html[data-theme]) .os-model-card input[type="radio"] {
+/* Vale para QUALQUER `<input>` dentro do cartão, e não só para o que o
+   componente escreve: quando o controle vem do formulário do Django
+   (`{{ form.ativo }}`), a classe é a que o Python deu — medido, a caixa nativa
+   aparecia inteira no meio do cartão e dobrava a altura dele. */
+:is(html[data-theme]) .os-model-card input[type="radio"],
+:is(html[data-theme]) .choice-card input[type="checkbox"],
+:is(html[data-theme]) .choice-card input[type="radio"],
+:is(html[data-theme]) .choice-card__input {
   height: 0;
   opacity: 0;
   position: absolute;
@@ -83,20 +96,23 @@
   display: none;
 }
 
-:is(html[data-theme]) .os-model-card__body {
+:is(html[data-theme]) .os-model-card__body,
+:is(html[data-theme]) .choice-card__body {
   display: grid;
   gap: 2px;
   min-width: 0;
 }
 
-:is(html[data-theme]) .os-model-card__title {
+:is(html[data-theme]) .os-model-card__title,
+:is(html[data-theme]) .choice-card__title {
   color: var(--text-strong);
   font-size: var(--text-size-base);
   font-weight: var(--weight-strong);
   line-height: 1.25;
 }
 
-:is(html[data-theme]) .os-model-card__hint {
+:is(html[data-theme]) .os-model-card__hint,
+:is(html[data-theme]) .choice-card__hint {
   color: var(--text-muted);
   font-size: var(--text-size-eyebrow);
   line-height: 1.35;
@@ -105,19 +121,84 @@
 /* ---- o escolhido ---------------------------------------------------------- */
 
 :is(html[data-theme]) .os-model-card.is-selected,
-:is(html[data-theme]) .os-model-card:has(input:checked) {
+:is(html[data-theme]) .os-model-card:has(input:checked),
+:is(html[data-theme]) .choice-card.is-selected,
+:is(html[data-theme]) .choice-card:has(input:checked) {
   background: var(--surface-selected);
   box-shadow: inset 3px 0 0 0 var(--accent);
 }
 
 :is(html[data-theme]) .os-model-card.is-selected .os-model-card__title,
-:is(html[data-theme]) .os-model-card:has(input:checked) .os-model-card__title {
+:is(html[data-theme]) .os-model-card:has(input:checked) .os-model-card__title,
+:is(html[data-theme]) .choice-card.is-selected .choice-card__title,
+:is(html[data-theme]) .choice-card:has(input:checked) .choice-card__title {
   color: var(--accent);
 }
 
 /* O anel de foco vai no CARTÃO, porque o `<input>` é invisível: sem isto quem
    navega por teclado percorre as opções sem ver onde está. */
-:is(html[data-theme]) .os-model-card:focus-within {
+:is(html[data-theme]) .os-model-card:focus-within,
+:is(html[data-theme]) .choice-card:focus-within {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
+}
+
+
+/* ---- a grade densa --------------------------------------------------------
+ *
+ * Quando cada cartão carrega SÓ um nome — as atividades do plano de trabalho —
+ * duas colunas deixam trinta opções numa rolagem longa e metade da largura
+ * vazia. Aqui o número de colunas vem da largura disponível, com 220px de piso:
+ * abaixo disso o nome de uma atividade quebra em três linhas.
+ */
+:is(html[data-theme]) .choice-grid--dense {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+/* Numa grade densa o cartão vive de um nome só: o padding cheio do cartão de
+   duas linhas empilharia altura por trinta itens. */
+:is(html[data-theme]) .choice-grid--dense > .choice-card {
+  padding: var(--gap-tight) var(--gap);
+}
+
+/* O vazio da BUSCA, não o da lista: nasce oculto e é o script da tela que o
+   mostra quando o filtro não acha nada. Some junto com a grade — quem digitou
+   precisa saber que digitou, não achar que a lista esvaziou. */
+:is(html[data-theme]) .choice-grid__empty {
+  color: var(--text-muted);
+  font-size: var(--text-size-base);
+  margin: var(--gap-tight) 0 0;
+}
+
+/* O cartão que vem de um formulário carrega o erro EMBAIXO, e não dentro: um
+   `<label>` só aceita conteúdo de frase, e o parágrafo de erro dentro dele é
+   documento inválido. O invólucro só existe nesse caso — na grade de opções o
+   cartão continua sendo filho direto, que é o que faz a regra de "ímpar ocupa a
+   linha" funcionar. */
+:is(html[data-theme]) .choice-card-field {
+  display: grid;
+  gap: var(--gap-tight);
+  min-width: 0;
+}
+
+/* A faixa de controles da grade — filtrar, aplicar um modelo, limpar. Mesma
+   forma da faixa de uma lista (`rail__form`): tudo na linha, o campo de busca
+   crescendo e os botões no tamanho do próprio rótulo. */
+:is(html[data-theme]) .choice-grid__toolbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  margin-bottom: var(--gap);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .choice-grid__toolbar > .input {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .choice-grid__toolbar > .select {
+  flex: 0 1 240px;
+  min-width: 0;
 }

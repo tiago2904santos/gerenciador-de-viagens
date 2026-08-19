@@ -1,14 +1,29 @@
+{% comment %}
+  Editar e remover um evento do plano. Os dois são `type="submit"` com
+  `formaction`, e não links ou formulários próprios: o cartão vive DENTRO do
+  `<form>` da etapa, formulário aninhado o HTML não tem, e um `<form>` irmão
+  ficaria sem os campos que a pessoa está editando.
+
+  `formnovalidate` porque sair para editar outro evento não deve exigir que este
+  esteja completo.
+{% endcomment %}
 {% if mostrar_acoes and ev.editar_url %}
-  <div class="pt-resumo-card-actions">
-    {# formaction: os botões vivem dentro do <form> do wizard (sem forms aninhados). #}
-    <c-ui.buttons.button type="submit" formmethod="post" formaction="{{ ev.editar_url }}" formnovalidate
-            class_name="icon-btn icon-btn--edit" aria_label="Editar evento" data-tooltip="Editar evento" only>
-      <c-ui.icons.icon icon="edit" only />
-    </c-ui.buttons.button>
-    <c-ui.buttons.button type="submit" formmethod="post" formaction="{{ ev.excluir_url }}" formnovalidate
-            data-confirm-submit data-confirm-message="Remover este evento do plano?"
-            class_name="icon-btn icon-btn--delete" aria_label="Remover evento" data-tooltip="Remover evento" only>
-      <c-ui.icons.icon icon="delete" only />
-    </c-ui.buttons.button>
-  </div>
+  <c-v2.icon_button
+    icon="edit"
+    type="submit"
+    :formaction="ev.editar_url"
+    :formnovalidate="True"
+    aria_label="Editar evento"
+    tooltip="Editar evento"
+  />
+  <c-v2.icon_button
+    icon="delete"
+    type="submit"
+    tone="late"
+    :formaction="ev.excluir_url"
+    :formnovalidate="True"
+    confirm_message="Remover este evento do plano?"
+    aria_label="Remover evento"
+    tooltip="Remover evento"
+  />
 {% endif %}

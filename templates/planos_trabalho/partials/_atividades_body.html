@@ -1,80 +1,68 @@
 {% comment %}
-  Seleção de atividades: grade com TODAS as atividades visíveis. Clicar no card
-  seleciona/desseleciona (checkbox embutido). name="atividades_codigos" — a view
-  lê getlist(). O preview de Metas/Recursos abaixo atualiza ao vivo.
-  Presets substituem a seleção atual; depois o usuário ajusta livremente.
+  Seleção de atividades no sistema v2 (2026-08-18): a grade densa de
+  `c-v2.choice_card`, com o filtro, o modelo e o "limpar" na mesma faixa.
+
+  Clicar num cartão marca ou desmarca a caixa embutida; `name="atividades_codigos"`
+  é o que a view lê com `getlist()`. Aplicar um preset substitui a seleção atual,
+  e depois disso a pessoa ajusta à vontade.
+
+  Os ganchos são contrato de `js/pages/planos-trabalho-wizard.js` — o filtro
+  (`data-pt-activity-search`), o preset (`data-pt-activity-preset`), o limpar
+  (`data-pt-activity-clear`), cada cartão (`data-pt-activity-item`), cada caixa
+  (`data-pt-activity-checkbox`) e o vazio da busca (`data-pt-activity-empty`).
+  Nome trocado não dá erro: o controle fica na tela e para de responder.
+
+  A busca é do CLIENTE, e por isso o campo não usa `filter`: quem esconde e
+  mostra os cartões é o script da etapa, que também cuida do vazio.
 {% endcomment %}
 {% if atividades_catalogo %}
-  <div class="pt-activity" data-pt-activity>
-    <div class="pt-activity__toolbar pt-activity__toolbar--panel">
-      <div class="pt-activity__preset">
-        <label class="sr-only" for="pt-atividade-preset">Preset de atividades</label>
-        <div class="custom-select pt-activity__preset-select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
-          <select id="pt-atividade-preset" data-pt-activity-preset>
-            <option value="">Aplicar preset…</option>
-            {% for preset in atividades_presets %}
-              <option value="{{ preset.pk }}"{% if preset.pk == atividades_preset_padrao_id %} selected{% endif %}>{{ preset.nome }}{% if preset.is_padrao %} — Padrão{% endif %}</option>
-            {% empty %}
-              <option value="" disabled>Nenhum preset cadastrado</option>
-            {% endfor %}
-          </select>
-        </div>
-        <a class="button button--secondary" href="{{ presets_manager_url }}" data-autosave-link="1">
-          Gerenciar presets
-        </a>
-      </div>
-      <div class="pt-activity__search">
-        <span class="pt-activity__search-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
-        </span>
-        <label class="sr-only" for="pt-atividade-search">Filtrar atividades</label>
-        <input
+  <div data-pt-activity>
+    <c-v2.choice_grid
+      :dense="True"
+      aria_label="Atividades disponíveis"
+      empty_message="Nenhuma atividade encontrada para a busca informada."
+      empty_hook="data-pt-activity-empty"
+    >
+      <c-slot name="toolbar">
+        <c-v2.select
+          select_id="pt-atividade-preset"
+          hook="data-pt-activity-preset"
+          name="pt_atividade_preset"
+          :options="atividades_presets_options"
+          :value="atividades_preset_padrao_id"
+          aria_label="Preset de atividades"
+        />
+        <c-v2.button label="Gerenciar presets" :href="presets_manager_url" :autosave_link="True" />
+        <c-v2.input
           type="search"
-          id="pt-atividade-search"
-          class="cv-field__control pt-activity__search-input"
+          icon="search"
+          input_id="pt-atividade-search"
+          hook="data-pt-activity-search"
           placeholder="Filtrar atividades por nome"
-          autocomplete="off"
-          data-pt-activity-search
-        >
-      </div>
-      <c-ui.buttons.button type="button"
-              class_name="button button--secondary pt-activity__clear"
-              data-pt-activity-clear only>
-        Limpar seleção
-      </c-ui.buttons.button>
-    </div>
-
-    <div class="pt-activity__grid" data-pt-activity-grid role="group" aria-label="Atividades disponíveis">
-      {% for atividade in atividades_catalogo %}
-        <label class="pt-activity-card{% if atividade.selected %} is-selected{% endif %}"
-               data-pt-activity-item
-               data-nome="{{ atividade.nome|lower }}"
-               title="{{ atividade.nome }}">
-          <input
-            class="pt-activity-card__checkbox"
-            type="checkbox"
-            name="atividades_codigos"
-            value="{{ atividade.codigo }}"
-            id="pt-atividade-{{ atividade.codigo }}"
-            data-pt-activity-checkbox
-            {% if atividade.selected %}checked{% endif %}
-          >
-          <span class="pt-activity-card__check" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
-          </span>
-          <span class="pt-activity-card__name">{{ atividade.nome }}</span>
-        </label>
-      {% endfor %}
-    </div>
-
-    <p class="pt-activity__empty" hidden data-pt-activity-empty>Nenhuma atividade encontrada para a busca informada.</p>
+          aria_label="Filtrar atividades"
+        />
+        <c-v2.button label="Limpar seleção" icon="x" hook="data-pt-activity-clear" />
+      </c-slot>
+      <c-slot name="body">
+        {% for atividade in atividades_catalogo %}
+          {% with filtro=atividade.nome|lower id_atividade="pt-atividade-"|add:atividade.codigo %}
+            <c-v2.choice_card
+              input_name="atividades_codigos"
+              :value="atividade.codigo"
+              :input_id="id_atividade"
+              :checked="atividade.selected"
+              :filter_text="filtro"
+              hook="data-pt-activity-item"
+              input_hook="data-pt-activity-checkbox"
+            >{{ atividade.nome }}</c-v2.choice_card>
+          {% endwith %}
+        {% endfor %}
+      </c-slot>
+    </c-v2.choice_grid>
   </div>
 {% else %}
-  <div class="document-inline-card">
-    <div class="document-inline-card__body">
-      <p class="document-inline-empty">
-        Nenhuma atividade cadastrada. Use <a href="{{ atividades_manager_url }}" target="_blank" rel="noopener">Gerenciar atividades</a> para cadastrar a primeira.
-      </p>
-    </div>
-  </div>
+  <c-v2.alert
+    tone="info"
+    message="Nenhuma atividade cadastrada. Use “Gerenciar atividades”, acima, para cadastrar a primeira."
+  />
 {% endif %}

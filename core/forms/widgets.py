@@ -34,7 +34,6 @@ class WidgetStyle(StrEnum):
     FORM_SELECT_TERMS_PICKER = "form-select search-picker__termos-native"
     SEARCH_PICKER_INPUT = "search-picker__input"
     TERM_OFICIO_OS_SOURCE = "termo-oficio-source-select os-oficio-source-select"
-    PT_PRESET_ACTIVITY_GRID = "pt-preset-activity-grid"
     PRESTACAO_FILE_INPUT = "form-control cv-field__control prestacao-file-input"
     TERM_OFICIO_SOURCE = "termo-oficio-source-select"
 

@@ -41,10 +41,11 @@ class GlobalPeriodDestinationsSectionTests(SimpleTestCase):
         # migrou para o v2 e monta período e destinos com `c-v2.date_picker` +
         # `c-v2.destinations`, com os MESMOS ganchos `data-location-*` que o
         # script da tela lê para serializar `destinos_json`.
-        consumers = (
-            "ordens_servico/partials/_evento_body.html",
-            "planos_trabalho/partials/_identificacao_evento_body.html",
-        )
+        # Plano de Trabalho saiu em 18/08/2026, também pelo mesmo caminho: o
+        # `form.destination_rows` que alimenta o `c-v2.destinations` é o mesmo
+        # que o de termo, e os nomes de campo do POST não mudaram. Quem garante
+        # isso agora é `planos_trabalho/tests/test_wizard_v2.py`.
+        consumers = ("ordens_servico/partials/_evento_body.html",)
 
         for relative_path in consumers:
             with self.subTest(template=relative_path):

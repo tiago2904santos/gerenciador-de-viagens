@@ -1,4 +1,4 @@
-{% cotton:vars aria_label autosave_link controls dialog dialog_label dialog_label_attr dialog_url dialog_url_attr disabled extra_class form hook href icon icon_after label name size slot type value variant %}
+{% cotton:vars aria_label autosave_link confirm_message controls dialog dialog_label dialog_label_attr dialog_url dialog_url_attr disabled extra_class form formaction formnovalidate hidden hook href icon icon_after label name size slot type value variant %}
 {% comment %}
   Button v2 — par de `static/css/v2/button.css`.
 
@@ -24,19 +24,37 @@
   antes de deixar a página. É o "Voltar" de todo formulário com autosave — sem
   ele, quem desiste da etapa leva junto o que já tinha digitado. O
   `c-v2.icon_button` já o tinha; aqui faltava, e a migração do wizard de ofício
-  foi quem cobrou.
+  foi quem cobrou. Vale igual para a ação que NAVEGA para outro cadastro —
+  "Gerenciar atividades" no meio de uma etapa do plano de trabalho. Só o
+  botão-link o emite.
 
   `name`/`value` são o par que faz um submit DIZER QUAL submit foi. É o que o
   wizard de ofício lê em `wizard_action` para saber se o POST veio de "Avançar",
   de "Voltar" ou de "Finalizar" — três ações no mesmo formulário, distinguidas
   só por isto. Enquanto não estavam declarados aqui, o rodapé v2 não conseguia
   substituir o legado: o atributo era aceito na chamada e descartado calado, e o
-  wizard recebia um POST sem ação nenhuma.
+  wizard recebia um POST sem ação nenhuma. O wizard de plano de trabalho lê o
+  mesmo `wizard_action` (`wizard_next`, `wizard_back`, `save_draft_list`,
+  `finalizar`); sem o par, a etapa apenas recarrega em si mesma.
 
   `hook` é o atributo `data-*` que liga o botão a um motor JS já existente —
   `hook="data-location-add"`, por exemplo. É declarado em vez de repassado
   solto porque o gancho é contrato do JS: se ele virar um atributo qualquer,
   ninguém percebe quando o nome muda e o botão para de responder calado.
+
+  `formaction`/`formnovalidate` mandam ESTE submit para outra URL sem exigir o
+  formulário inteiro válido. É o que permite "Adicionar evento ao plano" e as
+  ações de cada evento viverem DENTRO do `<form>` do wizard: formulário aninhado
+  o HTML não tem, e um `<form>` irmão perderia os campos da etapa.
+
+  `confirm_message` liga o botão ao guarda de `js/core/app.js`
+  (`data-confirm-submit` + `data-confirm-message`), que pergunta antes de enviar.
+  Remover um evento do plano não tem desfazer.
+
+  `hidden` é o botão que existe mas ainda não tem o que fazer — o "×" da única
+  linha de uma coleção. Ele nasce oculto e o motor JS o revela quando aparece a
+  segunda linha; sem o atributo no servidor, ele pisca na tela até o script
+  rodar.
 {% endcomment %}
 {% load icones %}
 {% if href %}
@@ -75,6 +93,10 @@
     {% if form %}form="{{ form }}"{% endif %}
     {% if name %}name="{{ name }}"{% endif %}
     {% if value %}value="{{ value }}"{% endif %}
+    {% if formaction %}formaction="{{ formaction }}"{% endif %}
+    {% if formnovalidate %}formnovalidate{% endif %}
+    {% if confirm_message %}data-confirm-submit data-confirm-message="{{ confirm_message }}"{% endif %}
+    {% if hidden %}hidden{% endif %}
     {% if hook %}{{ hook }}{% endif %}
   >
     {% if icon and not icon_after %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}

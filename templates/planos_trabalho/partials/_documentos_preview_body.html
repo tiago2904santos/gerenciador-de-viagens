@@ -1,36 +1,39 @@
-<section class="pt-document-preview document-inline-card--lazy" data-lazy-inline aria-labelledby="pt-document-preview-title">
-  <header class="pt-document-preview__header">
-    <span class="pt-document-preview__identity">
-      <span class="pt-document-preview__icon" aria-hidden="true">
-        <c-ui.icons.icon icon="document" only />
-      </span>
-      <span class="pt-document-preview__copy">
-        <span class="pt-document-preview__eyebrow">Documento gerado</span>
-        <strong class="pt-document-preview__title" id="pt-document-preview-title">Plano de Trabalho {{ plano.numero_formatado }}</strong>
-        <span class="pt-document-preview__hint">Prévia atualizada com os dados das etapas anteriores</span>
-      </span>
-    </span>
-    {% if documento_disponivel %}
-      <span class="pt-document-preview__actions" aria-label="Ações do documento">
-        <c-ui.buttons.icon_button :href="pdf_inline_url" action="preview" aria_label="Visualizar documento" tooltip="Visualizar documento" only />
-        <c-ui.buttons.icon_button :href="baixar_pdf_url" action="pdf" aria_label="Baixar PDF" tooltip="Baixar PDF" only />
-        <c-ui.buttons.icon_button :href="baixar_docx_url" action="docx" aria_label="Baixar DOCX" tooltip="Baixar DOCX" only />
-      </span>
-    {% endif %}
-  </header>
-  <div class="pt-document-preview__body">
-    {% if documento_disponivel %}
-      <div class="document-inline-viewer">
-        <iframe
-          class="document-inline-viewer__frame"
-          data-src="{{ pdf_inline_url }}"
-          src="{{ pdf_inline_url }}"
-          title="Visualização do plano de trabalho em PDF"
-          loading="lazy"
-        ></iframe>
-      </div>
-    {% else %}
-      <p class="document-inline-empty">Complete as etapas anteriores para visualizar o documento.</p>
-    {% endif %}
-  </div>
-</section>
+{% comment %}
+  A prévia do documento gerado — o `c-v2.document_preview`, o mesmo cartão que o
+  cadastro de termo usa. No legado esta tela desenhava a sua
+  (`pt-document-preview`), com cabeçalho, moldura e visualizador próprios: três
+  definições para a mesma caixa, numa folha de página que só ela carregava.
+
+  As três ações do cabeçalho são de LEITURA — ver, baixar em PDF, baixar em DOCX
+  — e por isso ficam em `icon_button`: numa linha só, sem rótulo, elas não
+  competem com o título do documento.
+
+  Sem documento, o cartão fica sem `src` e mostra a frase de vazio: um `<iframe>`
+  apontando para o nada é uma moldura cinza que parece falha de carregamento.
+{% endcomment %}
+{% with titulo_do_plano="Plano de Trabalho "|add:plano.numero_formatado %}
+  {% if documento_disponivel %}
+    <c-v2.document_preview
+      :title="titulo_do_plano"
+      eyebrow="Documento gerado"
+      hint="Prévia atualizada com os dados das etapas anteriores"
+      :src="pdf_inline_url"
+      :open="True"
+      frame_title="Visualização do plano de trabalho em PDF"
+    >
+      <c-slot name="actions">
+        <c-v2.icon_button icon="eye" :href="pdf_inline_url" target="_blank" aria_label="Visualizar documento" tooltip="Visualizar documento" />
+        <c-v2.icon_button icon="pdf" :href="baixar_pdf_url" aria_label="Baixar PDF" tooltip="Baixar PDF" />
+        <c-v2.icon_button icon="docx" :href="baixar_docx_url" aria_label="Baixar DOCX" tooltip="Baixar DOCX" />
+      </c-slot>
+    </c-v2.document_preview>
+  {% else %}
+    <c-v2.document_preview
+      :title="titulo_do_plano"
+      eyebrow="Documento gerado"
+      hint="Prévia atualizada com os dados das etapas anteriores"
+      :open="True"
+      empty_message="Complete as etapas anteriores para visualizar o documento."
+    />
+  {% endif %}
+{% endwith %}

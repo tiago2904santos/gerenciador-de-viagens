@@ -128,3 +128,39 @@
   flex-wrap: wrap;
   gap: var(--gap-tight);
 }
+
+/* ---- o título em três linhas ----------------------------------------------
+ *
+ * O cartão de prévia de uma ETAPA carrega mais que um nome: o tipo do documento
+ * em cima ("Documento gerado") e, embaixo, de onde vieram os dados. Empilhados
+ * dentro do próprio título, eles seguem o clique do `<summary>` — postos como
+ * irmãos, ficariam fora da área que abre e fecha o cartão.
+ */
+:is(html[data-theme]) .document-inline-card__title:has(.document-inline-card__eyebrow) {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .document-inline-card__eyebrow {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-normal);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+:is(html[data-theme]) .document-inline-card__hint {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-normal);
+}
+
+/* O vazio da prévia: a etapa ainda não produziu documento. Fica com o texto
+   apagado e sem moldura — uma caixa em volta de "ainda não há nada" desenha
+   atenção para o que não existe. */
+:is(html[data-theme]) .document-inline-card__empty {
+  color: var(--text-muted);
+  font-size: var(--text-size-base);
+  margin: 0;
+}

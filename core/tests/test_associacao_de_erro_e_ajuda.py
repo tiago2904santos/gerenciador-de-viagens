@@ -370,11 +370,18 @@ class ContratoDosChamadoresTests(SimpleTestCase):
         2026-08-18, migração de Ofícios (`NOVO-20260818-213853-fab772ef1b6e`):
         **33**. Saíram os três chamadores da etapa 1 — identificação, finalidade
         e motorista externo —, pelo mesmo motivo: o campo do v2 já traz o erro.
+
+        2026-08-18, migração de Planos de Trabalho
+        (`NOVO-20260818-223338-aa3c31f87b9d`): **30**. Saíram os três
+        últimos chamadores do app — a linha de efetivo (dois: unidade e
+        quantidade) e o campo de atividades do cadastro rápido de modelos. Todos
+        passaram ao `c-v2.form_field` ou ao `c-v2.field`, que trazem o erro
+        embutido e emitem o `id` que o `aria-describedby` do Django aponta.
         """
         achados = list(chamadores_de_field_error())
 
-        self.assertGreaterEqual(len(achados), 33)
-        self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 33)
+        self.assertGreaterEqual(len(achados), 30)
+        self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 30)
 
 
 class DicaEscritaAMaoTests(SimpleTestCase):

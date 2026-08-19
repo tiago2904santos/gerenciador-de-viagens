@@ -823,12 +823,12 @@ class PresetAtividadesQuickAddForm(forms.ModelForm):
             "nome": forms.TextInput(
                 attrs={**text_attrs(WidgetStyle.FORM_CONTROL), "autocomplete": "off", "placeholder": "Ex.: PCPR na Comunidade"},
             ),
-            "atividades": forms.CheckboxSelectMultiple(
-                attrs={
-                    **widget_attrs(WidgetStyle.PT_PRESET_ACTIVITY_GRID),
-                    "data-pt-preset-atividades": "true",
-                },
-            ),
+            # Sem classe nem gancho: o template do quick add não renderiza mais o
+            # widget inteiro — ele percorre as opções e monta um `c-v2.choice_grid`
+            # de `c-v2.choice_card`. A classe do contêiner (`pt-preset-activity-grid`)
+            # vivia só em `pages/planos-trabalho-atividades.css`, folha que esta tela
+            # nunca carregou: a grade chegava sem estilo nenhum ao navegador.
+            "atividades": forms.CheckboxSelectMultiple(),
         }
 
     def __init__(self, *args, **kwargs):

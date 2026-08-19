@@ -1,0 +1,63 @@
+{% cotton:vars checked extra_class field filter_text hint hook input_hook input_id input_name input_type slot value %}
+{% comment %}
+  Cartão de escolha v2 — a opção que ocupa uma caixa clicável inteira, com
+  título e explicação. Par de `static/css/v2/choice-card.css`.
+
+  Serve às duas formas: `input_type="radio"` para escolher UMA (o modelo de
+  motivo da OS) e `checkbox` para escolher VÁRIAS (as atividades do plano de
+  trabalho). A diferença é só o tipo do `<input>`; o desenho do escolhido é o
+  mesmo do resto do sistema — superfície própria, fita de accent à esquerda e
+  título no accent —, e é isso que ele existe para não deixar cada tela
+  reinventar.
+
+  SEM marca de rádio ou de "check": o cartão escolhido já se anuncia por três
+  coisas ao mesmo tempo, e um quarto sinal é ruído, não reforço. Foi a decisão
+  tomada no cartão de motivo da OS em 2026-08-16, e ela vale aqui.
+
+  O `<input>` fica invisível mas continua no fluxo do teclado, e o anel de foco
+  vai no CARTÃO: quem navega por Tab precisa ver onde está.
+
+  `hook`/`input_hook` são atributos `data-*` SEM valor, para o motor JS da tela
+  achar o cartão e a caixa — `data-pt-activity-item` e `data-pt-activity-checkbox`
+  no plano de trabalho. São declarados, e não repassados soltos, porque são
+  contrato: nome trocado não dá erro, o cartão só para de responder.
+
+  `filter_text` é por qual texto o cartão responde à busca da grade. Sai em
+  `data-choice-filter`, que é o que o script lê — em minúsculas, porque a
+  comparação é feita sem diferenciar caixa.
+
+  `field` é o caminho para o booleano que VEM DE UM FORMULÁRIO — o "Ativo" de um
+  catálogo. Aí o `<input>` é o widget do Django, com o `name`, o `id` e o estado
+  que ele já sabe; escrevê-lo à mão significaria repetir os três e escolher um
+  `value` na unha (`CheckboxInput` lê `""` como FALSO, então o cartão nasceria
+  marcado e chegaria desmarcado ao POST). Sem `field`, o cartão monta o próprio
+  `<input>` a partir de `input_name`/`value`, que é o caso da grade de opções.
+{% endcomment %}
+{% if field %}<div class="choice-card-field">{% endif %}
+<label
+  class="choice-card{% if extra_class %} {{ extra_class }}{% endif %}"
+  {% if filter_text %}data-choice-filter="{{ filter_text }}"{% endif %}
+  {% if hook %}{{ hook }}{% endif %}
+>
+  {% if field %}
+    {{ field }}
+  {% else %}
+    <input
+      class="choice-card__input"
+      type="{{ input_type|default:'checkbox' }}"
+      name="{{ input_name }}"
+      value="{{ value }}"
+      {% if input_id %}id="{{ input_id }}"{% endif %}
+      {% if checked %}checked{% endif %}
+      {% if input_hook %}{{ input_hook }}{% endif %}
+    >
+  {% endif %}
+  <span class="choice-card__body">
+    <span class="choice-card__title">{% if slot %}{{ slot }}{% else %}{{ field.label }}{% endif %}</span>
+    {% if hint %}<span class="choice-card__hint">{{ hint }}</span>{% endif %}
+  </span>
+</label>
+{% if field %}
+  <c-v2.field_error :errors="field.errors" />
+</div>
+{% endif %}

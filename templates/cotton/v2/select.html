@@ -1,4 +1,4 @@
-{% cotton:vars aria_label extra_class field filter name options surface value %}
+{% cotton:vars aria_label extra_class field filter hook name options select_id surface value %}
 {% comment %}
   Select v2 — par de `static/css/v2/select.css`.
 
@@ -15,6 +15,14 @@
 
   `filter` liga o select ao motor de coleções: "status" filtra a lista pelo
   valor escolhido.
+
+  `hook` é o atributo `data-*` SEM valor por onde um motor de PÁGINA acha o
+  `<select>` — o `data-pt-activity-preset` da etapa de atividades. Vai no
+  próprio `<select>`, e não no invólucro: é o elemento que o script lê e escuta,
+  e no invólucro o seletor nunca casaria.
+
+  `select_id` é o `id` do controle, para o `<label for>` de fora e para o script
+  que o procura por nome.
 {% endcomment %}
 <div
   class="select{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
@@ -29,6 +37,8 @@
       name="{{ name }}"
       aria-label="{{ aria_label }}"
       {% if filter %}data-collection-filter="{{ filter }}"{% endif %}
+      {% if select_id %}id="{{ select_id }}"{% endif %}
+      {% if hook %}{{ hook }}{% endif %}
     >
       {% for opt in options %}
         <option value="{{ opt.value }}"{% if opt.value == value %} selected{% endif %}>{{ opt.label }}</option>

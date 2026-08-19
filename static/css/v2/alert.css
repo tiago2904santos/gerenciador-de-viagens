@@ -49,6 +49,14 @@
   --alert-tone: var(--status-info);
 }
 
+/* O aviso que um motor preenche existe VAZIO, para haver onde escrever quando a
+   falha chegar — e vazio ele não pode ocupar espaço nem desenhar a fitinha.
+   `:empty` some e volta sozinho a cada `textContent`, o que `hidden` não faz: o
+   motor escreve o texto e não sabe desfazer o atributo. */
+:is(html[data-theme]) .alert:empty {
+  display: none;
+}
+
 
 /* ---- a pilha de avisos da página -------------------------------------------
  *

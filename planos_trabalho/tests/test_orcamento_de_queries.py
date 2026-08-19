@@ -19,6 +19,7 @@ from cadastros.models import Cargo
 from cadastros.models import Cidade
 from cadastros.models import Estado
 from cadastros.models import Unidade
+from cadastros.selectors import get_configuracao_sistema
 from planos_trabalho.models import EfetivoEvento
 from planos_trabalho.models import EfetivoPlano
 from planos_trabalho.models import EventoPlano
@@ -75,6 +76,11 @@ class OrcamentoDeQueriesPlanoTrabalhoTests(TestCase):
         vincular_area(user)
         # Aquecimento: singleton de configuracao e sessao nao sao da tela medida.
         self.client.get(reverse("planos_trabalho:index") + "?aba=atuais")
+        # A lista nao le a configuracao da area; o wizard passa a ler, pela secao
+        # de destinos do v2 (a UF da sede pre-seleciona o estado da primeira
+        # linha). Sem criar o singleton aqui, o `get_or_create` dele — SELECT,
+        # SAVEPOINT, INSERT e RELEASE — entraria na conta da tela medida.
+        get_configuracao_sistema()
 
     def _contar(self, url):
         with CaptureQueriesContext(connection) as queries:
@@ -146,4 +152,12 @@ class OrcamentoDeQueriesPlanoTrabalhoTests(TestCase):
     # card não busca mais `eventos__programa`, relação que ele não lê: -2.
     QUERIES_LISTA = 10
     QUERIES_LISTA_BUSCA = 10
-    QUERIES_WIZARD = 19
+    # 19 -> 20 na migracao do wizard para o v2 (2026-08-18): a secao de destinos
+    # passou a ser o `c-v2.destinations`, que busca os proprios dados em vez de
+    # exigi-los da view (`core/templatetags/destinos.py`). A consulta a mais e a
+    # leitura da configuracao da area, de onde sai a UF da sede que pre-seleciona
+    # o estado da primeira linha; ela e memoizada por REQUISICAO, entao nao cresce
+    # com o numero de destinos. Em troca, a lista de estados deixou de vir do
+    # queryset do formulario e a tela deixou de depender de a view lembrar de
+    # passar `estados` — o modo de falha era silencioso: o campo abria vazio.
+    QUERIES_WIZARD = 20

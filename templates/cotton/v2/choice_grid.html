@@ -1,0 +1,45 @@
+{% cotton:vars aria_label body dense describedby empty_hook empty_message error_id extra_class hook toolbar %}
+{% comment %}
+  Grade de cartões de escolha v2 — a caixa dos `choice_card`. Par de
+  `static/css/v2/choice-card.css`.
+
+  Duas colunas por padrão, uma em tela estreita. Com `dense`, tantas colunas
+  quanto couberem em 220px: é a forma da lista de atividades, onde cada cartão
+  carrega só um nome e trinta deles em duas colunas viram uma coluna de rolagem.
+
+  `role="group"` com `aria-label`: as opções são UMA escolha, e sem o grupo o
+  leitor de tela anuncia trinta caixas soltas sem dizer do que são.
+
+  A mensagem de vazio nasce OCULTA e é o script da tela que a mostra, quando a
+  busca não acha nada — por isso ela recebe o próprio gancho (`empty_hook`) em
+  vez de depender de um `{% if %}` do servidor: quem filtra aqui é o cliente.
+
+  `describedby` é o `id` do texto que EXPLICA a grade — a frase de ajuda do
+  campo. `aria-label` diz o que o grupo é; ele não diz como usá-lo, e sem o
+  ponteiro a instrução visível fica muda para quem usa leitor de tela. O
+  `<fieldset>` legado fazia isso com `aria-describedby`; o grupo do v2 faz
+  igual.
+
+  `error_id` entra na MESMA descrição, depois da ajuda, e só quando há erro —
+  quem o passa vazio não gera referência nenhuma. Apontar para um `id` que não
+  foi renderizado é pior que não apontar: é um ponteiro quebrado, e há teste de
+  repositório que varre exatamente isso (`referencias_quebradas`).
+
+  `toolbar` é a faixa de controles da grade — filtrar, aplicar um modelo, limpar
+  a seleção. Ela mora AQUI, e não solta no template da tela, porque é a grade que
+  ela governa: fora do componente, cada tela decidia de novo o espaçamento entre
+  o campo de busca e a primeira linha de opções.
+{% endcomment %}
+{% if toolbar %}<div class="choice-grid__toolbar">{{ toolbar }}</div>{% endif %}
+<div
+  class="choice-grid{% if dense %} choice-grid--dense{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+  role="group"
+  {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+  {% if describedby or error_id %}aria-describedby="{{ describedby }}{% if describedby and error_id %} {% endif %}{{ error_id }}"{% endif %}
+  {% if hook %}{{ hook }}{% endif %}
+>
+  {{ body }}
+</div>
+{% if empty_message %}
+  <p class="choice-grid__empty" hidden {% if empty_hook %}{{ empty_hook }}{% endif %}>{{ empty_message }}</p>
+{% endif %}

@@ -1,4 +1,4 @@
-{% cotton:vars aria_label autosave_link extra_class hook href icon menu_id menu_src target tone tooltip tooltip_tone type %}
+{% cotton:vars aria_label autosave_link confirm_message extra_class formaction formnovalidate hook href icon menu_id menu_src target tone tooltip tooltip_tone type %}
 {% comment %}
   Icon button v2 — ação sem rótulo, em forma circular.
 
@@ -33,6 +33,16 @@
   `target="_blank"` abre o destino noutra aba; vale só para o botão-link, e vem
   com `rel="noopener noreferrer"`, que a aba nova exige para não receber o
   controle desta.
+
+  `formaction`/`formnovalidate` mandam ESTE submit para outra URL sem exigir o
+  formulário inteiro válido. É como as ações de um evento do plano de trabalho
+  (editar, remover) vivem dentro do `<form>` da etapa: formulário aninhado o HTML
+  não tem, e um `<form>` irmão ficaria sem os campos que a etapa está editando.
+
+  `confirm_message` liga o botão ao guarda de `js/core/app.js`
+  (`data-confirm-submit` + `data-confirm-message`). Remover um evento do plano
+  não tem desfazer, e a ação é um ícone — o alvo mais fácil de acertar sem
+  querer.
 {% endcomment %}
 {% load icones %}
 {% if href %}
@@ -57,6 +67,9 @@
     {% if tooltip %}data-tooltip="{{ tooltip }}"{% endif %}
     {% if tooltip_tone %}data-tooltip-tone="{{ tooltip_tone }}"{% endif %}
     {% if hook %}{{ hook }}{% endif %}
+    {% if formaction %}formaction="{{ formaction }}"{% endif %}
+    {% if formnovalidate %}formnovalidate{% endif %}
+    {% if confirm_message %}data-confirm-submit data-confirm-message="{{ confirm_message }}"{% endif %}
     {% if menu_id %}
       aria-haspopup="true"
       aria-expanded="false"
