@@ -70,6 +70,30 @@
      `--surface-selected` das listas persegue. */
   --surface-selected-on-brand: color-mix(in srgb, var(--text-on-brand) 13%, transparent);
 
+  /* Sobre a faixa de marca o accent NÃO serve para texto nem para anel de foco
+     no tema claro: `#004a90` sobre `#155b9a` mede 1.26:1 — azul escuro sobre
+     azul médio. No escuro o mesmo papel cabe ao dourado, que mede 7.75:1. Por
+     isso os três tokens abaixo trocam de valor com o tema em vez de existirem
+     como um `color-mix` fixo na folha.
+
+     Medidos com luminância relativa da WCAG contra `--surface-brand`. */
+  /* 7.01:1 no claro (branco) · 7.75:1 no escuro (dourado). */
+  --accent-on-brand: var(--text-on-brand);
+  /* Anel de foco: 7.01:1 no claro · 6.49:1 no escuro. O piso para indicador de
+     foco é 3:1; o accent do claro dava 1.26 e sumia. */
+  --focus-ring-on-brand: var(--text-on-brand);
+  /* Rótulo apagado sobre a faixa. 76%, e não os 62% do primeiro corte: aquilo
+     media 3.75:1 no claro, abaixo dos 4.5:1 que texto de 12px exige. Agora
+     4.80:1 no claro e 9.16:1 no escuro. */
+  --text-muted-on-brand: color-mix(in srgb, var(--text-on-brand) 76%, transparent);
+
+  /* Vermelho de TEXTO, separado do `--danger` de superfície.
+     `--danger` é o mesmo nos dois temas por decisão do dono, e como fundo de
+     botão isso funciona — o texto sobre ele é branco. Como COR DE TEXTO ele
+     mede 2.99:1 sobre a caixa escura, abaixo do piso. Este token é o `--danger`
+     no claro e o vermelho claro do tema escuro (6.09:1) no escuro. */
+  --text-danger: var(--danger);
+
   /* ---- texto ---------------------------------------------------------- */
   --text-strong: #223348;
   --text-muted: #52657a;
@@ -176,6 +200,9 @@
   --shadow-menu: 0 12px 28px rgb(2 10 18 / 0.28);
   --surface-on-brand: color-mix(in srgb, var(--text-on-brand) 6%, transparent);
   --surface-selected-on-brand: color-mix(in srgb, var(--text-on-brand) 10%, transparent);
+  --accent-on-brand: var(--accent);
+  --focus-ring-on-brand: var(--focus-ring);
+  --text-danger: #ef7d77;
 
   --text-strong: #ffffff;
   --text-muted: #afc0d3;

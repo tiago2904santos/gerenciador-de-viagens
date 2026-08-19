@@ -24,7 +24,7 @@
 }
 
 :is(html[data-theme]) .field__error {
-  color: var(--danger);
+  color: var(--text-danger);
   font-size: var(--text-size-eyebrow);
   margin: 0;
 }

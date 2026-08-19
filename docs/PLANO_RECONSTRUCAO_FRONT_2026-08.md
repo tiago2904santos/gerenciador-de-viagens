@@ -861,6 +861,32 @@ foram mantidos, mesmo quando a captura estática de uma rota não casou regra na
 
 ---
 
+### E12 ✅ — As duas telas de casca · `NOVO-20260819-220313-6c7bd5d89165`, `NOVO-20260819-220313-df2a5685481a` · risco médio · concluída em 19/08/2026
+
+**Por que existe uma etapa depois da E11.** As doze etapas dimensionadas em 09/08 cobriam o
+conteúdo das telas e pararam na fronteira da casca. Sobraram exatamente dois pontos, e eram os dois
+mais vistos do sistema: a **barra lateral**, que está em toda tela autenticada, e o **login**, que é
+a primeira coisa que o usuário vê do produto. Nenhum dos dois lia um token do v2.
+
+| fatia | o que | como fechou |
+|---|---|---|
+| **E12-a barra lateral** | markup compõe `c-v2.button`; selos de duas letras viram ícones da folha; `v2/sidebar.css` substitui as 500 linhas de `layout/sidebar.css` | ✅ superfície `--surface-brand`, a mesma do `c-v2.header`; nenhuma regra consulta `html[data-theme]`; saem 7 regras `.sidebar-*` da camada escura |
+| **E12-b login** | a tela carrega `ui.bundle.css` e compõe `c-v2.field`, `c-v2.input`, `c-v2.button` e `c-v2.form_errors`; `v2/auth.css` substitui `pages/auth.css` | ✅ `LoginForm` emite `INPUT_V2`; as 19 variáveis `--auth-*` e a classe `auth-field-input` deixam de existir |
+| **E12-c contraste sobre a marca** | seis tokens novos, todos por tema, porque a escada `page → rail → field` não vale sobre `--surface-brand` | ✅ `--surface-on-brand`, `--surface-selected-on-brand`, `--accent-on-brand`, `--focus-ring-on-brand`, `--text-muted-on-brand`, `--text-danger` |
+
+**A lição da E12-c, que vale para o resto da frente.** Sobre a faixa de marca, **a mesma
+porcentagem não dá o mesmo contraste nos dois temas** — 10% de branco mede 1.257 sobre `#155b9a` e
+1.342 sobre `#062847`. E o `--accent` do tema claro (`#004a90`) não serve nem para texto nem para
+anel de foco ali: mede 1.26:1 contra a faixa. Os dois erros foram cometidos no primeiro corte desta
+etapa e pegos por medição, não a olho. Toda peça nova que se apoiar em `--surface-brand` precisa dos
+tokens `*-on-brand`, não do accent direto.
+
+**Resíduo registrado, fora do escopo desta etapa.** `v2/header.css` pinta `.header__eyebrow` com
+`--accent` sobre `--surface-brand` — a mesma medida de 1.26:1 no tema claro, em toda página que usa
+`c-v2.header`. A correção é trocar por `--accent-on-brand`, mas ela muda a aparência de todas as
+telas e por isso não viaja num PR de duas telas.
+
+
 ## 5. Aceite da frente inteira
 
 A reconstrução termina quando, medido por comando e não por opinião:

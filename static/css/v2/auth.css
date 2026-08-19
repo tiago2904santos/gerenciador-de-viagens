@@ -150,12 +150,19 @@
   gap: var(--gap-tight);
 }
 
+/* O eyebrow aparece nas DUAS colunas, e elas têm fundos diferentes: o accent
+   serve sobre a caixa do formulário e não serve sobre a faixa de marca — no
+   tema claro ele mede 1.26:1 ali. A regra de baixo cobre o caso da faixa. */
 :is(html[data-theme]) .auth-eyebrow {
   color: var(--accent);
   font-size: var(--text-size-eyebrow);
   font-weight: var(--weight-strong);
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+:is(html[data-theme]) .auth-intro .auth-eyebrow {
+  color: var(--accent-on-brand);
 }
 
 :is(html[data-theme]) .auth-title {
