@@ -30,6 +30,14 @@
   de servidor apareceram só com o texto de exemplo. Resolvido aqui, o atributo
   recebe uma variável simples.
 {% endcomment %}
+{% comment %}
+  Sem `field` não há o que desenhar, e a guarda existe porque a alternativa é
+  DERRUBAR a página: `default:field.label` é argumento de filtro, e argumento de
+  filtro que não resolve levanta `VariableDoesNotExist` em vez de virar vazio —
+  ao contrário de `{{ field.label }}` solto. Uma tela que monta o campo a partir
+  de um objeto opcional passava a estourar 500 ao migrar para cá.
+{% endcomment %}
+{% if field %}
 {% with rotulo=label|default:field.label ajuda=help|default:field.help_text erro=field.errors.0 ajuda_id=field.id_for_label|add:"_helptext" erro_id=field.id_for_label|add:"_error" %}
 <c-v2.field
   :label="rotulo"
@@ -56,3 +64,4 @@
   </c-slot>
 </c-v2.field>
 {% endwith %}
+{% endif %}

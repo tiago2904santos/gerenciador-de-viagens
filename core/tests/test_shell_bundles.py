@@ -22,7 +22,13 @@ FORM_COMPONENT_TEMPLATES = (
     "templates/oficios/wizard_base.html",
     "templates/ordens_servico/form.html",
     "templates/planos_trabalho/wizard_base.html",
-    "templates/prestacoes_contas/diario_motorista_form.html",
+    # NOVO-20260819: quem declara o bundle deixou de ser a página e passou a ser
+    # a casca do fluxo — o mesmo arranjo de `oficios/wizard_base.html` e de
+    # `planos_trabalho/wizard_base.html` logo acima. `diario_motorista_form.html`
+    # continua sendo a única tela de prestação cujo JS chama as APIs de
+    # formulário direto (`diario-motorista.js`, no inventário abaixo); ela agora
+    # herda a declaração em vez de repeti-la.
+    "templates/prestacoes_contas/flow_base.html",
     "templates/roteiros/roteiro_form_page.html",
     "templates/termos/form.html",
 )

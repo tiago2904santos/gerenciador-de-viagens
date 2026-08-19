@@ -166,6 +166,10 @@ UI_CSS: tuple[str, ...] = (
     "css/v2/download-picker.css",
     "css/v2/tooltip.css",
     "css/v2/surface.css",
+    # As seis `@font-face` manuscritas viajam aqui como DECLARAÇÃO: o navegador
+    # só busca o arquivo quando alguma regra casada pede a família, e só a tela
+    # de assinatura pede.
+    "css/v2/signature-fonts.css",
     "css/ui/tokens.css",
     "css/ui/header.css",
     "css/ui/sub-header.css",

@@ -652,21 +652,33 @@ class DarkRedesignContractTests(SimpleTestCase):
         # entrega": no `H-02` o card mestre passou a vir de
         # `cotton/form/card.html`, o HTML final ficou idêntico e o teste
         # falhou mesmo assim — ele guardava o arquivo, não o contrato.
-        for relative, card in (
-            ("relatorio_tecnico_form.html", "rt-wizard-card"),
-            ("diario_bordo_form.html", "diario-wizard-card"),
-            ("documentos_form.html", "docs-wizard-card"),
-            ("consolidado.html", "consolidado-wizard-card"),
+        #
+        # NOVO-20260819: com a migração de Prestações de Contas para o v2, o
+        # casco passou a ser o `c-v2.panel` e o rodapé o `c-v2.card_footer` —
+        # exatamente o que já acontecera com a etapa de transporte do ofício. O
+        # CONTRATO não mudou: as quatro telas continuam entregando o mesmo casco,
+        # o mesmo corpo e o mesmo rodapé, e nenhuma delas desenha os seus. O que
+        # mudou é qual componente canônico o cumpre, e portanto o vocabulário
+        # medido. A classe própria por tela (`rt-wizard-card` e as três irmãs)
+        # deixou de existir: ela só servia para a folha de página alcançar aquele
+        # cartão, e não há mais folha de página.
+        for relative in (
+            "relatorio_tecnico_form.html",
+            "diario_bordo_form.html",
+            "documentos_form.html",
+            "consolidado.html",
         ):
             with self.subTest(template=relative):
                 html = render_to_string(
                     f"prestacoes_contas/{relative}",
                     {"page_title": "Contrato", "wizard_page_steps": []},
                 )
-                self.assertIn("travel-document-card", html)
-                self.assertIn("travel-document-body", html)
-                self.assertIn("form-card__footer", html)
-                self.assertIn(card, html)
+                self.assertIn('class="panel', html)
+                self.assertIn("panel__title", html)
+                self.assertIn('class="card-footer', html)
+                # Nada do vocabulário anterior volta pela porta dos fundos.
+                self.assertNotIn("travel-document-card", html)
+                self.assertNotIn("form-card__footer", html)
 
     def test_rich_list_cards_share_the_entity_card_contract(self):
         templates = Path(settings.BASE_DIR) / "templates"

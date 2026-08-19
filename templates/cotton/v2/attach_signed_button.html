@@ -1,4 +1,4 @@
-{% cotton:vars accept aria_label choose_label current_name current_remove_url current_view_url doc_label eyebrow file_description file_help hint icon signed title upload_label url %}
+{% cotton:vars accept aria_label choose_label current_name current_remove_url current_view_url doc_label eyebrow file_description file_help hint icon initial_kind kinds_json reopen_key signed title upload_label url %}
 {% load icones %}
 {% comment %}
   Botão de linha que abre o diálogo de anexar arquivo.
@@ -25,6 +25,17 @@
   `is-assinado` é o que pinta o ícone de "já tem assinado" — o estado não vira
   texto porque numa lista o selo ocuparia a linha inteira por uma informação de
   um bit.
+
+  `kinds_json` é o caso de VÁRIOS documentos anexáveis pelo mesmo gatilho: o
+  payload que o diálogo lê para montar o seletor de tipo. `initial_kind` diz qual
+  vem escolhido, e `reopen_key` é como o motor sabe qual cartão reabrir depois do
+  upload. Os três chegaram com Prestações, onde um gatilho serve despacho,
+  ofício, relatório técnico, diário e comprovante — o `menu_attach_signed` já
+  tinha o primeiro, e faltavam os outros dois deste lado.
+
+  Os três SAEM ESCAPADOS no HTML, e isso está certo: quem os lê é
+  `getAttribute`, que devolve o texto já decodificado. É diferente do `hook`,
+  onde o escape estragaria o nome do atributo.
 {% endcomment %}
 {% comment %}
   Sem `{% with rotulo=aria_label|default:title %}`: variável NÃO PASSADA não
@@ -52,4 +63,7 @@
   {% if hint %}data-attach-signed-hint="{{ hint }}"{% endif %}
   {% if choose_label %}data-attach-signed-choose-label="{{ choose_label }}"{% endif %}
   {% if upload_label %}data-attach-signed-upload-label="{{ upload_label }}"{% endif %}
+  {% if kinds_json %}data-attach-signed-kinds="{{ kinds_json }}"{% endif %}
+  {% if initial_kind %}data-attach-signed-initial-kind="{{ initial_kind }}"{% endif %}
+  {% if reopen_key %}data-attach-signed-reopen-key="{{ reopen_key }}"{% endif %}
 >{% if icon %}{% icone_svg icon %}{% else %}{% icone_svg "sign" %}{% endif %}</button>

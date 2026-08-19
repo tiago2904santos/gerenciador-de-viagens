@@ -12,7 +12,11 @@ CONSUMERS = (
     # O card de ofício migrou para o v2 em 2026-08-18: o miolo deixou de ser um
     # parcial achatado e virou `c-v2.record` + `c-v2.itinerary`.
     "oficios/partials/oficio_list_card.html",
-    "prestacoes_contas/partials/_prestacao_card_body.html",
+    # NOVO-20260819: o miolo do card de prestação era um parcial de app incluído
+    # pelo componente; com a migração da app para o v2 ele foi absorvido pelo
+    # próprio `c-v2.prestacao_card`, que é onde o itinerário é chamado agora. O
+    # consumidor continua sendo um só — mudou o arquivo, não o contrato.
+    "cotton/v2/prestacao_card.html",
     # `planos_trabalho/partials/_plano_card_body.html` saiu junto, no mesmo dia e
     # pelo mesmo motivo.
     # `roteiros/partials/_roteiro_card_body.html` saiu em 2026-08-16: a lista de

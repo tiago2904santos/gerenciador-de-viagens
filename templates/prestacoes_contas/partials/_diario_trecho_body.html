@@ -1,56 +1,26 @@
-{{ form.id }}
-<div class="roteiro-trecho-card__route-row field-grid field-grid--cols-2">
-  <div class="roteiro-trecho-card__leg">
-    <div class="roteiro-trecho-card__leg-title">Saída</div>
-    <div class="field-grid field-grid--cols-2 roteiro-trecho-card__leg-grid">
-      <div class="field cv-field cv-field--readonly roteiro-trecho-card__leg-cidade">
-        <label class="cv-field__label" for="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-origem">Cidade de saída</label>
-        <input type="text" class="cv-field__control" id="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-origem" value="{{ d.origem }}" readonly tabindex="-1" aria-readonly="true">
-      </div>
-      <div class="field cv-field cv-field--readonly field-size-1">
-        <label class="cv-field__label" for="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-saida-data">Data</label>
-        <input type="text" class="cv-field__control" id="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-saida-data" value="{{ d.saida.data }}" readonly tabindex="-1" aria-readonly="true">
-      </div>
-      <div class="field cv-field cv-field--readonly field-size-1">
-        <label class="cv-field__label" for="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-saida-hora">Hora</label>
-        <input type="text" class="cv-field__control" id="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-saida-hora" value="{{ d.saida.hora }}" readonly tabindex="-1" aria-readonly="true">
-      </div>
-    </div>
-  </div>
+{% comment %}
+  Um trecho do diário: o que veio do roteiro (não se edita) e o que se preenche
+  aqui (KM e abastecimento).
 
-  <div class="roteiro-trecho-card__leg">
-    <div class="roteiro-trecho-card__leg-title">Chegada</div>
-    <div class="field-grid field-grid--cols-2 roteiro-trecho-card__leg-grid">
-      <div class="field cv-field cv-field--readonly roteiro-trecho-card__leg-cidade">
-        <label class="cv-field__label" for="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-destino">Cidade de chegada</label>
-        <input type="text" class="cv-field__control" id="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-destino" value="{{ d.destino }}" readonly tabindex="-1" aria-readonly="true">
-      </div>
-      <div class="field cv-field cv-field--readonly field-size-1">
-        <label class="cv-field__label" for="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-chegada-data">Data</label>
-        <input type="text" class="cv-field__control" id="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-chegada-data" value="{{ d.chegada.data }}" readonly tabindex="-1" aria-readonly="true">
-      </div>
-      <div class="field cv-field cv-field--readonly field-size-1">
-        <label class="cv-field__label" for="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-chegada-hora">Hora</label>
-        <input type="text" class="cv-field__control" id="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-chegada-hora" value="{{ d.chegada.hora }}" readonly tabindex="-1" aria-readonly="true">
-      </div>
-    </div>
-  </div>
+  O que veio do roteiro vira FATO, e não campo desabilitado. O legado desenhava
+  seis `<input readonly tabindex="-1">` para mostrar cidade, data e hora — a
+  caixa de um campo prometendo edição que não existe, e seis paradas de foco
+  desligadas à mão para desfazer a promessa. Fato é o que o sistema usa para
+  dado que se lê.
+
+  `form.id` fica: é o campo oculto que amarra a linha do formset à instância.
+{% endcomment %}
+{{ form.id }}
+
+<div class="fact-list">
+  <c-v2.fact label="Saída" :value="d.origem" note="{{ d.saida.data }} · {{ d.saida.hora }}" />
+  <c-v2.fact label="Chegada" :value="d.destino" note="{{ d.chegada.data }} · {{ d.chegada.hora }}" />
 </div>
 
-<div class="field-grid field-grid--cols-3 oficio-roteiro-time-calc-grid roteiro-time-calc-grid roteiro-trecho-card__time-grid">
-  <div class="field cv-field field-size-1">
-    <label class="cv-field__label" for="{{ form.km_inicial.id_for_label }}">KM inicial</label>
-    {{ form.km_inicial }}
-    {% if form.km_inicial.errors %}<c-ui.feedback.field_error :errors="form.km_inicial.errors" :field_id="form.km_inicial.auto_id" only />{% endif %}
-  </div>
-  <div class="field cv-field field-size-1">
-    <label class="cv-field__label" for="{{ form.km_final.id_for_label }}">KM final</label>
-    {{ form.km_final }}
-    {% if form.km_final.errors %}<c-ui.feedback.field_error :errors="form.km_final.errors" :field_id="form.km_final.auto_id" only />{% endif %}
-  </div>
-  <div class="field cv-field field-size-1">
-    <label class="cv-field__label" for="{{ form.abastecimento.id_for_label }}">Abastecimento</label>
-    <c-ui.select :field="form.abastecimento" surface="sub-header" only />
-    {% if form.abastecimento.errors %}<c-ui.feedback.field_error :errors="form.abastecimento.errors" :field_id="form.abastecimento.auto_id" only />{% endif %}
-  </div>
+<div class="field-grid">
+  <c-v2.form_field :field="form.km_inicial" label="KM inicial" />
+  <c-v2.form_field :field="form.km_final" label="KM final" />
+  <c-v2.field label="Abastecimento" :label_for="form.abastecimento.id_for_label" :error="form.abastecimento.errors.0">
+    <c-slot name="control"><c-v2.select :field="form.abastecimento" aria_label="Abastecimento" /></c-slot>
+  </c-v2.field>
 </div>

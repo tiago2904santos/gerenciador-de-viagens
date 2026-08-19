@@ -1,4 +1,4 @@
-{% cotton:vars actions actions_label body download_url empty_message extra_class frame_title group nested open_url src title %}
+{% cotton:vars actions actions_label body download_url empty_message extra_class frame_title group nested open_url src status status_tone title %}
 {% comment %}
   Documento inline — o cartão que abre e mostra o PDF na própria página. Par de
   `static/css/v2/document-inline.css`, que já estava no bundle do v2 sem ter
@@ -19,8 +19,19 @@
     gerado. O cartão continua na tela dizendo por que está vazio, em vez de
     sumir e deixar a lista com um buraco.
 
+  Os dois PRIMEIROS convivem: com `src` e `body`, o slot vem ANTES do
+  visualizador. É o relatório técnico da prestação, onde o campo da diária
+  ajustada muda o valor que o PDF logo abaixo mostra — separá-los faria editar
+  num lugar e conferir noutro. Sem essa combinação, quem precisasse do par teria
+  de reescrever o visualizador à mão e o componente perderia o dono do desenho.
+
   O cartão de grupo não é preguiçoso: não tem `<iframe>` próprio para hidratar,
   e marcá-lo como tal faria o motor procurar o que não existe.
+
+  `status` é o selo AO LADO do título — "Diária ajustada", "Motorista". Ele
+  qualifica o documento, e por isso fica junto do nome dele e não na ponta com
+  as ações: quem varre uma pilha de dez cartões precisa ler estado e nome no
+  mesmo movimento. Mesmo vocabulário de tom do `c-v2.chip`.
 
   `open_url`/`download_url` emitem `data-termo-inline-url` e
   `data-termo-download-pdf-url`, que são contrato do mesmo script: é por eles
@@ -35,7 +46,10 @@
   {% if download_url %}data-termo-download-pdf-url="{{ download_url }}"{% endif %}
 >
   <summary class="document-inline-card__header">
-    <span class="document-inline-card__title">{{ title }}</span>
+    <span class="document-inline-card__title">
+      {{ title }}
+      {% if status %}<c-v2.chip :label="status" :tone="status_tone" />{% endif %}
+    </span>
     {% if actions %}
       {% comment %}
         As ações moram DENTRO do `<summary>`, e o script para o clique delas
@@ -49,6 +63,7 @@
   </summary>
   <div class="document-inline-card__body{% if group %} document-inline-card__body--termos{% endif %}">
     {% if src %}
+      {% if body.strip %}{{ body }}{% endif %}
       <div class="document-inline-viewer">
         <iframe
           class="document-inline-viewer__frame"

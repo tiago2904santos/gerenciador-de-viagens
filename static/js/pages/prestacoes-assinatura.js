@@ -34,7 +34,7 @@
   const sheetCancel = document.getElementById("asgn-sheet-cancel");
   const sheetApply = document.getElementById("asgn-sheet-apply");
   const sheetBackdrop = document.getElementById("asgn-sheet-backdrop");
-  const tabs = Array.prototype.slice.call(document.querySelectorAll(".asgn-tab"));
+  const tabs = Array.prototype.slice.call(document.querySelectorAll("[data-tab]"));
   const panes = Array.prototype.slice.call(document.querySelectorAll(".asgn-tabpane"));
   const nameInput = document.getElementById("asgn-name-input");
   const fontChips = Array.prototype.slice.call(document.querySelectorAll(".asgn-fontchip"));
@@ -128,7 +128,9 @@
   tabs.forEach(function (tab) {
     tab.addEventListener("click", function () {
       const target = tab.dataset.tab;
-      tabs.forEach(function (t) { t.classList.toggle("is-active", t === tab); });
+      // `aria-pressed`, e não uma classe: é por ele que a folha do toggle v2
+      // pinta o segmento escolhido, e é ele que o leitor de tela anuncia.
+      tabs.forEach(function (t) { t.setAttribute("aria-pressed", t === tab ? "true" : "false"); });
       panes.forEach(function (p) { p.hidden = p.dataset.pane !== target; });
       if (target === "desenho") resizeDrawCanvas();
       updateApplyState();

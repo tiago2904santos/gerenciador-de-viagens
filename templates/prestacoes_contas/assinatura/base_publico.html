@@ -7,8 +7,18 @@
   <script src="{% static 'js/core/theme-shared.js' %}"></script>
   <script src="{% static 'js/core/theme-init.js' %}"></script>
   <title>{% block title %}Assinatura de documento{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/base/tokens.css' %}">
-  <link rel="stylesheet" href="{% static 'css/base/03-theme-dark.css' %}">
+  {% comment %}
+    A casca é PÚBLICA — sem barra lateral, sem menu, sem login: quem abre é o
+    signatário externo, no celular, por um link. O que mudou na migração para o
+    v2 (NOVO-20260819) é o que vai DENTRO dela: os componentes do sistema
+    entram, e `ui.bundle.css` é o que os veste. Ele já traz os tokens, então as
+    duas folhas de base saíram.
+
+    `prestacoes-assinatura.css` fica, e sobrou pouco: o visualizador de PDF em
+    canvas, a folha de assinatura arrastável e as fontes de assinatura não têm
+    par no sistema — são desta tela e de nenhuma outra.
+  {% endcomment %}
+  <link rel="stylesheet" href="{% static 'css/ui.bundle.css' %}">
   <link rel="stylesheet" href="{% static 'css/pages/prestacoes-assinatura.css' %}">
   <link rel="preload" href="{% static 'vendor/fonts/GreatVibes-Regular.ttf' %}" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="{% static 'vendor/fonts/AlexBrush-Regular.ttf' %}" as="font" type="font/ttf" crossorigin>
@@ -19,6 +29,18 @@
   {% block head_extra %}{% endblock %}
 </head>
 <body class="asgn">
+  {% comment %}
+    A folha de símbolos dos ícones. Ela é INFRAESTRUTURA, não componente visual:
+    os ícones do sistema são `<use href="#cv-icon-…">`, e sem os `<symbol>` na
+    página cada `<use>` aponta para o nada — o botão sai com o rótulo e um
+    espaço vazio no lugar do desenho. `base.html` a inclui pelo mesmo motivo, e
+    é por isso que só esta tela precisou declará-la: ela é a única do sistema
+    que não estende o `base.html`.
+
+    Medido no navegador durante a migração: sem esta linha, "Criar assinatura"
+    e os dois botões de página do visualizador ficavam sem ícone nenhum.
+  {% endcomment %}
+  <c-ui.icons._sprite />
   <header class="asgn-top">
     <span class="asgn-top__mark" aria-hidden="true">CV</span>
     <span class="asgn-top__name">Central de Viagens</span>

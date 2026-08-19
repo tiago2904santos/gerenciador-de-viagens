@@ -352,7 +352,13 @@ class BlocoDaTelaTests(RemocaoDaEquipeBase):
 
         resposta = self._abrir_rt()
         corpo = resposta.content.decode()
-        equipe, _, removidos = corpo.partition("prestacao-removidos-section")
+        # A âncora é o TÍTULO do bloco, e não uma classe de folha de página: com
+        # a migração para o v2 (NOVO-20260819) `prestacao-removidos-section` saiu
+        # junto com `prestacoes_contas.css`, e a partição passou a devolver a
+        # página inteira do lado da equipe — o teste reprovava por não achar o
+        # separador, não por o removido ter voltado.
+        equipe, separador, removidos = corpo.partition("Saíram da equipe")
+        self.assertTrue(separador, "o bloco de removidos sumiu da tela")
 
         self.assertNotIn(self.servidor_a.nome, equipe)
         self.assertIn(self.servidor_a.nome, removidos)

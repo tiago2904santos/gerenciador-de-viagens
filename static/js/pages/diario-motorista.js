@@ -1,6 +1,6 @@
 // Troca de motorista / viatura do diário.
 // - Cada "picker" (motorista/viatura) mostra o grupo de campos conforme a opção
-//   escolhida e marca o card selecionado (.is-selected — fallback do :has()).
+//   escolhida e marca o cartão selecionado (.is-selected — fallback do :has()).
 // - CV.documentSource preenche motorista + viatura a partir do ofício escolhido.
 // Sem JS, todos os grupos ficam visíveis e a validação é feita no servidor.
 (function () {
@@ -30,7 +30,11 @@
     function aplicar() {
       var modo = modoAtual();
       radios.forEach(function (radio) {
-        var card = radio.closest(".dmv-option");
+        /* `.choice-card` é o cartão de escolha do sistema; `.dmv-option` era a
+         * marcação própria desta tela, que saiu na migração para o v2. A
+         * classe continua sendo o fallback de `:has()` — a folha do v2 casa
+         * pelos dois caminhos. */
+        var card = radio.closest(".choice-card");
         if (card) {
           card.classList.toggle("is-selected", radio.checked);
         }

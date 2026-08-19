@@ -1,14 +1,30 @@
 {% comment %}
-Um campo de texto longo do RT: select de modelos (estilo justificativa do ofício) + textarea.
-O botão "Gerenciar modelos" fica no header do form_block (variant=resource).
-Espera a variável `c` (dict com select, textarea, label, manage_url, tem_modelos).
+  Um tópico de texto do Relatório Técnico: o modelo que o preenche e o texto em
+  si.
+
+  O modelo é o `select_with_action` — escolher um e ir gerenciá-los são a mesma
+  tarefa, e a ação aparece quando o ponteiro (ou o Tab) entra no campo. No
+  legado ela morava no cabeçalho do bloco, longe do campo que ela alimenta.
+
+  `c` é o dicionário do tópico: `select`, `textarea`, `label`, `manage_url` e
+  `tem_modelos`.
 {% endcomment %}
-<div class="cv-field--full-width">
-  <c-ui.forms.field :field="c.select" label="Modelo" only />
-  {% if not c.tem_modelos %}
-    <p class="field-help app-form-help">Nenhum modelo cadastrado para este campo. <a href="{{ c.manage_url }}">Cadastrar modelo</a></p>
-  {% endif %}
-</div>
-<div class="oficio-justificativa-card__wide-field cv-field--full-width">
-  <c-ui.forms.field :field="c.textarea" :label="c.label" only />
-</div>
+<c-v2.field label="Modelo" :label_for="c.select.id_for_label" :error="c.select.errors.0">
+  <c-slot name="control">
+    <c-v2.select_with_action
+      :field="c.select"
+      aria_label="Modelo de texto"
+      :action_href="c.manage_url"
+      action_icon="settings"
+      action_aria_label="Gerenciar modelos"
+      action_tooltip="Gerenciar modelos"
+      :action_autosave="True"
+    />
+  </c-slot>
+</c-v2.field>
+
+{% if not c.tem_modelos %}
+  <c-v2.alert tone="info" message="Nenhum modelo cadastrado para este campo — escreva o texto abaixo ou abra o gerenciamento de modelos." />
+{% endif %}
+
+<c-v2.form_field :field="c.textarea" :label="c.label" />

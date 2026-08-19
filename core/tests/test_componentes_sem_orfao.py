@@ -44,6 +44,13 @@ APAGADOS_COM_OS_CADASTROS = (
 APAGADOS_COM_OS_OFICIOS = ("ui/segment_toggle.html",)
 
 
+# Migração de Prestações de Contas para o v2 (NOVO-20260819): a lista de anexos
+# legada perdeu o último consumidor quando `partials/documento_anexos.html` foi
+# substituído pelo `c-v2.file_list`. Prova de grep no PR: zero ocorrências de
+# `file_list` fora do v2 em `templates/`, `static/js/`, `static/css/` e `*.py`.
+APAGADOS_COM_AS_PRESTACOES = ("ui/lists/file_list.html",)
+
+
 APAGADOS_COM_O_LAB = (
     "ui/buttons/field_action_button.html",
     "ui/buttons/floating_primary_action.html",
@@ -275,6 +282,16 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # O aviso de pendências do wizard NÃO é uma sétima peça: é o
         # `v2/alert_list.html` que Ofícios trouxe no mesmo dia. Nasceram em
         # paralelo com o mesmo contrato, e sobrou o que já estava no `main`.
+        #
+        # 160 (NOVO-20260819, migração de Prestações de Contas): +1 −1, e o
+        # número não se mexe. Entrou `v2/signature_fonts.html` — os seis chips de
+        # fonte da tela PÚBLICA de assinatura, cada um com DOIS `data-*` com
+        # valor (`data-key` e `data-family`) que `prestacoes-assinatura.js` lê;
+        # dois valores não cabem no `hook` de um `c-v2.button`, e `<button>` cru
+        # só é permitido aqui dentro. Saiu `ui/lists/file_list.html`, a lista de
+        # anexos do sistema anterior: o último consumidor era
+        # `prestacoes_contas/partials/documento_anexos.html`, e com ele no
+        # `c-v2.file_list` a peça legada ficou sem ninguém.
         self.assertEqual(len(self.components()), 160)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
@@ -299,6 +316,11 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         voltaram = [rel for rel in APAGADOS_COM_OS_OFICIOS if (COTTON / rel).exists()]
         self.assertEqual(voltaram, [], "componente apagado com os ofícios voltou")
 
+    def test_os_apagados_com_as_prestacoes_nao_voltaram(self):
+        """A lista de anexos legada, sem consumidor depois do `c-v2.file_list`."""
+        voltaram = [rel for rel in APAGADOS_COM_AS_PRESTACOES if (COTTON / rel).exists()]
+        self.assertEqual(voltaram, [], "componente apagado com as prestações voltou")
+
     def test_os_apagados_da_cascata_do_be25_nao_voltaram(self):
         """Idem para a cascata do `NOVO-44` e para o que caiu com o UI Lab (PR #247)."""
         voltaram = [rel for rel in APAGADOS_COM_O_LAB if (COTTON / rel).exists()]
@@ -322,6 +344,7 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
             | set(APAGADOS_COM_O_LAB)
             | set(APAGADOS_COM_OS_CADASTROS)
             | set(APAGADOS_COM_OS_OFICIOS)
+            | set(APAGADOS_COM_AS_PRESTACOES)
         )
         vivos = {str(path.relative_to(COTTON)) for path in self.components()}
         self.assertEqual(nomeados & vivos, set())

@@ -1,5 +1,7 @@
 <div class="field-grid">
-  <c-ui.forms.field :field="form.campo" size_class="field-size-2" only />
-  <c-ui.forms.field :field="form.nome" size_class="field-size-2" only />
-  <c-ui.forms.field :field="form.texto" size_class="field-size-4" only />
+  <c-v2.field label="Campo do relatório" :label_for="form.campo.id_for_label" :error="form.campo.errors.0">
+    <c-slot name="control"><c-v2.select :field="form.campo" aria_label="Campo do relatório" /></c-slot>
+  </c-v2.field>
+  <c-v2.form_field :field="form.nome" />
 </div>
+<c-v2.form_field :field="form.texto" />

@@ -1,30 +1,25 @@
+{% comment %}
+  Um cartão de documento inline por servidor: o pacote consolidado, aberto na
+  própria página.
+
+  Era um `<details>` escrito à mão com o cabeçalho copiado; agora é o
+  `c-v2.document_inline`, a mesma peça da conferência de ofício.
+{% endcomment %}
 {% for s in servidores %}
-  <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
-    <summary class="document-inline-card__header">
-      <span class="document-inline-card__title">
-        Pacote de {{ s.nome }}
-        {% if s.is_motorista %}
-          <c-ui.badges.chip label="Motorista" tone="warning" size="compact" only />
-        {% endif %}
-      </span>
-      <span class="document-inline-card__header-end">
-        <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do pacote">
-          <c-ui.buttons.icon_button :href="s.preview_inline_url" action="preview" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" only />
-          <c-ui.buttons.icon_button :href="s.download_url" action="pdf" aria_label="Baixar pacote (PDF final)" tooltip="Baixar pacote (PDF final)" only />
-        </span>
-      </span>
-    </summary>
-    <div class="document-inline-card__body">
-      <div class="document-inline-viewer">
-        <iframe
-          class="document-inline-viewer__frame"
-          data-src="{{ s.preview_inline_url }}"
-          title="Pacote final — {{ s.nome }}"
-          loading="lazy"
-        ></iframe>
-      </div>
-    </div>
-  </details>
+  <c-v2.document_inline
+    title="Pacote de {{ s.nome }}"
+    status="{% if s.is_motorista %}Motorista{% endif %}"
+    status_tone="progress"
+    :src="s.preview_inline_url"
+    frame_title="Pacote final — {{ s.nome }}"
+    empty_message="O pacote deste servidor ainda não foi gerado."
+    actions_label="Ações do pacote"
+  >
+    <c-slot name="actions">
+      <c-v2.icon_button icon="eye" :href="s.preview_inline_url" target="_blank" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" />
+      <c-v2.icon_button icon="pdf" :href="s.download_url" aria_label="Baixar pacote (PDF final)" tooltip="Baixar pacote (PDF final)" />
+    </c-slot>
+  </c-v2.document_inline>
 {% empty %}
-  <p class="document-inline-empty">Nenhum servidor disponível para gerar o pacote final.</p>
+  <c-v2.alert tone="info" message="Nenhum servidor disponível para gerar o pacote final." />
 {% endfor %}

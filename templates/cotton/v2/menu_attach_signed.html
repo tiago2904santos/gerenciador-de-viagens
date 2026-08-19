@@ -1,4 +1,4 @@
-{% cotton:vars current_name current_remove_url current_view_url doc_label kinds_json signed url %}
+{% cotton:vars accept choose_label current_name current_remove_url current_view_url description doc_label file_description file_help kinds_json reopen_key signed title upload_label url %}
 {% comment %}
   Item de menu que abre o diálogo de anexar o documento assinado.
 
@@ -16,7 +16,15 @@
   já decodificado — diferente do `hook`, onde o escape estraga o nome do atributo.
 
   O rótulo muda com o estado: sem assinado é "Anexar", com assinado é
-  "Gerenciar", porque as ações disponíveis passam a ser outras.
+  "Gerenciar", porque as ações disponíveis passam a ser outras. `title` e
+  `description` sobrescrevem os dois quando um gatilho cobre VÁRIOS documentos —
+  "Anexar documentos assinados / RT, diário ou comprovante", na prestação, onde
+  dizer "o termo" no plural seria mentira.
+
+  `reopen_key`, `accept`, `file_description`, `file_help` e os dois rótulos de
+  botão são os mesmos do `c-v2.attach_signed_button`, e existem aqui pela mesma
+  razão: o diálogo é um só e serve a documentos de formatos diferentes — o termo
+  do ofício aceita PDF, o comprovante da prestação aceita também PNG e JPEG.
 {% endcomment %}
 {% load icones %}
 <button
@@ -30,10 +38,16 @@
   data-attach-signed-current-view-url="{{ current_view_url }}"
   data-attach-signed-current-remove-url="{{ current_remove_url }}"
   {% if kinds_json %}data-attach-signed-kinds="{{ kinds_json }}"{% endif %}
+  {% if reopen_key %}data-attach-signed-reopen-key="{{ reopen_key }}"{% endif %}
+  {% if accept %}data-attach-signed-accept="{{ accept }}"{% endif %}
+  {% if file_description %}data-attach-signed-file-description="{{ file_description }}"{% endif %}
+  {% if file_help %}data-attach-signed-file-help="{{ file_help }}"{% endif %}
+  {% if choose_label %}data-attach-signed-choose-label="{{ choose_label }}"{% endif %}
+  {% if upload_label %}data-attach-signed-upload-label="{{ upload_label }}"{% endif %}
 >
   <span class="menu__icon" data-tone="success" aria-hidden="true">{% icone_svg "sign" %}</span>
   <span class="menu__copy">
-    <strong class="menu__title">{% if signed %}Gerenciar assinado{% else %}Anexar assinado{% endif %}</strong>
-    <small class="menu__description">{% if signed %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
+    <strong class="menu__title">{% if title %}{{ title }}{% elif signed %}Gerenciar assinado{% else %}Anexar assinado{% endif %}</strong>
+    <small class="menu__description">{% if description %}{{ description }}{% elif signed %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
   </span>
 </button>

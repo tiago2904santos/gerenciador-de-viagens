@@ -1,4 +1,4 @@
-{% cotton:vars aria_label autosave_link confirm_message extra_class formaction formnovalidate hook href icon menu_id menu_src target tone tooltip tooltip_tone type %}
+{% cotton:vars aria_label autosave_link confirm_message element_id extra_class formaction formnovalidate hook href icon menu_id menu_src target tone tooltip tooltip_tone type %}
 {% comment %}
   Icon button v2 — ação sem rótulo, em forma circular.
 
@@ -18,6 +18,14 @@
 
   `menu_src` é a variante `PF-04`: o corpo do menu não vai no HTML da lista,
   vem do servidor no primeiro clique.
+
+  `element_id` é o `id` do botão, pelo mesmo motivo do `c-v2.button`: alguns
+  motores acham a ação por `id`. Os dois botões de página do visualizador de
+  assinatura (`asgn-prev`, `asgn-next`) são isso. Enquanto não estava declarado
+  aqui, o atributo era aceito na chamada e DESCARTADO calado pelo Cotton — o
+  script da tela procurava os dois, achava `null`, e a página inteira morria no
+  primeiro `addEventListener`. Nenhum erro no servidor, nenhum aviso no
+  template: a tela abria e não fazia nada.
 
   `hook` é o atributo `data-*` que liga o botão a um motor JS, pelo mesmo motivo
   do `c-v2.button`: o gancho é contrato do JS, e declarado aqui não muda de nome
@@ -49,6 +57,7 @@
   <a
     class="icon-button{% if extra_class %} {{ extra_class }}{% endif %}"
     href="{{ href }}"
+    {% if element_id %}id="{{ element_id }}"{% endif %}
     {% if target %}target="{{ target }}" rel="noopener noreferrer"{% endif %}
     aria-label="{{ aria_label }}"
     {% if tone %}data-tone="{{ tone }}"{% endif %}
@@ -61,6 +70,7 @@
 {% else %}
   <button
     type="{{ type|default:'button' }}"
+    {% if element_id %}id="{{ element_id }}"{% endif %}
     class="icon-button{% if extra_class %} {{ extra_class }}{% endif %}"
     aria-label="{{ aria_label }}"
     {% if tone %}data-tone="{{ tone }}"{% endif %}
