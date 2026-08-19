@@ -220,6 +220,49 @@ class WizardV2Tests(TestCase):
             with self.subTest(gancho=gancho):
                 self.assertIn(gancho, html)
 
+    def test_o_fato_que_o_calculo_preenche_nao_nasce_no_desenho_de_vazio(self):
+        """Com o estado vazio do `fact`, o total chegava certo e continuava apagado.
+
+        `fact__value--empty` é apagado, itálico, sem `--strong` e sem
+        `data-fit-text`; o `runCalc()` só troca o `textContent`. O traço faz o
+        elemento já nascer sendo o valor que ele vai virar — é o que o
+        `c-v2.travel_allowance` do roteiro faz.
+        """
+        self.plano.saida_sede_data = None
+        self.plano.chegada_sede_data = None
+        self.plano.diarias_valor_total = None
+        self.plano.save()
+        html = self._html("planos_trabalho:wizard_efetivo_diarias")
+
+        resultado = html[html.index("data-pt-diarias-resultado") :]
+        resultado = resultado[: resultado.index("</div>", resultado.index("data-pt-resultado-efetivo"))]
+        self.assertNotIn("fact__value--empty", resultado)
+        self.assertIn("fact__value--strong", resultado)
+        self.assertIn("data-fit-text", resultado)
+
+    def test_o_erro_do_destino_chega_a_tela(self):
+        """`clean()` anexa "Informe a cidade do destino." a `destino_cidade`.
+
+        As linhas de destino são `<select>` montados pelo componente, fora do
+        `field` — sem renderizar os erros dos dois campos, a etapa recarregava
+        com o resumo genérico e nenhum campo destacado.
+        """
+        resposta = self.client.post(
+            reverse("planos_trabalho:wizard_identificacao", args=[self.plano.pk]),
+            {
+                "wizard_action": "wizard_next",
+                "destino_estado": self.maringa.estado_id,
+                "destino_cidade": "",
+                "data_evento_inicio": "2026-09-01",
+                "data_evento_fim": "2026-09-03",
+                "coordenador_adm_modo": "SERVIDOR",
+                "coordenador_op_modo": "SERVIDOR",
+            },
+        )
+
+        self.assertEqual(resposta.status_code, 200)
+        self.assertContains(resposta, "Informe a cidade do destino.")
+
     # ---- etapa 3 ---------------------------------------------------------
 
     def test_a_grade_de_atividades_mantem_os_ganchos_da_selecao(self):

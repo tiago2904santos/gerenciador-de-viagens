@@ -55,13 +55,17 @@
     {% endwith %}
   {% else %}
     {% comment %}
-      Sem cálculo, os três fatos continuam na tela — com o texto de vazio que o
-      próprio `fact` dá. Escondê-los faria a etapa mudar de altura no primeiro
-      cálculo, e o script não teria onde escrever quando o resultado chegasse.
+      Sem cálculo, os três fatos continuam na tela — e com um TRAÇO, não com o
+      vazio do próprio `fact`. É o que o `c-v2.travel_allowance` do roteiro já
+      fazia, e pela mesma razão: o estado vazio pinta `fact__value--empty`
+      (apagado, itálico, sem `--strong` e sem `data-fit-text`), e o
+      `runCalc()` só troca o `textContent` — o total chegaria certo e continuaria
+      com a cara de "não informado". Com o traço, o elemento já nasce sendo o
+      valor que ele vai virar.
     {% endcomment %}
-    <c-v2.fact label="Valor total do plano" :strong="True" value_hook="data-pt-resultado-total" note_label="Valor por extenso" note_hook="data-pt-resultado-total-extenso" />
-    <c-v2.fact label="Valor por servidor" value_hook="data-pt-resultado-unitario" note_label="Valor por extenso" note_hook="data-pt-resultado-unitario-extenso" />
-    <c-v2.fact label="Composição por servidor" value_hook="data-pt-resultado-composicao" note_label="Efetivo total" note_hook="data-pt-resultado-efetivo" />
+    <c-v2.fact label="Valor total do plano" value="—" :strong="True" value_hook="data-pt-resultado-total" note_label="Valor por extenso" note="—" note_hook="data-pt-resultado-total-extenso" />
+    <c-v2.fact label="Valor por servidor" value="—" value_hook="data-pt-resultado-unitario" note_label="Valor por extenso" note="—" note_hook="data-pt-resultado-unitario-extenso" />
+    <c-v2.fact label="Composição por servidor" value="—" value_hook="data-pt-resultado-composicao" note_label="Efetivo total" note="—" note_hook="data-pt-resultado-efetivo" />
   {% endif %}
 </div>
 
