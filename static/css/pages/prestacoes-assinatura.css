@@ -76,7 +76,6 @@ body.asgn {
   padding: 1.25rem;
   box-shadow: 0 12px 30px rgba(11, 31, 51, 0.06);
 }
-
 .asgn-alert {
   background: color-mix(in srgb, var(--asgn-danger) 12%, var(--asgn-card));
   color: var(--asgn-danger);
@@ -104,7 +103,6 @@ body.asgn {
 }
 .asgn-btn--primary { background: var(--asgn-primary); color: var(--asgn-primary-ink); }
 .asgn-btn--primary:disabled { background: #9bb8e6; cursor: not-allowed; }
-
 /* Formulário identidade */
 .asgn-form { display: grid; gap: 1rem; }
 .asgn-input {

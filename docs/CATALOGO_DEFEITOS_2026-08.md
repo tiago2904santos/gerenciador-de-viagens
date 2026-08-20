@@ -10480,3 +10480,15 @@ viaja no `ui.bundle.css`; quem herda o valor errado é o `<input>`/`<select>`
 NATIVO escondido atrás de cada widget, e o `<option>` dentro dele. Vale abrir
 linha própria: ou o manifesto passa a incluir aquele bloco, ou os tokens legados
 saem de vez.
+
+### NOVO-20260820-185700-cd31dbf0dde8 🟢 RESOLVIDO · `NOVO` CSS órfão da assinatura bloqueava o gate de produção · UI/QA · risco baixo
+
+Depois da migração das telas de assinatura para os componentes V2, 29 blocos de
+seletores permaneceram em `static/css/pages/prestacoes-assinatura.css` sem
+nenhum consumidor no repositório. O gate `audit_css_morto.py --max 0` reproduzia
+29 blocos mortos (2,6 KB) e impedia a publicação no CI.
+
+Foram removidos exatamente os seletores listados pelo auditor. As regras ainda
+consumidas pelo visualizador e pelo construtor público de assinatura foram
+preservadas. A mesma auditoria, executada com detalhe após a poda, passou com
+zero bloco morto e zero KB órfão.

@@ -103,6 +103,7 @@ Fase 9 — a qualquer momento, em branch própria
 
 - **Backend e frontend correm em paralelo** — são superfícies disjuntas.
 - **Fases 4 e 7 nunca correm juntas**: o HTML define o nome, o CSS pinta o nome.
+- [x] `NOVO-20260820-185700-cd31dbf0dde8` remove os 29 blocos órfãos deixados pela migração V2 da assinatura e restaura o gate de CSS morto da publicação.
 - **`BE-11`, `BE-12` e `BE-13` nunca em paralelo entre si**: são a mesma superfície.
 - **Duas frentes nunca na mesma camada ao mesmo tempo.**
 
