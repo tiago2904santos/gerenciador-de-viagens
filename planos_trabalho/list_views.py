@@ -12,7 +12,6 @@ from core.deletion import DelecaoProtegidaError
 from eventos.services import resolve_evento_from_request
 from core.retorno import com_next
 from core.retorno import daqui
-from .models import PlanoTrabalho
 from .selectors import hidratar_planos_da_pagina
 from .selectors import listar_planos_trabalho
 from .presenters import apresentar_plano_card

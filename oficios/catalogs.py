@@ -10,8 +10,6 @@ via `contexto_extra`, e não por constante como nos catálogos do Plano de Traba
 
 from __future__ import annotations
 
-from django.urls import reverse
-
 from core.catalog import CatalogConfig
 from core.catalog import CatalogMessages
 from core.catalog import delete_view

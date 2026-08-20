@@ -10257,6 +10257,16 @@ de cobertura de `static/js/core/app.js` bloqueava todo deploy de `main`.
 rótulo, a quebra de linhas, a integração com `CV.overlay` e as quatro formas de
 encerrar o diálogo, sem reduzir nenhum piso de cobertura.
 
+### NOVO-20260820-171043-eae5a24a481a 🟢 RESOLVIDO · `NOVO` Imports órfãos bloquearam o lint de produção · QA · risco baixo
+
+O commit consolidado deixou três imports sem consumidor em
+`justificativas/catalogs.py`, `oficios/catalogs.py` e
+`planos_trabalho/list_views.py`. O gate obrigatório `ruff check .` encontrou os
+três `F401` e bloqueou a suíte antes dos testes Django, impedindo o deploy.
+
+**Correção:** removidos somente os três imports órfãos, sem alterar lógica,
+contratos ou comportamento das telas.
+
 ### NOVO-20260820-132553-c8781d82b56f 🟢 RESOLVIDO · `NOVO` O último menu do sistema antigo mantinha `action-system.css` de pé · FE · risco médio
 
 `templates/prestacoes_contas/partials/_card_menus.html` era o único lugar do

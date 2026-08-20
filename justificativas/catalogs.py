@@ -12,8 +12,6 @@ mudança de microcopy — território do `N-11`, na Etapa 8, não deste PR.
 
 from __future__ import annotations
 
-from django.urls import reverse
-
 from core.catalog import CatalogConfig
 from core.catalog import CatalogMessages
 from core.catalog import delete_view
