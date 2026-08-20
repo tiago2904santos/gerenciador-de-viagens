@@ -10732,3 +10732,51 @@ dívida voltar inteira sem CI vermelho:
 
 Nenhum dos dois números é conquista deste PR: os dois já estavam pagos e sem trava. O que muda é
 que agora regridem em vermelho.
+
+### NOVO-20260820-211943-6a686a695549 🔴 ABERTO · `NOVO` Os perfis de CSS por rota podam o tema escuro inteiro: 42 rotas servem tokens claros com `data-theme="dark"` · PF-02 / UI-02 · **risco alto — atinge produção**
+
+O `PF-02` fechou o empacotamento com 15 perfis determinísticos por família de rota
+(`scripts/build_css_profiles.py`), servidos no lugar do `shell.bundle.css` pelo
+`shell_css_profile` (`core/context_processors.py`). `CSS_ROUTE_PROFILES_ENABLED` tem padrão
+**`true`** em `config/settings/base.py:25` e não aparece no `.env.example` — está ligado em
+produção.
+
+O manifesto guarda o hash das regras que **casaram** na captura, e a captura roda em UMA
+passagem, no tema claro. Nenhuma regra dentro de `html[data-theme="dark"]` casa nessa passagem,
+então o bloco de tokens do tema escuro é podado dos **15** perfis. A expansão do
+`_with_dom_families` não cobre o caso: ela só devolve estado interativo
+(`hover`/`focus`/`checked`), não variante de tema.
+
+**Medido no navegador**, mesma rota (`/oficios/`), mesmo tema (`localStorage.theme = "dark"`,
+com o `data-theme="dark"` que o `theme-init.js` escreve), só trocando
+`CSS_ROUTE_PROFILES_ENABLED`:
+
+| token | perfis ligados | perfis desligados (correto) |
+|---|---|---|
+| `--color-bg` | `#f7fbff` | `#0d1725` |
+| `--color-text` | `#132238` | `#f0f6ff` |
+| `--color-card` | `#ffffff` | `#132238` |
+| `--color-card-muted` | `#e3eaf2` | `#111e2f` |
+| `--color-accent` | `#155b9a` | `#d8a21b` |
+
+Ou seja: **o tema escuro não existe nas 42 rotas com perfil.** A rota sem perfil (`login`) e a
+casca pública, que carregam o bundle inteiro, continuam certas — o que explica o defeito ter
+passado: quem conferiu o tema escuro numa tela pública viu tudo certo.
+
+Por que a paridade perfil/bundle do `PF-02` não pegou: ela comparou estilo computado dos
+elementos presentes, e naquele momento nenhuma regra entregue consumia os tokens podados de um
+jeito que mudasse pixel na captura clara. Podar uma DECLARAÇÃO de token não muda nada até alguém
+lê-la — e no tema claro ninguém lia a versão escura.
+
+**Duas saídas, e elas não são equivalentes:**
+
+1. **Mitigação imediata** — `CSS_ROUTE_PROFILES_ENABLED=false` no `.env` de produção. Devolve o
+   tema escuro no próximo request, sem deploy de código, e custa os bytes que o `PF-02` economizou.
+2. **Conserto** — o podador nunca deve descartar bloco que só declara custom property. É o mesmo
+   tratamento que `_render_rules` já dá a `@import`, `@font-face` e `@property`: entra sempre,
+   porque a cobertura do CDP não sabe medi-lo. Depois, recapturar e reconferir a paridade **nos
+   dois temas**, que é o furo do processo de captura.
+
+Encosta no `NOVO-20260820-171008-7afb74d82d2c`: a decisão de estender os perfis ao `ui.bundle.css`
+não deve sair antes deste conserto, ou o mesmo corte de tema atingiria também o v2 — hoje o v2
+escapa só porque `ui.bundle.css` não passa pelo podador.
