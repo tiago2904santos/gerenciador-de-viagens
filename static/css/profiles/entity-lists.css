@@ -1197,10 +1197,6 @@ html[data-theme="light"] {
   overflow:       visible;
   width:          100%;
 }
-html[data-theme="dark"] body {
-  background-attachment: fixed;
-  
-}
 html[data-theme="dark"] ::selection {
   background: var(--color-selection);
   color: var(--color-heading);

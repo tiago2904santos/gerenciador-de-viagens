@@ -1624,21 +1624,15 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
 
    Esta regra quase saiu na poda de 2026-08-20 por parecer inerte. A medição não
    a pegou porque `background-attachment` não estava na lista de propriedades
-   medidas — falha do método, não da regra. Quem achou foi um print rolado. Se
-   for medir de novo, meça as quatro propriedades de fundo, não só cor e imagem.
+   medidas — a falha era do método, não da regra. Quem achou foi um print
+   rolado. Se for medir de novo, meça as quatro de fundo, não só cor e imagem.
 
-   O CORPO DA REGRA ABAIXO É INTOCÁVEL, comentário interno incluído: o
-   `css_profiles_manifest.json` indexa regra pelo sha256 do texto serializado, e
-   comentário DENTRO das chaves entra no hash. Tirar aquele parágrafo daqui já
-   apagou esta regra dos quinze `profiles/*.css` uma vez, e o fundo preto voltou
-   em 21 das 33 telas medidas — as servidas por perfil. */
+   `font-family` saiu daqui: virou `--font-sans` em `tokens.css`, valendo nos
+   dois temas (`NOVO-62`). `-webkit-font-smoothing` saiu no `NOVO-58` (E8) e
+   virou regra base em `base/base.css` — era 48,2% da divergência não-cor do
+   sistema. Se voltarem a ser declarados aqui, a divergência volta com eles. */
 html[data-theme="dark"] body {
   background-attachment: fixed;
-  /* NOVO-58 (E8): `-webkit-font-smoothing` saiu daqui e virou regra base em
-     `base/base.css`, junto de `font-family` e `line-height`. Era 48,2% da
-     divergência não-cor do sistema — a maior fatia isolada, e maior que as
-     quatro famílias catalogadas da E8 somadas. Se voltar a ser declarado aqui,
-     a divergência volta com ele. */
 }
 
 html[data-theme="dark"] ::selection {
