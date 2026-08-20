@@ -51,22 +51,6 @@
   width: 8px;
 }
 
-.notice__title {
-  color: inherit;
-  display: block;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  grid-column: 2;
-}
-
-.notice__message {
-  color: inherit;
-  display: block;
-  font-weight: var(--font-weight-semibold);
-  grid-column: 2;
-  line-height: 1.45;
-}
-
 /* Variante info */
 .notice--info,
 .pte-events__banner {
@@ -77,23 +61,6 @@
 
 .notice--info::before {
   background: var(--color-info);
-}
-
-/* Banner PTE: layout flex com ícone (sem marcador circular) */
-.pte-events__banner,
-.notice.pte-events__banner {
-  align-items: center;
-  display: flex;
-  font-size: var(--font-size-sm, 0.875rem);
-  gap: var(--space-2);
-  grid-template-columns: unset;
-  line-height: 1.4;
-}
-
-.pte-events__banner::before,
-.notice.pte-events__banner::before {
-  content: none;
-  display: none;
 }
 
 /* Variante success */

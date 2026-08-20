@@ -30,15 +30,6 @@
   margin-bottom: 0;
 }
 
-/* ============================================================
-   Painel grid do design system.
-   Tokens de rota; caixa extra só em .app-form-grid-panel.
-   ============================================================ */
-
-.app-form-grid-panel.align-items-end {
-  align-items: end;
-}
-
 /* --------------------------------------------------------------------------
    2. Campos e controles
    -------------------------------------------------------------------------- */
@@ -72,19 +63,6 @@
   height: 18px;
   min-height: 18px;
   width: 18px;
-}
-
-.app-page--roteiros-form .btn-outline-secondary {
-  background: var(--route-button-secondary-bg);
-  border-color: var(--route-button-secondary-border);
-  color: var(--route-button-secondary-text);
-}
-
-.app-page--roteiros-form .btn-outline-secondary:hover,
-.app-page--roteiros-form .btn-outline-secondary:focus-visible {
-  background: var(--route-button-secondary-hover-bg);
-  border-color: var(--route-button-secondary-hover-border);
-  color: var(--route-button-secondary-text);
 }
 
 .form-actions,
@@ -145,18 +123,6 @@
   box-shadow: none;
 }
 
-.app-card-toggle.is-checked .app-card-toggle__icon {
-  background: var(--color-success-soft);
-  border-color: var(--color-success-border-soft);
-  color: color-mix(in srgb, var(--color-success) 75%, var(--color-heading));
-}
-
-.app-card-toggle.is-checked .app-card-toggle__state {
-  background: color-mix(in srgb, var(--color-success) 16%, var(--color-success-soft));
-  box-shadow: none;
-  color: color-mix(in srgb, var(--color-success) 75%, var(--color-heading));
-}
-
 .app-card-toggle.is-disabled {
   cursor: not-allowed;
   opacity: 0.68;
@@ -168,12 +134,6 @@
   transform: none;
 }
 
-.field-control-row .form-select,
-.field-control-row .form-control {
-  flex: 1 1 0;
-  min-width: 0;
-}
-
 /* --------------------------------------------------------------------------
    5. Responsividade de acao lateral
    -------------------------------------------------------------------------- */
@@ -183,16 +143,6 @@
     grid-template-columns: auto minmax(0, 1fr);
     width: 100%;
   }
-}
-
-/* --------------------------------------------------------------------------
-   6. Estados de bloqueio e placeholders
-   -------------------------------------------------------------------------- */
-/* RG travado quando "Não possui RG" */
-.field-rg-wrap.field--locked .form-control {
-  background: var(--color-input-disabled-bg);
-  color: var(--color-input-disabled-text);
-  cursor: not-allowed;
 }
 
 .form-control::placeholder,
@@ -212,13 +162,6 @@ textarea[readonly] {
   border-color: var(--color-border);
   color: var(--color-input-disabled-text);
   opacity: 1;
-}
-
-.field-rg-wrap.field--locked label::after {
-  color: var(--color-help);
-  content: " — bloqueado";
-  font-size: var(--font-size-xs);
-  font-weight: 700;
 }
 
 html[data-theme="dark"] .form-check-input,
@@ -264,234 +207,4 @@ html[data-theme="dark"] input[type="checkbox"] {
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-soft);
   padding: var(--space-5);
-}
-
-/* ==========================================================================
-   ALIASES CANONICOS DO DESIGN SYSTEM — Fase 10: Wizard shell
-   .app-wizard-* e .app-stepper-* como aliases de .travel-document-wizard-* e
-   .oficio-stepper-*. Classes originais nao removidas.
-   Tratamento visual completo aqui: garante que o wizard funcione mesmo
-   sem oficios.css carregado (ex.: cache antigo de style.css).
-   ========================================================================== */
-
-.app-wizard {
-  container-type: inline-size;
-}
-
-/* ==========================================================================
-   Painel de formulário (cadastros) — altura e alinhamento unificados
-   ========================================================================== */
-
-.main-form-panel {
-  --field-bg: var(--color-input-bg);
-  --field-bg-soft: var(--field-bg-hover);
-  --field-border: var(--color-input-border);
-  --field-border-hover: var(--color-border-strong);
-  --field-border-focus: var(--input-border-focus);
-  --field-text: var(--color-input-text);
-}
-
-.main-form-panel .field,
-.main-form-panel .app-form-field,
-.main-form-panel .cv-field {
-  --field-bg: var(--color-input-bg);
-  --field-bg-soft: var(--field-bg-hover);
-  --field-border: var(--color-input-border);
-  --field-border-hover: var(--color-border-strong);
-  --field-border-focus: var(--input-border-focus);
-  --field-text: var(--color-input-text);
-  --field-focus-ring: var(--input-focus-ring);
-  --form-control-height: var(--control-height-md);
-  align-content: start;
-  gap: var(--space-2);
-}
-
-.main-form-panel .app-form-label,
-.main-form-panel .cv-field__label,
-.main-form-panel .search-picker__label {
-  color: var(--color-label);
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  line-height: 1.2;
-  margin: 0;
-  min-height: calc(var(--font-size-sm) * 1.2);
-}
-
-.main-form-panel .form-control {
-  background:
-    linear-gradient(var(--field-bg), var(--field-bg)) padding-box,
-    linear-gradient(var(--field-border), var(--field-border)) border-box;
-  border: 1px solid transparent;
-  border-radius: var(--radius-control);
-  box-shadow: var(--shadow-xs);
-  box-sizing: border-box;
-  color: var(--field-text);
-  height: var(--form-control-height);
-  line-height: 1.25;
-  max-height: var(--form-control-height);
-  min-height: var(--form-control-height);
-  padding: 0 var(--space-3);
-  transition:
-    background var(--transition-fast),
-    box-shadow var(--transition-fast);
-}
-
-/* HT-01: `outline: none` sem substituto, em `.form-control` que aparece em 21
-   templates. O `:focus` fica (mouse continua sem chrome, que era a intencao);
-   o `:focus-visible` sai, e quem manda nele agora e o piso em `base.css`. */
-.main-form-panel .form-control:focus:not(:focus-visible) {
-  outline: none;
-}
-
-.main-form-panel .form-control::placeholder {
-  color: var(--color-input-placeholder);
-  opacity: 1;
-}
-
-.main-form-panel select:not([class]),
-.main-form-panel .form-select,
-.main-form-panel select.form-select {
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352657a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
-    no-repeat right var(--space-3) center / 16px 16px,
-    linear-gradient(var(--field-bg), var(--field-bg)) padding-box,
-    linear-gradient(var(--field-border), var(--field-border)) border-box;
-  border: 1px solid transparent;
-  border-radius: var(--radius-control);
-  box-shadow: var(--shadow-xs);
-  box-sizing: border-box;
-  color: var(--field-text);
-  height: var(--form-control-height);
-  max-height: var(--form-control-height);
-  min-height: var(--form-control-height);
-  padding: 0 calc(var(--space-6) + var(--space-2)) 0 var(--space-3);
-  transition:
-    background var(--transition-fast),
-    box-shadow var(--transition-fast);
-}
-
-.main-form-panel select:not([class]):focus,
-.main-form-panel select:not([class]):focus-visible,
-.main-form-panel .form-select:focus,
-.main-form-panel .form-select:focus-visible,
-.main-form-panel select.form-select:focus,
-.main-form-panel select.form-select:focus-visible {
-  outline: none;
-}
-
-.main-form-panel .custom-select__trigger {
-  background:
-    linear-gradient(var(--field-bg), var(--field-bg)) padding-box,
-    linear-gradient(var(--field-border), var(--field-border)) border-box;
-  border: 1px solid transparent;
-  box-shadow: var(--shadow-xs);
-  color: var(--field-text);
-}
-
-.main-form-panel .custom-select__trigger:focus,
-.main-form-panel .custom-select__trigger:focus-visible {
-  outline: none;
-}
-
-.main-form-panel .custom-select--open:not(.custom-select--menu-portal) .custom-select__trigger {
-  box-shadow: none;
-}
-
-.main-form-panel .custom-select__trigger,
-.main-form-panel .search-picker__control {
-  box-sizing: border-box;
-  height: var(--form-control-height);
-  max-height: var(--form-control-height);
-  min-height: var(--form-control-height);
-}
-
-.main-form-panel .field-with-action {
-  align-items: center;
-  min-height: var(--form-control-height);
-}
-
-.main-form-panel .field-with-action .custom-select {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.main-form-panel .field-with-action .custom-select__trigger {
-  width: 100%;
-}
-
-/* Gerenciar: input encolhe no hover; botão absoluto por cima, à direita */
-.main-form-panel .field-with-action--manage-reveal {
-  --field-manage-btn-size: var(--form-control-height);
-  --field-manage-btn-gap: var(--space-2);
-  display: block;
-  gap: 0;
-  min-height: var(--form-control-height);
-  overflow: visible;
-  position: relative;
-}
-
-.main-form-panel .field-with-action--manage-reveal > .custom-select,
-.main-form-panel .field-with-action--manage-reveal > .form-control,
-.main-form-panel .field-with-action--manage-reveal > .form-select,
-.main-form-panel .field-with-action--manage-reveal > select {
-  box-sizing: border-box;
-  display: block;
-  max-width: 100%;
-  min-width: 0;
-  position: relative;
-  transition: width var(--transition-fast), max-width var(--transition-fast);
-  width: 100%;
-  z-index: 2;
-}
-
-.main-form-panel .field-with-action--manage-reveal:hover > .custom-select,
-.main-form-panel .field-with-action--manage-reveal:focus-within > .custom-select,
-.main-form-panel .field-with-action--manage-reveal:hover > .form-control,
-.main-form-panel .field-with-action--manage-reveal:focus-within > .form-control,
-.main-form-panel .field-with-action--manage-reveal:hover > .form-select,
-.main-form-panel .field-with-action--manage-reveal:focus-within > .form-select,
-.main-form-panel .field-with-action--manage-reveal:hover > select,
-.main-form-panel .field-with-action--manage-reveal:focus-within > select {
-  max-width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
-  width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
-}
-
-.main-form-panel .field-with-action--manage-reveal .custom-select__trigger {
-  width: 100%;
-}
-
-/* Painel de motoristas fixos — desce ao ativar "Com Motorista" */
-.main-form-panel .viatura-motoristas-panel {
-  display: grid;
-  grid-template-rows: 0fr;
-  opacity: 0;
-  overflow: hidden;
-  transition:
-    grid-template-rows 0.35s ease,
-    opacity 0.3s ease;
-  width: 100%;
-}
-
-.main-form-panel .viatura-motoristas-panel--open {
-  grid-template-rows: 1fr;
-  opacity: 1;
-}
-
-.main-form-panel .viatura-motoristas-panel__inner {
-  min-height: 0;
-  overflow: hidden;
-  transform: translateY(-0.5rem);
-  transition: transform 0.35s ease;
-}
-
-.main-form-panel .viatura-motoristas-panel--open .viatura-motoristas-panel__inner {
-  transform: translateY(0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .main-form-panel .viatura-motoristas-panel,
-  .main-form-panel .viatura-motoristas-panel__inner {
-    transition: none;
-  }
 }

@@ -681,14 +681,6 @@ textarea[readonly] {
   color: var(--color-input-disabled-text, var(--color-text-muted, var(--color-muted)));
   opacity: 1;
 }
-.main-form-panel {
-  --field-bg: var(--color-input-bg);
-  --field-bg-soft: var(--field-bg-hover);
-  --field-border: var(--color-input-border);
-  --field-border-hover: var(--color-border-strong);
-  --field-border-focus: var(--input-border-focus);
-  --field-text: var(--color-input-text);
-}
 html[data-theme="dark"] {
   --color-danger-bg: rgba(180, 35, 24, 0.22);
   --color-danger-text: #ffc8c2;
@@ -1376,52 +1368,11 @@ html[data-theme="light"] {
   --stepper-status-current-color: var(--color-accent);
   --stepper-status-missing-color: var(--color-danger);
 }
-.page-shell {
-  box-sizing:     border-box;
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--page-shell-gap);
-  max-width:      var(--page-shell-max-width);
-  position:       relative;
-  width:          100%;
-  z-index:        var(--z-page-shell);
-}
-.page-shell--standard-simple > .main-form-panel,
-.cv-page--narrow > .main-form-panel {
-  margin-inline: auto;
-  max-width: var(--layout-form-panel-max-width);
-  width: 100%;
-}
-.main-form-panel {
-  background:     var(--surface-form-panel);
-  border:         1px solid var(--border-form-panel);
-  border-radius:  var(--form-panel-radius);
-  box-shadow:     var(--shadow-form-panel);
-  box-sizing:     border-box;
-  display:        flex;
-  flex-direction: column;
-  overflow:       visible;
-  width:          100%;
-}
-.main-form-panel .field-grid,
-.main-form-panel .field,
-.main-form-panel .cv-field,
-.main-form-panel .search-picker,
-.main-form-panel .custom-select,
-.main-form-panel .field-with-action {
-  overflow: visible;
-}
 .section-header__description {
   color:       var(--theme-text-muted);
   font-size:   var(--font-size-sm);
   line-height: 1.5;
   margin:      0;
-}
-@media (max-width: 840px) {
-.page-shell {
-    gap:           var(--space-4);
-    padding-block: var(--space-4);
-  }
 }
 :root {
   --action-height: var(--control-height-md);
@@ -1556,11 +1507,6 @@ html[data-theme="dark"] {
   --action-modal-shadow: 0 30px 86px rgba(0, 0, 0, 0.58);
   --action-modal-backdrop: rgba(2, 8, 15, 0.78);
 }
-.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) {
-  display: grid;
-  gap: 0;
-  overflow: hidden;
-}
 html[data-theme="dark"] body {
   background-attachment: fixed;
   
@@ -1573,14 +1519,4 @@ html[data-theme="dark"] :is(input, select, textarea) {
   background: var(--color-input-bg);
   border-color: var(--color-input-border);
   color: var(--color-input-text);
-}
-:is(html[data-theme="dark"])
-  .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) {
-  background: var(--card-family-bg);
-  border: 1px solid var(--card-family-border);
-  box-shadow: var(--card-family-shadow);
-}
-:is(html[data-theme])
-  .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) {
-  border-radius: 16px;
 }

@@ -16,8 +16,9 @@ nenhuma precise conhecê-lo. Proibir isso obrigaria a duplicar as 55 regras sob
 seletor de container, subindo especificidade — que é a dívida que a Fase 7 veio
 pagar, não contrair.
 
-Os quatro sites que exercem essa permissão estão anotados no CSS, cada um
-dizendo qual regra global ele dirige.
+Os quatro sites que exerciam essa permissão morreram em 2026-08-20, com os
+cartões do wizard do sistema antigo. A permissão continua valendo; quando um
+site voltar, ele mora no arquivo do componente que o exerce.
 """
 
 from __future__ import annotations
@@ -108,25 +109,34 @@ class TokenGlobalMoraEmDuasCamadasTests(SimpleTestCase):
             "base/theme.css voltou — era a terceira camada que a E7 dissolveu",
         )
 
-    def test_a_re_ligacao_com_escopo_continua_permitida(self):
+    def test_a_re_ligacao_com_escopo_so_acontece_em_componente(self):
         """A regra é sobre escopo raiz, não sobre o prefixo do nome.
 
-        Se este teste falhar é porque alguém apertou a catraca para banir
-        re-ligação de componente também. Antes de "consertar" o CSS, leia o
-        docstring do módulo: os quatro sites existem para dirigir 55 regras
-        globais, e removê-los duplica as 55 sob seletor de container.
+        Re-ligar um token global dentro de um seletor de COMPONENTE continua
+        permitido — é assim que um container dirige as 55 regras globais que
+        leem `--color-input-bg` e `--color-focus` sem que nenhuma delas precise
+        conhecê-lo.
+
+        2026-08-20: os quatro sites que exerciam a permissão morreram junto com
+        os cartões do wizard do sistema antigo (`.travel-document-card` e
+        irmãos), que nenhum template emitia mais. A permissão fica; o que este
+        teste guarda é o LUGAR dela — quando um site voltar, ele tem de estar no
+        arquivo de um componente, nunca numa das duas camadas de token.
         """
-        com_escopo = 0
+        fora_de_lugar = []
         for arquivo in _fontes():
-            if arquivo.relative_to(CSS).as_posix() in CAMADAS:
-                continue
+            relativo = arquivo.relative_to(CSS).as_posix()
             for seletor, corpo in _blocos(arquivo.read_text(encoding="utf-8")):
                 if _e_escopo_raiz(seletor):
                     continue
-                com_escopo += sum(
-                    1 for nome in DEFINICAO.findall(corpo) if nome.startswith(FAMILIAS)
-                )
-        self.assertGreater(com_escopo, 0, "a permissão sumiu do CSS sem passar por aqui")
+                for nome in DEFINICAO.findall(corpo):
+                    if nome.startswith(FAMILIAS) and relativo in CAMADAS:
+                        fora_de_lugar.append(f"{relativo}: {nome} sob {seletor.strip()[:40]}")
+        self.assertEqual(
+            fora_de_lugar,
+            [],
+            "re-ligação de token global dentro de uma camada de token — ver UI-03",
+        )
 
     def test_o_bloco_escuro_herdado_ficou_antes_do_bloco_proprio(self):
         """Ordem, não conteúdo — e é o detalhe que mudaria cor em silêncio.

@@ -1,65 +1,9 @@
-/* NOVO-120: as regras que davam superfície, raio e padding próprios aos
-   campos e blocos dentro dos wizards de documento foram removidas. Elas
-   duplicavam — com `!important` — o que os componentes globais de
-   `static/css/ui/` agora fazem, e o resultado eram duas camadas disputando
-   a mesma peça. O componente é a fonte única. */
 
-/*
- * theme-shared-components.css - contratos visuais compartilhados entre temas.
- *
- * Extraido da antiga camada transitoria escura na E9 (UI-02). Regras aqui
- * nao escolhem paleta: descrevem geometria, composicao e estados comuns.
- */
-
-:is(html[data-theme])
-  .empty-state--compact :is(.empty-state__title, .empty-state__message) {
-  margin-inline: 0;
-}
 
 :is(html[data-theme])
   :is(.page-shell--wizard, .cv-page--flow) {
   --form-section-header-padding: 12px 18px 12px 30px;
   --form-section-body-padding: 16px 18px;
-}
-
-/* Título livre do evento: quebra em até duas linhas no list-header. */
-:is(html[data-theme])
-  .evento-guided-page
-  .list-header--wizard-band
-  .list-header__title {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  overflow-wrap: anywhere;
-  text-overflow: ellipsis;
-  white-space: normal;
-}
-
-:is(html[data-theme])
-  .form-card > .cv-form-section-header {
-  --_wizard-filete-left: 14px;
-  min-height: 58px;
-}
-
-:is(html[data-theme])
-  .form-card > .quick-create-panel__header.cv-form-section-header {
-  padding-left: 34px;
-}
-
-:is(html[data-theme])
-  .form-card > .form-section-body {
-  display: grid;
-  gap: 10px;
-  padding: 14px;
-}
-
-:is(html[data-theme])
-  .document-form-page
-  .termo-documentos-preview
-  .oficio-documentos-preview-section__body {
-  display: grid;
-  gap: var(--space-4, 1rem);
 }
 
 /* Controles da ficha: superfícies sólidas, raios menores e nenhuma luz de
@@ -155,82 +99,6 @@
 :is(html[data-theme])
   .cv-module-card {
   border-radius: 14px;
-}
-
-:is(html[data-theme])
-  .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) {
-  border-radius: 16px;
-}
-
-@media (max-width: 640px) {
-  :is(html[data-theme])
-    .main-form-panel > .form-section > .section-header {
-    padding: var(--space-4) var(--space-4) var(--space-4) var(--space-8);
-  }
-
-  :is(html[data-theme])
-    .main-form-panel > .form-section > .section-header::before {
-    left: var(--space-4);
-  }
-}
-
-:is(html[data-theme])
-  .record-card {
-  border-radius: 16px;
-}
-
-:is(html[data-theme])
-  .record-card {
-  background: var(--card-family-bg);
-  border: 1px solid var(--card-family-border);
-  box-shadow: var(--card-family-shadow);
-  transform: none;
-}
-
-:is(html[data-theme])
-  .record-card:hover {
-  box-shadow: var(--card-family-shadow);
-  transform: none;
-}
-
-:is(html[data-theme])
-  .record-card__id-row {
-  background: var(--card-family-header-bg);
-  background-image: var(--card-family-header-image);
-  border-bottom-color: var(--card-family-border-strong);
-}
-
-:is(html[data-theme])
-  .record-card__id-row::before {
-  background: var(--card-family-accent-bg);
-  box-shadow: var(--card-family-accent-shadow);
-  width: var(--card-family-accent-width);
-}
-
-:is(html[data-theme])
-  .record-card__info-value {
-  color: var(--color-heading);
-  font-size: clamp(1rem, 1.5vw, 1.35rem);
-  font-weight: 750;
-}
-
-/* Título do card de lista com a mesma linguagem tipográfica do título dos
-   cards de formulário (.form-section-title): uppercase, extrabold,
-   letter-spacing e glow do acento. Só o item de título do id-row (o rótulo
-   pequeno acima permanece como está). */
-:is(html[data-theme])
-  .record-card__id-row .record-card__info-value {
-  color: var(--theme-text-heading, var(--color-heading));
-  font-size: clamp(0.92rem, 1.15vw, 1.05rem);
-  font-weight: var(--font-weight-extrabold);
-  letter-spacing: 0.05em;
-  text-shadow: 0 1px 6px color-mix(in srgb, var(--color-accent) 20%, transparent);
-  text-transform: uppercase;
-}
-
-:is(html[data-theme])
-  .record-card__id-row .record-card__info-value--wrap {
-  letter-spacing: 0.03em;
 }
 
 :is(html[data-theme])

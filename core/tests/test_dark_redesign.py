@@ -85,7 +85,6 @@ class DarkRedesignContractTests(SimpleTestCase):
             ">>> css/actions/action-system.css >>>"
         )
         action_system_index = bundle.index(">>> css/actions/action-system.css >>>")
-        form_panel_index = bundle.index(">>> css/fields/form-panel.css >>>")
         theme_shared_components_index = bundle.index(
             ">>> css/components/theme-shared-components.css >>>"
         )
@@ -105,7 +104,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         # descrevia como "compat residual", e nenhuma tela emitia as classes dela.
         # `lists/record-list.css` saiu em 2026-08-20: das nove regras dela só a
         # pilha continuava viva, e foi para `v2/record.css`.
-        self.assertLess(action_system_index, form_panel_index)
+        self.assertLess(action_system_index, theme_dark_components_index)
         # `layout/app-shell.css` saiu do shell em 2026-08-20 junto com a pasta
         # `layout/`: a casca virou `v2/shell.css` e viaja no pacote do v2.
         # `lists/content-cards.css` saiu pelo mesmo motivo — o cartão de módulo
@@ -115,7 +114,6 @@ class DarkRedesignContractTests(SimpleTestCase):
         # saiu no mesmo dia: o diálogo global de `core/app.js` passou a montar o
         # `<dialog class="modal">` do v2, e a folha do `cv-dialog` ficou sem
         # nenhuma marcação para vestir.
-        self.assertLess(form_panel_index, theme_dark_components_index)
         self.assertLess(theme_dark_components_index, theme_shared_components_index)
         self.assertLess(action_system_index, theme_dark_components_index)
 
@@ -226,19 +224,26 @@ class DarkRedesignContractTests(SimpleTestCase):
         )
 
     def test_event_stepper_uses_one_shared_ring_and_shared_typography(self):
-        # Decisão visual do dono em 11/08/2026: um anel no passo ativo.
-        self.assertIn(
-            "0 0 0 3px color-mix(",
-            self.page_shell_css,
-        )
-        self.assertIn(
-            ':is(html[data-theme])\n  .list-header--wizard-stepper\n  .page-stepper__eyebrow',
-            self.list_header_css,
-        )
-        self.assertNotIn(
-            ':is(html[data-theme="dark"])\n  .list-header--wizard-stepper\n  .page-stepper__eyebrow',
-            self.list_header_css,
-        )
+        """Um anel no passo ativo, e a mesma tipografia nos dois temas.
+
+        A decisão é do dono (11/08/2026) e continua valendo; o que mudou foi
+        onde ela mora. O `page-stepper__*` era a fileira do sistema antigo e
+        morreu em 2026-08-20 — nenhum template a emitia desde que a etapa virou
+        `c-v2.stepper`, e as regras que restavam vestiam ar.
+        """
+        stepper = (
+            Path(settings.BASE_DIR) / "static" / "css" / "v2" / "stepper.css"
+        ).read_text(encoding="utf-8")
+
+        # O anel: um só, no nó da etapa atual, e sem aumentar o círculo.
+        self.assertIn("box-shadow: 0 0 0 5px color-mix(", stepper)
+        self.assertEqual(stepper.count("box-shadow: 0 0 0 5px color-mix("), 1)
+
+        # Tipografia compartilhada: o rótulo é descrito uma vez, sob a raiz dos
+        # dois temas, e o escuro não redeclara nada dele.
+        self.assertIn(":is(html[data-theme]) .stepper__label {", stepper)
+        self.assertNotIn(':is(html[data-theme="dark"]) .stepper__label', stepper)
+        self.assertNotIn('html[data-theme="dark"] .stepper__label', stepper)
 
     def test_custom_select_v2_uses_one_geometry_for_both_themes(self):
         # NOVO-112: o claro espelha o escuro; somente os tokens de paleta mudam.
@@ -261,10 +266,12 @@ class DarkRedesignContractTests(SimpleTestCase):
     def test_entity_cards_use_one_structure_for_both_themes(self):
         # NOVO-113: listas claras e escuras compartilham geometria e tipografia;
         # apenas os tokens de paleta mudam o resultado visual.
+        # `.record-card`, `.record-card__id-row` e `.record-card__info-value`
+        # saíram em 2026-08-20: o cartão de lista é `c-v2.record` desde a
+        # migração das listas, e as três regras vestiam marcação que nenhum
+        # template emite. O que sobrou do vocabulário antigo — a faixa do cartão
+        # de OS e a perna do itinerário — continua medido aqui.
         selectors = (
-            ".record-card {",
-            ".record-card__id-row {",
-            ".record-card__id-row .record-card__info-value {",
             ":is(.fact-block, .person-row, .record-card__subcard) {",
             ".itinerary__leg {",
         )
@@ -302,9 +309,20 @@ class DarkRedesignContractTests(SimpleTestCase):
         for contract in dark_contracts:
             self.assertIn(contract, self.tokens_css)
 
-        self.assertIn("--step1-surface: var(--wizard-card-bg);", self.desenho_css)
-        self.assertIn("--step1-panel: var(--wizard-panel-bg);", self.desenho_css)
-        self.assertIn("--step1-field: var(--wizard-field-bg);", self.desenho_css)
+        # A LIGAÇÃO entre `--wizard-*` e `--step1-*` era feita numa regra presa
+        # aos cartões do wizard antigo (`.travel-document-card`,
+        # `.oficio-roteiro-card` e mais três), e os cinco deixaram de ser
+        # emitidos — a etapa é `c-v2.form_block` desde a migração dos wizards.
+        # A regra saiu em 2026-08-20; os tokens ficam, porque é deles que a
+        # decisão do dono (painel azul-cinza, campo branco) é feita, e o v2 os
+        # lê pela escada de superfície.
+        for morta in (
+            "--step1-surface: var(--wizard-card-bg);",
+            "--step1-panel: var(--wizard-panel-bg);",
+            "--step1-field: var(--wizard-field-bg);",
+        ):
+            with self.subTest(ligacao=morta):
+                self.assertNotIn(morta, self.desenho_css)
 
     def test_templates_do_not_reintroduce_inline_visual_or_event_contracts(self):
         templates = Path(settings.BASE_DIR) / "templates"
@@ -880,81 +898,68 @@ class DarkRedesignContractTests(SimpleTestCase):
                 self.assertIn("var(--color-primary", declaration)
                 self.assertNotIn("var(--color-accent", declaration)
 
-    def test_dark_wizard_filete_stays_gold_and_tracks_header_content(self):
+    def test_o_filete_do_wizard_antigo_nao_voltou(self):
+        """O filete dourado era do cabeçalho de seção do sistema antigo.
+
+        `--_wizard-filete-*` desenhava a listra vertical de
+        `.cv-form-section-header`, que saiu em 2026-08-20 com o resto do casco.
+        No v2 quem marca a seção é o título do `form_block`, sem listra: um
+        bloco não precisa de duas marcas para dizer onde começa.
+        """
         page_shell = (
             Path(settings.BASE_DIR) / "static" / "css" / "layout" / "page-shell.css"
         ).read_text(encoding="utf-8")
+        self.assertNotIn("--_wizard-filete", page_shell)
+        self.assertNotIn(".cv-form-section-header", page_shell)
 
-        self.assertIn("--_wizard-filete-inset-block", page_shell)
-        self.assertIn("bottom:        var(--_wizard-filete-inset-block);", page_shell)
-        self.assertIn("top:           var(--_wizard-filete-inset-block);", page_shell)
-        self.assertIn("height:        auto;", page_shell)
-        self.assertIn(
-            "padding: var(--space-3) var(--space-4) var(--space-3) var(--space-8);",
-            page_shell,
-        )
+    def test_o_casco_antigo_nao_centraliza_mais_nada(self):
+        """`page-shell--standard-simple > .main-form-panel` não existe mais.
 
-        dark_filete_rule = self.css.split(".cv-form-section-header::before", 1)[1]
-        dark_filete_rule = dark_filete_rule.split("}", 1)[0]
-        self.assertIn("var(--card-family-accent-bg)", dark_filete_rule)
-        self.assertNotIn("var(--color-primary-bright)", dark_filete_rule)
-
-    def test_standard_simple_centers_a_tokenized_compact_panel(self):
+        Era o painel centrado com largura máxima do sistema antigo. As cinco
+        telas que o usavam migraram em 2026-08-20 (índice de Documentos, modelos
+        de texto, as duas prévias de termo e a espera de geração): a casca do v2
+        é a `form-page`, e a largura vem do `content-wrap`.
+        """
         page_shell = (
             Path(settings.BASE_DIR) / "static" / "css" / "layout" / "page-shell.css"
         ).read_text(encoding="utf-8")
-        # `H-05`/Fase 9: o seletor ganhou o alias `cv-page--narrow` na mesma regra.
-        marker = ".page-shell--standard-simple > .main-form-panel"
-        self.assertIn(marker, page_shell)
-        standard_simple = page_shell.split(marker, 1)[1]
-        # Pula aliases agrupados até o bloco `{ ... }`
-        standard_simple = standard_simple.split("{", 1)[1].split("}", 1)[0]
-
-        self.assertIn("max-width: var(--layout-form-panel-max-width);", standard_simple)
-        self.assertIn("margin-inline: auto;", standard_simple)
+        self.assertNotIn(".page-shell--standard-simple", page_shell)
+        self.assertNotIn(".main-form-panel", page_shell)
         self.assertIn("css/shell.bundle.css", self.base)
-        bundle = (
-            Path(settings.BASE_DIR) / "static" / "css" / "shell.bundle.css"
-        ).read_text(encoding="utf-8")
-        self.assertIn(">>> css/layout/page-shell.css >>>", bundle)
 
-    def test_list_and_form_cards_share_the_dark_card_family(self):
-        for token in (
-            "--card-family-bg:",
-            "--card-family-header-bg:",
-            "--card-family-header-image:",
-            "--card-family-border:",
-            "--card-family-shadow:",
-            "--card-family-accent-bg:",
-            "--card-family-accent-width:",
-        ):
-            with self.subTest(token=token):
-                self.assertIn(token, self.tokens_css)
+    def test_a_familia_de_cartao_do_sistema_antigo_nao_voltou(self):
+        """`--card-family-*` morreu com os três cartões que a consumiam.
 
-        wizard_header = self.css.rsplit(".cv-form-section-header {", 1)[1]
-        wizard_header = wizard_header.split("}", 1)[0]
-        list_header = self.css.split(".record-card__id-row {", 1)[1]
-        list_header = list_header.split("}", 1)[0]
+        O contrato original era "lista, wizard e formulário simples usam a MESMA
+        família de cartão" — sete tokens compartilhados por `.record-card`,
+        `.cv-form-section-header` e `.main-form-panel > .form-section >
+        .section-header`. Em 2026-08-20 os três deixaram de existir: a lista é
+        `c-v2.record`, o wizard é `c-v2.form_block` e o formulário simples é a
+        `form-page`. A família ficou sem consumidor.
 
-        for shared_token in (
-            "var(--card-family-header-bg)",
+        O que o v2 põe no lugar é a escada de superfície (`--surface-rail`,
+        `--surface-field`), que vale para os três pelo mesmo motivo: eles são a
+        mesma caixa em papéis diferentes.
+        """
+        for morta in (".record-card {", ".cv-form-section-header {"):
+            with self.subTest(seletor=morta):
+                self.assertNotIn(morta, self.desenho_css)
+
+        folhas = " ".join(
+            caminho.read_text(encoding="utf-8")
+            for caminho in (Path(settings.BASE_DIR) / "static" / "css").rglob("*.css")
+            if "bundle" not in caminho.name and "profiles" not in str(caminho)
+        )
+        # O CABEÇALHO da família e a listra de destaque morreram com os três
+        # cartões. `--card-family-bg`, `-border` e `-shadow` seguem vivos: a
+        # faixa do cartão de OS e a perna do itinerário ainda os leem, e são
+        # superfície, não cabeçalho.
+        for morto in (
             "var(--card-family-header-image)",
             "var(--card-family-border-strong)",
+            "var(--card-family-accent-bg)",
+            "var(--card-family-accent-shadow)",
+            "var(--card-family-accent-width)",
         ):
-            with self.subTest(shared_token=shared_token):
-                self.assertIn(shared_token, wizard_header)
-                self.assertIn(shared_token, list_header)
-
-        self.assertEqual(self.css.count(".record-card__id-row::before"), 1)
-
-        simple_form_header = self.css.rsplit(
-            ".main-form-panel > .form-section > .section-header {", 1
-        )[1].split("}", 1)[0]
-        simple_form_filete = self.css.rsplit(
-            ".main-form-panel > .form-section > .section-header::before {", 1
-        )[1].split("}", 1)[0]
-
-        self.assertIn("var(--card-family-header-bg)", simple_form_header)
-        self.assertIn("var(--card-family-header-image)", simple_form_header)
-        self.assertIn("var(--card-family-accent-bg)", simple_form_filete)
-        self.assertIn("var(--card-family-accent-width)", simple_form_filete)
+            with self.subTest(token=morto):
+                self.assertNotIn(morto, folhas)

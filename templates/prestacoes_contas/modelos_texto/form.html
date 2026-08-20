@@ -1,12 +1,20 @@
 {% extends "base.html" %}
+{% comment %}
+  Cadastro de modelo de texto das prestações.
+
+  Migrada para o v2 em 2026-08-20: era `page-shell page-shell--standard-simple`
+  com um `main-form-panel form-card` por dentro — o casco e o painel do sistema
+  antigo. A casca de cadastro do v2 é `form-page` + `form-page__form`, a mesma
+  de servidores, viaturas e configuração.
+{% endcomment %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--standard-simple">
+  <div class="form-page">
     <c-v2.header eyebrow="PRESTAÇÕES" :title="page_title" :description="page_description" icon_label="PC" module_label="Modelos de Texto" only />
 
-    <form class="main-form-panel form-card" method="post" novalidate>
+    <form class="form-page__form" method="post" novalidate>
       {% csrf_token %}
       <c-v2.form_block title="Dados do modelo" description="Escolha o campo, o nome e o texto do modelo." section_id="modelos-texto-form-section" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :element_id="element_id" :extra_class="extra_class" :heading_level="heading_level" :shell="shell" :variant="variant"><c-slot name="body">{% include "prestacoes_contas/modelos_texto/_form_body.html" with form=form only %}</c-slot></c-v2.form_block>
       {% with cotton_attr_primary_label=submit_label|default:"Salvar" %}<c-v2.card_footer secondary_label="Voltar" :secondary_url="back_url" :primary_label="cotton_attr_primary_label" only />{% endwith %}

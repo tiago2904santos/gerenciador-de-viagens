@@ -25,13 +25,6 @@
   transform: translateY(-2px);
 }
 
-/* Wizard Ofício: campos diretos no section-body devem ocupar largura total */
-.form-section-body > .cv-field,
-.form-section-body > .field {
-  align-self: stretch;
-  width: 100%;
-}
-
 /* Na etapa de justificativa, o campo "Modelo" precisa esticar a linha inteira. */
 .oficio-justificativa-card .wizard-inner-section > .field,
 .oficio-justificativa-card .wizard-inner-section > .app-form-field {
@@ -44,108 +37,9 @@
   scrollbar-width: thin;
 }
 
-/* Textarea de Motivo no wizard: visual idêntico ao input, só com altura maior */
-.travel-document-wizard .cv-field__control {
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-input-border);
-  border-radius: var(--radius-control);
-  box-shadow: var(--shadow-xs);
-  box-sizing: border-box;
-  color: var(--color-input-text);
-  font-size: var(--font-size-sm);
-  min-height: var(--control-height-md);
-  padding: var(--field-padding-y) var(--space-3);
-  transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast),
-    color var(--transition-fast);
-  width: 100%;
-}
-
-.travel-document-wizard .form-control:-webkit-autofill,
-.travel-document-wizard .form-control:-webkit-autofill:hover,
-.travel-document-wizard .form-control:-webkit-autofill:focus,
-.travel-document-wizard .cv-field__control:-webkit-autofill,
-.travel-document-wizard .cv-field__control:-webkit-autofill:hover,
-.travel-document-wizard .cv-field__control:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px var(--field-bg-soft, var(--color-input-bg)) inset, var(--field-shadow-focus);
-  -webkit-text-fill-color: var(--field-text, var(--color-input-text));
-  border-color: var(--field-border-focus, var(--field-focus-border));
-  caret-color: var(--field-text, var(--color-input-text));
-  color: var(--field-text, var(--color-input-text));
-}
-
-.travel-document-wizard .cv-field--readonly .cv-field__control,
-.travel-document-wizard .cv-field__control[readonly] {
-  background: var(--route-field-disabled-bg);
-  border-color: var(--color-border-strong);
-  box-shadow: none;
-  color: var(--color-input-text);
-  cursor: default;
-  opacity: 1;
-}
-
-.travel-document-wizard .cv-field__control--textarea {
-  height: var(--text-area-height-md);
-  min-height: var(--text-area-height-md);
-  max-height: none;
-  padding-bottom: var(--space-3);
-  padding-top: var(--space-3);
-  resize: vertical;
-  line-height: 1.5;
-}
-
-@media (max-width: 720px) {
-  .oficio-equipe-section__header .btn {
-    justify-content: center;
-    width: 100%;
-  }
-}
-
-.travel-document-wizard__main {
-  min-width: 0;
-}
-
-/* Botões do footer: altura padrão do sistema de botões */
-
-.travel-document-wizard__main .form-section-stack--comfortable {
-  --_stack-gap: var(--space-6);
-  gap:          var(--_stack-gap);
-}
-
-.travel-document-wizard__main .form-section-stack > form > .footer-actions,
-.travel-document-wizard__main .form-section-stack > .footer-actions {
-  margin-top: calc(-1 * var(--space-6));
-}
-
-.travel-document-wizard__main {
-  min-width: 0;
-}
-
-.oficio-data-grid__field > .field {
-  flex: 1 1 auto;
-}
-
-.oficio-data-observacao .field {
-  max-width: none;
-}
-
 .oficio-viatura-busca__wrap {
   position: relative;
   width: 100%;
-}
-
-.oficio-viatura-busca__dropdown.floating-dropdown--active {
-  border-radius: var(--radius-md);
-  z-index: calc(var(--z-dropdown) + 10);
-}
-
-/* Painel manual de viatura — escondido quando há viatura cadastrada vinculada.
-   Usa !important porque .form-field--hidden compete com .field-grid em
-   especificidade em alguns contextos do wizard. */
-.oficio-viatura-manual.form-field--hidden {
-  display: none !important;
 }
 
 /* Card da viatura selecionada — usa o slot do __driver-control para o
@@ -167,30 +61,6 @@
   text-decoration: none;
 }
 
-.motivo-card__footer .field-help {
-  margin-bottom: 0;
-}
-
-.motivo-card__model .form-select {
-  width: 100%;
-}
-
-.motivo-card__textarea .field {
-  max-width: none;
-}
-
-.motivo-card__textarea textarea.form-control {
-  min-height: 112px;
-  resize: vertical;
-  width: 100%;
-}
-
-@media (max-width: 600px) {
-  .motivo-card__actions .btn {
-    width: 100%;
-  }
-}
-
 /* --------------------------------------------------------------------------
    Wizard — Etapa 5 Documentos / resumo executivo
    -------------------------------------------------------------------------- */
@@ -201,11 +71,6 @@
   gap: var(--space-2);
   grid-template-columns: repeat(2, minmax(0, 1fr));
   min-width: 0;
-}
-
-.oficio-documentos-travellers-grid:not(.oficio-documentos-travellers-grid--single)
-  > .oficio-documentos-traveller-tile:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
 }
 
 .oficio-documentos-traveller-tile {
@@ -233,12 +98,6 @@
   justify-content: center;
   letter-spacing: 0.04em;
   width: 40px;
-}
-
-.oficio-documentos-traveller-tile--motorista .oficio-documentos-traveller-tile__avatar {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--color-on-accent);
 }
 
 .oficio-documentos-traveller-tile__main {
@@ -346,27 +205,6 @@
   word-break: break-word;
 }
 
-.oficio-documentos-route-card__status-chip.status-chip--draft,
-.oficio-documentos-route-card__status-chip.chip--warning {
-  background: var(--route-status-draft-bg);
-  border-color: var(--route-status-draft-border);
-  color: var(--route-status-draft-text);
-}
-
-.oficio-documentos-route-card__status-chip.status-chip--completed,
-.oficio-documentos-route-card__status-chip.chip--success {
-  background: var(--route-status-final-bg);
-  border-color: var(--route-status-final-border);
-  color: var(--route-status-final-text);
-}
-
-.oficio-documentos-route-card__status-chip.status-chip--muted,
-.oficio-documentos-route-card__status-chip.chip--muted {
-  background: var(--route-status-muted-bg);
-  border-color: var(--route-status-muted-border);
-  color: var(--route-status-muted-text);
-}
-
 .viatura-sugestao-chip {
   align-items: center;
   background: var(--color-card-muted);
@@ -396,11 +234,6 @@
   letter-spacing: 0.03em;
 }
 
-/* Quando há sugestões visíveis, esconde a mensagem de "nenhuma viatura" */
-.search-picker__selected-panel:has(.viatura-sugestoes:not([hidden])) .search-picker__selected-empty {
-  display: none;
-}
-
 /* Fade-out suave no botão que acabou de ser desativado */
 @keyframes cv-segment-fade-out {
   from { opacity: 1; }
@@ -423,31 +256,6 @@
   width: 100%;
 }
 
-.evento-doc-toggle .segment-toggle__btn {
-  border-radius: 7px;
-  color: var(--color-muted-strong);
-  justify-content: center;
-  min-height: 34px;
-  padding: 7px 10px;
-  text-align: center;
-  transform: none;
-  width: 100%;
-  transition: background-color var(--transition-fast), color var(--transition-fast);
-}
-
-.evento-doc-toggle .segment-toggle__btn[aria-pressed="true"] {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  box-shadow: none;
-  color: var(--color-on-accent);
-  transform: none;
-}
-
-.evento-doc-toggle .segment-toggle__btn:hover:not([aria-pressed="true"]) {
-  background: color-mix(in srgb, #fff 5%, transparent);
-  color: var(--color-text);
-}
-
 /* Telas estreitas: quebra o toggle em duas colunas para não espremer os rótulos. */
 @media (max-width: 720px) {
   .evento-doc-toggle.segment-toggle {
@@ -457,28 +265,6 @@
 
 .evento-doc-panel {
   margin-top: 8px;
-}
-
-.evento-doc-source-picker .search-picker__field {
-  gap: 7px;
-}
-
-.evento-doc-source-picker .search-picker__selected-panel {
-  gap: 8px;
-}
-
-/* .roteiro-editor__route-list traz space-3 (12px); aqui 8px entre busca e lista. */
-.evento-doc-source-picker .search-picker__selected-list,
-.evento-doc-source-picker .roteiro-editor__route-list {
-  gap: 8px;
-  margin-top: 8px;
-}
-
-/* O roster genérico (dark-redesign.css) força overflow:visible na lista de
-   selecionados; aqui a lista reaproveita o scroll de 220px do roteiro-editor,
-   então sem overflow:auto os cards vazam para fora do card do documento. */
-.evento-doc-summary-panel .search-picker__selected-list {
-  overflow-y: auto !important;
 }
 
 /* Destaque do card marcado (Documentos vinculados). .related-route-item.is-active
@@ -583,82 +369,6 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .search-picker {
   --driver-text:   var(--color-accent);
 }
 
-/* Equipe (step1): cards selecionados em até 2 colunas quando houver espaço.
-   Escopo restrito ao roster do step1 — outros pickers (ex.: roteiro) seguem 1 coluna. */
-[data-travel-document-wizard-step1] .travel-document-body
-  .search-picker--people.search-picker--roster
-  .search-picker__selected-list {
-  display: grid;
-  gap: var(--space-2, 8px);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  min-width: 0;
-}
-
-[data-travel-document-wizard-step1] .travel-document-body
-  .search-picker--people.search-picker--roster
-  .search-picker__selected-card {
-  min-width: 0;
-}
-
-[data-travel-document-wizard-step1] .travel-document-body
-  .search-picker--people.search-picker--roster
-  .search-picker__selected-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-[data-travel-document-wizard-step1] .travel-document-body
-  .search-picker--people.search-picker--roster
-  .search-picker__selected-card:only-child,
-[data-travel-document-wizard-step1] .travel-document-body
-  .search-picker--people.search-picker--roster
-  .search-picker__selected-card:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
-}
-
-@media (max-width: 720px) {
-  [data-travel-document-wizard-step1] .travel-document-body
-    .search-picker--people.search-picker--roster
-    .search-picker__selected-list {
-    grid-template-columns: 1fr;
-  }
-
-  [data-travel-document-wizard-step1] .travel-document-body
-    .search-picker--people.search-picker--roster
-    .search-picker__selected-card:only-child,
-  [data-travel-document-wizard-step1] .travel-document-body
-    .search-picker--people.search-picker--roster
-    .search-picker__selected-card:last-child:nth-child(odd) {
-    grid-column: auto;
-  }
-}
-
-/* ── Etapa 1 / Roteiro: painéis por seção (layout estrutural) ─ */
-.page-shell--wizard.travel-document-wizard,
-.cv-page--flow.travel-document-wizard {
-  --stepper-missing-bg: color-mix(in srgb, var(--color-danger) 10%, transparent);
-  --stepper-missing-border: color-mix(in srgb, var(--color-danger) 28%, transparent);
-  --stepper-missing-color: color-mix(in srgb, var(--color-danger) 78%, var(--color-heading));
-  --stepper-status-missing-color: color-mix(in srgb, var(--color-danger) 68%, var(--color-muted));
-}
-
-/* ── Sugestões de viatura: sem corte (JS já limita a 8 chips) ───── */
-/* max-height removido — overflow: hidden cortava chips na segunda linha */
-
-/* Regras responsivas exclusivas do wizard, separadas dos cards de listagem. */
-@media (max-width: 720px) {
-  .travel-document-wizard__main .form-section-stack--comfortable {
-    --_stack-gap: var(--space-5);
-  }
-
-  .travel-document-wizard .form-section-title {
-    font-size: clamp(1.08rem, 5vw, 1.45rem);
-    letter-spacing: 0.04em;
-    overflow-wrap: anywhere;
-  }
-}
-
 /* --------------------------------------------------------------------------
    FAB — Floating Action Button container (eventos wizard etapas 2-5)
    Primário no mesmo tom do Avançar do cadastro de ofícios (accent dourado).
@@ -676,25 +386,4 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .search-picker {
 
 .fab-container .fab {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-}
-
-.oficio-external-driver__identity > .search-picker {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  margin: 0;
-  padding: 0;
-}
-
-.oficio-external-driver__identity .search-picker__field {
-  gap: 0;
-}
-
-@media (max-width: 720px) {
-  .oficio-external-driver .segment-toggle {
-    align-self: stretch;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
 }

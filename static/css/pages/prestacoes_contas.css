@@ -1,53 +1,5 @@
 
 
-.rt-summary-card .oficio-documentos-admin-facts {
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  overflow: visible;
-}
-
-.rt-summary-card .oficio-documentos-admin-facts > .oficio-documentos-card__body {
-  padding: var(--space-5) 0 0;
-}
-
-.rt-summary-card .oficio-documentos-facts {
-  display: grid;
-  gap: var(--space-3);
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin: 0;
-}
-
-.rt-summary-card .oficio-documentos-fact {
-  min-width: 0;
-}
-
-.rt-summary-card .oficio-documentos-fact dd {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Motorista/origem do diário: mais largos e com quebra, para caber nome + CPF + chip. */
-.rt-summary-card .oficio-documentos-fact.diario-motorista-fact {
-  grid-column: span 2;
-}
-
-.rt-summary-card .oficio-documentos-fact.diario-motorista-fact dd {
-  align-items: center;
-  column-gap: var(--space-2);
-  display: flex;
-  flex-wrap: wrap;
-  overflow: visible;
-  row-gap: var(--space-1);
-  text-overflow: clip;
-  white-space: normal;
-}
-
-.rt-summary-card .rt-summary-card__traveller-card > .oficio-documentos-card__body {
-  padding: 0;
-}
-
 /* Servidores do RT: colunas dinâmicas por quantidade (até 3 por linha), como
    nos Viajantes do ofício — o modificador --nX no container define o flex-basis. */
 
@@ -181,13 +133,6 @@
   margin: 0;
 }
 
-.diario-wizard-card .diario-trecho-block .roteiro-editor__retorno-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  min-width: 0;
-}
-
 .rt-cost-field-group {
   min-width: 0;
 }
@@ -309,36 +254,11 @@
   margin-top: var(--space-2);
 }
 
-.docs-equipe-solicitacao__field .form-control {
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  color: var(--color-heading);
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  margin: 0;
-  min-height: 0;
-  padding: 0;
-  width: 100%;
-}
-
-.docs-equipe-solicitacao__field .form-control:focus {
-  outline: none;
-}
-
 /* Documentos: cards de anexo no padrão document-inline do ofício */
 .docs-attach-stack {
   display: grid;
   gap: var(--space-3, 0.75rem);
   min-width: 0;
-}
-
-.docs-attach-tile .oficio-documentos-traveller-tile__name {
-  text-transform: none;
-}
-
-.docs-attach-tile .oficio-documentos-traveller-tile__meta {
-  text-transform: none;
 }
 
 /* Etapa PDF Final — card unificado (padrão ofício/RT/Documentos) */

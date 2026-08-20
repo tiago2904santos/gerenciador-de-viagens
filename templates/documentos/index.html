@@ -1,9 +1,16 @@
 {% extends "base.html" %}
+{% comment %}
+  Índice de Documentos — só o cabeçalho: a tela existe para a rota e para o link
+  da barra lateral.
+
+  Migrada para o v2 em 2026-08-20: era `page-shell page-shell--standard-simple`,
+  o casco do sistema antigo. A casca do v2 é a `list-page`, a mesma das listas.
+{% endcomment %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--standard-simple">
+  <div class="list-page">
     <c-v2.header :title="page_title" :description="page_description" />
   </div>
 {% endblock %}

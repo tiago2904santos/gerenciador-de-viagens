@@ -1,18 +1,36 @@
 {% extends "base.html" %}
 {% load static %}
+{% comment %}
+  A espera da geração, em página inteira (o irmão embutido é
+  `geracao_aguarde_embedded.html`, que roda dentro de um `<iframe>`).
+
+  Migrada para o v2 em 2026-08-20: era `main-form-panel`, o painel de formulário
+  do sistema antigo, e não há formulário nenhum aqui — é um painel com um aviso.
+
+  O invólucro existe por causa dos dois ganchos: `document-generation-wait.js`
+  lê a URL de status do MESMO elemento em que acha o gancho, e atributo com
+  VALOR não passa pelo `data_hook` do painel (sai escapado).
+{% endcomment %}
 
 {% block content %}
-  <section
-    class="main-form-panel"
-    data-document-generation-wait
-    data-status-url="{{ geracao.status_url }}"
-  >
-    <h1>Preparando documento</h1>
-    <p data-document-generation-message>
-      A geração continua em segundo plano. Esta página abrirá o arquivo assim que ele estiver pronto.
-    </p>
-    <p><a class="button button--secondary" href="{% url 'documentos:index' %}">Voltar</a></p>
-  </section>
+  <div class="list-page">
+    <div data-document-generation-wait data-status-url="{{ geracao.status_url }}">
+      <c-v2.panel
+        title="Preparando documento"
+        description="A geração continua em segundo plano. Esta página abrirá o arquivo assim que ele estiver pronto."
+      >
+        <c-slot name="body">
+          <p class="field__help" data-document-generation-message>
+            Assim que o arquivo ficar pronto, o download começa sozinho.
+          </p>
+        </c-slot>
+        <c-slot name="footer">
+          {% url 'documentos:index' as documentos_url %}
+          <c-v2.button label="Voltar" variant="secondary" icon="arrow-left" :href="documentos_url" />
+        </c-slot>
+      </c-v2.panel>
+    </div>
+  </div>
 {% endblock %}
 
 {% block extra_js %}

@@ -10211,3 +10211,38 @@ apagada — nenhuma página a carregava desde a migração do editor, em 17/08.
 depois. Atenção: o iframe reusa o cache do renderizador — sem
 `fetch(folha, {cache: "reload"})` antes de medir, a comparação passa em falso.
 
+### NOVO-20260820-121318-ae033d699bdf 🟢 RESOLVIDO · `NOVO` O casco de página do sistema antigo sobrevivia em cinco telas · FE · risco médio
+
+`layout/page-shell.css` se descrevia como "Sistema Oficial de Camadas": `page-shell`,
+cabeçalho limpo, fileira de etapas, `main-form-panel`, `form-section`, grade de
+campos e painel de lista — a hierarquia obrigatória de toda tela. Restavam CINCO
+telas presas a ele (índice de Documentos, modelos de texto, as duas prévias de
+termo e a espera de geração), e por causa delas 1.450 linhas continuavam no bundle
+de todas as páginas.
+
+Junto vinham ~250 regras em onze folhas cujo seletor citava classe que NENHUM
+template emite — `page-stepper__*`, `pagination-shell*`, `page-header__*`,
+`filter-bar*`, `record-card__id-row`, `list-header__rail`. Elas não eram pegas
+pela poda anterior porque bastava UMA classe viva no seletor para a regra ficar.
+
+**Correção:** as cinco telas passaram para `list-page`/`form-page`; o casco caiu
+para 759 linhas e `fields/form-panel.css`, `pages/termos.css` e
+`pages/cadastros-config.css` foram apagadas. O total de CSS legado foi de 6.393
+para 3.822 linhas.
+
+**Duas armadilhas da poda por classe, ambas medidas:**
+
+1. `:is(a, b, c)` é UNIÃO: basta uma alternativa viva. Apagar
+   `:is(.card, .app-card, .module-card, .document-card)` por causa de
+   `.document-card` tirou a sombra do cartão de módulo do v2, que é a única das
+   quatro ainda emitida.
+2. A varredura por token NÃO enxerga classe montada por interpolação
+   (`asgn-fontchip--{{ f.key }}`). Por isso a poda por classe nunca roda em
+   `static/css/v2/` — rodou uma vez, e levou seis regras vivas das fontes de
+   assinatura.
+
+**Como conferir:** impressão digital de estilo computado em 25 telas, comparada
+por CHAVE (tag + classe + ordinal), não por índice: o mapa carrega peças em tempos
+diferentes e desloca o índice de tudo que vem depois. Resultado: nenhuma
+diferença.
+

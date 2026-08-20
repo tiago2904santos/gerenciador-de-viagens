@@ -197,13 +197,12 @@ class ShellBundleGateTests(SimpleTestCase):
         ).read_text(encoding="utf-8")
         self.assertIn(".oficio-reveal-panel {", justificativas)
 
-        for relative, selector in {
-            "static/css/pages/oficios.css": "\n.oficio-reveal-panel {",
-            "static/css/pages/termos.css": "\n.termo-oficio-picker {",
-        }.items():
-            with self.subTest(source=relative):
-                source = (ROOT / relative).read_text(encoding="utf-8")
-                self.assertNotIn(selector, source)
+        oficios = (ROOT / "static/css/pages/oficios.css").read_text(encoding="utf-8")
+        self.assertNotIn("\n.oficio-reveal-panel {", oficios)
+
+        # `pages/termos.css` foi APAGADA em 2026-08-20: sobraram duas regras de
+        # um cartão de lista que virou `c-v2.record`, e nenhuma tela a carregava.
+        self.assertFalse((ROOT / "static/css/pages/termos.css").exists())
 
         # `pages/roteiros.css` foi APAGADA em 2026-08-20: o editor migrou para o
         # v2 em 17/08 e nenhuma página a carregava desde então.

@@ -45,27 +45,6 @@ html[data-theme="dark"] :is(input, select, textarea):focus-visible {
   outline: none;
 }
 
-/* Listas usam cabeçalho flat (list-header.css) — sem card/sombra no stack. */
-:is(html[data-theme="dark"])
-  :is(.page-shell--list, .cv-page--collection) .page-header-stack:not(.list-header) {
-  background: #132238;
-  border-color: color-mix(in srgb, var(--color-border) 84%, #31577c);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.32);
-}
-
-:is(html[data-theme="dark"])
-  :is(.page-shell--list, .cv-page--collection) .page-header-stack:not(.list-header) .page-header-band {
-  background: #132238;
-  padding: 20px clamp(20px, 2.4vw, 30px) 16px;
-}
-
-:is(html[data-theme="dark"])
-  :is(.page-shell--list, .cv-page--collection) .page-header-stack:not(.list-header) .page-header-rail {
-  background: #132238;
-  border-top-color: rgba(152, 184, 218, 0.22);
-  padding: 14px clamp(20px, 2.4vw, 30px) 18px;
-}
-
 :is(html[data-theme="dark"])
   .termo-oficio-summary-panel {
   background: transparent;
@@ -80,15 +59,6 @@ html[data-theme="dark"] :is(input, select, textarea) {
   background: var(--color-input-bg);
   border-color: var(--color-input-border);
   color: var(--color-input-text);
-}
-
-/* Os formulários canônicos usavam um fundo composto por gradientes. No tema
-   escuro, os controles passam a ter uma caixa sólida e claramente delimitada. */
-:is(html[data-theme="dark"])
-  .main-form-panel :is(.form-control, .form-select, select.form-select) {
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-input-border);
-  box-shadow: none;
 }
 
 html[data-theme="dark"] :is(input, select, textarea)[readonly] {
@@ -156,62 +126,6 @@ html[data-theme="dark"] :is(input, select, textarea):disabled {
 }
 
 :is(html[data-theme="dark"])
-  .document-form-page
-  .termo-documentos-preview
-  .document-inline-card {
-  background: var(--step1-field, var(--color-input-bg)) !important;
-  border-color: transparent !important;
-  border-radius: 10px;
-  box-shadow: none !important;
-}
-
-/* Os termos internos usam uma única superfície no cabeçalho e no corpo,
-   como o agrupamento equivalente da etapa 4 do ofício. */
-:is(html[data-theme="dark"])
-  .document-form-page
-  .termo-documentos-preview
-  .document-inline-card--termos
-  .document-inline-card--nested,
-:is(html[data-theme="dark"])
-  .document-form-page
-  .termo-documentos-preview
-  .document-inline-card--termos
-  .document-inline-card--nested
-  > :is(.document-inline-card__header, .document-inline-card__body) {
-  background: var(--step1-panel, var(--color-surface-soft)) !important;
-  border-color: transparent !important;
-}
-
-:is(html[data-theme="dark"])
-  .document-form-page
-  .termo-documentos-preview
-  .document-inline-card__title {
-  color: var(--color-heading);
-}
-
-:is(html[data-theme="dark"])
-  .document-form-page
-  .termo-documentos-preview
-  .document-inline-viewer {
-  background: var(--color-surface-muted);
-  border-color: var(--color-border);
-}
-
-:is(html[data-theme="dark"])
-  .document-form-page
-  .termo-documentos-preview
-  .document-inline-empty {
-  color: var(--color-muted);
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-documentos] .oficio-documentos-summary-section .oficio-documentos-card__title {
-  color: var(--color-heading);
-  font-size: 0.95rem;
-  font-weight: 700;
-}
-
-:is(html[data-theme="dark"])
   .form-stack {
   border: 0;
   gap: 12px;
@@ -229,23 +143,6 @@ html[data-theme="dark"] :is(input, select, textarea):disabled {
 :is(html[data-theme="dark"])
   .form-card .custom-select__chevron {
   color: var(--color-accent-text);
-}
-
-:is(html[data-theme="dark"])
-  .composite-field__control .form-control {
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  min-width: 0;
-}
-
-html[data-theme="dark"] .composite-field__control .form-control:hover,
-html[data-theme="dark"] .composite-field__control .form-control:focus,
-html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  outline: none;
 }
 
 /* Buttons and icon actions */
@@ -296,35 +193,6 @@ html[data-theme="dark"] :is(.empty-state, .app-empty-state) {
 html[data-theme="dark"] .empty-state__title {
   color: #fff;
   margin: 0;
-}
-
-:is(html[data-theme="dark"])
-  .pagination-shell__page.is-current {
-  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
-  border-color: var(--color-accent);
-  box-shadow: none;
-  color: var(--color-heading);
-}
-
-:is(html[data-theme="dark"])
-  .pagination-shell__page.is-current:is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
-  border-color: var(--color-accent-hover, var(--color-accent));
-  color: var(--color-accent-hover, var(--color-accent));
-}
-
-:is(html[data-theme="dark"])
-  .cv-form-section-header {
-  --_wizard-filete-width: var(--card-family-accent-width);
-  background: var(--card-family-header-bg);
-  background-image: var(--card-family-header-image);
-  border-color: var(--card-family-border-strong);
-}
-
-:is(html[data-theme="dark"])
-  .cv-form-section-header::before {
-  background: var(--card-family-accent-bg);
-  box-shadow: var(--card-family-accent-shadow);
 }
 
 :is(html[data-theme="dark"])
@@ -392,37 +260,6 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  .summary-card .pt-resumo-box {
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-border-soft);
-  border-radius: 11px;
-  box-shadow: none;
-}
-
-:is(html[data-theme="dark"])
-  .summary-card .pt-resumo-box:hover {
-  background: var(--color-primary-soft);
-  border-color: var(--color-border-strong);
-}
-
-:is(html[data-theme="dark"])
-  .summary-card .pt-resumo-box__label {
-  color: var(--color-muted);
-  font-size: 0.68rem;
-  letter-spacing: 0.07em;
-}
-
-:is(html[data-theme="dark"])
-  .summary-card .pt-resumo-box__label--accent {
-  color: var(--color-accent-text);
-}
-
-:is(html[data-theme="dark"])
-  .summary-card :is(.pt-resumo-box__value, .pt-resumo-valor__amount) {
-  color: var(--color-heading);
-}
-
-:is(html[data-theme="dark"])
   .summary-card .oficio-documentos-fact {
   background: var(--color-input-bg);
   border-color: var(--color-border-soft);
@@ -447,23 +284,6 @@ html[data-theme="dark"] *::after {
   color: var(--color-heading);
 }
 
-:is(html[data-theme="dark"])
-  .summary-card .rt-summary-card__section-ribbon::before {
-  background: var(--color-border-strong);
-}
-
-:is(html[data-theme="dark"])
-  .summary-card .oficio-documentos-traveller-line {
-  background: var(--color-surface-soft);
-  border-color: var(--color-border);
-  box-shadow: none;
-}
-
-:is(html[data-theme="dark"])
-  .summary-card .oficio-documentos-card__title {
-  color: var(--color-heading);
-}
-
 /* Module navigation cards and the redesigned dashboard. */
 :is(html[data-theme="dark"])
   .cv-module-card {
@@ -481,54 +301,6 @@ html[data-theme="dark"] *::after {
   .cv-module-card:hover {
   box-shadow: var(--shadow-panel);
   transform: translateY(-1px);
-}
-
-:is(html[data-theme="dark"])
-  .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) {
-  background: var(--card-family-bg);
-  border: 1px solid var(--card-family-border);
-  box-shadow: var(--card-family-shadow);
-}
-
-:is(html[data-theme="dark"])
-  .main-form-panel > .form-section {
-  background: var(--card-family-bg);
-  box-shadow: none;
-}
-
-:is(html[data-theme="dark"])
-  .main-form-panel > .form-section > .section-header {
-  background: var(--card-family-header-bg);
-  background-image: var(--card-family-header-image);
-  border-bottom: 1px solid var(--card-family-border-strong);
-  padding: var(--space-4) var(--space-6) var(--space-4) var(--space-10);
-}
-
-:is(html[data-theme="dark"])
-  .main-form-panel > .form-section > .section-header::before {
-  background: var(--card-family-accent-bg);
-  bottom: var(--space-4);
-  box-shadow: var(--card-family-accent-shadow);
-  height: auto;
-  left: var(--space-6);
-  top: var(--space-4);
-  transform: none;
-  width: var(--card-family-accent-width);
-}
-
-:is(html[data-theme="dark"])
-  .main-form-panel .section-header__title {
-  color: var(--color-heading);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-extrabold);
-  letter-spacing: 0.045em;
-  text-transform: uppercase;
-}
-
-:is(html[data-theme="dark"])
-  .main-form-panel > .card-footer {
-  background: var(--card-family-bg);
-  border-top-color: var(--card-family-border);
 }
 
 :is(html[data-theme="dark"])
@@ -559,20 +331,6 @@ html[data-theme="dark"] *::after {
   background: var(--step1-panel);
   border: 0;
   box-shadow: none;
-}
-
-:is(html[data-theme="dark"])
-  .collection-panel
-  .list-tab {
-  --list-tab-bg: var(--step1-surface);
-  --list-tab-hover-bg: color-mix(in srgb, var(--step1-surface) 82%, #fff 18%);
-  --list-tab-count-bg: color-mix(in srgb, #fff 12%, transparent);
-}
-
-:is(html[data-theme="dark"])
-  .collection-panel
-  .pagination-shell__controls {
-  background: var(--step1-surface);
 }
 
 :is(html[data-theme="dark"])

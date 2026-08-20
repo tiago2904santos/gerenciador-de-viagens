@@ -1,21 +1,21 @@
 {% extends "base.html" %}
-{% load static %}
+{% comment %}
+  Prévia do termo — só o resumo, em leitura.
+
+  Migrada para o v2 em 2026-08-20. Eram SEIS classes de casco empilhadas
+  (`page-shell page-shell--standard-simple travel-document-wizard app-wizard
+  document-form-page` + `main-form-panel--stack` + `form-section-stack`) para
+  entregar um cabeçalho e um painel. As duas folhas de página saíram junto:
+  `pages/oficios.css` vestia os CAMPOS do wizard, e aqui não há campo nenhum;
+  `pages/termos.css`, a lista.
+{% endcomment %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/pages/oficios.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/termos.css' %}">
-{% endblock %}
-
 {% block content %}
-  <div class="page-shell page-shell--standard-simple travel-document-wizard app-wizard document-form-page">
+  <div class="form-page">
     <c-v2.header eyebrow="TERMOS" :title="page_title" icon_label="TM" module_label="Termos" back_label="Editar termo" :back_url="editar_url" only />
 
-    <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
-      <div class="form-section-stack form-section-stack--comfortable">
-        <c-v2.panel title="Resumo do termo" description="Dados efetivos usados na geração do documento" title_id="termo-preview-cadastro-title" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :body_extra_class="body_extra_class" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :extra_class="extra_class" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "termos/partials/_preview_cadastro_body.html" with preview=preview termo=termo only %}</c-slot></c-v2.panel>
-      </div>
-    </div>
+    <c-v2.panel title="Resumo do termo" description="Dados efetivos usados na geração do documento" title_id="termo-preview-cadastro-title" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :body_extra_class="body_extra_class" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :extra_class="extra_class" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "termos/partials/_preview_cadastro_body.html" with preview=preview termo=termo only %}</c-slot></c-v2.panel>
   </div>
 {% endblock %}

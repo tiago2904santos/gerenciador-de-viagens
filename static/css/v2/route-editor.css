@@ -437,56 +437,6 @@
   margin-top: 0;
 }
 
-/* ========================================================================
-   Etapas Ofício (Dados / Roteiro / Justificativa / Documentos) — card + camada intermediária
-   Card externo escuro; blocos em surface-soft; campos no tom do card
-   (poço inset dentro de cada seção).
-   ======================================================================== */
-/* NOVO-100 (E9-c): as quatro variaveis do sistema de superficie do wizard eram
-   ligadas SO no escuro. No claro elas nao existiam neste escopo, e as 32
-   leituras sem `fallback` que moram dentro do wizard nao resolviam nada.
-
-   Esta e a razao pela qual a familia 8b ficou bloqueada (`NOVO-93`): no escuro
-   `border: 0` funciona porque o fundo separa; levar so a borda para o claro
-   tirava a fronteira sem por nada no lugar, porque o fundo dependia de um token
-   que o claro nao tinha.
-
-   O NOVO-93 resolveu a decisao pendente: o claro adotou tres niveis de
-   superficie e os componentes da familia 8b passaram a consumir estes tokens
-   nos dois temas. A regra abaixo continua sendo a ligacao semantica comum. */
-:is(html[data-theme])
-  :is([data-travel-document-wizard-step1] .travel-document-card, [data-travel-document-wizard-rt] .travel-document-card, [data-travel-document-wizard-diario] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card, [data-travel-document-wizard-roteiro] .oficio-roteiro-card, [data-travel-document-wizard-justificativa] .oficio-justificativa-card, [data-travel-document-wizard-documentos] .oficio-documentos-unified-card, [data-travel-document-wizard-documentos] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card) {
-  --step1-surface: var(--wizard-card-bg);
-  --step1-panel: var(--wizard-panel-bg);
-  --step1-field: var(--wizard-field-bg);
-  --step1-empty: var(--step1-field);
-  --color-input-bg: var(--step1-field);
-  background: var(--step1-surface);
-  border-color: color-mix(in srgb, var(--color-border) 40%, transparent);
-}
-
-:is(html[data-theme])
-  :is([data-travel-document-wizard-step1] .travel-document-card, [data-travel-document-wizard-rt] .travel-document-card, [data-travel-document-wizard-diario] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card, [data-travel-document-wizard-roteiro] .oficio-roteiro-card, [data-travel-document-wizard-justificativa] .oficio-justificativa-card, [data-travel-document-wizard-documentos] .oficio-documentos-unified-card, [data-travel-document-wizard-documentos] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card) > .cv-form-section-header {
-  background: transparent;
-  min-height: 64px;
-}
-
-:is(html[data-theme])
-  :is([data-travel-document-wizard-step1] .travel-document-card, [data-travel-document-wizard-rt] .travel-document-card, [data-travel-document-wizard-diario] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card, [data-travel-document-wizard-roteiro] .oficio-roteiro-card, [data-travel-document-wizard-justificativa] .oficio-justificativa-card, [data-travel-document-wizard-documentos] .oficio-documentos-unified-card, [data-travel-document-wizard-documentos] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card) > .cv-form-section-header .form-section-title {
-  font-size: 1.05rem;
-  letter-spacing: 0.02em;
-  text-transform: none;
-}
-
-:is(html[data-theme])
-  :is([data-travel-document-wizard-step1] .travel-document-card, [data-travel-document-wizard-rt] .travel-document-card, [data-travel-document-wizard-diario] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card, [data-travel-document-wizard-roteiro] .oficio-roteiro-card, [data-travel-document-wizard-justificativa] .oficio-justificativa-card, [data-travel-document-wizard-documentos] .oficio-documentos-unified-card, [data-travel-document-wizard-documentos] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card) > .cv-form-section-header .form-section-subtitle {
-  color: var(--color-muted);
-  display: block;
-  font-size: var(--font-size-xs);
-  margin: 4px 0 0;
-  max-width: 56ch;
-}
-
 :is(html[data-theme])
   :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block) > .form-block__header {
   align-items: flex-start;
@@ -1325,20 +1275,6 @@
   background: transparent;
   border: 0;
   box-shadow: none;
-}
-
-/* ── de `components/theme-dark-components.css` ── */
-
-/* =========================================================
-   Canonical dark wizard and form composition
-   Header de wizard passou a ser `.list-header--wizard` (NOVO-20).
-   O contrato visual do band/rail antigo (grid horizontal) foi removido.
-   ========================================================= */
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-step1] .travel-document-card, [data-travel-document-wizard-rt] .travel-document-card, [data-travel-document-wizard-diario] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card, [data-travel-document-wizard-roteiro] .oficio-roteiro-card, [data-travel-document-wizard-justificativa] .oficio-justificativa-card, [data-travel-document-wizard-documentos] .oficio-documentos-unified-card, [data-travel-document-wizard-documentos] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card) {
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 10px 28px rgba(0, 0, 0, 0.28);
 }
 
 /* A regra que pintava a LISTA ABERTA dentro dos wizards saiu em 2026-08-20.

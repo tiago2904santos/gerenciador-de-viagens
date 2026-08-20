@@ -1,11 +1,16 @@
 {% extends "base.html" %}
+{% comment %}
+  Pré-visualização do termo a partir do ofício.
+
+  Migrada para o v2 em 2026-08-20: `page-shell page-shell--standard-simple` e
+  `main-form-panel` eram o casco e o painel do sistema antigo. Aqui é uma tela
+  de leitura com um bloco — a casca é a `form-page`, e o bloco se basta.
+{% endcomment %}
 {% block title %}{{ page_title }}{% endblock %}
 {% block content %}
-  <div class="page-shell page-shell--standard-simple">
+  <div class="form-page">
     {% url "oficios:dados_viajantes" oficio.pk as oficio_url %}
     <c-v2.header eyebrow="OFÍCIOS" :title="page_title" icon_label="TM" module_label="Termos" back_label="Voltar ao ofício" :back_url="oficio_url" only />
-    <div class="main-form-panel">
-      <c-v2.form_block title="Pré-visualização" section_id="termos-preview-section" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :description="description" :element_id="element_id" :extra_class="extra_class" :heading_level="heading_level" :shell="shell" :variant="variant"><c-slot name="body">{% include "termos/partials/_oficio_preview_body.html" with preview=preview only %}</c-slot></c-v2.form_block>
-    </div>
+    <c-v2.form_block title="Pré-visualização" section_id="termos-preview-section" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :description="description" :element_id="element_id" :extra_class="extra_class" :heading_level="heading_level" :shell="shell" :variant="variant"><c-slot name="body">{% include "termos/partials/_oficio_preview_body.html" with preview=preview only %}</c-slot></c-v2.form_block>
   </div>
 {% endblock %}

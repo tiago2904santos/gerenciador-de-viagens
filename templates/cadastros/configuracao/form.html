@@ -6,14 +6,12 @@
 
 {% block title %}{{ page_title }}{% endblock %}
 
-{% block extra_css %}
-  {% comment %}
-    A folha da página fica: o corpo da aba de diárias tem a tabela de valores
-    vigentes, que ainda é desenho próprio. Ela sai quando essa tabela virar peça
-    do v2.
-  {% endcomment %}
-  <link rel="stylesheet" href="{% static 'css/pages/cadastros-config.css' %}">
-{% endblock %}
+{% comment %}
+  Sem folha de página desde 2026-08-20: `pages/cadastros-config.css` era um
+  reforço de "campo sem borda" para seis classes de campo antigas, e todas elas
+  já são vestidas pelos componentes do v2 — a folha inteira desenhava o que o
+  `v2/field.css` e o `v2/input.css` decidem.
+{% endcomment %}
 
 {% block content %}
   {% comment %}

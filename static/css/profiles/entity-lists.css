@@ -1455,26 +1455,6 @@ html[data-theme="light"] {
   --stepper-status-current-color: var(--color-accent);
   --stepper-status-missing-color: var(--color-danger);
 }
-.page-shell {
-  box-sizing:     border-box;
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--page-shell-gap);
-  max-width:      var(--page-shell-max-width);
-  position:       relative;
-  width:          100%;
-  z-index:        var(--z-page-shell);
-}
-.floating-action {
-  align-items: flex-end;
-  display: flex;
-  justify-content: flex-end;
-  margin-top: var(--space-4);
-  position: fixed;
-  right: clamp(var(--space-4), 2vw, var(--space-5));
-  bottom: clamp(var(--space-4), 2vw, var(--space-5));
-  z-index: calc(var(--z-footer-actions-fixed) + 20);
-}
 .list-panel {
   background:     var(--surface-list-panel);
   border:         1px solid var(--border-list-panel);
@@ -1485,20 +1465,6 @@ html[data-theme="light"] {
   flex-direction: column;
   overflow:       visible;
   width:          100%;
-}
-@media (max-width: 840px) {
-.page-shell {
-    gap:           var(--space-4);
-    padding-block: var(--space-4);
-  }
-}
-#quick-add-modelo-motivo .cv-field__control--textarea:focus,
-#quick-add-modelo-motivo .cv-field__control--textarea:focus-visible {
-  outline: none;
-}
-#quick-add-atividade .cv-field__control--textarea:focus,
-#quick-add-atividade .cv-field__control--textarea:focus-visible {
-  outline: none;
 }
 :root {
   --action-height: var(--control-height-md);
@@ -1689,53 +1655,6 @@ html[data-theme="dark"] .empty-state__title {
   border-radius: 14px;
 }
 :is(html[data-theme])
-  .record-card {
-  border-radius: 16px;
-}
-:is(html[data-theme])
-  .record-card {
-  background: var(--card-family-bg);
-  border: 1px solid var(--card-family-border);
-  box-shadow: var(--card-family-shadow);
-  transform: none;
-}
-:is(html[data-theme])
-  .record-card:hover {
-  box-shadow: var(--card-family-shadow);
-  transform: none;
-}
-:is(html[data-theme])
-  .record-card__id-row {
-  background: var(--card-family-header-bg);
-  background-image: var(--card-family-header-image);
-  border-bottom-color: var(--card-family-border-strong);
-}
-:is(html[data-theme])
-  .record-card__id-row::before {
-  background: var(--card-family-accent-bg);
-  box-shadow: var(--card-family-accent-shadow);
-  width: var(--card-family-accent-width);
-}
-:is(html[data-theme])
-  .record-card__info-value {
-  color: var(--color-heading);
-  font-size: clamp(1rem, 1.5vw, 1.35rem);
-  font-weight: 750;
-}
-:is(html[data-theme])
-  .record-card__id-row .record-card__info-value {
-  color: var(--theme-text-heading, var(--color-heading));
-  font-size: clamp(0.92rem, 1.15vw, 1.05rem);
-  font-weight: var(--font-weight-extrabold);
-  letter-spacing: 0.05em;
-  text-shadow: 0 1px 6px color-mix(in srgb, var(--color-accent) 20%, transparent);
-  text-transform: uppercase;
-}
-:is(html[data-theme])
-  .record-card__id-row .record-card__info-value--wrap {
-  letter-spacing: 0.03em;
-}
-:is(html[data-theme])
   .record-card__band {
   background: var(--card-family-bg);
 }
@@ -1882,50 +1801,6 @@ html[data-theme="dark"] .empty-state__title {
   position: relative;
   width: 100%;
 }
-.list-header__search-icon .icon {
-  display: block;
-  flex: 0 0 auto;
-  height: 16px;
-  width: 16px;
-}
-.list-header__filters .date-picker,
-.list-header__filters .travel-period-filter {
-  flex: 0 1 auto;
-  min-width: 0;
-}
-.list-header__filters .travel-period-filter__btn {
-  height: var(--list-header-control-height);
-  min-height: var(--list-header-control-height);
-}
-.list-header .header-filter-input {
-  background: var(--surface-filter-input);
-  border: 1px solid var(--border-filter-input);
-  border-radius: var(--radius-control);
-  box-sizing: border-box;
-  color: var(--text-filter);
-  font-size: var(--font-size-sm);
-  height: var(--list-header-control-height);
-  outline: none;
-  padding: 0 var(--space-3);
-  width: 100%;
-}
-.list-header .header-filter-input:focus,
-.list-header .header-filter-input:focus-visible {
-  outline: none;
-}
-.list-header__rail .custom-select__trigger.custom-select__trigger--v2 {
-  border-radius: var(--radius-control);
-  height: var(--list-header-control-height);
-  min-height: var(--list-header-control-height);
-}
-.list-header__rail .list-header__search-input.header-filter-input:focus,
-.list-header__rail .list-header__search-input.header-filter-input:focus-visible,
-.list-header__rail .custom-select__trigger.custom-select__trigger--v2:focus,
-.list-header__rail .custom-select__trigger.custom-select__trigger--v2:focus-visible {
-  border: 0;
-  box-shadow: none;
-  outline: none;
-}
 .list-header.filter-header,
 .list-header.page-header-stack {
   overflow: hidden;
@@ -1935,22 +1810,4 @@ html[data-theme="dark"] .empty-state__title {
   background: var(--color-surface-muted);
   border-color: var(--color-border);
   box-shadow: var(--shadow-md);
-}
-:is(html[data-theme="dark"])
-  .list-header__rail .custom-select--v2 {
-  --cs-chevron-color: var(--color-accent);
-}
-:is(html[data-theme="dark"])
-  .list-header__rail
-  .custom-select__trigger--v2
-  .custom-select__chevron,
-:is(html[data-theme="dark"])
-  .list-header__rail
-  .custom-select__trigger--v2:is(:hover, :focus, :focus-visible, [aria-expanded="true"])
-  .custom-select__chevron,
-:is(html[data-theme="dark"])
-  .list-header__rail
-  .custom-select--v2.custom-select--open
-  .custom-select__chevron {
-  color: var(--color-accent);
 }

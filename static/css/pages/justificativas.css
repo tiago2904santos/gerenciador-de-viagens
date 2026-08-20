@@ -105,69 +105,6 @@
   transform: none;
 }
 
-.justificativa-quick-add.is-open {
-  max-height: 1400px;
-}
-
-.justificativas-page .list-header--inline-create .justificativa-quick-add__body {
-  align-items: stretch;
-  display: grid;
-  gap: var(--space-4);
-  padding: var(--space-4) 0;
-}
-
-.justificativa-quick-add .cv-field,
-.justificativa-quick-add .custom-select,
-.justificativa-quick-add .field-with-action {
-  overflow: visible;
-}
-
-.justificativa-quick-add .field-with-action {
-  align-items: center;
-  min-height: var(--form-control-height, var(--control-height-md));
-}
-
-.justificativa-quick-add .field-with-action .custom-select {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.justificativa-quick-add .field-with-action .custom-select__trigger {
-  width: 100%;
-}
-
-.justificativa-quick-add .field-with-action--manage-reveal > .custom-select,
-.justificativa-quick-add .field-with-action--manage-reveal > .form-control,
-.justificativa-quick-add .field-with-action--manage-reveal > .form-select,
-.justificativa-quick-add .field-with-action--manage-reveal > select {
-  box-sizing: border-box;
-  display: block;
-  max-width: 100%;
-  min-width: 0;
-  position: relative;
-  transition: width var(--transition-fast), max-width var(--transition-fast);
-  width: 100%;
-  z-index: 2;
-}
-
-.justificativa-quick-add .field-with-action--manage-reveal:hover > .custom-select,
-.justificativa-quick-add .field-with-action--manage-reveal:focus-within > .custom-select,
-.justificativa-quick-add .field-with-action--manage-reveal:hover > .form-control,
-.justificativa-quick-add .field-with-action--manage-reveal:focus-within > .form-control,
-.justificativa-quick-add .field-with-action--manage-reveal:hover > .form-select,
-.justificativa-quick-add .field-with-action--manage-reveal:focus-within > .form-select,
-.justificativa-quick-add .field-with-action--manage-reveal:hover > select,
-.justificativa-quick-add .field-with-action--manage-reveal:focus-within > select {
-  max-width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
-  width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
-}
-
-.justificativas-page .list-header--inline-create .justificativa-quick-add__actions {
-  justify-content: flex-end;
-  margin-left: 0;
-  width: 100%;
-}
-
 /*
  * Pronto para salvar: mesmo primary dourado do "Salvar rascunho" do cadastro
  * de ofícios (.form-card__footer .card-footer__primary .cv-btn).
@@ -233,13 +170,6 @@
 .justificativas-page .list-header .inline-create__toggle.justificativa-quick-add__toggle--changing .inline-create__toggle-label {
   opacity: 0;
   transform: translateY(4px);
-}
-
-@media (max-width: 720px) {
-  .justificativas-page .list-header--inline-create .justificativa-quick-add__actions {
-    align-items: stretch;
-    flex-direction: column;
-  }
 }
 
 /* ---- o painel que se revela -----------------------------------------------
