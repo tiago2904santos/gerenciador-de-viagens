@@ -1,3 +1,432 @@
+/* ══════════════════════════════════════════════════════════════════════════
+ * BASE, vinda de `fields/select.css` em 2026-08-20 — mesma história do picker: são as
+ * declarações do componente do v2, que nasceram numa pasta com nome do sistema
+ * antigo. O `cv-field*` e o `form-select` são emitidos pelo PRÓPRIO
+ * `v2/form_field.html` e `v2/date_picker.html`.
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+/* ==========================================================================
+   select.css
+   Sistema global de select / multiselect
+   Central de Viagens 3.0
+
+   Componentes:
+     .cv-select-wrapper      — wrapper de <select> nativo com seta customizada
+
+   Tokens sao definidos aqui em :root e sobrescritos por tema.
+   Nenhum hex de cor nas regras de componente — apenas tokens.
+   ========================================================================== */
+
+/* =========================================================
+   01. Design Tokens — :root
+   ========================================================= */
+
+:root {
+  /* Sizing */
+
+  /* Colors — adapts to theme via tokens */
+  --select-border:         var(--color-border-strong);
+  --select-border-focus:   var(--color-primary);
+  --select-focus-ring:     0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent);
+
+  /* Disabled */
+
+  /* Error / Success */
+
+}
+
+/* =========================================================
+   02. Theme overrides — Dark
+   ========================================================= */
+
+html[data-theme="dark"] {
+  --select-border:         var(--theme-border-card);
+}
+
+/* =========================================================
+   03. Theme overrides — Light
+   ========================================================= */
+
+html[data-theme="light"] {
+  --select-border:         var(--color-border-strong);
+}
+
+/* =========================================================
+   05. Global native select styling
+   Todo <select> dentro de .main-form-panel e .list-panel
+   recebe automaticamente o estilo do design system sem
+   necessidade de alterar templates existentes.
+   ========================================================= */
+
+/* Native select em .main-form-panel: ver forms.css (gradiente --field-bg).
+   List-panel mantém estilo legado abaixo. */
+
+.list-panel select:not([class]),
+.list-panel .form-select {
+  appearance: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352657a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right var(--space-3) center / 16px 16px,
+    var(--color-card);
+  border: 1px solid var(--select-border);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-xs);
+  box-sizing: border-box;
+  color: var(--color-text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  height: var(--control-height-md);
+  padding: 0 calc(var(--space-6) + var(--space-2)) 0 var(--space-3);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  width: 100%;
+}
+
+.list-panel select:not([class]):focus,
+.list-panel select:not([class]):focus-visible {
+  outline: none;
+}
+
+/* ==========================================================================
+   UI Lab clone — Custom Select Premium / Inline Action
+   Fonte 1:1: static/css/dev/ui-lab-fields.css + templates/dev/ui_lab/selects_filters.html
+   ========================================================================== */
+
+:root {
+  --field-padding-y: 0;
+  --field-bg-hover: var(--theme-surface-card);
+  --field-shadow-focus: 0 0 0 var(--space-1) var(--input-focus-ring), var(--shadow-xs);
+  --field-error-bg: var(--color-danger-soft);
+  --field-error-shadow: 0 0 0 var(--space-1) var(--color-danger-border-soft), var(--shadow-xs);
+  /* NOVO-51: lia `var(--cv-field-border)`, que este mesmo bloco definia como
+     `var(--theme-input-border)`. Aponta direto para a fonte, e nao para
+     `--color-input-border`: no fallback sem JS os dois divergem, e a E7 nao
+     mexe nessa camada (fica para a E8). */
+  --select-border: var(--theme-input-border);
+  --select-border-focus: var(--input-border-focus);
+  --select-focus-shadow: var(--field-shadow-focus);
+  --chip-bg: var(--color-primary-soft);
+  --chip-border: var(--color-info-border-strong);
+  --chip-color: var(--color-primary-strong);
+  --option-selected-bg: var(--color-primary-soft);
+  --cs-trigger-shadow: var(--shadow-sm);
+  --cs-chevron-color: var(--theme-text-muted);
+  --cs-menu-bg: var(--theme-surface-card);
+  --cs-menu-border: var(--theme-border-card);
+  --cs-menu-radius: var(--radius-control);
+  --cs-option-selected-color: var(--color-primary);
+  --cs-z-index: 200;
+}
+
+html[data-theme="dark"] {
+  --field-bg-hover: var(--theme-surface-card-soft);
+  --field-error-bg: var(--color-input-bg);
+  --chip-bg: var(--color-info-bg);
+  --chip-border: var(--color-info-border);
+  --chip-color: var(--color-info-text);
+  --option-selected-bg: var(--color-info-bg);
+  --cs-trigger-shadow: none;
+  --cs-option-selected-color: var(--color-info-text);
+}
+
+.cv-field {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.app-form-field .cv-field__label,
+.cv-field__label {
+  color: var(--color-label-strong);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+}
+
+.field-with-action {
+  align-items: center;
+  display: flex;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+
+.field-with-action .field-action {
+  align-self: center;
+  flex: 0 0 auto;
+  height: var(--control-height-md);
+  max-height: var(--control-height-md);
+  min-height: var(--control-height-md);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * BASE, vinda de `fields/custom-select.css` em 2026-08-20.
+ *
+ * Esta parte NÃO é legado: são as declarações do próprio componente do v2, que
+ * moravam numa pasta com nome do sistema antigo porque foi lá que nasceram. O
+ * arquivo v2 carregava só o DELTA — e por isso apagar a pasta antiga teria
+ * apagado o componente.
+ *
+ * A ordem foi preservada: base primeiro, delta depois, exatamente como os dois
+ * bundles as entregavam.
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+/* Custom select enhanced by static/js/components/picker-select.js. */
+
+.custom-select {
+  max-width: 100%;
+  min-width: 0;
+  position: relative;
+  width: 100%;
+}
+
+.custom-select__native {
+  clip: rect(0 0 0 0);
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  width: 1px;
+}
+
+.custom-select__trigger {
+  align-items: center;
+  background:
+    linear-gradient(var(--color-card), var(--color-card)) padding-box,
+    linear-gradient(var(--select-border), var(--select-border)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  box-shadow: var(--cs-trigger-shadow);
+  box-sizing: border-box;
+  color: var(--color-input-text);
+  cursor: pointer;
+  display: flex;
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  gap: var(--space-2);
+  height: var(--control-height-md);
+  max-width: 100%;
+  min-height: var(--control-height-md);
+  min-width: 0;
+  padding: 0 var(--space-3);
+  text-align: left;
+  transition: background 150ms ease, box-shadow 150ms ease;
+  width: 100%;
+}
+
+.custom-select__trigger:focus,
+.custom-select__trigger:focus-visible {
+  outline: none;
+}
+
+.custom-select--open:not(.custom-select--menu-portal) .custom-select__trigger {
+  background:
+    linear-gradient(var(--field-bg-hover), var(--field-bg-hover)) padding-box,
+    linear-gradient(var(--select-border), var(--select-border)) border-box;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  box-shadow: none;
+}
+
+.custom-select__value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-select__value--placeholder {
+  color: var(--color-input-placeholder);
+}
+
+.custom-select__chevron {
+  align-items: center;
+  color: var(--cs-chevron-color);
+  display: flex;
+  flex-shrink: 0;
+  transition: color 150ms ease;
+}
+
+.custom-select__chevron svg {
+  display: block;
+  transition: transform 200ms ease;
+}
+
+.custom-select--open .custom-select__chevron {
+  color: var(--cs-chevron-color);
+}
+
+.custom-select--open .custom-select__chevron svg {
+  transform: rotate(180deg);
+}
+
+html[data-theme="dark"] .custom-select--v2 {
+  --cs-chevron-color: var(--color-accent);
+}
+
+html[data-theme="dark"] .custom-select--v2 .custom-select__chevron,
+html[data-theme="dark"] .custom-select--v2 .custom-select__chevron svg {
+  color: var(--color-accent);
+  stroke: currentColor;
+}
+
+@keyframes cv-cs-menu-enter {
+  from { opacity: 0; transform: translateY(-4px) scaleY(0.97); }
+  to   { opacity: 1; transform: translateY(0) scaleY(1); }
+}
+
+.custom-select__menu {
+  --cs-menu-bg: var(--theme-surface-card);
+  --cs-menu-border: var(--theme-border-card);
+  --cs-menu-radius: var(--radius-control);
+  animation: cv-cs-menu-enter 160ms ease both;
+  background: var(--cs-menu-bg);
+  border: 1px solid var(--select-border);
+  border-top: none;
+  border-radius: 0 0 var(--cs-menu-radius) var(--cs-menu-radius);
+  box-shadow: var(--shadow-md);
+  box-sizing: border-box;
+  left: 0;
+  list-style: none;
+  margin: 0;
+  max-height: 248px;
+  min-width: 100%;
+  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0;
+  position: absolute;
+  scrollbar-width: thin;
+  top: 100%;
+  transform-origin: top;
+  width: 100%;
+  z-index: var(--cs-z-index);
+}
+
+.custom-select__menu.floating-dropdown--active {
+  background: var(--cs-menu-bg);
+  border-radius: var(--cs-menu-radius);
+  border-top: 1px solid var(--select-border);
+  overflow: hidden;
+  /* Portal no body: acima do modal, mesmo contrato do search-picker. */
+  z-index: calc(var(--z-modal, 100) + 20);
+}
+
+.custom-select__menu::-webkit-scrollbar { width: 4px; }
+.custom-select__menu::-webkit-scrollbar-track { background: transparent; }
+.custom-select__menu::-webkit-scrollbar-thumb {
+  background: var(--cs-menu-border);
+  border-radius: 4px;
+}
+
+.custom-select__option {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-size: var(--font-size-sm);
+  gap: var(--space-2);
+  min-height: var(--control-height-sm);
+  padding: var(--space-2) var(--space-3);
+  transition: background 80ms ease;
+  user-select: none;
+}
+
+.custom-select__option:first-child {
+  border-top-left-radius: calc(var(--cs-menu-radius) - var(--space-1));
+  border-top-right-radius: calc(var(--cs-menu-radius) - var(--space-1));
+}
+
+.custom-select__option:last-child {
+  border-bottom-left-radius: calc(var(--cs-menu-radius) - var(--space-1));
+  border-bottom-right-radius: calc(var(--cs-menu-radius) - var(--space-1));
+}
+
+.custom-select__option:hover:not(.custom-select__option--disabled) {
+  background: var(--theme-list-row-hover);
+}
+
+.custom-select__option--focused {
+  background: var(--theme-list-row-hover);
+}
+
+.custom-select__option--selected {
+  background: var(--option-selected-bg);
+  color: var(--cs-option-selected-color);
+  font-weight: var(--font-weight-semibold);
+}
+
+.custom-select__option--selected:hover:not(.custom-select__option--disabled),
+.custom-select__option--selected.custom-select__option--focused {
+  background: var(--option-selected-bg);
+  filter: brightness(0.97);
+}
+
+.custom-select__option--disabled {
+  color: var(--color-input-placeholder);
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.custom-select__option-check {
+  align-items: center;
+  color: var(--color-primary);
+  display: flex;
+  flex-shrink: 0;
+  opacity: 0;
+  width: 16px;
+}
+
+.custom-select__option--selected .custom-select__option-check {
+  opacity: 1;
+}
+
+.custom-select__option-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-select--disabled .custom-select__trigger,
+.custom-select__trigger:disabled {
+  background:
+    linear-gradient(var(--color-input-disabled-bg), var(--color-input-disabled-bg)) padding-box,
+    linear-gradient(var(--select-border), var(--select-border)) border-box;
+  color: var(--color-input-disabled-text);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.custom-select--disabled .custom-select__chevron {
+  opacity: 0.45;
+}
+
+.custom-select--error .custom-select__trigger {
+  background:
+    linear-gradient(var(--field-error-bg), var(--field-error-bg)) padding-box,
+    linear-gradient(var(--color-danger-border-strong), var(--color-danger-border-strong)) border-box;
+}
+
+.custom-select--error.custom-select--open .custom-select__trigger {
+  box-shadow: var(--field-error-shadow);
+}
+
+.custom-select--error .custom-select__chevron {
+  color: var(--color-danger);
+}
+
+@media (max-width: 600px) {
+  .custom-select__menu {
+    max-height: 200px;
+  }
+}
+
+
 /* Select — gatilho e menu. Depende de `v2/tokens.css`.
  *
  * O gatilho e o menu são criados em tempo de execução por

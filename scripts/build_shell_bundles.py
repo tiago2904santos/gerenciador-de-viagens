@@ -27,7 +27,6 @@ SHELL_CSS: tuple[str, ...] = (
     "css/base/03-theme-dark.css",
     "css/base/utilities.css",
     "css/layout/page-shell.css",
-    "css/fields/field.css",
     "css/actions/action-system.css",
     "css/lists/record-list.css",
     "css/fields/form-panel.css",
@@ -44,7 +43,6 @@ SHELL_CSS: tuple[str, ...] = (
 )
 
 FORM_COMPONENTS_CSS: tuple[str, ...] = (
-    "css/fields/date-picker.css",
     "css/fields/file-picker.css",
 )
 
@@ -55,17 +53,14 @@ FORM_COMPONENTS_CSS_AFTER_SHELL: tuple[str, ...] = (
 )
 
 FORM_COMPONENT_IMPORTS: tuple[tuple[str, str], ...] = (
-    (
-        '@import url("./lists/cards.css");',
-        '@import url("./fields/search-picker.css");',
-    ),
-    (
-        '@import url("./fields/select.css");',
-        '@import url("./fields/custom-select.css");',
-    ),
+    # As bases do picker, do calendário e do select foram FUNDIDAS nas folhas
+    # v2 correspondentes em 2026-08-20 — não há mais o que importar aqui.
 )
 
-_FORM_CSS_INSERT_AT = SHELL_CSS.index("css/fields/field.css") + 1
+# O bloco de formulário entra ANTES do sistema de ações, que é onde
+# `fields/field.css` o ancorava até a fusão das bases no v2 (2026-08-20).
+# Depois dele, o `action-system` venceria o file picker na cascata.
+_FORM_CSS_INSERT_AT = SHELL_CSS.index("css/base/utilities.css") + 1
 SHELL_CSS_WITH_FORM_COMPONENTS: tuple[str, ...] = (
     SHELL_CSS[:_FORM_CSS_INSERT_AT]
     + FORM_COMPONENTS_CSS

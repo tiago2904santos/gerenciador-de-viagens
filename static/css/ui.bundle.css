@@ -632,6 +632,84 @@
 /* <<< css/v2/input.css <<< */
 
 /* >>> css/v2/field.css >>> */
+/* ══════════════════════════════════════════════════════════════════════════
+ * BASE, vinda de `fields/field.css` em 2026-08-20 — mesma história do picker: são as
+ * declarações do componente do v2, que nasceram numa pasta com nome do sistema
+ * antigo. O `cv-field*` e o `form-select` são emitidos pelo PRÓPRIO
+ * `v2/form_field.html` e `v2/date_picker.html`.
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+/* ==========================================================================
+   Campo de texto — a regra base que nunca existiu
+   ==========================================================================
+
+   `.cv-field__control` é a classe de campo com maior alcance do sistema: 11
+   templates, 30 rotas. E até este arquivo ela **não tinha nenhuma regra base**.
+
+   Ela existia só em 64 regras de sobrescrita espalhadas por 14 arquivos, com 70
+   `!important`. O que pintava o campo de fato era o seletor de elemento nu
+   `input, select, textarea` em `base.css:59`.
+
+   Não é que os campos divergiram ao longo do tempo. É que **nunca existiu um
+   campo** — existia o elemento cru do navegador e um monte de correção por
+   cima. Daí saíram, medidos: 27 cadeias distintas de `background`, 13 valores
+   de `border-radius`, 7 alturas com 5 nomes de token diferentes todos valendo
+   44px, e 6 formas de declarar a mesma linha de 1px.
+
+   ## Por que os valores aqui são exatamente os de `base.css`
+
+   Este arquivo **não muda aparência nenhuma**, de propósito. Ele copia o que o
+   seletor de elemento já entrega e passa a entregar pela classe.
+
+   A tentação era escrever aqui os valores "certos" e corrigir tudo de uma vez.
+   Isso misturaria duas coisas num PR só — dar um lar à classe, e mudar o
+   visual — e qualquer diferença que aparecesse na medição seria impossível de
+   atribuir a uma das duas. Com a base neutra, cada sobrescrita pode ser
+   removida depois e medida sozinha: some ou não some.
+
+   ## O que muda, então
+
+   O lugar. A partir daqui existe **um** ponto onde a aparência de um campo é
+   decidida, e as 64 sobrescritas passam a ser dívida visível em vez de
+   arquitetura. A ordem do trabalho seguinte é: remover as redundantes (as que
+   já declaram o que esta regra entrega), depois converter as divergentes.
+
+   O `uppercase` NÃO mora aqui: o dono escolheu máscara, que muda o valor
+   digitado, e não `text-transform`, que só muda a aparência. Está em
+   `core/forms/widgets.py` (`NOVO-53`).
+
+   ## Por que `:where()` e não a classe nua
+
+   `.cv-field__control` tem especificidade 0,1,0 — mais que o seletor de
+   elemento (0,0,1) que hoje pinta o campo. Escrita assim, a regra base passava
+   a VENCER estilos de contexto legítimos escritos com seletor de elemento, e a
+   medição pegou: 55 elementos mudaram, com raio indo de 12px para 14px e borda
+   de 0 para 1px em campos que eram deliberadamente sem borda.
+
+   `:where()` zera a especificidade. A regra vira o que uma base deve ser: vale
+   onde ninguém disse nada, e perde para qualquer coisa que diga. É o que
+   permite que ela seja neutra hoje e o alvo da padronização amanhã.
+   ========================================================================== */
+
+:where(.cv-field__control) {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  min-height: var(--control-height-md);
+  padding: 0 var(--space-3);
+}
+
+/* A única variação que o dono admitiu: textarea aceita as duas caixas e cresce.
+   Os valores são os mesmos de `base.css:71`. */
+:where(.cv-field__control--textarea) {
+  min-height: var(--text-area-height-md);
+  padding-bottom: var(--space-3);
+  padding-top: var(--space-3);
+  resize: vertical;
+}
+
+
 /* Field — rótulo, controle, ajuda e erro. Depende de `v2/tokens.css`.
  *
  * COLISÃO: `.field` já existe no legado (33 usos). Enquanto ele viver, estas
@@ -1084,6 +1162,435 @@
 /* <<< css/v2/rail.css <<< */
 
 /* >>> css/v2/select.css >>> */
+/* ══════════════════════════════════════════════════════════════════════════
+ * BASE, vinda de `fields/select.css` em 2026-08-20 — mesma história do picker: são as
+ * declarações do componente do v2, que nasceram numa pasta com nome do sistema
+ * antigo. O `cv-field*` e o `form-select` são emitidos pelo PRÓPRIO
+ * `v2/form_field.html` e `v2/date_picker.html`.
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+/* ==========================================================================
+   select.css
+   Sistema global de select / multiselect
+   Central de Viagens 3.0
+
+   Componentes:
+     .cv-select-wrapper      — wrapper de <select> nativo com seta customizada
+
+   Tokens sao definidos aqui em :root e sobrescritos por tema.
+   Nenhum hex de cor nas regras de componente — apenas tokens.
+   ========================================================================== */
+
+/* =========================================================
+   01. Design Tokens — :root
+   ========================================================= */
+
+:root {
+  /* Sizing */
+
+  /* Colors — adapts to theme via tokens */
+  --select-border:         var(--color-border-strong);
+  --select-border-focus:   var(--color-primary);
+  --select-focus-ring:     0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent);
+
+  /* Disabled */
+
+  /* Error / Success */
+
+}
+
+/* =========================================================
+   02. Theme overrides — Dark
+   ========================================================= */
+
+html[data-theme="dark"] {
+  --select-border:         var(--theme-border-card);
+}
+
+/* =========================================================
+   03. Theme overrides — Light
+   ========================================================= */
+
+html[data-theme="light"] {
+  --select-border:         var(--color-border-strong);
+}
+
+/* =========================================================
+   05. Global native select styling
+   Todo <select> dentro de .main-form-panel e .list-panel
+   recebe automaticamente o estilo do design system sem
+   necessidade de alterar templates existentes.
+   ========================================================= */
+
+/* Native select em .main-form-panel: ver forms.css (gradiente --field-bg).
+   List-panel mantém estilo legado abaixo. */
+
+.list-panel select:not([class]),
+.list-panel .form-select {
+  appearance: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352657a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right var(--space-3) center / 16px 16px,
+    var(--color-card);
+  border: 1px solid var(--select-border);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-xs);
+  box-sizing: border-box;
+  color: var(--color-text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  height: var(--control-height-md);
+  padding: 0 calc(var(--space-6) + var(--space-2)) 0 var(--space-3);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  width: 100%;
+}
+
+.list-panel select:not([class]):focus,
+.list-panel select:not([class]):focus-visible {
+  outline: none;
+}
+
+/* ==========================================================================
+   UI Lab clone — Custom Select Premium / Inline Action
+   Fonte 1:1: static/css/dev/ui-lab-fields.css + templates/dev/ui_lab/selects_filters.html
+   ========================================================================== */
+
+:root {
+  --field-padding-y: 0;
+  --field-bg-hover: var(--theme-surface-card);
+  --field-shadow-focus: 0 0 0 var(--space-1) var(--input-focus-ring), var(--shadow-xs);
+  --field-error-bg: var(--color-danger-soft);
+  --field-error-shadow: 0 0 0 var(--space-1) var(--color-danger-border-soft), var(--shadow-xs);
+  /* NOVO-51: lia `var(--cv-field-border)`, que este mesmo bloco definia como
+     `var(--theme-input-border)`. Aponta direto para a fonte, e nao para
+     `--color-input-border`: no fallback sem JS os dois divergem, e a E7 nao
+     mexe nessa camada (fica para a E8). */
+  --select-border: var(--theme-input-border);
+  --select-border-focus: var(--input-border-focus);
+  --select-focus-shadow: var(--field-shadow-focus);
+  --chip-bg: var(--color-primary-soft);
+  --chip-border: var(--color-info-border-strong);
+  --chip-color: var(--color-primary-strong);
+  --option-selected-bg: var(--color-primary-soft);
+  --cs-trigger-shadow: var(--shadow-sm);
+  --cs-chevron-color: var(--theme-text-muted);
+  --cs-menu-bg: var(--theme-surface-card);
+  --cs-menu-border: var(--theme-border-card);
+  --cs-menu-radius: var(--radius-control);
+  --cs-option-selected-color: var(--color-primary);
+  --cs-z-index: 200;
+}
+
+html[data-theme="dark"] {
+  --field-bg-hover: var(--theme-surface-card-soft);
+  --field-error-bg: var(--color-input-bg);
+  --chip-bg: var(--color-info-bg);
+  --chip-border: var(--color-info-border);
+  --chip-color: var(--color-info-text);
+  --option-selected-bg: var(--color-info-bg);
+  --cs-trigger-shadow: none;
+  --cs-option-selected-color: var(--color-info-text);
+}
+
+.cv-field {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.app-form-field .cv-field__label,
+.cv-field__label {
+  color: var(--color-label-strong);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+}
+
+.field-with-action {
+  align-items: center;
+  display: flex;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+
+.field-with-action .field-action {
+  align-self: center;
+  flex: 0 0 auto;
+  height: var(--control-height-md);
+  max-height: var(--control-height-md);
+  min-height: var(--control-height-md);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * BASE, vinda de `fields/custom-select.css` em 2026-08-20.
+ *
+ * Esta parte NÃO é legado: são as declarações do próprio componente do v2, que
+ * moravam numa pasta com nome do sistema antigo porque foi lá que nasceram. O
+ * arquivo v2 carregava só o DELTA — e por isso apagar a pasta antiga teria
+ * apagado o componente.
+ *
+ * A ordem foi preservada: base primeiro, delta depois, exatamente como os dois
+ * bundles as entregavam.
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+/* Custom select enhanced by static/js/components/picker-select.js. */
+
+.custom-select {
+  max-width: 100%;
+  min-width: 0;
+  position: relative;
+  width: 100%;
+}
+
+.custom-select__native {
+  clip: rect(0 0 0 0);
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  width: 1px;
+}
+
+.custom-select__trigger {
+  align-items: center;
+  background:
+    linear-gradient(var(--color-card), var(--color-card)) padding-box,
+    linear-gradient(var(--select-border), var(--select-border)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  box-shadow: var(--cs-trigger-shadow);
+  box-sizing: border-box;
+  color: var(--color-input-text);
+  cursor: pointer;
+  display: flex;
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  gap: var(--space-2);
+  height: var(--control-height-md);
+  max-width: 100%;
+  min-height: var(--control-height-md);
+  min-width: 0;
+  padding: 0 var(--space-3);
+  text-align: left;
+  transition: background 150ms ease, box-shadow 150ms ease;
+  width: 100%;
+}
+
+.custom-select__trigger:focus,
+.custom-select__trigger:focus-visible {
+  outline: none;
+}
+
+.custom-select--open:not(.custom-select--menu-portal) .custom-select__trigger {
+  background:
+    linear-gradient(var(--field-bg-hover), var(--field-bg-hover)) padding-box,
+    linear-gradient(var(--select-border), var(--select-border)) border-box;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  box-shadow: none;
+}
+
+.custom-select__value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-select__value--placeholder {
+  color: var(--color-input-placeholder);
+}
+
+.custom-select__chevron {
+  align-items: center;
+  color: var(--cs-chevron-color);
+  display: flex;
+  flex-shrink: 0;
+  transition: color 150ms ease;
+}
+
+.custom-select__chevron svg {
+  display: block;
+  transition: transform 200ms ease;
+}
+
+.custom-select--open .custom-select__chevron {
+  color: var(--cs-chevron-color);
+}
+
+.custom-select--open .custom-select__chevron svg {
+  transform: rotate(180deg);
+}
+
+html[data-theme="dark"] .custom-select--v2 {
+  --cs-chevron-color: var(--color-accent);
+}
+
+html[data-theme="dark"] .custom-select--v2 .custom-select__chevron,
+html[data-theme="dark"] .custom-select--v2 .custom-select__chevron svg {
+  color: var(--color-accent);
+  stroke: currentColor;
+}
+
+@keyframes cv-cs-menu-enter {
+  from { opacity: 0; transform: translateY(-4px) scaleY(0.97); }
+  to   { opacity: 1; transform: translateY(0) scaleY(1); }
+}
+
+.custom-select__menu {
+  --cs-menu-bg: var(--theme-surface-card);
+  --cs-menu-border: var(--theme-border-card);
+  --cs-menu-radius: var(--radius-control);
+  animation: cv-cs-menu-enter 160ms ease both;
+  background: var(--cs-menu-bg);
+  border: 1px solid var(--select-border);
+  border-top: none;
+  border-radius: 0 0 var(--cs-menu-radius) var(--cs-menu-radius);
+  box-shadow: var(--shadow-md);
+  box-sizing: border-box;
+  left: 0;
+  list-style: none;
+  margin: 0;
+  max-height: 248px;
+  min-width: 100%;
+  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0;
+  position: absolute;
+  scrollbar-width: thin;
+  top: 100%;
+  transform-origin: top;
+  width: 100%;
+  z-index: var(--cs-z-index);
+}
+
+.custom-select__menu.floating-dropdown--active {
+  background: var(--cs-menu-bg);
+  border-radius: var(--cs-menu-radius);
+  border-top: 1px solid var(--select-border);
+  overflow: hidden;
+  /* Portal no body: acima do modal, mesmo contrato do search-picker. */
+  z-index: calc(var(--z-modal, 100) + 20);
+}
+
+.custom-select__menu::-webkit-scrollbar { width: 4px; }
+.custom-select__menu::-webkit-scrollbar-track { background: transparent; }
+.custom-select__menu::-webkit-scrollbar-thumb {
+  background: var(--cs-menu-border);
+  border-radius: 4px;
+}
+
+.custom-select__option {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-size: var(--font-size-sm);
+  gap: var(--space-2);
+  min-height: var(--control-height-sm);
+  padding: var(--space-2) var(--space-3);
+  transition: background 80ms ease;
+  user-select: none;
+}
+
+.custom-select__option:first-child {
+  border-top-left-radius: calc(var(--cs-menu-radius) - var(--space-1));
+  border-top-right-radius: calc(var(--cs-menu-radius) - var(--space-1));
+}
+
+.custom-select__option:last-child {
+  border-bottom-left-radius: calc(var(--cs-menu-radius) - var(--space-1));
+  border-bottom-right-radius: calc(var(--cs-menu-radius) - var(--space-1));
+}
+
+.custom-select__option:hover:not(.custom-select__option--disabled) {
+  background: var(--theme-list-row-hover);
+}
+
+.custom-select__option--focused {
+  background: var(--theme-list-row-hover);
+}
+
+.custom-select__option--selected {
+  background: var(--option-selected-bg);
+  color: var(--cs-option-selected-color);
+  font-weight: var(--font-weight-semibold);
+}
+
+.custom-select__option--selected:hover:not(.custom-select__option--disabled),
+.custom-select__option--selected.custom-select__option--focused {
+  background: var(--option-selected-bg);
+  filter: brightness(0.97);
+}
+
+.custom-select__option--disabled {
+  color: var(--color-input-placeholder);
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.custom-select__option-check {
+  align-items: center;
+  color: var(--color-primary);
+  display: flex;
+  flex-shrink: 0;
+  opacity: 0;
+  width: 16px;
+}
+
+.custom-select__option--selected .custom-select__option-check {
+  opacity: 1;
+}
+
+.custom-select__option-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-select--disabled .custom-select__trigger,
+.custom-select__trigger:disabled {
+  background:
+    linear-gradient(var(--color-input-disabled-bg), var(--color-input-disabled-bg)) padding-box,
+    linear-gradient(var(--select-border), var(--select-border)) border-box;
+  color: var(--color-input-disabled-text);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.custom-select--disabled .custom-select__chevron {
+  opacity: 0.45;
+}
+
+.custom-select--error .custom-select__trigger {
+  background:
+    linear-gradient(var(--field-error-bg), var(--field-error-bg)) padding-box,
+    linear-gradient(var(--color-danger-border-strong), var(--color-danger-border-strong)) border-box;
+}
+
+.custom-select--error.custom-select--open .custom-select__trigger {
+  box-shadow: var(--field-error-shadow);
+}
+
+.custom-select--error .custom-select__chevron {
+  color: var(--color-danger);
+}
+
+@media (max-width: 600px) {
+  .custom-select__menu {
+    max-height: 200px;
+  }
+}
+
+
 /* Select — gatilho e menu. Depende de `v2/tokens.css`.
  *
  * O gatilho e o menu são criados em tempo de execução por
@@ -4088,6 +4595,945 @@
 /* <<< css/v2/destinations.css <<< */
 
 /* >>> css/v2/picker.css >>> */
+/* ══════════════════════════════════════════════════════════════════════════
+ * BASE, vinda de `fields/search-picker.css` em 2026-08-20.
+ *
+ * Esta parte NÃO é legado: são as declarações do próprio componente do v2, que
+ * moravam numa pasta com nome do sistema antigo porque foi lá que nasceram. O
+ * arquivo v2 carregava só o DELTA — e por isso apagar a pasta antiga teria
+ * apagado o componente.
+ *
+ * A ordem foi preservada: base primeiro, delta depois, exatamente como os dois
+ * bundles as entregavam.
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+/* ==========================================================================
+   search-picker
+   Campo customizado de busca, dropdown e selecao. O select nativo permanece
+   oculto apenas para compatibilidade de formulario.
+   ========================================================================== */
+
+/* Tokens globais — o dropdown flutuante (body) precisa destes valores */
+:root {
+  --sp-field-bg: var(--theme-input-bg, var(--color-input-bg));
+  --sp-field-bg-soft: var(--theme-surface-card-soft, var(--color-card-soft));
+  --sp-field-border: var(--theme-input-border, var(--color-input-border));
+  --sp-field-border-focus: var(--route-button-primary-border, var(--color-secondary));
+  --sp-field-text: var(--theme-input-text, var(--color-input-text));
+  --sp-field-focus-ring: var(--route-focus-ring, var(--color-info-border));
+  --sp-dropdown-bg: var(--theme-surface-card, var(--color-card));
+  --sp-dropdown-option-hover: var(--theme-list-row-hover, var(--color-primary-soft));
+  --sp-selected-panel-bg: var(--theme-surface-card-soft, var(--color-card-soft));
+  --sp-selected-panel-border: var(--theme-border-card, var(--color-border));
+  --sp-selected-card-bg: var(--theme-surface-card, var(--color-card));
+  --sp-selected-card-border: var(--theme-border-card, var(--color-border-soft));
+}
+
+.search-picker {
+  --field-bg: var(--sp-field-bg);
+  --field-bg-soft: var(--sp-field-bg-soft);
+  --field-border: var(--sp-field-border);
+  --field-border-hover: var(--color-border-strong);
+  --field-border-focus: var(--sp-field-border-focus);
+  --field-text: var(--sp-field-text);
+  --field-placeholder: var(--color-input-placeholder);
+  --field-focus-ring: var(--sp-field-focus-ring);
+  --dropdown-bg: var(--sp-dropdown-bg);
+  --dropdown-border: var(--sp-field-border-focus);
+  --dropdown-shadow: var(--shadow-panel);
+  --dropdown-option-hover: var(--sp-dropdown-option-hover);
+  --dropdown-option-selected: var(--color-info-bg);
+  --selected-panel-bg: var(--sp-selected-panel-bg);
+  --selected-panel-border: var(--sp-selected-panel-border);
+  --selected-card-bg: var(--sp-selected-card-bg);
+  --selected-card-border: var(--sp-selected-card-border);
+  --control-active-bg: var(--state-success-bg-active);
+  --control-active-border: var(--state-success-border-hover);
+  --control-active-text: var(--state-success-text-active);
+  --control-inactive-bg: var(--state-warning-bg-active);
+  --control-inactive-border: var(--state-warning-border-hover);
+  --control-inactive-text: var(--state-warning-text-active);
+  --danger-bg: color-mix(in srgb, var(--color-danger) 92%, black 8%);
+  --danger-border: color-mix(in srgb, var(--color-danger) 78%, black 22%);
+  --danger-text: var(--state-danger-text-active);
+  --remove-rail-width: calc(var(--space-10) + var(--space-2));
+  --selected-card-open-gap: var(--space-2);
+  --driver-bg: var(--color-bg-subtle, var(--color-primary-soft));
+  --driver-border: var(--btn-secondary-active-border, var(--color-primary));
+  --driver-text: var(--btn-secondary-active-color, var(--color-primary-strong));
+  --search-picker-height: var(--control-height-md);
+  --search-picker-radius: var(--radius-control);
+  --search-picker-card-radius: var(--radius-card);
+  --search-picker-focus-shadow: 0 0 0 var(--space-1) var(--field-focus-ring), var(--shadow-xs);
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+  position: relative;
+  width: 100%;
+}
+
+.search-picker__native,
+.search-picker__termos-native {
+  display: none !important;
+}
+
+.search-picker__field {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  position: relative;
+}
+
+.search-picker__label {
+  color: var(--color-label, var(--color-label-strong));
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.search-picker__hint {
+  color: var(--theme-text-muted, var(--color-muted));
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+}
+
+/* Controle e dropdown repetem tokens — dropdown no body não herda do .search-picker */
+.search-picker__control,
+.search-picker__dropdown {
+  --field-bg: var(--sp-field-bg);
+  --field-bg-soft: var(--sp-field-bg-soft);
+  --field-border: var(--sp-field-border);
+  --field-border-hover: var(--color-border-strong);
+  --field-border-focus: var(--sp-field-border-focus);
+  --field-text: var(--sp-field-text);
+  --field-placeholder: var(--color-input-placeholder);
+  --field-focus-ring: var(--sp-field-focus-ring);
+  --dropdown-bg: var(--sp-dropdown-bg);
+  --dropdown-border: var(--sp-field-border-focus);
+  --dropdown-shadow: var(--shadow-panel);
+  --dropdown-option-hover: var(--sp-dropdown-option-hover);
+  --dropdown-option-selected: var(--color-info-bg);
+  --search-picker-radius: var(--radius-control);
+}
+
+.search-picker__control {
+  align-items: center;
+  background:
+    linear-gradient(var(--field-bg), var(--field-bg)) padding-box,
+    linear-gradient(var(--field-border), var(--field-border)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--search-picker-radius);
+  box-shadow: var(--shadow-xs);
+  box-sizing: border-box;
+  display: flex;
+  gap: var(--space-2);
+  min-height: var(--search-picker-height);
+  min-width: 0;
+  padding: 0 var(--space-3);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    border-radius var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+/* Com menu no body, mantém cantos arredondados no campo */
+.search-picker--open:not(.search-picker--menu-portal) .search-picker__control {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  box-shadow: none;
+}
+
+.search-picker__icon {
+  color: var(--field-placeholder);
+  flex: 0 0 auto;
+  height: var(--space-4);
+  position: relative;
+  width: var(--space-4);
+}
+
+.search-picker__icon::before {
+  border: 2px solid currentColor;
+  border-radius: var(--radius-pill);
+  box-sizing: border-box;
+  content: "";
+  height: var(--space-3);
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: var(--space-3);
+}
+
+.search-picker__icon::after {
+  background: currentColor;
+  border-radius: var(--radius-pill);
+  content: "";
+  height: 2px;
+  position: absolute;
+  right: 0;
+  top: calc(var(--space-3) - 1px);
+  transform: rotate(45deg);
+  transform-origin: center;
+  width: var(--space-2);
+}
+
+.search-picker__input {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--field-text);
+  flex: 1 1 auto;
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+  min-height: calc(var(--search-picker-height) - var(--space-3));
+  min-width: 0;
+  outline: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.search-picker__input:focus,
+.search-picker__input:focus-visible {
+  box-shadow: none;
+  outline: none;
+}
+
+.search-picker__input::placeholder {
+  color: var(--field-placeholder);
+  opacity: 1;
+}
+
+.search-picker__input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.search-picker__clear,
+.search-picker__remove {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--selected-card-border);
+  border-radius: var(--radius-pill);
+  color: var(--theme-text-muted, var(--color-muted));
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-black);
+  height: var(--space-6);
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  text-transform: uppercase;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  width: var(--space-6);
+}
+
+/* Limpar busca: só o "x", sem cápsula/fundo. */
+.search-picker__clear {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--color-muted-strong, var(--theme-text-muted, var(--color-muted)));
+  font-size: 0.95rem;
+  font-weight: var(--font-weight-semibold);
+  height: auto;
+  min-height: 1.25rem;
+  min-width: 1.25rem;
+  text-transform: none;
+  width: auto;
+}
+
+.search-picker__selected-card > .search-picker__remove {
+  background: var(--danger-bg);
+  align-self: center;
+  border: 0;
+  border-radius: calc(var(--search-picker-radius) - 1px) 0 0 calc(var(--search-picker-radius) - 1px);
+  border-right: 1px solid var(--danger-border);
+  box-shadow: none;
+  color: var(--danger-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-black);
+  grid-column: 1;
+  grid-row: 1;
+  height: auto;
+  margin: calc(var(--space-3) * -1) 0 calc(var(--space-3) * -1) calc(var(--space-3) * -1);
+  min-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  text-transform: uppercase;
+  transform: translateX(calc(var(--space-2) * -1));
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    opacity var(--transition-base),
+    transform var(--transition-base),
+    width var(--transition-base);
+  width: var(--remove-rail-width);
+}
+
+/* Com driver: remove cobre as 2 linhas (corpo + driver-control) */
+.search-picker__selected-card--with-driver > .search-picker__remove {
+  grid-row: 1 / span 2;
+}
+
+/* Cards simples (sem term nem driver): rail de excluir mais estreito */
+.search-picker__selected-card:not(.search-picker__selected-card--with-term):not(.search-picker__selected-card--with-driver) {
+  --remove-rail-width: var(--space-9);
+}
+
+.search-picker__selected-card:hover > .search-picker__remove {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.search-picker__clear {
+  display: none;
+}
+
+.search-picker--has-query .search-picker__clear {
+  display: inline-flex;
+}
+
+.search-picker__clear:hover,
+.search-picker__clear:focus-visible {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--color-text, var(--theme-text-heading));
+  outline: none;
+}
+
+.search-picker__remove:hover,
+.search-picker__remove:focus-visible {
+  background: var(--danger-bg);
+  border-color: var(--danger-border);
+  color: var(--danger-text);
+  outline: none;
+}
+
+.search-picker__selected-card > .search-picker__remove:hover,
+.search-picker__selected-card > .search-picker__remove:focus-visible {
+  background: color-mix(in srgb, var(--danger-bg) 86%, var(--theme-text-heading) 14%);
+  border-color: var(--danger-border);
+  color: var(--danger-text);
+  outline: 2px solid var(--danger-border);
+  outline-offset: -2px;
+}
+
+.search-picker__dropdown {
+  animation: cv-search-picker-menu-in var(--transition-base) both;
+  background: var(--dropdown-bg);
+  border: 1px solid var(--dropdown-border);
+  border-radius: 0 0 var(--search-picker-radius) var(--search-picker-radius);
+  border-top: 0;
+  box-shadow: var(--dropdown-shadow);
+  box-sizing: border-box;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  transform-origin: top;
+  z-index: var(--z-dropdown);
+}
+
+.search-picker__dropdown.floating-dropdown--active {
+  background: var(--dropdown-bg);
+  border-radius: var(--search-picker-radius);
+  border-top: 1px solid var(--dropdown-border);
+  overflow: hidden;
+  /* Portal no body: precisa ficar acima do modal (--z-modal), senão o menu
+     some atrás do painel do diálogo (ex.: Vincular usuário). */
+  z-index: calc(var(--z-modal, 100) + 20);
+}
+
+.search-picker--open .search-picker__dropdown {
+  box-shadow: var(--search-picker-focus-shadow), var(--dropdown-shadow);
+  clip-path: inset(0 calc(var(--space-1) * -1) calc(var(--space-1) * -1) calc(var(--space-1) * -1));
+}
+
+@keyframes cv-search-picker-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--space-1) * -1)) scaleY(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+.search-picker__list {
+  display: grid;
+  gap: var(--space-1);
+  max-height: calc(var(--control-height-lg) * 5);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--field-border-hover) transparent;
+  scrollbar-width: thin;
+}
+
+.search-picker__list::-webkit-scrollbar {
+  width: var(--space-1);
+}
+
+.search-picker__list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.search-picker__list::-webkit-scrollbar-thumb {
+  background: var(--field-border-hover);
+  border-radius: var(--radius-pill);
+}
+
+.search-picker__option {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--theme-text-body, var(--color-text));
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: var(--space-3);
+  min-height: var(--control-height-md);
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+  width: 100%;
+}
+
+.search-picker__option:first-child {
+  border-top-left-radius: calc(var(--search-picker-radius) - var(--space-1));
+  border-top-right-radius: calc(var(--search-picker-radius) - var(--space-1));
+}
+
+.search-picker__option:last-child {
+  border-bottom-left-radius: calc(var(--search-picker-radius) - var(--space-1));
+  border-bottom-right-radius: calc(var(--search-picker-radius) - var(--space-1));
+}
+
+.search-picker__option:hover,
+.search-picker__option--active {
+  background: var(--dropdown-option-hover);
+}
+
+.search-picker__option--selected {
+  background: var(--dropdown-option-selected);
+  border-color: var(--color-info-border-strong);
+}
+
+.search-picker__option-marker {
+  align-items: center;
+  border: 1px solid var(--field-border-hover);
+  border-radius: var(--radius-pill);
+  box-sizing: border-box;
+  color: var(--color-white);
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: var(--space-5);
+  justify-content: center;
+  position: relative;
+  width: var(--space-5);
+}
+
+.search-picker__option--selected .search-picker__option-marker {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.search-picker__option--unidade .search-picker__option-marker {
+  border-radius: var(--radius-sm);
+  border-style: dashed;
+}
+
+.search-picker__option--unidade .search-picker__option-main::before {
+  color: var(--color-description);
+  content: "Unidade";
+  display: inline-block;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  margin-right: var(--space-2);
+  text-transform: uppercase;
+}
+
+.search-picker__option--selected .search-picker__option-marker::after {
+  border-bottom: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  content: "";
+  height: var(--space-2);
+  transform: translateY(calc(var(--space-1) * -1)) rotate(45deg);
+  width: var(--space-1);
+}
+
+.search-picker__option-content {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.search-picker__option-main {
+  color: var(--theme-text-heading, var(--color-heading));
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-picker__option-meta {
+  color: var(--theme-text-muted, var(--color-muted));
+  font-size: var(--font-size-xs);
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Estrutura enriquecida usada pelo tema escuro. Mantida oculta na base para
+   não iniciar o redesign do tema claro nesta etapa. */
+.search-picker__option-visual,
+.search-picker__option-status {
+  display: none;
+}
+
+.search-picker__empty,
+.search-picker__selected-empty {
+  background: var(--field-bg-soft);
+  border: 1px dashed var(--selected-panel-border);
+  border-radius: var(--radius-md);
+  color: var(--theme-text-muted, var(--color-muted));
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+  margin: 0;
+  padding: var(--space-4);
+  text-align: center;
+}
+
+.search-picker__empty {
+  border-radius: 0;
+  border-width: 0;
+}
+
+.search-picker__selected-panel {
+  background: var(--selected-panel-bg);
+  border: 1px solid var(--selected-panel-border);
+  border-radius: var(--search-picker-card-radius);
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4);
+}
+
+.search-picker__selected-header {
+  align-items: center;
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.search-picker__selected-title {
+  color: var(--color-label);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-black);
+  letter-spacing: var(--letter-spacing-label);
+  line-height: 1.2;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.search-picker__selected-count {
+  align-items: center;
+  background: var(--color-primary);
+  border: 1px solid var(--color-info-border-strong);
+  border-radius: var(--radius-pill);
+  color: var(--color-white);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  justify-content: center;
+  min-height: var(--space-6);
+  min-width: var(--space-6);
+  padding: 0 var(--space-2);
+}
+
+.search-picker__selected-list {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: 1fr;
+  min-width: 0;
+}
+
+.search-picker--compact .search-picker__selected-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.search-picker--compact .search-picker__selected-card:only-child,
+.search-picker--compact .search-picker__selected-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.search-picker__selected-card {
+  align-items: start;
+  background: var(--selected-card-bg);
+  border: 1px solid var(--selected-card-border);
+  border-radius: var(--search-picker-radius);
+  box-shadow: var(--shadow-xs);
+  display: grid;
+  column-gap: 0;
+  grid-template-columns: 0 minmax(0, 1fr) auto;
+  min-width: 0;
+  overflow: hidden;
+  padding: var(--space-3);
+  row-gap: 0;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast),
+    grid-template-columns var(--transition-base);
+}
+
+.search-picker__selected-card--with-term {
+  align-items: center;
+  grid-template-columns: 0 minmax(0, 1fr) auto;
+}
+
+.search-picker__selected-card:hover,
+.search-picker__selected-card--with-term:hover {
+  column-gap: var(--space-1);          /* gap pequeno entre rail X e corpo */
+  grid-template-columns: var(--remove-rail-width) minmax(0, 1fr) auto;
+}
+
+/* row-gap só quando o botão de motorista existir */
+.search-picker__selected-card--with-driver:hover {
+  row-gap: var(--space-4);
+}
+
+.search-picker__selected-card--has-term {
+  border-color: var(--selected-card-border);
+  box-shadow: var(--shadow-xs);
+}
+
+.search-picker__selected-main {
+  display: grid;
+  gap: var(--space-1);
+  grid-column: 2;
+  min-width: 0;
+}
+
+.search-picker__selected-title-row {
+  align-items: center;
+  display: flex;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.search-picker__selected-name {
+  color: var(--theme-text-heading, var(--color-heading));
+  flex: 0 1 auto;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-picker__driver-chip {
+  background: var(--driver-bg);
+  border: 1px solid var(--driver-border);
+  border-radius: var(--radius-pill);
+  color: var(--driver-text);
+  display: none;
+  flex: 0 0 auto;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  padding: var(--space-1) var(--space-2);
+}
+
+.search-picker__selected-card--driver .search-picker__driver-chip {
+  display: inline-flex;
+}
+
+.search-picker__selected-meta,
+.search-picker__selected-detail {
+  color: var(--theme-text-muted, var(--color-muted));
+  font-size: var(--font-size-xs);
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-picker__selected-detail {
+  display: none;
+}
+
+.search-picker--detailed .search-picker__selected-detail {
+  display: block;
+}
+
+.search-picker--detailed .search-picker__selected-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.search-picker--detailed .search-picker__selected-card:only-child,
+.search-picker--detailed .search-picker__selected-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.search-picker__term-control {
+  align-items: center;
+  border-top: 0;
+  display: grid;
+  gap: var(--space-1);
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  padding-top: 0;
+}
+
+.search-picker__term-label {
+  color: var(--theme-text-muted-strong, var(--color-muted-strong));
+  display: none;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+}
+
+/* O toggle de Termo usa field-side-action--state (dot colorido).
+   Os estilos visuais já existem em buttons.css — nenhuma regra extra. */
+
+.search-picker__driver-control {
+  grid-column: 2 / -1;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(calc(var(--space-2) * -1));
+  transition:
+    max-height var(--transition-base),
+    opacity var(--transition-base),
+    transform var(--transition-base);
+}
+
+.search-picker__selected-card:hover .search-picker__driver-control {
+  max-height: calc(var(--control-height-md) + var(--space-2));
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Estrutura compartilhada do roster: o card seleciona o motorista, enquanto
+   termo e remoção continuam como ações independentes acima da área clicável. */
+.search-picker--roster .search-picker__selected-card {
+  position: relative;
+}
+
+.search-picker--roster .search-picker__driver-surface {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  inset: 0;
+  padding: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+}
+
+.search-picker--roster :is(.search-picker__selected-avatar, .search-picker__selected-main) {
+  pointer-events: none;
+  position: relative;
+  z-index: 2;
+}
+
+.search-picker--roster .search-picker__selected-actions {
+  position: relative;
+  z-index: 3;
+}
+
+.search-picker--roster .search-picker__driver-control {
+  display: none;
+}
+
+.search-picker__driver-toggle {
+  align-items: center;
+  appearance: none;
+  background: var(--field-bg-soft);
+  border: 1px solid var(--selected-card-border);
+  border-radius: var(--search-picker-radius);
+  color: var(--theme-text-body, var(--color-text));
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  gap: var(--space-2);
+  min-height: var(--control-height-md);
+  padding: var(--space-2) var(--space-4);
+  text-align: left;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  width: 100%;
+}
+
+.search-picker__driver-toggle:hover,
+.search-picker__driver-toggle:focus-visible {
+  border-color: var(--driver-border);
+  outline: none;
+}
+
+.search-picker__driver-toggle--active {
+  background: var(--driver-bg);
+  border-color: var(--driver-border);
+  color: var(--driver-text);
+}
+
+.search-picker__driver-marker {
+  border: 1px solid currentColor;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: var(--space-4);
+  position: relative;
+  width: var(--space-4);
+}
+
+.search-picker__driver-toggle--active .search-picker__driver-marker::after {
+  background: currentColor;
+  border-radius: var(--radius-pill);
+  content: "";
+  inset: 3px;
+  position: absolute;
+}
+
+.search-picker__driver-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-picker--error {
+  --field-border: var(--danger-border);
+  --field-border-hover: var(--danger-border);
+  --field-border-focus: var(--danger-border);
+  --field-focus-ring: var(--danger-border);
+}
+
+.search-picker--error .search-picker__selected-panel {
+  border-color: var(--danger-border);
+}
+
+.search-picker--disabled {
+  opacity: 1;
+}
+
+.search-picker--disabled .search-picker__control,
+.search-picker--disabled .search-picker__selected-panel,
+.search-picker--disabled .search-picker__selected-card {
+  background: var(--color-input-disabled-bg);
+  box-shadow: none;
+}
+
+.search-picker--disabled .search-picker__control {
+  cursor: not-allowed;
+}
+
+.search-picker--disabled .search-picker__input,
+.search-picker--disabled .search-picker__selected-name,
+.search-picker--disabled .search-picker__selected-meta,
+.search-picker--disabled .search-picker__selected-detail {
+  color: var(--color-input-disabled-text);
+}
+
+.search-picker--disabled .search-picker__clear,
+.search-picker--disabled .search-picker__remove,
+.search-picker--disabled .search-picker__term-control .field-side-action,
+.search-picker--disabled .search-picker__driver-toggle {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.search-picker--disabled .search-picker__selected-card,
+.search-picker--disabled .search-picker__term-control,
+.search-picker--disabled .search-picker__driver-control {
+  opacity: 0.72;
+}
+
+.search-picker--disabled .search-picker__selected-card:hover {
+  column-gap: 0;
+  grid-template-columns: 0 minmax(0, 1fr) auto;
+}
+
+.search-picker--disabled .search-picker__remove {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .search-picker--compact .search-picker__selected-list,
+  .search-picker--detailed .search-picker__selected-list {
+    grid-template-columns: 1fr;
+  }
+
+  .search-picker--compact .search-picker__selected-card:only-child,
+  .search-picker--compact .search-picker__selected-card:last-child:nth-child(odd),
+  .search-picker--detailed .search-picker__selected-card:only-child,
+  .search-picker--detailed .search-picker__selected-card:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+
+  .search-picker__term-control {
+    border-top: 1px solid var(--selected-card-border);
+    grid-column: 2 / -1;
+    grid-row: auto;
+    grid-template-columns: 1fr;
+    justify-self: stretch;
+    padding-top: var(--space-3);
+  }
+
+  .search-picker__selected-card--with-driver .search-picker__remove {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+}
+
+.search-picker--single.search-picker--detailed .search-picker__selected-card > .search-picker__remove {
+  margin: calc(var(--space-4) * -1) 0 calc(var(--space-4) * -1) calc(var(--space-5) * -1);
+}
+
+.search-picker--single.search-picker--detailed .search-picker__selected-name {
+  font-size: var(--font-size-md);
+  overflow: visible;
+  text-overflow: unset;
+  white-space: normal;
+}
+
+
 /* Picker — busca de entidade. Depende de `v2/tokens.css`.
  *
  * As classes `search-picker__*` são geradas por `js/components/picker.js` e
@@ -4938,6 +6384,587 @@
 /* <<< css/v2/picker.css <<< */
 
 /* >>> css/v2/date-picker.css >>> */
+/* ══════════════════════════════════════════════════════════════════════════
+ * BASE, vinda de `fields/date-picker.css` em 2026-08-20.
+ *
+ * Esta parte NÃO é legado: são as declarações do próprio componente do v2, que
+ * moravam numa pasta com nome do sistema antigo porque foi lá que nasceram. O
+ * arquivo v2 carregava só o DELTA — e por isso apagar a pasta antiga teria
+ * apagado o componente.
+ *
+ * A ordem foi preservada: base primeiro, delta depois, exatamente como os dois
+ * bundles as entregavam.
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+/* --------------------------------------------------------------------------
+   date-picker — componente compartilhado
+   -------------------------------------------------------------------------- */
+
+html {
+  --date-picker-selected-bg-start: var(--stepper-active-bg, var(--color-accent));
+  --date-picker-selected-bg-end: var(--stepper-active-bg, var(--color-accent));
+  --date-picker-selected-border: transparent;
+  --date-picker-selected-color: var(--stepper-active-color, var(--color-white));
+  --date-picker-selected-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  --date-picker-selected-halo: var(--stepper-active-bg, var(--color-accent));
+}
+
+html[data-theme="dark"] {
+  --date-picker-selected-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+}
+
+html[data-theme="light"] {
+  --date-picker-selected-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
+}
+
+.date-picker {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+  position: relative;
+}
+
+.date-picker__control {
+  align-items: stretch;
+  display: flex;
+  gap: var(--space-2);
+  min-width: 0;
+  position: relative;
+}
+
+/* Campo de input: chrome de field. Gatilhos action-button (.cv-btn) e
+   ícone embutido (--icon) ficam de fora — cada um tem visual próprio. */
+.date-picker__trigger:not(.cv-btn):not(.date-picker__trigger--icon) {
+  align-items: center;
+  appearance: none;
+  background:
+    linear-gradient(var(--theme-surface-card), var(--theme-surface-card)) padding-box,
+    linear-gradient(var(--color-input-border, var(--color-border-strong)), var(--color-input-border, var(--color-border-strong))) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-xs);
+  color: var(--theme-text-body);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  justify-content: center;
+  min-height: var(--control-height-md);
+  padding: 0 var(--space-4);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.date-picker__trigger:not(.cv-btn):not(.date-picker__trigger--icon):focus,
+.date-picker__trigger:not(.cv-btn):not(.date-picker__trigger--icon):focus-visible {
+  outline: none;
+}
+
+/* Action-button: alinha ao cv-btn sem perder o gancho do date-picker. */
+.date-picker__trigger.cv-btn {
+  flex: 0 0 auto;
+}
+
+.date-picker__trigger--icon {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  box-shadow: none;
+  color: var(--theme-text-body);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 28px;
+  justify-content: center;
+  min-height: 0;
+  opacity: 0;
+  padding: 0;
+  pointer-events: none;
+  position: absolute;
+  right: var(--space-2);
+  top: 50%;
+  transform: translateY(-50%);
+  transition: opacity 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+  width: 28px;
+  z-index: 2;
+}
+
+.date-picker__trigger--icon svg {
+  display: block;
+  flex: 0 0 auto;
+  height: 16px;
+  width: 16px;
+}
+
+.date-picker__control:hover .date-picker__trigger--icon,
+.date-picker__control:focus-within .date-picker__trigger--icon,
+.date-picker--open .date-picker__trigger--icon {
+  background: var(--btn-secondary-bg);
+  border-color: var(--btn-secondary-border);
+  color: var(--btn-secondary-color);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.date-picker__trigger--icon:hover {
+  background: var(--btn-secondary-hover-bg);
+  border-color: var(--btn-secondary-hover-border);
+  box-shadow: var(--shadow-xs);
+  color: var(--btn-secondary-hover-color);
+  transform: translateY(calc(-50% - 1px));
+}
+
+.date-picker__trigger--icon:active {
+  transform: translateY(calc(-50% + 1px));
+}
+
+.date-picker__trigger--icon:focus-visible {
+  box-shadow: var(--btn-focus-ring);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.date-picker__summary {
+  color: var(--theme-text-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.date-picker__panel {
+  --date-picker-day-gap: 2px;
+  --date-picker-day-size: 40px;
+  --date-picker-grid-width: calc((7 * var(--date-picker-day-size)) + (6 * var(--date-picker-day-gap)));
+  /* Quebra de semana: suaviza apenas as quinas da borda; inicio/fim seguem pill. */
+  --date-picker-week-edge-radius: 4px;
+  background: var(--route-card-inner-bg, var(--theme-surface-card));
+  border: 1px solid var(--route-card-inner-border, var(--theme-border-card));
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  position: fixed;
+  width: min(calc(var(--date-picker-grid-width) + (2 * var(--space-4))), calc(100vw - 16px));
+  z-index: calc(var(--z-sticky-stepper, 1100) + 20);
+}
+
+.date-picker--open .date-picker__panel,
+.date-picker__panel--entering {
+  animation: cv-date-picker-enter 150ms ease-out both;
+}
+
+@keyframes cv-date-picker-enter {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.date-picker__panel-header {
+  align-items: center;
+  display: grid;
+  gap: var(--space-2);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.date-picker__context {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 var(--space-1) var(--space-1);
+}
+
+.date-picker__context-step {
+  color: var(--stepper-active-bg, var(--color-accent));
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.date-picker__context-route {
+  color: var(--theme-text-heading);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.date-picker__month {
+  color: var(--theme-text-heading);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: 0;
+  text-align: center;
+}
+
+.date-picker__nav,
+.date-picker__footer-action {
+  align-items: center;
+  appearance: none;
+  background:
+    linear-gradient(var(--theme-surface-card), var(--theme-surface-card)) padding-box,
+    linear-gradient(var(--color-input-border, var(--color-border-strong)), var(--color-input-border, var(--color-border-strong))) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  color: var(--theme-text-body);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  justify-content: center;
+  min-height: var(--control-height-sm);
+  padding: 0 var(--space-3);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.date-picker__nav:hover,
+.date-picker__footer-action:hover {
+  background:
+    linear-gradient(var(--field-bg-hover), var(--field-bg-hover)) padding-box,
+    linear-gradient(var(--color-border-strong, var(--color-border-strong)), var(--color-border-strong, var(--color-border-strong))) border-box;
+}
+
+.date-picker__weekdays,
+.date-picker__days {
+  column-gap: var(--date-picker-day-gap);
+  display: grid;
+  grid-template-columns: repeat(7, var(--date-picker-day-size));
+  justify-content: center;
+  row-gap: var(--date-picker-day-gap);
+}
+
+.date-picker__weekday {
+  color: var(--theme-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  padding: var(--space-1) 0;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.date-picker__day {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  color: var(--theme-text-body);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-semibold);
+  box-sizing: border-box;
+  height: var(--date-picker-day-size);
+  isolation: isolate;
+  justify-content: center;
+  min-width: 0;
+  padding: 0;
+  position: relative;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    filter var(--transition-fast),
+    box-shadow var(--transition-fast);
+  width: 100%;
+}
+
+.date-picker__day::before {
+  border-radius: 50%;
+  content: "";
+  height: var(--date-picker-day-size);
+  left: 50%;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--date-picker-day-size);
+  z-index: -1;
+}
+
+.date-picker__day:hover {
+  filter: brightness(1.08);
+  z-index: 2;
+}
+
+.date-picker__day:hover:not(.date-picker__day--selected):not(.date-picker__day--range):not(.date-picker__day--multi-selected) {
+  background-color: rgba(127, 127, 127, 0.1);
+}
+
+.date-picker__day--selected:hover,
+.date-picker__day--range:hover,
+.date-picker__day--multi-selected:hover {
+  background-color: transparent;
+}
+
+.date-picker__day--multi-selected {
+  overflow: visible;
+}
+
+.date-picker__day-badge {
+  align-items: center;
+  background: var(--color-white);
+  border: 1px solid var(--stepper-active-bg, var(--color-accent));
+  border-radius: 999px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.22);
+  color: var(--color-primary-strong);
+  display: inline-flex;
+  font-size: 9px;
+  font-weight: 800;
+  height: 16px;
+  justify-content: center;
+  line-height: 1;
+  min-width: 16px;
+  pointer-events: none;
+  position: absolute;
+  right: -3px;
+  top: -3px;
+  z-index: 4;
+}
+
+html[data-theme="dark"] .date-picker__day-badge {
+  background: var(--color-white);
+  border-color: var(--stepper-active-bg, var(--color-accent));
+  color: var(--stepper-active-bg, var(--color-accent));
+}
+
+html[data-theme="light"] .date-picker__day-badge {
+  background: var(--color-white);
+  border-color: #0b3a66;
+  color: #0b3a66;
+}
+
+.date-picker__day--muted {
+  color: var(--theme-text-muted);
+  opacity: 0.55;
+}
+
+/* Multi sequencial: dias fora da ordem da rota (antes do trecho anterior) ficam bloqueados. */
+.date-picker__day:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.date-picker__day:disabled:hover {
+  background-color: transparent;
+  filter: none;
+}
+
+.date-picker__day--today {
+  border-color: transparent;
+}
+
+.date-picker__day--today::after {
+  background: var(--date-picker-selected-bg-start);
+  border-radius: 50%;
+  bottom: 4px;
+  box-shadow: 0 0 0 1px var(--route-card-inner-bg, var(--theme-surface-card));
+  content: "";
+  height: 5px;
+  left: 50%;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 5px;
+  z-index: 3;
+}
+
+.date-picker__day--today.date-picker__day--selected::after,
+.date-picker__day--today.date-picker__day--range::after,
+.date-picker__day--today.date-picker__day--multi-selected::after {
+  background: var(--date-picker-selected-color);
+  box-shadow: 0 0 0 1px var(--date-picker-selected-halo);
+}
+
+.date-picker__day--selected,
+.date-picker__day--range-start,
+.date-picker__day--range-end,
+.date-picker__day--multi-selected {
+  color: var(--date-picker-selected-color);
+  z-index: 2;
+}
+
+.date-picker__day--selected::before,
+.date-picker__day--range-start::before,
+.date-picker__day--range-end::before,
+.date-picker__day--multi-single::before {
+  background:
+    linear-gradient(180deg, var(--date-picker-selected-bg-start) 0%, var(--date-picker-selected-bg-end) 100%);
+  border: 1px solid var(--date-picker-selected-border);
+  box-shadow: var(--date-picker-selected-shadow);
+}
+
+.date-picker__day--multi-selected:not(.date-picker__day--multi-single)::before {
+  background:
+    linear-gradient(180deg, var(--date-picker-selected-bg-start) 0%, var(--date-picker-selected-bg-end) 100%);
+  border-radius: 0;
+  box-shadow: none;
+  height: var(--date-picker-day-size);
+  width: var(--date-picker-day-size);
+}
+
+.date-picker__day--multi-start {
+  border-right-color: var(--date-picker-selected-border);
+  z-index: 2;
+}
+
+.date-picker__day--multi-selected.date-picker__day--multi-start::before,
+.date-picker__day--multi-single::before {
+  border-bottom-left-radius: var(--radius-pill);
+  border-top-left-radius: var(--radius-pill);
+}
+
+.date-picker__day--multi-middle {
+  border-left-color: var(--date-picker-selected-border);
+  border-radius: 0;
+  border-right-color: var(--date-picker-selected-border);
+  z-index: 2;
+}
+
+.date-picker__day--multi-end {
+  border-left-color: var(--date-picker-selected-border);
+  z-index: 2;
+}
+
+.date-picker__day--multi-selected.date-picker__day--multi-end::before,
+.date-picker__day--multi-single::before {
+  border-bottom-right-radius: var(--radius-pill);
+  border-top-right-radius: var(--radius-pill);
+}
+
+.date-picker__day--multi-selected:nth-child(7n)::before {
+  border-bottom-right-radius: var(--date-picker-week-edge-radius);
+  border-top-right-radius: var(--date-picker-week-edge-radius);
+}
+
+.date-picker__day--multi-selected:nth-child(7n + 1)::before {
+  border-bottom-left-radius: var(--date-picker-week-edge-radius);
+  border-top-left-radius: var(--date-picker-week-edge-radius);
+}
+
+.date-picker__day--multi-selected.date-picker__day--multi-start::before,
+.date-picker__day--multi-single::before {
+  border-bottom-left-radius: var(--radius-pill);
+  border-top-left-radius: var(--radius-pill);
+}
+
+.date-picker__day--multi-selected.date-picker__day--multi-end::before,
+.date-picker__day--multi-single::before {
+  border-bottom-right-radius: var(--radius-pill);
+  border-top-right-radius: var(--radius-pill);
+}
+
+.date-picker__day--multi-single {
+  border-radius: var(--radius-pill);
+  z-index: 2;
+}
+
+.date-picker__day--range {
+  background: transparent;
+  border-color: transparent;
+  border-radius: 0;
+  color: var(--date-picker-selected-color);
+  z-index: 2;
+}
+
+.date-picker__day--range::before {
+  background:
+    linear-gradient(180deg, var(--date-picker-selected-bg-start) 0%, var(--date-picker-selected-bg-end) 100%);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  height: var(--date-picker-day-size);
+  width: var(--date-picker-day-size);
+}
+
+html[data-theme="dark"] .date-picker .date-picker__day--multi-selected,
+html[data-theme="dark"] .date-picker .date-picker__day--multi-start,
+html[data-theme="dark"] .date-picker .date-picker__day--multi-middle,
+html[data-theme="dark"] .date-picker .date-picker__day--multi-end,
+html[data-theme="dark"] .date-picker .date-picker__day--multi-single,
+html[data-theme="light"] .date-picker .date-picker__day--multi-selected,
+html[data-theme="light"] .date-picker .date-picker__day--multi-start,
+html[data-theme="light"] .date-picker .date-picker__day--multi-middle,
+html[data-theme="light"] .date-picker .date-picker__day--multi-end,
+html[data-theme="light"] .date-picker .date-picker__day--multi-single {
+  background-color: transparent !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: var(--date-picker-selected-color) !important;
+}
+
+html[data-theme="dark"] .date-picker .date-picker__day--multi-single::before,
+html[data-theme="light"] .date-picker .date-picker__day--multi-single::before {
+  background: var(--date-picker-selected-bg-start) !important;
+  border-color: transparent !important;
+  box-shadow: var(--date-picker-selected-shadow) !important;
+}
+
+html[data-theme="dark"] .date-picker .date-picker__day--multi-selected:hover,
+html[data-theme="dark"] .date-picker .date-picker__day--multi-start:hover,
+html[data-theme="dark"] .date-picker .date-picker__day--multi-middle:hover,
+html[data-theme="dark"] .date-picker .date-picker__day--multi-end:hover,
+html[data-theme="dark"] .date-picker .date-picker__day--multi-single:hover,
+html[data-theme="light"] .date-picker .date-picker__day--multi-selected:hover,
+html[data-theme="light"] .date-picker .date-picker__day--multi-start:hover,
+html[data-theme="light"] .date-picker .date-picker__day--multi-middle:hover,
+html[data-theme="light"] .date-picker .date-picker__day--multi-end:hover,
+html[data-theme="light"] .date-picker .date-picker__day--multi-single:hover {
+  filter: brightness(1.08);
+  z-index: 2;
+}
+
+.date-picker__day--range:nth-child(7n + 1)::before {
+  border-bottom-left-radius: var(--date-picker-week-edge-radius);
+  border-top-left-radius: var(--date-picker-week-edge-radius);
+}
+
+.date-picker__day--range:nth-child(7n)::before {
+  border-bottom-right-radius: var(--date-picker-week-edge-radius);
+  border-top-right-radius: var(--date-picker-week-edge-radius);
+}
+
+.date-picker__day--range.date-picker__day--range-start::before {
+  border-bottom-left-radius: var(--radius-pill);
+  border-top-left-radius: var(--radius-pill);
+}
+
+.date-picker__day--range.date-picker__day--range-end::before {
+  border-bottom-right-radius: var(--radius-pill);
+  border-top-right-radius: var(--radius-pill);
+}
+
+.date-picker__day--range.date-picker__day--range-start.date-picker__day--range-end::before {
+  border-radius: var(--radius-pill);
+}
+
+.date-picker__day:focus-visible {
+  box-shadow: var(--field-shadow-focus);
+  outline: none;
+  z-index: 1;
+}
+
+.date-picker__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+
 /* Date picker — campo de data. Depende de `v2/tokens.css`.
  *
  * A marcação vem do partial global `cotton/ui/forms/date_picker.html` e o painel

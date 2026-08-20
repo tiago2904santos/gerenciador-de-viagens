@@ -122,27 +122,19 @@ COBERTURA_ADIADA = {
     "static/css/feedback/document-download-loading.css",
     "static/css/feedback/metric.css",
     "static/css/feedback/notice.css",
-    "static/css/feedback/pendencias.css",
-    "static/css/feedback/summary-items.css",
-    "static/css/fields/date-picker.css",
-    "static/css/fields/field.css",
     "static/css/fields/file-picker.css",
     "static/css/fields/form-panel.css",
     "static/css/fields/form-sections.css",
     "static/css/layout/app-shell.css",
     "static/css/lists/content-cards.css",
-    "static/css/lists/filter-header.css",
     "static/css/lists/list-header.css",
-    "static/css/lists/list-tabs.css",
     "static/css/lists/record-list.css",
     "static/css/pages/document-generation-embedded.css",
-    "static/css/pages/document-viewer.css",
 }
 
 # Arquivos CSS globais onde seletores de domínio não devem aparecer
 GLOBAL_CSS = {
     "static/css/fields/forms.css",
-    "static/css/lists/lists.css",
     "static/css/lists/cards.css",
     "static/css/layout/layout.css",
     "static/css/base/base.css",

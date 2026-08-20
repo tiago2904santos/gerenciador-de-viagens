@@ -107,13 +107,26 @@ class ShellBundleGateTests(SimpleTestCase):
         self.assertEqual(len(scripts[2:]), MAX_SHELL_BODY_SCRIPTS)
 
     def test_ht04_form_css_leaves_the_default_shell_without_changing_order(self):
+        """O pacote de formulário carrega o que só ele precisa, e nada mais.
+
+        Em 2026-08-20 as BASES do picker, do calendário e do select saíram de
+        `fields/` e foram fundidas nas folhas do v2 (`v2/picker.css`,
+        `v2/date-picker.css`, `v2/select.css`). Elas não eram legado: eram as
+        declarações do próprio componente, e o arquivo v2 carregava só o delta —
+        duas folhas para uma peça, em dois bundles diferentes.
+
+        Com a fusão, o mecanismo de `@import` injetado no `style.css` também
+        deixou de existir. O que este teste guarda agora é o que sobrou de
+        verdade: as duas folhas exclusivas do formulário estão no pacote de
+        formulário e FORA do shell padrão, na ordem em que a cascata precisa
+        delas.
+        """
         base = BASE_HTML.read_text(encoding="utf-8")
         shell = (ROOT / "static/css/shell.bundle.css").read_text(encoding="utf-8")
         form_shell = (
             ROOT / "static/css/shell.form-components.bundle.css"
         ).read_text(encoding="utf-8")
         sources = (
-            "css/fields/date-picker.css",
             "css/fields/file-picker.css",
             "css/fields/related-route-picker.css",
         )
@@ -125,10 +138,6 @@ class ShellBundleGateTests(SimpleTestCase):
                 self.assertIn(f">>> {source} >>>", form_shell)
 
         self.assertLess(
-            form_shell.index(">>> css/fields/field.css >>>"),
-            form_shell.index(">>> css/fields/date-picker.css >>>"),
-        )
-        self.assertLess(
             form_shell.index(">>> css/fields/file-picker.css >>>"),
             form_shell.index(">>> css/actions/action-system.css >>>"),
         )
@@ -137,45 +146,18 @@ class ShellBundleGateTests(SimpleTestCase):
             form_shell.index(">>> css/fields/related-route-picker.css >>>"),
         )
 
-        style = (ROOT / "static/css/style.css").read_text(encoding="utf-8")
-        picker_import = '@import url("./fields/search-picker.css");'
-        select_import = '@import url("./fields/select.css");'
-        custom_select_import = '@import url("./fields/custom-select.css");'
-        self.assertNotIn(picker_import, style)
-        self.assertNotIn(picker_import, shell)
-        self.assertIn(picker_import, form_shell)
-        self.assertIn(select_import, style)
-        self.assertIn(select_import, shell)
-        self.assertIn(select_import, form_shell)
-        self.assertNotIn(custom_select_import, style)
-        self.assertNotIn(custom_select_import, shell)
-        self.assertIn(custom_select_import, form_shell)
+        # As bases fundidas não voltaram a ser folha própria.
+        for extinta in ("fields/search-picker.css", "fields/date-picker.css",
+                        "fields/custom-select.css", "fields/select.css",
+                        "fields/field.css"):
+            with self.subTest(extinta=extinta):
+                self.assertFalse((ROOT / "static/css" / extinta).exists())
 
-        native_select = (ROOT / "static/css/fields/select.css").read_text(
-            encoding="utf-8"
-        )
-        custom_select = (ROOT / "static/css/fields/custom-select.css").read_text(
-            encoding="utf-8"
-        )
-        self.assertNotIn(".custom-select {", native_select)
-        self.assertIn(".custom-select {", custom_select)
-
-        self.assertLess(
-            form_shell.index('@import url("./lists/cards.css");'),
-            form_shell.index(picker_import),
-        )
-        self.assertLess(
-            form_shell.index(picker_import),
-            form_shell.index(select_import),
-        )
-        self.assertLess(
-            form_shell.index(select_import),
-            form_shell.index(custom_select_import),
-        )
-        self.assertLess(
-            form_shell.index(custom_select_import),
-            form_shell.index('@import url("./layout/stages.css");'),
-        )
+        # E o que elas declaravam continua chegando à tela, pelo pacote do v2.
+        ui = (ROOT / "static/css/ui.bundle.css").read_text(encoding="utf-8")
+        for marca in (".search-picker__control", ".date-picker__panel", ".custom-select__menu"):
+            with self.subTest(marca=marca):
+                self.assertIn(marca, ui)
 
     def test_ht04_form_css_consumers_choose_the_form_shell(self):
         include_marker = (
