@@ -28,6 +28,8 @@ SHELL_CSS: tuple[str, ...] = (
     "css/base/utilities.css",
     "css/layout/page-shell.css",
     "css/feedback/notice.css",
+    "css/components/theme-dark-components.css",
+    "css/components/theme-shared-components.css",
 )
 
 FORM_COMPONENTS_CSS: tuple[str, ...] = ()

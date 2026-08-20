@@ -10346,3 +10346,67 @@ manifesto for recalibrado (`build_css_profiles.py --capture`).
 **Como conferir:** os dois menus abertos no navegador (tema escuro), o diálogo de
 anexar assinado abrindo com os três tipos e o texto "PDF, PNG ou JPEG", e a
 varredura das folhas carregadas: `.action-menu` aparece em zero regras.
+
+### NOVO-20260820-145942-799ca708c584 🟢 RESOLVIDO · `NOVO` As duas folhas de tema descreviam 80 regras; 8 ainda pintavam algo · FE · risco alto
+
+`theme-dark-components.css` e `theme-shared-components.css` eram a camada de
+"transitional theme overrides": 80 regras descrevendo cartão, tabela, modal,
+selo, chip, estado vazio, tooltip, spinner, ficha, rodapé de formulário, linha de
+pessoa, perna de itinerário, painel de coleção e os blocos do wizard de
+documentos — cada uma DE FORA do componente que vestia. O próprio cabeçalho da
+folha dizia "long-term: dissolve into owning component files".
+
+Poda por classe não servia aqui: **nenhuma** das 80 regras era morta por seletor.
+O que estava morto era o EFEITO — o seletor casa, mas cada propriedade declarada
+já perdia para o v2.
+
+**Como se mediu:** impressão digital de estilo computado em 33 telas (23.034
+elementos), com e sem as folhas no pacote. As 20 telas de lista não bastaram: as
+regras de `oficio-documentos-*` e `termo-*` só aparecem nas etapas do wizard, e
+com 20 telas a medida deu 67 diferenças; com as 33, deu 11.092. Ampliar a
+cobertura mudou a conclusão por duas ordens de grandeza.
+
+**Resultado:** 63 regras apagadas, 18 mantidas. As folhas foram de 652 para 217
+linhas. Fica o que a medida provou sustentar algo — campo NATIVO no escuro
+(309 inputs, 3.175 opções, 41 selects escondidos atrás dos widgets), a sombra do
+cartão de módulo e o gatilho do select v2 — mais o que a medida não enxerga por
+construção: estados (`:hover`, `:focus`), `::selection` e a trava de
+`prefers-reduced-motion`, mantidos por argumento.
+
+**Duas armadilhas, as duas pagas nesta etapa:**
+
+1. **A lista de propriedades É o alcance da medida.** `background-attachment`
+   não estava nela, e a regra `html[data-theme="dark"] body { background-attachment:
+   fixed }` foi apagada por "inerte". O `body` tem três gradientes e NENHUMA cor
+   sólida embaixo: com `scroll`, a área rolada fica preta. A medida deu tudo
+   limpo; quem achou foi um print rolado. A segunda passada mediu 42
+   propriedades, não 30.
+
+2. **Comentário DENTRO das chaves entra no hash da regra.** Ao restaurar a regra
+   do fundo, o parágrafo que morava dentro dela foi movido para fora — texto
+   diferente, sha256 diferente, e a regra sumiu dos quinze `profiles/*.css`. O
+   fundo preto voltou em 21 das 33 telas: exatamente as servidas por perfil. A
+   correção foi recolocar o corpo byte a byte e pôr a prosa nova ANTES da chave.
+
+**Diferenças que sobraram, e por que não são regressão:** 25 são `border-color`
+de `.person-row` numa borda `0px none` — nenhuma folha do projeto dá
+`border-width` a essa classe, então não há o que pintar; 5 são deriva
+sub-pixel (142,59px → 141,70px) num cartão de `/justificativas/`, reproduzida
+por um CONTROLE NULO (duas capturas do mesmo CSS); 1 é a borda dourada do campo
+com `autofocus` no `/perfil/` — corrida de foco no iframe, e o `:focus` foi
+conferido à mão, funcionando.
+
+**Achados de passagem:** `templates/ordens_servico/partials/_os_card_body.html`
+não é incluído por ninguém — é o único emissor de `.record-card__band`, e por
+isso a classe não renderiza em lugar nenhum. `.itinerary__leg` e
+`.record-card__subcard` não são emitidos por template algum. E
+`--entity-card-inner-bg` ficou órfão nas duas camadas de token, junto de
+`--action-primary-*` e `--icon-btn-tooltip-*`, à espera da recalibração do
+manifesto.
+
+**O que NÃO foi feito:** dissolver as 18 regras restantes nos componentes donos.
+`theme-shared-components.css` hoje é `v2/select.css` fora de lugar, mas ela é a
+ÚLTIMA folha do pacote do shell e `v2/select.css` vem depois, no `ui.bundle.css`:
+mover as regras para lá as faria vencer disputas que hoje perdem. É a mesma
+inversão que quebrou o menu do select e o cabeçalho do bloco de formulário na
+migração das folhas de lista, e precisa da mesma medição.

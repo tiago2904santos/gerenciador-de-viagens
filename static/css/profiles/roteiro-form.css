@@ -1444,6 +1444,30 @@ html[data-theme="light"] {
   --stepper-status-current-color: var(--color-accent);
   --stepper-status-missing-color: var(--color-danger);
 }
+html[data-theme="dark"] body {
+  background-attachment: fixed;
+  
+}
+html[data-theme="dark"] ::selection {
+  background: var(--color-selection);
+  color: var(--color-heading);
+}
+html[data-theme="dark"] :is(input, select, textarea) {
+  background: var(--color-input-bg);
+  border-color: var(--color-input-border);
+  color: var(--color-input-text);
+}
+html[data-theme="dark"] :is(input, select, textarea)[readonly] {
+  background: var(--color-input-disabled-bg);
+  border-color: var(--color-border-strong);
+  color: var(--color-muted-strong);
+}
+html[data-theme="dark"] :is(input, select, textarea):disabled {
+  background: var(--color-input-disabled-bg);
+  border-color: var(--color-border-soft);
+  color: var(--color-input-disabled-text);
+  opacity: 1;
+}
 :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block) {
   margin: 0;
 }

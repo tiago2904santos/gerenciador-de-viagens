@@ -1,209 +1,24 @@
+/* O gatilho do select v2 — e mais nada.
+ *
+ * A folha era a metade "vale nos dois temas" do redesenho: 30 regras sobre
+ * ficha, rodapé de formulário, cartão de registro, faixa, linha de pessoa,
+ * perna de itinerário e painel de coleção, todas descrevendo componentes DE
+ * FORA deles.
+ *
+ * Em 2026-08-20 mediu-se o que elas ainda ganhavam (33 telas, 23.034 elementos,
+ * com e sem a folha): 22 não mudavam um pixel. As 8 do select v2 mudavam —
+ * o gatilho ganhava sombra de volta e o valor dentro dele deixava de ser
+ * `flex`/centro em 32 casos —, e são as que ficaram.
+ *
+ * O nome do arquivo já não descreve o conteúdo: isto é `v2/select.css` fora de
+ * lugar. A fusão é o passo seguinte, e não é mecânica — esta folha é a ÚLTIMA
+ * do pacote do shell, e `v2/select.css` vem depois dele, no `ui.bundle.css`.
+ * Mover as regras para lá as faria vencer disputas que hoje perdem. É a mesma
+ * armadilha que inverteu o menu do select e o cabeçalho do bloco de formulário
+ * na migração das folhas de lista; ali a saída foi inserir ANTES da divisa
+ * `=== DELTA v2 ===`, e é isso que precisa ser medido aqui também.
+ */
 
-
-:is(html[data-theme])
-  :is(.page-shell--wizard, .cv-page--flow) {
-  --form-section-header-padding: 12px 18px 12px 30px;
-  --form-section-body-padding: 16px 18px;
-}
-
-/* Controles da ficha: superfícies sólidas, raios menores e nenhuma luz de
-   foco. O número e o ano formam um único controle composto. */
-:is(html[data-theme])
-  .form-card :is(.form-control, .custom-select__trigger, textarea) {
-  border-radius: 10px;
-}
-
-:is(html[data-theme])
-  .form-card textarea.form-control {
-  min-height: 92px;
-  padding: 12px 14px;
-}
-
-@media (max-width: 820px) {
-  :is(html[data-theme])
-    .form-stack {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-:is(html[data-theme])
-  .form-card__footer:not([hidden])
-  .card-footer-section {
-  bottom: auto;
-  margin: 0;
-  position: static;
-  width: auto;
-  z-index: auto;
-}
-
-/* Linha sutil separando o footer do corpo do card — mesmo tom do rodapé do
-   card de lista (.record-card__footer usa var(--color-border-soft)). */
-:is(html[data-theme])
-  .form-card__footer
-  .card-footer-section__divider {
-  border-top: 1px solid var(--color-border-soft);
-  display: block;
-}
-
-:is(html[data-theme])
-  .form-card__footer
-  .card-footer {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  padding: var(--space-4) var(--space-6);
-}
-
-:is(html[data-theme])
-  .form-card__footer
-  .card-footer__secondary:empty {
-  display: none;
-}
-
-@media (max-width: 640px) {
-
-  :is(html[data-theme])
-    .form-card__footer:not([hidden])
-    .card-footer-section {
-    bottom: 8px;
-    margin: 0 8px 8px;
-    width: auto;
-  }
-
-  :is(html[data-theme])
-    .form-card__footer .card-footer {
-    justify-content: stretch;
-  }
-
-  :is(html[data-theme])
-    .form-card__footer .card-footer__primary {
-    width: 100%;
-  }
-}
-
-@keyframes cv-skeleton-pulse {
-  to { background-position: -200% 0; }
-}
-
-:is(html[data-theme])
-  .entity-card {
-  border-radius: 14px;
-}
-
-:is(html[data-theme])
-  .cv-module-card {
-  border-radius: 14px;
-}
-
-:is(html[data-theme])
-  .record-card__band {
-  background: var(--card-family-bg);
-}
-
-:is(html[data-theme])
-  .record-card__band + .record-card__band::before {
-  display: none;
-}
-
-:is(html[data-theme])
-  :is(.fact-block, .person-row, .record-card__subcard) {
-  background: var(--entity-card-inner-bg);
-  border-color: var(--color-border);
-  box-shadow: none;
-}
-
-:is(html[data-theme])
-  .person-row--highlight {
-  background: color-mix(
-    in srgb,
-    var(--color-accent) 12%,
-    var(--color-surface-muted, var(--color-input-bg))
-  );
-  border-color: var(--color-accent-border-soft);
-  box-shadow: inset 4px 0 0 var(--color-accent);
-}
-
-:is(html[data-theme])
-  .person-row__avatar {
-  /* Mesmo tom do chip Pendente (.person-row__badge) */
-  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
-  border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
-  color: var(--color-accent);
-}
-
-:is(html[data-theme])
-  .person-row--highlight .person-row__avatar {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--color-on-accent);
-}
-
-:is(html[data-theme])
-  .itinerary__leg {
-  background: var(--card-family-bg) !important;
-  border-color: transparent !important;
-}
-
-:is(html[data-theme])
-  .itinerary__leg:hover {
-  background: var(--card-family-bg) !important;
-  border-color: transparent !important;
-}
-
-:is(html[data-theme])
-  .person-row--highlight .person-row__badge {
-  background: var(--color-accent);
-  border: 0;
-  box-shadow: none;
-  color: var(--color-on-accent);
-}
-
-:is(html[data-theme])
-  .collection-panel {
-  --step1-panel: var(--color-surface-soft);
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-field: var(--step1-surface);
-}
-
-:is(html[data-theme])
-  :is(.fact-block, .person-row, .record-card__subcard) {
-  border-color: transparent;
-  transition: border-color var(--transition-fast), background-color var(--transition-fast);
-}
-
-:is(html[data-theme])
-  :is(.fact-block, .person-row, .record-card__subcard):hover {
-  border-color: transparent;
-}
-
-/* Labels internos mais discretos que os valores — hierarquia label < valor. */
-:is(html[data-theme])
-  :is(.person-row__meta, .itinerary__time) {
-  color: var(--color-subtle);
-}
-
-/* Valores em destaque claro sobre os labels. */
-:is(html[data-theme])
-  :is(.fact-block__value--strong, .fact-block__value, .person-row__name) {
-  color: var(--color-heading);
-}
-
-/* Linhas de trecho: mesmo fundo da seção do card. */
-:is(html[data-theme])
-  .itinerary__leg {
-  background: var(--card-family-bg) !important;
-  border-color: transparent !important;
-}
-
-:is(html[data-theme])
-  .itinerary__leg:hover {
-  background: var(--card-family-bg) !important;
-  border-color: transparent !important;
-}
-
-/* Exceção de composição: no formulário de Termos, o painel selecionado não
-   cria um segundo card ao redor dos cartões de resultado. */
 :is(html[data-theme])
   .custom-select__trigger--v2 {
   border-radius: 10px;

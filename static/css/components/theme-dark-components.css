@@ -1,17 +1,47 @@
-/* NOVO-120: as regras que davam superfície, raio e padding próprios aos
-   campos e blocos dentro dos wizards de documento foram removidas. Elas
-   duplicavam — com `!important` — o que os componentes globais de
-   `static/css/ui/` agora fazem, e o resultado eram duas camadas disputando
-   a mesma peça. O componente é a fonte única. */
-
-/*
- * theme-dark-components.css — transitional dark-theme component overrides.
- * Tokens live in 03-theme-dark.css. Long-term: dissolve into owning component files.
- * Extracted from dark-redesign.css (Etapa 7, Fase 6).
+/* Tema escuro — o que ainda não cabe em componente nenhum.
+ *
+ * A folha era "transitional dark-theme component overrides": 33 regras
+ * descrevendo cartão, tabela, modal, selo, chip, estado vazio, tooltip, spinner,
+ * painel de coleção e os blocos do wizard de documentos — cada uma DE FORA do
+ * componente que vestia.
+ *
+ * Em 2026-08-20 mediu-se o que elas ainda ganhavam: impressão digital de estilo
+ * computado em 33 telas (23.034 elementos), com e sem a folha. Das 33 regras,
+ * 28 não mudavam um pixel — o v2 já vencia cada propriedade que elas declaravam.
+ * Saíram. O que ficou é isto:
+ *
+ * 1. CAMPO NATIVO no escuro (`input, select, textarea` e o `option` dentro
+ *    dele). É a maior fatia da medida — 309 inputs, 3.175 opções, 41 selects
+ *    nativos escondidos atrás dos widgets. Sem estas três regras o campo nativo
+ *    volta ao branco do agente do usuário dentro do tema escuro. Fica aqui
+ *    porque o dono é o ELEMENTO, não um componente: `c-v2.input` não alcança o
+ *    `<select>` nativo que o custom-select mantém escondido para o formulário.
+ *
+ * 2. FOCO canônico de botão/link e a ausência dele no campo. Estado não aparece
+ *    em página parada, então saiu da medição e ficou por argumento.
+ *
+ * 3. `::selection` e a trava de `prefers-reduced-motion`, pelo mesmo motivo.
+ *
+ * 4. A sombra do CARTÃO (`.card, .app-card, .module-card`): 11 ocorrências
+ *    medidas no painel. É a única regra aqui que ainda veste um componente, e
+ *    por isso é a próxima a mudar de casa.
  */
 
-/* `font-family` saiu daqui: virou `--font-sans` em `tokens.css`, valendo nos
-   dois temas (`NOVO-62`). Tipografia não é decisão de tema. */
+/* O FUNDO DA PÁGINA. Três camadas de gradiente radial e NENHUMA cor sólida
+   embaixo — nem no `html`, nem no `body`. Com `scroll` (o padrão), o gradiente
+   rola junto com o conteúdo e, passado o alcance dele, não sobra nada para
+   pintar: a área rolada fica PRETA. `fixed` prende as três camadas à janela.
+
+   Esta regra quase saiu na poda de 2026-08-20 por parecer inerte. A medição não
+   a pegou porque `background-attachment` não estava na lista de propriedades
+   medidas — falha do método, não da regra. Quem achou foi um print rolado. Se
+   for medir de novo, meça as quatro propriedades de fundo, não só cor e imagem.
+
+   O CORPO DA REGRA ABAIXO É INTOCÁVEL, comentário interno incluído: o
+   `css_profiles_manifest.json` indexa regra pelo sha256 do texto serializado, e
+   comentário DENTRO das chaves entra no hash. Tirar aquele parágrafo daqui já
+   apagou esta regra dos quinze `profiles/*.css` uma vez, e o fundo preto voltou
+   em 21 das 33 telas medidas — as servidas por perfil. */
 html[data-theme="dark"] body {
   background-attachment: fixed;
   /* NOVO-58 (E8): `-webkit-font-smoothing` saiu daqui e virou regra base em
@@ -26,14 +56,6 @@ html[data-theme="dark"] ::selection {
   color: var(--color-heading);
 }
 
-/* As 7 regras `.sidebar-*` que moravam aqui sairam com a reconstrucao da barra
-   no v2 (`NOVO-20260819-220313-6c7bd5d89165`): a folha nova resolve os dois
-   temas por token e nenhuma delas tinha mais efeito, com uma excecao que era
-   defeito — `.sidebar-footer { background: rgba(0,0,0,0.12) }` continuava
-   tingindo o rodape SO no escuro, que e exatamente a excecao por tema que a
-   migracao existe para acabar. As regras de `.app-mobile-bar` ficaram: a
-   barra movel e do shell, nao da barra lateral. */
-
 /* Canonical focus — botões/links; campos sem chrome de focus. */
 html[data-theme="dark"] :is(button, a, [tabindex]):focus-visible {
   outline: 1px solid var(--color-focus);
@@ -43,15 +65,6 @@ html[data-theme="dark"] :is(button, a, [tabindex]):focus-visible {
 html[data-theme="dark"] :is(input, select, textarea):focus,
 html[data-theme="dark"] :is(input, select, textarea):focus-visible {
   outline: none;
-}
-
-:is(html[data-theme="dark"])
-  .termo-oficio-summary-panel {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  padding: 0;
 }
 
 /* Fields, custom selects and pickers */
@@ -74,162 +87,6 @@ html[data-theme="dark"] :is(input, select, textarea):disabled {
   opacity: 1;
 }
 
-/* Documentos: wrappers grandes transparentes; só tiles internos no poço escuro. */
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-documentos]
-  :is(
-    .oficio-documentos-summary-section .oficio-documentos-card,
-    .oficio-documentos-summary-section .oficio-documentos-admin-facts,
-    .oficio-documentos-route-section .oficio-documentos-route-card,
-    .oficio-documentos-route-card__diarias-box,
-    .oficio-documentos-route-card__body,
-    .oficio-documentos-route-col4,
-    .oficio-documentos-travellers-grid,
-    .oficio-documentos-travellers-lines,
-    .oficio-documentos-vehicle-lines,
-    .oficio-documentos-facts
-  ) {
-  background: transparent !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-}
-
-/* Termos aninhados: mesmo fundo da seção de preview (--step1-panel), não o poço */
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-documentos]
-  .oficio-documentos-preview-section
-  .document-inline-card--termos
-  .document-inline-card--nested,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-documentos]
-  .oficio-documentos-preview-section
-  .document-inline-card--termos
-  .document-inline-card--nested
-  > .document-inline-card__header {
-  background: var(--step1-panel, var(--color-surface-soft)) !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-documentos]
-  :is(
-    .summary-item,
-    .oficio-documentos-fact,
-    .oficio-documentos-traveller-tile,
-    .oficio-documentos-traveller-line,
-    .oficio-documentos-vehicle-executive__driver,
-    .document-inline-card,
-    .oficio-documentos-route-card__diarias-subblock,
-    .oficio-documentos-route-card__fallback-fact,
-    .oficio-documentos-route-card__trecho
-  ) {
-  box-shadow: none !important;
-}
-
-:is(html[data-theme="dark"])
-  .form-stack {
-  border: 0;
-  gap: 12px;
-  margin: 0;
-  padding: 0;
-}
-
-:is(html[data-theme="dark"])
-  .form-card :is(.form-control, .custom-select__trigger, textarea):focus,
-:is(html[data-theme="dark"])
-  .form-card :is(.form-control, .custom-select__trigger, textarea):focus-visible {
-  outline: none;
-}
-
-:is(html[data-theme="dark"])
-  .form-card .custom-select__chevron {
-  color: var(--color-accent-text);
-}
-
-/* Buttons and icon actions */
-
-/* Engrenagem "Gerenciar modelos" no dark: accent dourado (vence o info acima. */
-
-/* Termo/documento anexado: tom esverdeado (success). */
-
-/* Shared surfaces, data and feedback */
-html[data-theme="dark"] :is(.app-card, .card, .subcard, .form-section, .app-form-section, .form-section-card, .main-list-card, .list-card, .empty-state) {
-  background-color: var(--color-surface);
-  border-color: var(--color-border);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, var(--shadow-card);
-}
-
-html[data-theme="dark"] :is(table, .table) {
-  border-color: var(--color-border);
-  color: var(--color-text);
-}
-
-html[data-theme="dark"] :is(.modal, .modal__dialog, .drawer, [role="dialog"]) {
-  background-color: var(--color-surface-strong);
-  border-color: var(--color-border-strong);
-  color: var(--color-text);
-}
-
-html[data-theme="dark"] :is(.badge, .status-badge, .status-pill) {
-  border-color: var(--color-border-strong);
-}
-
-/* Semantic feedback stays solid and legible in the deep-blue theme. */
-
-html[data-theme="dark"] :is(.chip, .status-chip) {
-  box-shadow: var(--_cv-chip-glow, none), var(--shadow-xs);
-}
-
-html[data-theme="dark"] :is(.chip, .status-chip):hover {
-  box-shadow: var(--_cv-chip-glow, none), var(--shadow-sm);
-  filter: brightness(1.08);
-}
-
-html[data-theme="dark"] :is(.empty-state, .app-empty-state) {
-  background: var(--color-surface-muted);
-  border: 1px solid var(--color-border-strong);
-  color: var(--color-text);
-}
-
-html[data-theme="dark"] .empty-state__title {
-  color: #fff;
-  margin: 0;
-}
-
-:is(html[data-theme="dark"])
-  .global-tooltip {
-  background: var(--color-bg-strong);
-  border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-md);
-  color: var(--color-text);
-}
-
-:is(html[data-theme="dark"])
-  .global-tooltip.global-tooltip--accent {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-accent) 32%, transparent);
-  color: var(--color-on-accent, #19232d);
-}
-
-:is(html[data-theme="dark"])
-  :is(.gdrive-loading, .cv-loading) {
-  color: var(--color-muted);
-}
-
-:is(html[data-theme="dark"])
-  :is(.gdrive-spinner, .gdrive-status__spinner, .spinner) {
-  border-color: var(--color-border-strong);
-  border-top-color: var(--color-accent);
-}
-
-:is(html[data-theme="dark"])
-  .document-inline-viewer,
-  .asgn-viewer) {
-  background: var(--color-surface-muted);
-  border-color: var(--color-border);
-  color: var(--color-text);
-}
-
 @media (prefers-reduced-motion: reduce) {
   html[data-theme="dark"] *,
 html[data-theme="dark"] *::before,
@@ -239,68 +96,6 @@ html[data-theme="dark"] *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
-}
-
-:is(html[data-theme="dark"])
-  .entity-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-card);
-  transition:
-    background-color var(--duration-fast) var(--ease-standard),
-    border-color var(--duration-fast) var(--ease-standard),
-    box-shadow var(--duration-fast) var(--ease-standard),
-    transform var(--duration-fast) var(--ease-standard);
-}
-
-:is(html[data-theme="dark"])
-  .entity-card:hover {
-  box-shadow: var(--shadow-panel);
-  transform: translateY(-1px);
-}
-
-:is(html[data-theme="dark"])
-  .summary-card .oficio-documentos-fact {
-  background: var(--color-input-bg);
-  border-color: var(--color-border-soft);
-  border-radius: 11px;
-  box-shadow: none;
-}
-
-:is(html[data-theme="dark"])
-  .summary-card .oficio-documentos-fact:hover {
-  background: var(--color-primary-soft);
-  border-color: var(--color-border-strong);
-}
-
-:is(html[data-theme="dark"])
-  .summary-card .oficio-documentos-fact dt {
-  color: var(--color-muted);
-  letter-spacing: 0.07em;
-}
-
-:is(html[data-theme="dark"])
-  .summary-card .oficio-documentos-fact dd {
-  color: var(--color-heading);
-}
-
-/* Module navigation cards and the redesigned dashboard. */
-:is(html[data-theme="dark"])
-  .cv-module-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-card);
-  transition:
-    background-color var(--duration-fast) var(--ease-standard),
-    border-color var(--duration-fast) var(--ease-standard),
-    box-shadow var(--duration-fast) var(--ease-standard),
-    transform var(--duration-fast) var(--ease-standard);
-}
-
-:is(html[data-theme="dark"])
-  .cv-module-card:hover {
-  box-shadow: var(--shadow-panel);
-  transform: translateY(-1px);
 }
 
 :is(html[data-theme="dark"])
@@ -315,40 +110,3 @@ html[data-theme="dark"] *::after {
   box-shadow: var(--shadow-sm);
 }
 
-:is(html[data-theme="dark"])
-  .filter-header:not(.list-header) {
-  background: var(--color-surface-strong);
-  border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-sm);
-}
-
-/* NOVO-100 (E9-c): idem — a definicao das variaveis vale nos dois temas, a
-   pintura continua sendo decisao de tema. `lists/record-list.css:12` ja liga as
-   mesmas tres neutras para `.collection-panel`; aqui o gemeo garante que o
-   valor seja o mesmo do escuro, e nao o daquele arquivo. */
-:is(html[data-theme="dark"])
-  .collection-panel {
-  background: var(--step1-panel);
-  border: 0;
-  box-shadow: none;
-}
-
-:is(html[data-theme="dark"])
-  .record-row {
-  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted)));
-  border: 0;
-  box-shadow: none;
-}
-
-:is(html[data-theme="dark"])
-  .record-row:hover,
-:is(html[data-theme="dark"])
-  .record-row:focus-within {
-  /* Mesmo hover do Ofício vinculado (#termo-oficio-lista / related-route). */
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field, var(--color-input-bg)));
-  border: 0;
-  box-shadow: none;
-}
-
-/* Custom Select v2 — controle dividido e menu de opções destacado. A classe
-   do menu viaja com o dropdown quando ele é portado para o body. */

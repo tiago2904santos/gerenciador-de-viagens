@@ -53,6 +53,8 @@ class DarkRedesignContractTests(SimpleTestCase):
                     "form-block.css",
                     "date-picker.css",
                     "field.css",
+                    "person-row.css",
+                    "fact.css",
                 )
             ]
         )
@@ -264,33 +266,38 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("--shadow-custom-select-menu:", self.tokens_css)
 
     def test_entity_cards_use_one_structure_for_both_themes(self):
-        # NOVO-113: listas claras e escuras compartilham geometria e tipografia;
-        # apenas os tokens de paleta mudam o resultado visual.
-        # `.record-card`, `.record-card__id-row` e `.record-card__info-value`
-        # saíram em 2026-08-20: o cartão de lista é `c-v2.record` desde a
-        # migração das listas, e as três regras vestiam marcação que nenhum
-        # template emite. O que sobrou do vocabulário antigo — a faixa do cartão
-        # de OS e a perna do itinerário — continua medido aqui.
-        selectors = (
-            ":is(.fact-block, .person-row, .record-card__subcard) {",
-            ".itinerary__leg {",
-        )
-        for selector in selectors:
-            with self.subTest(selector=selector):
-                shared = f':is(html[data-theme])\n  {selector}'
-                dark_only = f':is(html[data-theme="dark"])\n  {selector}'
-                self.assertIn(shared, self.desenho_css)
-                self.assertNotIn(dark_only, self.desenho_css)
+        """Claro e escuro mudam de PALETA, nunca de geometria.
 
-        self.assertIn(
-            "--entity-card-inner-bg: var(--color-surface-powder);",
-            self.base_tokens_css,
-        )
-        self.assertIn(
-            "--entity-card-inner-bg: var(--color-surface-soft);",
-            self.tokens_css,
-        )
-        self.assertIn("background: var(--entity-card-inner-bg);", self.desenho_css)
+        O contrato era medido por um par: a regra existe sob
+        `:is(html[data-theme])` e NÃO existe uma gêmea sob
+        `:is(html[data-theme="dark"])`. Em 2026-08-20 as regras compartilhadas
+        da linha de pessoa e do bloco de fato saíram das folhas de tema — a
+        medição (33 telas, 23.034 elementos, com e sem a folha) mostrou que o
+        v2 já vencia cada propriedade que elas declaravam.
+
+        O contrato ficou mais forte, e é assim que se mede agora: a peça é
+        vestida pela folha do componente, e a camada de TEMA não fala dela em
+        nenhum dos dois escopos. Zero regra por tema é o caso perfeito de
+        "mesma geometria nos dois temas".
+
+        `.itinerary__leg` e `.record-card__subcard` não entram: nenhum template
+        as emite, e a poda as levou junto.
+        """
+        for classe, folha in ((".person-row", "person-row.css"), (".fact-block", "fact.css")):
+            with self.subTest(classe=classe):
+                self.assertIn(classe, self.desenho_css)
+                self.assertNotIn(f'{classe} ', self.components_css)
+                self.assertIn(
+                    classe,
+                    (
+                        Path(settings.BASE_DIR) / "static" / "css" / "v2" / folha
+                    ).read_text(encoding="utf-8"),
+                    f"{classe} deixou de ser vestida por v2/{folha}",
+                )
+
+        for morta in (".itinerary__leg", ".record-card__subcard"):
+            with self.subTest(morta=morta):
+                self.assertNotIn(morta, self.components_css)
 
     def test_light_wizard_uses_blue_gray_sections_with_white_fields(self):
         # NOVO-113: a referencia aprovada inverte a hierarquia que havia

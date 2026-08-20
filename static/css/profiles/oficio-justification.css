@@ -1454,6 +1454,79 @@ html[data-theme="light"] {
     padding: 12px 10px;
   }
 }
+html[data-theme="dark"] body {
+  background-attachment: fixed;
+  
+}
+html[data-theme="dark"] ::selection {
+  background: var(--color-selection);
+  color: var(--color-heading);
+}
+html[data-theme="dark"] :is(input, select, textarea) {
+  background: var(--color-input-bg);
+  border-color: var(--color-input-border);
+  color: var(--color-input-text);
+}
+:is(html[data-theme])
+  .custom-select__trigger--v2 {
+  border-radius: 10px;
+}
+:is(html[data-theme])
+  .custom-select__trigger--v2 {
+  align-items: stretch;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  box-shadow: none;
+  color: var(--color-text);
+  gap: 0;
+  min-height: var(--control-height-md);
+  overflow: hidden;
+  padding: 0;
+  transition: border-color 120ms ease;
+}
+:is(html[data-theme])
+  .custom-select__trigger--v2:focus,
+:is(html[data-theme])
+  .custom-select__trigger--v2:focus-visible {
+  outline: none;
+}
+:is(html[data-theme])
+  .custom-select__trigger--v2 .custom-select__value {
+  align-items: center;
+  display: flex;
+  min-width: 0;
+  padding: 0 14px;
+}
+:is(html[data-theme])
+  .custom-select--v2 {
+  --cs-chevron-color: var(--color-accent);
+}
+:is(html[data-theme])
+  .custom-select__trigger--v2 .custom-select__chevron,
+:is(html[data-theme])
+  .custom-select__trigger--v2:hover .custom-select__chevron,
+:is(html[data-theme])
+  .custom-select__trigger--v2:focus .custom-select__chevron,
+:is(html[data-theme])
+  .custom-select__trigger--v2:focus-visible .custom-select__chevron,
+:is(html[data-theme])
+  .custom-select__trigger--v2[aria-expanded="true"] .custom-select__chevron,
+:is(html[data-theme])
+  .custom-select--v2.custom-select--open .custom-select__chevron,
+:is(html[data-theme])
+  .custom-select--v2.custom-select--disabled .custom-select__chevron,
+:is(html[data-theme])
+  .list-header__rail .custom-select__trigger--v2 .custom-select__chevron {
+  align-items: center;
+  align-self: stretch;
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface-muted));
+  color: var(--color-accent);
+  display: inline-flex;
+  justify-content: center;
+  transform: none;
+  transition: none;
+  width: 44px;
+}
 :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block) {
   margin: 0;
 }
