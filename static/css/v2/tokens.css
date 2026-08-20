@@ -25,17 +25,17 @@
 
 :root {
   /* ---- superfícies ---------------------------------------------------- */
-  /* O `page` é mais fundo que o original (#e8eef6) porque o degrau para o rail
+  /* O `page` é mais fundo que o valor claro original porque o degrau para o rail
      media 1.055 — praticamente nada — e a alternância de superfície, que é o
      que separa uma camada da outra em todo o sistema, sumia no tema claro.
      Agora mede 1.29.
 
      O `rail` voltou ao valor original por decisão do dono: a versão mais funda
-     que eu tinha posto (#dfe5ed) igualava o degrau rail→field ao do escuro,
+     que eu tinha posto igualava o degrau rail→field ao do escuro,
      mas puxava o azul para o cinza. Em troca, rail→field fica em 1.106 no
      claro contra 1.27 no escuro — o campo se separa menos da caixa aqui. */
-  --surface-page: #d3d8e0;
-  --surface-rail: #eef4fc;
+  --surface-page: #d4dde9;
+  --surface-rail: #e3eaf2;
   --surface-field: #ffffff;
   --surface-brand: #155b9a;
   /* Fundo da linha escolhida numa lista de opções. É a cor que o desenho antigo
@@ -127,7 +127,7 @@
    *
    * Por isso NÃO aparecem no bloco `[data-theme="dark"]` abaixo. */
   --status-done: #1e8e4f;
-  --status-progress: #d99e0b;
+  --status-progress: #d8a21b;
   --status-late: #c0392b;
   --status-info: #2b6cb0;
 
@@ -188,8 +188,8 @@
 }
 
 :is(html[data-theme="dark"]) {
-  --surface-page: #0b1520;
-  --surface-rail: #132132;
+  --surface-page: #0d1725;
+  --surface-rail: #111e2f;
   --surface-field: #223348;
   --surface-brand: #062847;
   /* O accent diluído — o tom amarelado que o desenho antigo dava à linha

@@ -16,8 +16,8 @@
      baixo, então o resultado se adapta aos dois temas sozinho.
      
      Foi isso que apagou a única regra do v2 com valor por tema: a versão
-     anterior misturava com `--surface-field` e sujava no escuro — o amarelo
-     caía em pardo (#3c423f) e o vermelho em arroxeado (#383444), medidos. */
+     anterior misturava com `--surface-field` e sujava no escuro — amarelo e
+     vermelho perdiam o tom esperado, conforme medição. */
   background: color-mix(in srgb, var(--alert-tone, var(--status-info)) 16%, transparent);
   /* A fitinha lateral fica: ela dá o sinal mesmo em leitura rápida, quando o
      fundo translúcido é sutil demais para ser percebido de canto de olho. É a

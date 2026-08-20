@@ -122,13 +122,13 @@ html[data-theme="dark"] {
   --color-primary-bright: #2f88c7;
   --color-primary-soft: #16324b;
   --color-secondary: #155b9a;
-  --color-secondary-hover: #1a70bb;
+  --color-secondary-hover: #2b6cb0;
   --color-secondary-soft: #16324b;
   --color-accent: #d8a21b;
   --color-accent-hover: #e0ab3c;
   --color-accent-soft: #3b3320;
   --color-accent-text: #e0ab3c;
-  --color-accent-border-soft: #7a641f;
+  --color-accent-border-soft: #78611b;
   --color-accent-border-strong: #a5851f;
   --color-on-accent: var(--color-primary-dark);
   --glow-accent: 0 14px 34px rgba(216, 162, 27, 0.22);
