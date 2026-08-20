@@ -10571,7 +10571,7 @@ tolerância adicional: qualquer queda futura abaixo desses valores volta a
 reprovar o pipeline. Nenhum auditor foi desativado e nenhum teto de outra métrica
 foi alterado.
 
-### NOVO-20260820-171008-7afb74d82d2c 🟡 ACEITO COM DÍVIDA · `NOVO` O v2 entrega 517 KB de CSS em toda página, e o piso do NOVO-70 caiu de 49% para 13% · FE/PERF · risco médio
+### NOVO-20260820-171008-7afb74d82d2c 🔴 ABERTO · `NOVO` O v2 entrega 517 KB de CSS em toda página: NOVO-70 e o aceite PF-02 ficam incompatíveis · FE/PERF · risco médio
 
 O `NOVO-70` mede quanto do CSS entregue numa rota é de fato usado, e é catraca:
 o uso só pode subir. Nas 43 rotas ele caiu de **48,9% em média para 12,9%** — o
@@ -10588,18 +10588,39 @@ canônico: `cargo-editar` entrega 590.469 bytes e casa 64.013.
 Só apareceu agora porque o `NOVO-70` é o **último passo** do workflow e a `main`
 estava vermelha há 25 execuções — ele não rodava.
 
-**Decisão do dono (2026-08-20): rebaselinar e lançar.** Os 43 pisos foram
-regravados com a medição real do runner (`floor = valor medido`, que é o corpo
-de `updated_floors(allow_weaker=True)`). Feito à mão porque o `workflow_dispatch`
-expõe `--atualizar-tetos` mas **não** `--permitir-subir-teto`, e sem ele o script
-faz `floor = max(anterior, atual)` — mede certo e regrava o piso antigo.
+**Rebaselinar NÃO resolve, e a tentativa provou por quê.** Os 43 pisos foram
+regravados com a medição do runner (`3e79269c`) e a suíte passou a reprovar em
+`core.tests.test_metricas_front.test_todas_as_rotas_cumprem_o_aceite_pf02_de_35_por_cento`,
+que afirma que TODA rota usa ao menos **35%** — é o critério de aceite do PF-02
+codificado como teste, com a mensagem "PF-02 ainda aberto". Os dois lados se
+contradizem e **nenhum valor neste arquivo deixa a CI verde**:
 
-**A dívida fica registrada, e o conserto é conhecido:** aplicar ao v2 o mesmo
+- pisos antigos (43-60%): a suíte passa, o gate `NOVO-70` reprova (medido 13%);
+- pisos novos (13%): o gate passa, a suíte reprova no aceite de 35%.
+
+É assim de propósito — o teste existe para ninguém baixar o número e declarar
+vitória. A recalibração foi **revertida**; o estado honesto é o gate vermelho
+apontando a dívida real.
+
+**Decisão do dono (2026-08-20): lançar por `workflow_dispatch` do `deploy.yml`,
+com a `main` vermelha no `NOVO-70`.** O código foi verificado por outros
+caminhos — suíte completa verde na CI em `2288c7cb` (só PF-07, corrigido, e este
+gate falharam), 2.464 testes locais, os cinco auditores de frontend e o
+`collectstatic` com o storage de manifesto do WhiteNoise. Os gates do DEPLOY
+continuam todos valendo: backup, `check --deploy`, `collectstatic`, `migrate`,
+health check e `trap ERR` que reverte código e banco.
+
+Nota operacional: o `workflow_dispatch` do `tests.yml` expõe `--atualizar-tetos`
+mas **não** `--permitir-subir-teto`; sem ele o script faz
+`floor = max(anterior, atual)` — mede certo e regrava o piso antigo. A medição
+crua fica no artefato `frontend-route-metrics-<run_id>` (`css-por-rota.json`).
+
+**O conserto é conhecido, e é o único que fecha os dois lados:** aplicar ao v2 o mesmo
 PF-02 que o shell já tem — perfis por família de rota gerados pelo
 `build_css_profiles.py`, que hoje exclui `static/css/v2/` de propósito ("NÃO
 passa pelo podador... e o orçamento de dois arquivos do NOVO-12 fica
 preservado"). Isso devolveria o uso para a casa dos 40-60%. Enquanto não for
-feito, a catraca protege o número novo, não o antigo.
+feito, o `NOVO-70` fica vermelho e a `main` só deploya por dispatch manual.
 
 **Nuance que pesou na decisão:** 517 KB é o tamanho cru. O WhiteNoise entrega
 comprimido e o arquivo é UM só, cacheado uma vez para o app inteiro, enquanto os
