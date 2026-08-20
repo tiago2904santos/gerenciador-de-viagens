@@ -29,17 +29,17 @@
 
 :root {
   /* ---- superfícies ---------------------------------------------------- */
-  /* O `page` é mais fundo que o original (#e8eef6) porque o degrau para o rail
+  /* O `page` é mais fundo que o valor claro original porque o degrau para o rail
      media 1.055 — praticamente nada — e a alternância de superfície, que é o
      que separa uma camada da outra em todo o sistema, sumia no tema claro.
      Agora mede 1.29.
 
      O `rail` voltou ao valor original por decisão do dono: a versão mais funda
-     que eu tinha posto (#dfe5ed) igualava o degrau rail→field ao do escuro,
+     que eu tinha posto igualava o degrau rail→field ao do escuro,
      mas puxava o azul para o cinza. Em troca, rail→field fica em 1.106 no
      claro contra 1.27 no escuro — o campo se separa menos da caixa aqui. */
-  --surface-page: #d3d8e0;
-  --surface-rail: #eef4fc;
+  --surface-page: #d4dde9;
+  --surface-rail: #e3eaf2;
   --surface-field: #ffffff;
   --surface-brand: #155b9a;
   /* Fundo da linha escolhida numa lista de opções. É a cor que o desenho antigo
@@ -131,7 +131,7 @@
    *
    * Por isso NÃO aparecem no bloco `[data-theme="dark"]` abaixo. */
   --status-done: #1e8e4f;
-  --status-progress: #d99e0b;
+  --status-progress: #d8a21b;
   --status-late: #c0392b;
   --status-info: #2b6cb0;
 
@@ -192,8 +192,8 @@
 }
 
 :is(html[data-theme="dark"]) {
-  --surface-page: #0b1520;
-  --surface-rail: #132132;
+  --surface-page: #0d1725;
+  --surface-rail: #111e2f;
   --surface-field: #223348;
   --surface-brand: #062847;
   /* O accent diluído — o tom amarelado que o desenho antigo dava à linha
@@ -840,7 +840,7 @@
  *
  * Um campo é a mesma coisa em qualquer contexto: barra de filtros, formulário
  * ou wizard. O sistema antigo tinha TRÊS superfícies diferentes para isto na
- * mesma tela (medido em `/roteiros/novo/`: #243541, #112439, #111e2f) — é
+ * mesma tela (medido em `/roteiros/novo/` com três tons intermediários) — é
  * exatamente o que esta folha existe para não deixar acontecer de novo.
  */
 
@@ -3594,8 +3594,8 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
      baixo, então o resultado se adapta aos dois temas sozinho.
      
      Foi isso que apagou a única regra do v2 com valor por tema: a versão
-     anterior misturava com `--surface-field` e sujava no escuro — o amarelo
-     caía em pardo (#3c423f) e o vermelho em arroxeado (#383444), medidos. */
+     anterior misturava com `--surface-field` e sujava no escuro — amarelo e
+     vermelho perdiam o tom esperado, conforme medição. */
   background: color-mix(in srgb, var(--alert-tone, var(--status-info)) 16%, transparent);
   /* A fitinha lateral fica: ela dá o sinal mesmo em leitura rápida, quando o
      fundo translúcido é sutil demais para ser percebido de canto de olho. É a
@@ -11889,7 +11889,7 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
 }
 
 /* As ações ficam em FIELD: a linha é `rail`, e o `icon-button` do sistema herda a
-   superfície de onde está — medido, saía `#132132` sobre `#132132`, botão invisível.
+   superfície de onde está — medido, usava o mesmo tom do fundo e ficava invisível.
    Aqui é o degrau seguinte que separa o controle do fundo, como no resto do v2. */
 :is(html[data-theme]) .file-picker__row .icon-button {
   --icon-button-surface: var(--surface-field);

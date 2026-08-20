@@ -513,7 +513,7 @@
 }
 
 /* As ações ficam em FIELD: a linha é `rail`, e o `icon-button` do sistema herda a
-   superfície de onde está — medido, saía `#132132` sobre `#132132`, botão invisível.
+   superfície de onde está — medido, usava o mesmo tom do fundo e ficava invisível.
    Aqui é o degrau seguinte que separa o controle do fundo, como no resto do v2. */
 :is(html[data-theme]) .file-picker__row .icon-button {
   --icon-button-surface: var(--surface-field);

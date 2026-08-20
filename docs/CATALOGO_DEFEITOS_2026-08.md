@@ -10279,6 +10279,18 @@ explicitamente seus contratos e usam `only`; a fila de downloads passou a usar
 `CV.http.request`, preservando `Response`, credenciais e cabeçalho AJAX. O
 auditor voltou a registrar zero erros sem aumentar o teto de avisos.
 
+### NOVO-20260820-174349-60ca85c53759 🟢 RESOLVIDO · `NOVO` Cores perceptualmente duplicadas bloquearam o gate de produção · UI/QA · risco baixo
+
+O gate `audit_paleta --max 0` da execução de CI `32398484209` encontrou onze
+cores praticamente indistinguíveis já representadas por tokens canônicos. O
+auditor também contabilizava valores históricos escritos em comentários, o que
+mantinha duplicatas sem qualquer consumidor visual.
+
+**Correção:** os tokens de superfície, progresso e apoio do tema escuro passaram
+a reutilizar as cores canônicas indicadas pelo auditor; referências hexadecimais
+meramente históricas foram removidas dos comentários. Os bundles foram
+regenerados e o gate voltou a registrar zero duplicatas perceptuais.
+
 ### NOVO-20260820-132553-c8781d82b56f 🟢 RESOLVIDO · `NOVO` O último menu do sistema antigo mantinha `action-system.css` de pé · FE · risco médio
 
 `templates/prestacoes_contas/partials/_card_menus.html` era o único lugar do
