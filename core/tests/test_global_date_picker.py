@@ -106,7 +106,7 @@ class GlobalDatePickerTests(SimpleTestCase):
             Path(settings.BASE_DIR)
             / "static"
             / "css"
-            / "fields"
+            / "v2"
             / "date-picker.css"
         )
         css = css_path.read_text(encoding="utf-8")

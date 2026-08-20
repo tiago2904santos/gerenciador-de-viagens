@@ -1,0 +1,177 @@
+/* Casca do aplicativo — a grade que segura barra lateral e conteúdo.
+ *
+ * Veio de `layout/layout.css` (a grade) e da metade não-lateral de
+ * `layout/app-shell.css` (o salto de acessibilidade e a barra móvel) em
+ * 2026-08-20, quando a pasta `layout/` foi extinta. As classes são as mesmas —
+ * quem as emite é `templates/base.html`, e renomeá-las trocaria a casca de
+ * TODAS as telas de uma vez, sem ganho nenhum.
+ *
+ * O que mudou foi o endereço e a raiz: agora tudo mora sob `html[data-theme]`,
+ * como todo o resto do v2. Par da barra lateral em `v2/sidebar.css`.
+ */
+
+:is(html[data-theme]) .app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+:is(html[data-theme]) .app-main {
+  box-sizing: border-box;
+  min-width: 0;
+  /* O recuo é FLUIDO, e veio de `theme-shared-components.css` (2026-08-20).
+     `layout/layout.css` declarava 32px/24px/16px/12px em quatro faixas e
+     NENHUM valia: a regra do tema tinha um seletor a mais e vencia em todas
+     elas. O que a tela sempre mostrou é este clamp. */
+  padding: clamp(20px, 2.6vw, 40px);
+  width: 100%;
+}
+
+:is(html[data-theme]) .content-wrap {
+  margin: 0;
+  max-width: var(--page-max-width);
+  padding: 0;
+  width: 100%;
+}
+
+/* A sobrancelha de página. Continua aqui, e não em `v2/header.css`, porque
+   `js/core/app.js` a escreve em avisos montados fora do cabeçalho. */
+:is(html[data-theme]) .eyebrow {
+  color: var(--color-accent);
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: var(--space-1);
+  text-transform: uppercase;
+}
+
+/* O salto para o conteúdo: fora da tela até receber foco. */
+:is(html[data-theme]) .skip-link {
+  border-radius: var(--radius-control);
+  left: 16px;
+  padding: 10px 14px;
+  position: fixed;
+  top: 12px;
+  transform: translateY(-160%);
+  transition: transform 120ms ease;
+  z-index: calc(var(--z-modal, 1000) + 10);
+}
+
+:is(html[data-theme]) .skip-link:focus {
+  transform: translateY(0);
+}
+
+/* Barra móvel e fundo escurecido só existem abaixo de 840px. */
+:is(html[data-theme]) .app-mobile-bar,
+:is(html[data-theme]) .sidebar-drawer-close,
+:is(html[data-theme]) .sidebar-scrim {
+  display: none;
+}
+
+/* O raio fica FORA da consulta de mídia, como estava em
+   `theme-shared-components.css`: os dois botões existem no DOM em qualquer
+   largura — escondidos acima de 840px —, e o raio é do botão, não da faixa. */
+:is(html[data-theme]) .app-mobile-bar__toggle,
+:is(html[data-theme]) .sidebar-drawer-close {
+  border-radius: 10px;
+}
+
+@media (max-width: 840px) {
+  :is(html[data-theme]) .app-shell {
+    display: block;
+  }
+
+  :is(html[data-theme]) .app-mobile-bar {
+    align-items: center;
+    display: flex;
+    height: 64px;
+    justify-content: space-between;
+    padding: 0 16px;
+    position: sticky;
+    top: 0;
+    z-index: calc(var(--z-sidebar, 20) - 1);
+  }
+
+  :is(html[data-theme]) .app-mobile-bar__brand {
+    align-items: center;
+    display: inline-flex;
+    font-weight: 750;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  :is(html[data-theme]) .app-mobile-bar__toggle,
+  :is(html[data-theme]) .sidebar-drawer-close {
+    align-items: center;
+    cursor: pointer;
+    display: inline-flex;
+    height: 40px;
+    justify-content: center;
+    width: 40px;
+  }
+
+  :is(html[data-theme]) .app-mobile-bar__toggle {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  :is(html[data-theme]) .app-mobile-bar__toggle > span {
+    height: 2px;
+    width: 18px;
+  }
+}
+
+/* No celular o clamp daria 20px; 14px é o que o tema impunha, e é o que a tela
+   mostra desde então. */
+@media (max-width: 600px) {
+  :is(html[data-theme]) .app-main {
+    padding: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(html[data-theme]) .skip-link {
+    transition: none;
+  }
+}
+
+/* ---- pintura do tema escuro -----------------------------------------------
+ *
+ * Veio de `components/theme-dark-components.css` em 2026-08-20, com o seletor
+ * intacto. A barra móvel e o salto de acessibilidade só têm pintura NO ESCURO:
+ * no claro eles herdam a superfície da página, e mudar isso aqui seria
+ * redesenhar duas peças de casca no meio de uma mudança de endereço.
+ */
+
+:is(html[data-theme="dark"]) .skip-link {
+  background: var(--color-surface-strong);
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--shadow-md);
+  color: var(--color-heading);
+}
+
+:is(html[data-theme="dark"]) .app-mobile-bar {
+  background: var(--sidebar-surface);
+  border-bottom: 1px solid var(--sidebar-border);
+  box-shadow: var(--shadow-sm);
+}
+
+:is(html[data-theme="dark"]) .app-mobile-bar__brand {
+  color: var(--sidebar-brand-fg);
+}
+
+:is(html[data-theme="dark"]) :is(.app-mobile-bar__toggle, .sidebar-drawer-close) {
+  background: var(--color-primary-soft);
+  border: 1px solid var(--color-border);
+  color: var(--color-heading);
+}
+
+:is(html[data-theme="dark"]) .app-mobile-bar__toggle:hover,
+:is(html[data-theme="dark"]) .sidebar-drawer-close:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary-bright);
+}
+
+:is(html[data-theme="dark"]) .app-mobile-bar__toggle > span {
+  background: currentColor;
+}

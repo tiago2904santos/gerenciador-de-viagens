@@ -1,5 +1,17 @@
 {% load icones %}
 {% load static %}
+{% comment %}
+  A espera da prévia, dentro do `<iframe>`.
+
+  Migrada para o v2 em 2026-08-20: era `document-generation-embedded*`, com uma
+  folha de página só dela (80 linhas), e o assunto é o mesmo do aviso de
+  download — documento em preparação. As duas passaram a ser
+  `v2/document-loading.css`, e esta é a variante `--embedded`, que ocupa a tela
+  em vez de flutuar sobre ela.
+
+  Casca própria (sem `base.html`) porque a página vive dentro de um quadro: a
+  barra lateral e o cabeçalho do sistema apareceriam duas vezes.
+{% endcomment %}
 <!doctype html>
 <html lang="pt-br">
 <head>
@@ -9,22 +21,22 @@
   <script src="{% static 'js/core/theme-init.js' %}"></script>
   <title>Preparando documento</title>
   <link rel="stylesheet" href="{% static 'css/shell.bundle.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/document-generation-embedded.css' %}">
+  <link rel="stylesheet" href="{% static 'css/ui.bundle.css' %}">
 </head>
-<body class="document-generation-embedded">
+<body class="document-loading document-loading--embedded">
   <c-v2.sprite />
   <main
-    class="document-generation-embedded__panel"
+    class="document-loading__panel"
     data-document-generation-wait
     data-status-url="{{ geracao.status_url }}"
   >
-    <span class="document-generation-embedded__icon" aria-hidden="true">
+    <span class="document-loading__mark" aria-hidden="true">
       {% icone_svg "document" %}
     </span>
-    <span class="document-generation-embedded__spinner" aria-hidden="true"></span>
-    <p class="document-generation-embedded__eyebrow">Documento em preparação</p>
-    <h1>Gerando a prévia do plano</h1>
-    <p class="document-generation-embedded__message" data-document-generation-message>
+    <span class="document-loading__spinner" aria-hidden="true"></span>
+    <p class="document-loading__eyebrow">Documento em preparação</p>
+    <h1 class="document-loading__title">Gerando a prévia do plano</h1>
+    <p class="document-loading__detail" data-document-generation-message>
       Aguarde um instante. O documento será exibido aqui automaticamente.
     </p>
   </main>

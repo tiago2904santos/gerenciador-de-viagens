@@ -377,7 +377,16 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # mudaram de endereço para `v2/`. O total não muda — elas não sumiram,
         # o diretório legado é que ficou vazio.
         # NENHUMA folha fora de `v2/`: o namespace é um só.
-        self.assertEqual(len(self.components()), 81)
+        #
+        # 84 (2026-08-20): +3 para a migração da tela do Drive, a última com
+        # folha de página inteira só dela. `v2/progress.html` (barra de um
+        # trabalho longo), `v2/stat.html` (contagem com ícone) e
+        # `v2/folder_row.html` (a linha do navegador de pastas). As três eram
+        # desenho exclusivo daquela tela, em `pages/gdrive-config.css`, e
+        # nenhuma tinha equivalente no v2 — o `fact` descreve um registro, não
+        # uma contagem, e o `record` daria 68px de altura para mostrar o nome de
+        # uma pasta.
+        self.assertEqual(len(self.components()), 84)
 
     def test_fora_do_v2_so_restam_pecas_sem_equivalente(self):
         fora_do_v2 = {

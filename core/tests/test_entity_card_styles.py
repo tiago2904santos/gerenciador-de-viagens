@@ -36,6 +36,9 @@ class EntityCardStylesTests(SimpleTestCase):
     def test_listagens_nao_reintroduzem_folhas_sem_regra_casada(self):
         expected_absent = {
             "templates/eventos/index.html": "css/pages/eventos-list.css",
+            # A folha do wizard de documentos foi APAGADA em 2026-08-20: nenhuma
+            # tela a carregava desde que o cartão inline virou componente, e as 22
+            # regras que ainda vestiam alguma coisa foram para `v2/document-inline.css`.
             "templates/oficios/index.html": "css/pages/oficios-documentos-inline.css",
         }
         for relative_path, stylesheet in expected_absent.items():

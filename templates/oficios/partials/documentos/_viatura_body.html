@@ -6,21 +6,21 @@
   linha dizendo que não há nada a dizer.
 {% endcomment %}
 {% with t=documentos_ctx.transporte %}
-  <div class="document-summary document-summary--vehicle fact-list">
-    <c-v2.form_block aria_label="Placa" extra_class="document-summary__fact-panel document-summary__fact-panel--vehicle">
+  <div class="fact-list fact-list--band-4">
+    <c-v2.form_block aria_label="Placa">
       <c-slot name="body"><c-v2.fact label="Placa" value="{{ t.viatura|default:t.placa }}" /></c-slot>
     </c-v2.form_block>
-    <c-v2.form_block aria_label="Modelo" extra_class="document-summary__fact-panel document-summary__fact-panel--vehicle">
+    <c-v2.form_block aria_label="Modelo">
       <c-slot name="body"><c-v2.fact label="Modelo" :value="t.modelo" /></c-slot>
     </c-v2.form_block>
-    <c-v2.form_block aria_label="Tipo" extra_class="document-summary__fact-panel document-summary__fact-panel--vehicle">
+    <c-v2.form_block aria_label="Tipo">
       <c-slot name="body"><c-v2.fact label="Tipo" value="{{ t.tipo_viatura|default:t.tipo }}" /></c-slot>
     </c-v2.form_block>
-    <c-v2.form_block aria_label="Combustível" extra_class="document-summary__fact-panel document-summary__fact-panel--vehicle">
+    <c-v2.form_block aria_label="Combustível">
       <c-slot name="body"><c-v2.fact label="Combustível" :value="t.combustivel" /></c-slot>
     </c-v2.form_block>
     {% if t.mostrar_motorista_externo %}
-      <c-v2.form_block aria_label="Motorista carona" extra_class="document-summary__fact-panel document-summary__fact-panel--vehicle">
+      <c-v2.form_block aria_label="Motorista carona">
         <c-slot name="body"><c-v2.fact label="Motorista carona" :value="t.motorista" /></c-slot>
       </c-v2.form_block>
     {% endif %}

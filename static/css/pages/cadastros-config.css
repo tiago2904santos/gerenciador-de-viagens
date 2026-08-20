@@ -29,7 +29,6 @@
   box-shadow: none;
 }
 
-
 :is(html[data-theme="dark"])
   .cadastros-form-page[data-configuracoes-shell]
   .date-picker__control {

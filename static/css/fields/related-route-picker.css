@@ -1,31 +1,11 @@
-/* Shared document-form and related-route picker families (UI-04). */
+/* O que sobrou das famílias de formulário de documento (UI-04).
 
-.oficio-reveal-panel {
-  overflow: hidden;
-  opacity: 0;
-  transform: translateY(-12px);
-  transition:
-    opacity 220ms ease,
-    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform;
-}
-
-.oficio-reveal-panel.is-open {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .oficio-reveal-panel {
-    transition: none;
-    transform: none;
-  }
-}
-
-:is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-consolidado]) :is(.travel-document-body, .oficio-roteiro-body, .oficio-justificativa-body, .oficio-documentos-body) {
-  display: grid;
-  gap: 10px;
-}
+   O picker de documento vinculado saiu para `v2/picker.css` e o painel que se
+   revela para `pages/justificativas.css`, ambos em 2026-08-20 — cada um foi
+   para onde o seu dono está. Ficaram as regras de ESCOPO DE WIZARD, que não são
+   de nenhum componente: elas desfazem, dentro dos wizards, o que o desenho
+   antigo faz por fora. Morrem quando `travel-document-block` e as outras três
+   classes de bloco pararem de ser emitidas. */
 
 :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block) {
   margin: 0;
@@ -40,152 +20,9 @@
   text-align: left;
 }
 
-.roteiro-editor__route-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin-top: var(--space-3);
-  max-height: 220px;
-  overflow: auto;
-}
-
-.related-route-picker.search-picker--people.search-picker--roster {
-  gap: 0 !important;
-}
-
-.related-route-picker .search-picker__field {
-  gap: 7px;
-}
-
-.related-route-picker .search-picker__selected-list.roteiro-editor__route-list {
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.related-route-list {
-  scrollbar-color: rgba(191, 211, 234, 0.6) transparent;
-}
-
-.related-route-list::-webkit-scrollbar {
-  width: 28px;
-}
-
-.related-route-list::-webkit-scrollbar-track {
-  background: transparent;
-  margin: var(--space-1) 0;
-}
-
-.related-route-list::-webkit-scrollbar-thumb {
-  background: rgba(191, 211, 234, 0.45);
-  border-radius: var(--radius-pill);
-  transition: background 0.2s;
-}
-
-.related-route-list::-webkit-scrollbar-thumb:hover {
-  background: var(--color-accent);
-}
-
-.related-route-list::-webkit-scrollbar-button {
-  display: none;
-}
-
-.related-route-item {
-  background: var(--route-card-inner-bg);
-  border: 1px solid var(--route-section-border);
-  border-radius: var(--radius-md);
-  color: var(--theme-text-body);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: var(--space-2) var(--space-3);
-  text-align: left;
-  transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast);
-}
-
-.related-route-item:hover {
-  background: var(--route-card-inner-bg);
-  border-color: var(--route-button-secondary-hover-border);
-}
-
-.related-route-item.is-active {
-  border-color: var(--re-accent-border);
-  box-shadow: 0 0 0 2px var(--re-choice-ring);
-}
-
-.related-route-item .related-route-title {
-  color: var(--theme-text-heading);
-  font-weight: 700;
-}
-
-.related-route-item .related-route-period {
-  color: var(--theme-text-muted);
-  font-size: 12px;
-}
-
-.related-route-empty {
-  border: 1px dashed var(--theme-border-card);
-  border-radius: var(--radius-md);
-  color: var(--theme-text-muted);
-  font-size: 13px;
-  padding: var(--space-4);
-  text-align: center;
-}
-
 .document-form .form-section-card,
 .document-form-block {
   scroll-margin-top: 24px;
-}
-
-.termo-oficio-source-select {
-  display: none;
-}
-
-.termo-oficio-picker {
-  display: grid;
-  gap: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-step1]
-  .related-route-picker.termo-oficio-picker.search-picker--people.search-picker--roster,
-.document-form-page .related-route-picker.termo-oficio-picker.search-picker--people.search-picker--roster,
-.termo-oficio-picker.search-picker--people.search-picker--roster {
-  gap: 0 !important;
-}
-
-.termo-oficio-picker .search-picker__field,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-step1]
-  .related-route-picker.termo-oficio-picker
-  .search-picker__field {
-  gap: 7px !important;
-}
-
-.termo-oficio-summary-panel {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  margin-top: 0;
-  padding: 0;
-}
-
-.termo-oficio-picker .search-picker__selected-list,
-.termo-oficio-picker .roteiro-editor__route-list,
-.termo-oficio-summary-panel .search-picker__selected-list,
-.termo-oficio-summary-panel .related-route-list,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-step1]
-  .related-route-picker.termo-oficio-picker
-  :is(.search-picker__selected-list, #termo-oficio-lista, #os-oficio-lista) {
-  display: grid;
-  gap: 8px !important;
-  margin-top: 8px;
-  max-height: 280px;
-  overflow: auto;
 }
 
 .document-form-page #termo-oficio-lista,

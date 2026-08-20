@@ -41,8 +41,8 @@ class FieldFocusTokenTests(SimpleTestCase):
         self.assertNotIn("--field-shadow-focus: none", escuro)
 
     def test_consumidores_de_sombra_compoem_a_cor_do_anel(self):
-        select = (CSS / "fields" / "select.css").read_text(encoding="utf-8")
-        file_picker = (CSS / "fields" / "file-picker.css").read_text(encoding="utf-8")
+        select = (CSS / "v2" / "select.css").read_text(encoding="utf-8")
+        file_picker = (CSS / "v2" / "file-picker.css").read_text(encoding="utf-8")
         self.assertIn(
             "0 0 0 var(--space-1) var(--input-focus-ring), var(--shadow-xs)",
             select,
@@ -50,7 +50,10 @@ class FieldFocusTokenTests(SimpleTestCase):
         self.assertIn("0 0 0 var(--space-1) var(--input-focus-ring)", file_picker)
 
     def test_wizard_de_roteiro_nao_desliga_mais_o_anel_de_campo(self):
-        roteiro = (CSS / "pages" / "roteiros.css").read_text(encoding="utf-8")
+        """`pages/roteiros.css` foi APAGADA em 2026-08-20 — a tela migrou para o
+        v2 em 17/08 e nenhuma página a carregava desde então. As quatro supressões
+        continuam proibidas, agora onde o editor mora: `v2/route-editor.css`."""
+        roteiro = (CSS / "v2" / "route-editor.css").read_text(encoding="utf-8")
         for supressao in (
             "--input-focus-ring: transparent",
             "--field-shadow-focus: none",

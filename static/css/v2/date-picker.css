@@ -579,6 +579,147 @@ html[data-theme="light"] .date-picker .date-picker__day--multi-single:hover {
 }
 
 
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * VINDAS DAS FOLHAS DE TEMA E DO CASCO ANTIGO, em 2026-08-20.
+ *
+ * Descreviam este componente DE FORA dele — em `theme-shared-components.css`,
+ * `theme-dark-components.css`, `layout/page-shell.css`, `fields/forms.css` ou
+ * `lists/list-header.css`. Enquanto ficaram lá, o componente do v2 dependia de
+ * folhas do sistema antigo para ter forma, e toda tela migrada carregava
+ * aquelas folhas por causa dele.
+ *
+ * Vieram com o texto INTACTO — `!important` e escopo de wizard inclusive —, e
+ * ANTES da divisa: elas chegavam pelo bundle do shell, que é anterior ao
+ * `ui.bundle.css`, e por isso perdiam para o delta do v2. Anexá-las no fim
+ * inverteria a disputa sem mudar um valor sequer. Medido antes e depois em 20
+ * telas: nenhuma diferença.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+html[data-theme] .date-picker__footer .date-picker__footer-action {
+  border-radius: 10px;
+}
+
+html[data-theme] .date-picker__footer .date-picker__footer-action {
+  background: var(--step1-panel, var(--color-surface-soft));
+  background-image: none;
+  border: 0;
+  box-shadow: none;
+  color: var(--color-heading, var(--theme-text-heading));
+  font-weight: var(--font-weight-bold);
+  min-height: var(--control-height-sm, 34px);
+  padding: 0 14px;
+  transform: none;
+}
+
+html[data-theme] .date-picker__footer .date-picker__footer-action:hover,
+html[data-theme] .date-picker__footer .date-picker__footer-action:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted));
+  background-image: none;
+  border: 0;
+  box-shadow: none;
+  color: var(--color-accent-text, var(--color-accent));
+  outline: 0;
+  transform: none;
+}
+
+html[data-theme="dark"] :is(.date-picker__panel, .popover) {
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+  box-shadow: var(--shadow-elevated);
+}
+
+
+/* ---- a pílula de período --------------------------------------------------
+ *
+ * Veio de `lists/list-header.css` em 2026-08-20. É o gatilho do calendário na
+ * variante `control_variant="filter-pill"` — emitido por este componente
+ * (`cotton/v2/date_picker.html`) e aceso por `js/components/date-picker.js`,
+ * que põe `travel-period-filter--active` quando há data escolhida.
+ *
+ * Morava na folha da BARRA DE LISTA porque foi lá que a pílula apareceu
+ * primeiro. As regras que a qualificam dentro da barra (altura do controle do
+ * rail) ficaram lá — aquelas são da barra.
+ *
+ * O nome `travel-period-filter*` é contrato do JS e não se renomeia aqui.
+ */
+
+:is(html[data-theme="dark"])
+  .travel-period-filter--filled
+  .travel-period-filter__btn,
+:is(html[data-theme="dark"])
+  .travel-period-filter--filled
+  .travel-period-filter__btn:hover:not(:disabled) {
+  background: var(--color-card-soft);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.travel-period-filter__btn {
+  align-items: center;
+  background:
+    linear-gradient(var(--color-card), var(--color-card)) padding-box,
+    linear-gradient(var(--select-border), var(--select-border)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  box-shadow: var(--cs-trigger-shadow);
+  color: var(--color-input-text);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  gap: var(--space-2);
+  height: var(--control-height-md);
+  min-height: var(--control-height-md);
+  padding: 0 var(--space-3);
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+  white-space: nowrap;
+}
+
+.travel-period-filter__btn:hover:not(:disabled) {
+  background:
+    linear-gradient(var(--field-bg-hover), var(--field-bg-hover)) padding-box,
+    linear-gradient(var(--color-secondary), var(--color-secondary)) border-box;
+}
+
+.travel-period-filter__btn:focus-visible {
+  background:
+    linear-gradient(var(--field-bg-hover), var(--field-bg-hover)) padding-box,
+    linear-gradient(var(--select-border-focus), var(--select-border-focus)) border-box;
+  box-shadow: var(--select-focus-shadow);
+  outline: none;
+}
+
+.travel-period-filter__label {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+.travel-period-filter--active .travel-period-filter__btn {
+  background: color-mix(in srgb, var(--color-primary-bright) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary-bright) 55%, transparent);
+  color: var(--color-heading);
+}
+
+.travel-period-filter--active .travel-period-filter__btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-primary-bright) 20%, transparent);
+  border-color: var(--color-primary-bright);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * DELTA v2 — daqui para baixo é o redesenho, sob a raiz `html[data-theme]`.
+ *
+ * A divisa é lida por teste — a linha `=== DELTA v2 ===`: as asserções de
+ * aparência do v2 descrevem ESTA metade. Medir o arquivo inteiro faria o teste
+ * ler a regra base que o delta sobrescreve — foi o que aconteceu na fusão de
+ * 2026-08-20, com sete asserções apontando para a declaração antiga da mesma
+ * classe, três telas acima.
+ * ══════════════════════════════════════════════════════════════════════════ */
+/* === DELTA v2 === */
+
 /* Date picker — campo de data. Depende de `v2/tokens.css`.
  *
  * A marcação vem do partial global `cotton/ui/forms/date_picker.html` e o painel

@@ -1,26 +1,32 @@
-{% load icones %}
+{% comment %}
+  Diretório de destino do Drive — contagens, navegador de pastas e organização
+  em massa.
+
+  Migrado para o v2 em 2026-08-20. Era a última tela com uma folha de página
+  inteira só dela (`pages/gdrive-config.css`, 719 linhas): contagem, barra de
+  progresso e linha de pasta viraram componentes do sistema
+  (`c-v2.stat`, `c-v2.progress`, `c-v2.folder_row`), e o que sobrou de casca é
+  do navegador, em `v2/folder-browser.css`.
+
+  Os `id` são CONTRATO de `js/pages/gdrive-config.js` — é por eles que o motor
+  acha cada peça. Renomear um deles não dá erro: o navegador simplesmente para
+  de responder.
+{% endcomment %}
 {% if not drive_autorizado %}
-  <p class="gdrive-hint gdrive-disabled-hint">
-    Conecte uma conta Google primeiro para poder navegar e selecionar pastas.
-  </p>
+  <p class="field__help">Conecte uma conta Google primeiro para poder navegar e selecionar pastas.</p>
 {% else %}
-  <div class="gdrive-stats-row">
-    <div class="gdrive-stat">
-      <span class="gdrive-stat__icon" aria-hidden="true">{% icone_svg "cloud" %}</span>
-      <span class="gdrive-stat__text">Arquivos enviados ao Drive</span>
-      <span class="gdrive-stat__value">{{ drive_total_arquivos }}</span>
-    </div>
+  <div class="stat-row">
+    <c-v2.stat icon="cloud" label="Arquivos enviados ao Drive" :value="drive_total_arquivos" />
     {% if drive_pode_reorganizar %}
-      <div class="gdrive-stat">
-        <span class="gdrive-stat__icon" aria-hidden="true">{% icone_svg "calendar" %}</span>
-        <span class="gdrive-stat__text">Eventos cadastrados</span>
-        <span class="gdrive-stat__value">{{ drive_total_eventos }}</span>
-      </div>
+      <c-v2.stat icon="calendar" label="Eventos cadastrados" :value="drive_total_eventos" />
     {% endif %}
   </div>
-  {% if not drive_modo_ativo %}<p class="gdrive-mock-note">Modo mock — sem chamadas reais ao Drive.</p>{% endif %}
 
-  <div class="gdrive-folder-browser" id="gdrive-folder-browser"
+  {% if not drive_modo_ativo %}
+    <c-v2.alert tone="info" message="Modo mock — sem chamadas reais ao Drive." />
+  {% endif %}
+
+  <div class="folder-browser" id="gdrive-folder-browser"
        data-url-listar="{% url 'google_drive:api_listar_pastas' %}"
        data-url-criar="{% url 'google_drive:api_criar_pasta' %}"
        data-url-salvar="{% url 'google_drive:salvar_pasta_raiz' %}"
@@ -29,46 +35,52 @@
        data-csrf="{{ csrf_token }}">
 
     {% if drive_pasta_raiz_id %}
-      <div class="gdrive-pasta-atual">
-        <span class="gdrive-pasta-atual__label">Pasta atual</span>
-        <div class="gdrive-pasta-selecionada">
-          <span class="gdrive-pasta-selecionada__icon" aria-hidden="true">{% icone_svg "folder" %}</span>
-          <span class="gdrive-pasta-selecionada__nome">{{ drive_pasta_raiz_nome|default:drive_pasta_raiz_id }}</span>
-          <a href="https://drive.google.com/drive/folders/{{ drive_pasta_raiz_id }}"
-             target="_blank" rel="noopener"
-             class="gdrive-pasta-selecionada__link">Ver no Drive ↗</a>
-        </div>
+      {% comment %}
+        A pasta escolhida é UM FATO, não um título: o valor em corpo normal, e o
+        atalho para o Drive ao lado como ação secundária. Com `strong` o nome da
+        pasta saía em 24px, maior que o título do bloco que o contém.
+      {% endcomment %}
+      <div class="folder-browser__current">
+        {% with nome_pasta=drive_pasta_raiz_nome|default:drive_pasta_raiz_id %}
+          <c-v2.fact label="Pasta atual" :value="nome_pasta" />
+        {% endwith %}
+        {% with url_drive="https://drive.google.com/drive/folders/"|add:drive_pasta_raiz_id %}
+          <c-v2.button label="Ver no Drive" variant="secondary" icon="link" :href="url_drive" link_target="_blank" link_rel="noopener" />
+        {% endwith %}
       </div>
     {% endif %}
 
-    <div class="gdrive-browser-toolbar">
+    <div class="folder-browser__toolbar">
       <c-v2.gdrive_root_toggle />
-      <div class="gdrive-navrow">
+      <div class="folder-browser__nav">
         <c-v2.button label="Voltar" variant="secondary" icon="arrow-left" id="gdrive-btn-voltar" :hidden="True" />
-        <span class="gdrive-breadcrumb" id="gdrive-breadcrumb"></span>
+        <span class="folder-browser__path" id="gdrive-breadcrumb"></span>
       </div>
     </div>
 
-    <div class="gdrive-browser-body" id="gdrive-browser-body" hidden>
-      <div class="gdrive-folder-list" id="gdrive-folder-list" role="list"></div>
-      <p class="gdrive-folder-empty" id="gdrive-folder-empty" hidden>
+    <div class="folder-browser__body" id="gdrive-browser-body" hidden>
+      <div class="folder-list" id="gdrive-folder-list" role="list"></div>
+      <p class="folder-list__empty" id="gdrive-folder-empty" hidden>
         Nenhuma pasta encontrada neste diretório.
       </p>
-      <div class="gdrive-loading" id="gdrive-loading" aria-live="polite">
-        <span class="gdrive-spinner" aria-hidden="true"></span> Carregando…
-      </div>
+      <p class="folder-list__empty" id="gdrive-loading" aria-live="polite">Carregando…</p>
     </div>
 
-    <div class="gdrive-new-folder" id="gdrive-new-folder" hidden>
-      <div class="gdrive-new-folder__form">
-        <input type="text" id="gdrive-nova-pasta-nome"
-               class="cv-input"
-               placeholder="Nome da nova pasta"
-               maxlength="255"
-               aria-label="Nome da nova pasta">
+    <div class="folder-browser__new" id="gdrive-new-folder" hidden>
+      <div class="folder-browser__new-row">
+        <c-v2.field label="Nome da nova pasta" :hide_label="True" label_for="gdrive-nova-pasta-nome">
+          <c-slot name="control">
+            <c-v2.input
+              input_id="gdrive-nova-pasta-nome"
+              placeholder="Nome da nova pasta"
+              aria_label="Nome da nova pasta"
+              attrs="maxlength=255"
+            />
+          </c-slot>
+        </c-v2.field>
         <c-v2.button label="Criar pasta" variant="secondary" id="gdrive-btn-criar" />
       </div>
-      <p class="gdrive-hint">A pasta será criada no diretório atual.</p>
+      <p class="field__help">A pasta será criada no diretório atual.</p>
     </div>
 
     <form method="post" action="{% url 'google_drive:salvar_pasta_raiz' %}" id="gdrive-form-salvar">
@@ -77,56 +89,59 @@
       <input type="hidden" name="pasta_raiz_nome" id="gdrive-input-pasta-nome">
     </form>
 
-    <div class="gdrive-browser-actions" id="gdrive-browser-actions" hidden>
+    <div class="folder-browser__actions" id="gdrive-browser-actions" hidden>
       <c-v2.button label="Criar nova pasta aqui" variant="secondary" icon="plus" id="gdrive-btn-toggle-criar" />
       <c-v2.button label="Usar esta pasta como destino" variant="primary" id="gdrive-btn-selecionar" :disabled="True" />
     </div>
   </div>
 
   {% if drive_pode_reorganizar %}
-    <div class="gdrive-subsection">
-      <div class="gdrive-subsection__head">
-        <div class="gdrive-subsection__headtext">
-          <h4 class="gdrive-subsection__title">Organização em massa</h4>
-          <p class="gdrive-block__sub">
-            Reorganiza no Drive todos os eventos e ofícios avulsos: move/renomeia o
-            que já foi enviado e sobe o que falta. Documentos novos já são
-            organizados sozinhos.
-          </p>
-        </div>
-        <div class="gdrive-actions gdrive-actions--massa">
-          <c-v2.button label="Ver prévia" variant="secondary" icon="eye" id="gdrive-btn-previa" />
-          <form method="post" action="{% url 'google_drive:reorganizar_tudo' %}"
-                data-confirm-submit data-confirm-message="Reorganizar TODOS os eventos e ofícios avulsos no Drive? Isso move/renomeia arquivos já enviados e sobe os que faltam.">
-            {% csrf_token %}
-            <c-v2.button label="Reorganizar tudo no Drive" variant="primary" icon="sync" type="submit" />
-          </form>
-        </div>
-      </div>
+    <c-v2.form_block
+      title="Organização em massa"
+      description="Reorganiza no Drive todos os eventos e ofícios avulsos: move/renomeia o que já foi enviado e sobe o que falta. Documentos novos já são organizados sozinhos."
+      :heading_level="4"
+    >
+      <c-slot name="actions">
+        <c-v2.button label="Ver prévia" variant="secondary" icon="eye" id="gdrive-btn-previa" />
+        <form method="post" action="{% url 'google_drive:reorganizar_tudo' %}"
+              data-confirm-submit data-confirm-message="Reorganizar TODOS os eventos e ofícios avulsos no Drive? Isso move/renomeia arquivos já enviados e sobe os que faltam.">
+          {% csrf_token %}
+          <c-v2.button label="Reorganizar tudo no Drive" variant="primary" icon="sync" type="submit" />
+        </form>
+      </c-slot>
+      <c-slot name="body">
+        <div id="gdrive-massa"
+             data-url-previa="{% url 'google_drive:previa_reorganizacao' %}"
+             data-url-status="{% url 'google_drive:status_reorganizacao' %}">
+          {% if drive_job_reorg %}
+            {% with estado=drive_job_reorg.get_status_display %}
+              <c-v2.progress
+                element_id="gdrive-status"
+                label="Status da reorganização"
+                :state="estado"
+                state_id="gdrive-status-texto"
+                percent_id="gdrive-status-percent"
+                fill_id="gdrive-progress-fill"
+              />
+            {% endwith %}
+          {% else %}
+            <c-v2.progress
+              element_id="gdrive-status"
+              label="Status da reorganização"
+              state_id="gdrive-status-texto"
+              percent_id="gdrive-status-percent"
+              fill_id="gdrive-progress-fill"
+              :hidden="True"
+            />
+          {% endif %}
 
-      <div class="gdrive-massa" id="gdrive-massa"
-           data-url-previa="{% url 'google_drive:previa_reorganizacao' %}"
-           data-url-status="{% url 'google_drive:status_reorganizacao' %}">
-        <div class="gdrive-status" id="gdrive-status"{% if not drive_job_reorg %} hidden{% endif %}>
-          <div class="gdrive-status__row">
-            <span class="gdrive-status__spinner" aria-hidden="true"></span>
-            <div class="gdrive-status__body">
-              <span class="gdrive-status__label">Status da reorganização</span>
-              <span class="gdrive-status__text" id="gdrive-status-texto">{% if drive_job_reorg %}{{ drive_job_reorg.get_status_display }}{% endif %}</span>
-            </div>
-            <span class="gdrive-status__percent" id="gdrive-status-percent"></span>
-          </div>
-          <div class="gdrive-progress" id="gdrive-progress" role="progressbar" aria-labelledby="gdrive-status-texto" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-            <div class="gdrive-progress__fill" id="gdrive-progress-fill"></div>
+          <div class="folder-browser__new" id="gdrive-previa" hidden>
+            <span class="field__label">Prévia (o que será criado/movido)</span>
+            <ul class="folder-list" id="gdrive-previa-lista" role="list"></ul>
+            <p class="field__help" id="gdrive-previa-aviso" hidden></p>
           </div>
         </div>
-
-        <div class="gdrive-previa" id="gdrive-previa" hidden>
-          <span class="gdrive-previa__label">Prévia (o que será criado/movido)</span>
-          <ul class="gdrive-previa-lista" id="gdrive-previa-lista"></ul>
-          <p class="gdrive-hint" id="gdrive-previa-aviso" hidden></p>
-        </div>
-      </div>
-    </div>
+      </c-slot>
+    </c-v2.form_block>
   {% endif %}
 {% endif %}

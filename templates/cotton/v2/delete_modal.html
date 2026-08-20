@@ -12,8 +12,8 @@
   - `data-delete-confirm-form` no `<form>`, que recebe a `action` de
     `data-delete-url` do gatilho. Sem action o `openSimple` retorna sem abrir nada;
   - `data-delete-confirm-label` no `<strong>`, que recebe `data-delete-label`;
-  - `.delete-confirm-modal__title` no título, que recebe `data-delete-title` — é
-    por isso que o `c-v2.modal` ganhou `title_class`: a classe é seletor de JS, e
+  - `data-delete-modal-title` no título, que recebe `data-delete-title` — é
+    por isso que o `c-v2.modal` ganhou `title_hook`: o atributo é seletor de JS, e
     sem ela o título fica preso em "Excluir registro?" mesmo com o gatilho pedindo
     outro;
   - `data-overlay-close` em tudo que fecha (é o `cancel` da configuração).
@@ -32,7 +32,7 @@
   hook="data-delete-confirm-modal"
   modal_id="delete-confirm-modal"
   :title="titulo"
-  title_class="delete-confirm-modal__title"
+  title_hook="data-delete-modal-title"
   extra_class="modal--delete"
 >
   <c-slot name="body">

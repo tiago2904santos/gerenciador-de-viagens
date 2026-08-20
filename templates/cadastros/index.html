@@ -3,39 +3,40 @@
 {% block title %}Cadastros{% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--standard catalog-hub">
+  {% comment %}
+    Hub de Cadastros — os atalhos para cada catálogo, em duas seções.
+
+    Migrado em 2026-08-20. O que estava aqui usava `page-shell--standard`,
+    `catalog-hub`, `catalog-section` e `catalog-grid` — e as três últimas **não
+    tinham CSS em lugar nenhum**: os cartões caíam empilhados, um por linha,
+    porque a grade que deveria arrumá-los nunca existiu.
+
+    Agora cada seção é um `panel` (que é como o sistema agrupa) e a fileira é a
+    grade do próprio cartão de módulo.
+  {% endcomment %}
+  <div class="list-page">
     <c-v2.header :title="page_title" :description="page_description" />
 
-    <section class="catalog-section" aria-labelledby="cadastros-operacionais-title">
-      <div class="catalog-section__heading">
-        <div>
-          <span class="catalog-section__eyebrow">Operação</span>
-          <h2 id="cadastros-operacionais-title">Cadastros principais</h2>
-        </div>
-        <p>Dados compartilhados pelos documentos e fluxos de viagem.</p>
-      </div>
-      <div class="catalog-grid">
-        {% for module in modules %}
-          <c-v2.module_card :title="module.title" :description="module.description" :href="module.href" action_label="Abrir" :eyebrow="module.eyebrow" />
-        {% endfor %}
-      </div>
-    </section>
-
-    {% if internal_modules %}
-      <section class="catalog-section" aria-labelledby="cadastros-internos-title">
-        <div class="catalog-section__heading">
-          <div>
-            <span class="catalog-section__eyebrow">Configuração</span>
-            <h2 id="cadastros-internos-title">Cadastros internos</h2>
-          </div>
-          <p>Parâmetros administrativos e referências de apoio.</p>
-        </div>
-        <div class="catalog-grid">
-          {% for module in internal_modules %}
+    <c-v2.panel title="Cadastros principais" description="Dados compartilhados pelos documentos e fluxos de viagem." eyebrow="Operação">
+      <c-slot name="body">
+        <div class="module-card-grid">
+          {% for module in modules %}
             <c-v2.module_card :title="module.title" :description="module.description" :href="module.href" action_label="Abrir" :eyebrow="module.eyebrow" />
           {% endfor %}
         </div>
-      </section>
+      </c-slot>
+    </c-v2.panel>
+
+    {% if internal_modules %}
+      <c-v2.panel title="Cadastros internos" description="Parâmetros administrativos e referências de apoio." eyebrow="Configuração">
+        <c-slot name="body">
+          <div class="module-card-grid">
+            {% for module in internal_modules %}
+              <c-v2.module_card :title="module.title" :description="module.description" :href="module.href" action_label="Abrir" :eyebrow="module.eyebrow" />
+            {% endfor %}
+          </div>
+        </c-slot>
+      </c-v2.panel>
     {% endif %}
   </div>
 {% endblock %}

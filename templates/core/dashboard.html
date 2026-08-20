@@ -18,12 +18,12 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-  <div class="page-shell">
+  <div class="list-page">
     <c-v2.header eyebrow="CENTRAL DE VIAGENS 3" title="Início" description="Escolha um módulo para começar." icon_label="CV" only />
 
     <section aria-labelledby="inicio-modulos-title">
       <h2 id="inicio-modulos-title" class="sr-only">Módulos</h2>
-      <div class="metric-grid metric-grid--4">
+      <div class="module-card-grid">
         {% url 'oficios:index' as url_oficios %}
         {% url 'termos:index' as url_termos %}
         {% url 'justificativas:index' as url_justificativas %}

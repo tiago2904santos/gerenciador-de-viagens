@@ -1,57 +1,50 @@
-<fieldset class="dmv-picker" data-dmv-picker="viatura">
-  <legend class="sr-only">Viatura do diário</legend>
-  <div class="dmv-picker__grid">
+{% comment %}
+  Viatura do diário — de onde ela vem, e os campos de cada origem. Migrada para
+  o v2 em 2026-08-20 junto com o motorista, e pela mesma razão.
+
+  `data-viatura-group` é contrato de `js/pages/diario-motorista.js`.
+{% endcomment %}
+{% comment %}
+  O grupo aponta para o parágrafo de erro — e SÓ quando há erro. O
+  `yesno` com variável monta a referência condicional sem duplicar a grade
+  em dois ramos de `{% if %}`: em Cotton a abertura de um componente não
+  pode ficar dentro de um ramo e o fechamento fora dele. Mesmo idioma do
+  cadastro rápido de presets.
+{% endcomment %}
+{% with erro_id=form.viatura_modo.auto_id|add:"_error" %}
+  {% with opcoes_do_erro=erro_id|add:"," %}
+    {% with erro_ref=form.viatura_modo.errors.0|yesno:opcoes_do_erro %}
+      <c-v2.choice_grid aria_label="Viatura do diário" :error_id="erro_ref">
+  <c-slot name="body">
     {% for radio in form.viatura_modo %}
-      <label class="dmv-option">
-        {{ radio.tag }}
-        <span class="dmv-option__mark" aria-hidden="true"></span>
-        <span class="dmv-option__content">
-          <span class="dmv-option__title">{{ radio.choice_label }}</span>
-          {% if radio.data.value == "OFICIO" %}
-            <span class="dmv-option__hint">{{ viatura_oficio.viatura }}{% if viatura_oficio.placa %} · {{ viatura_oficio.placa }}{% endif %}</span>
-          {% elif radio.data.value == "BANCO" %}
-            <span class="dmv-option__hint">Escolher uma viatura já cadastrada no sistema.</span>
-          {% else %}
-            <span class="dmv-option__hint">Digitar os dados do veículo à mão.</span>
-          {% endif %}
-        </span>
-      </label>
+      {% if radio.data.value == "OFICIO" %}
+        {% with dica=viatura_oficio.viatura|add:viatura_oficio_sufixo_placa %}
+          <c-v2.choice_card :field="radio.tag" input_type="radio" :hint="dica">{{ radio.choice_label }}</c-v2.choice_card>
+        {% endwith %}
+      {% elif radio.data.value == "BANCO" %}
+        <c-v2.choice_card :field="radio.tag" input_type="radio" hint="Escolher uma viatura já cadastrada no sistema.">{{ radio.choice_label }}</c-v2.choice_card>
+      {% else %}
+        <c-v2.choice_card :field="radio.tag" input_type="radio" hint="Digitar os dados do veículo à mão.">{{ radio.choice_label }}</c-v2.choice_card>
+      {% endif %}
     {% endfor %}
-  </div>
-  {% if form.viatura_modo.errors %}<c-v2.field_error :errors="form.viatura_modo.errors" :field_id="form.viatura_modo.auto_id" only />{% endif %}
-</fieldset>
+  </c-slot>
+      </c-v2.choice_grid>
+    {% endwith %}
+  {% endwith %}
+{% endwith %}
+{% if form.viatura_modo.errors %}<c-v2.field_error :errors="form.viatura_modo.errors" :field_id="form.viatura_modo.auto_id" only />{% endif %}
 
 {# Viatura do cadastro #}
-<div class="dmv-group" data-viatura-group="BANCO" hidden>
-  <div class="field cv-field">
-    <label class="cv-field__label" for="{{ form.viatura.id_for_label }}">Viatura do cadastro</label>
-    {{ form.viatura }}
-    {% if form.viatura.errors %}<c-v2.field_error :errors="form.viatura.errors" :field_id="form.viatura.auto_id" only />{% endif %}
-  </div>
+<div data-viatura-group="BANCO" hidden>
+  <c-v2.form_field :field="form.viatura" label="Viatura do cadastro" />
 </div>
 
 {# Viatura manual #}
-<div class="dmv-group" data-viatura-group="MANUAL" hidden>
-  <div class="dmv-fields">
-    <div class="field cv-field dmv-fields__wide">
-      <label class="cv-field__label" for="{{ form.viatura_manual_modelo.id_for_label }}">Modelo</label>
-      {{ form.viatura_manual_modelo }}
-      {% if form.viatura_manual_modelo.errors %}<c-v2.field_error :errors="form.viatura_manual_modelo.errors" :field_id="form.viatura_manual_modelo.auto_id" only />{% endif %}
-    </div>
-    <div class="field cv-field">
-      <label class="cv-field__label" for="{{ form.viatura_manual_placa.id_for_label }}">Placa</label>
-      {{ form.viatura_manual_placa }}
-      {% if form.viatura_manual_placa.errors %}<c-v2.field_error :errors="form.viatura_manual_placa.errors" :field_id="form.viatura_manual_placa.auto_id" only />{% endif %}
-    </div>
-    <div class="field cv-field">
-      <label class="cv-field__label" for="{{ form.viatura_manual_tipo.id_for_label }}">Tipo</label>
-      {{ form.viatura_manual_tipo }}
-      {% if form.viatura_manual_tipo.errors %}<c-v2.field_error :errors="form.viatura_manual_tipo.errors" :field_id="form.viatura_manual_tipo.auto_id" only />{% endif %}
-    </div>
-    <div class="field cv-field">
-      <label class="cv-field__label" for="{{ form.viatura_manual_combustivel.id_for_label }}">Combustível</label>
-      {{ form.viatura_manual_combustivel }}
-      {% if form.viatura_manual_combustivel.errors %}<c-v2.field_error :errors="form.viatura_manual_combustivel.errors" :field_id="form.viatura_manual_combustivel.auto_id" only />{% endif %}
-    </div>
+<div data-viatura-group="MANUAL" hidden>
+  <div class="field-grid field-grid--cols-2">
+    <c-v2.form_field :field="form.viatura_manual_modelo" label="Modelo" extra_class="field-grid__span-2" />
+    <c-v2.form_field :field="form.viatura_manual_placa" label="Placa" />
+    <c-v2.form_field :field="form.viatura_manual_tipo" label="Tipo" />
+    <c-v2.form_field :field="form.viatura_manual_combustivel" label="Combustível" />
   </div>
 </div>

@@ -47,39 +47,6 @@
   padding-top: 0;
 }
 
-.justificativa-quick-add {
-  display: grid;
-  gap: var(--space-3);
-}
-
-/* Tokens do step1 sem a caixa travel-document-card. */
-[data-justificativa-quick-add] .justificativa-quick-add__scope {
-  --step1-surface: var(--color-surface-muted, var(--color-card));
-  --step1-panel: var(--color-surface-soft, var(--color-card));
-  --step1-field: var(--step1-surface);
-  --step1-empty: var(--step1-field);
-  display: grid;
-  gap: 10px;
-  /* document-form-page no escopo só para herdar regras de lista 1 coluna. */
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  padding: 0;
-}
-
-:is(html[data-theme="dark"]) [data-justificativa-quick-add] .justificativa-quick-add__scope {
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-panel: var(--color-surface-soft);
-  --step1-field: var(--step1-surface);
-  --step1-empty: var(--step1-field);
-  /* UI-03: re-ligacao COM ESCOPO, nao definicao global — permitida de proposito.
-     45 regras globais leem var(--color-input-bg); re-ligar aqui faz todas elas
-     pintarem o campo com a superficie do passo 1 sem que nenhuma delas precise
-     conhecer este container. Converter para estilo direto custaria duplicar as
-     45 sob este seletor, subindo especificidade — o oposto da Fase 7. */
-  --color-input-bg: var(--step1-field);
-}
-
 /* Lista do Ofício vinculado: mesma do termo, só um pouco mais baixa. */
 :is(html[data-theme="dark"])
   [data-justificativa-quick-add]
@@ -169,16 +136,6 @@
   width: 100%;
 }
 
-.justificativa-quick-add .field-with-action--manage-reveal {
-  --field-manage-btn-size: var(--form-control-height, var(--control-height-md));
-  --field-manage-btn-gap: var(--space-2);
-  display: block;
-  gap: 0;
-  min-height: var(--form-control-height, var(--control-height-md));
-  overflow: visible;
-  position: relative;
-}
-
 .justificativa-quick-add .field-with-action--manage-reveal > .custom-select,
 .justificativa-quick-add .field-with-action--manage-reveal > .form-control,
 .justificativa-quick-add .field-with-action--manage-reveal > .form-select,
@@ -205,34 +162,11 @@
   width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
 }
 
-.justificativa-quick-add .field-with-action--manage-reveal > .icon-btn--field-manage {
-  height: var(--field-manage-btn-size);
-  max-height: var(--field-manage-btn-size);
-  min-height: var(--field-manage-btn-size);
-  opacity: 0;
-  pointer-events: none;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  transition: opacity var(--transition-fast);
-  width: var(--field-manage-btn-size);
-  z-index: 1;
-}
-
-.justificativa-quick-add .field-with-action--manage-reveal:hover > .icon-btn--field-manage,
-.justificativa-quick-add .field-with-action--manage-reveal:focus-within > .icon-btn--field-manage {
-  opacity: 1;
-  pointer-events: auto;
-  z-index: 5;
-}
-
 .justificativas-page .list-header--inline-create .justificativa-quick-add__actions {
   justify-content: flex-end;
   margin-left: 0;
   width: 100%;
 }
-
 
 /*
  * Pronto para salvar: mesmo primary dourado do "Salvar rascunho" do cadastro
@@ -305,5 +239,35 @@
   .justificativas-page .list-header--inline-create .justificativa-quick-add__actions {
     align-items: stretch;
     flex-direction: column;
+  }
+}
+
+/* ---- o painel que se revela -----------------------------------------------
+ *
+ * Veio de `fields/related-route-picker.css` em 2026-08-20. É a finalidade da
+ * justificativa: o painel nasce fechado e desce quando `js/core/app.js` acende
+ * `is-open`. Mora aqui porque é esta tela que o emite — era a única classe da
+ * folha do picker que não falava de picker.
+ */
+
+.oficio-reveal-panel {
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-12px);
+  transition:
+    opacity 220ms ease,
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.oficio-reveal-panel.is-open {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oficio-reveal-panel {
+    transition: none;
+    transform: none;
   }
 }

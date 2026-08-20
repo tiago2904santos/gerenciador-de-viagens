@@ -1,0 +1,201 @@
+/* Linha do navegador de pastas — par de `cotton/v2/folder_row.html`.
+ *
+ * A linha inteira é o alvo de ESCOLHER; "Abrir" é um botão à direita, separado,
+ * porque entrar numa pasta é outra coisa. A escolhida marca-se por
+ * `aria-pressed`, como todo estado de escolha do sistema.
+ *
+ * Veio de `pages/gdrive-config.css` em 2026-08-20, quando a tela do Drive
+ * passou para o v2.
+ */
+
+:is(html[data-theme]) .folder-list {
+  display: grid;
+  gap: 4px;
+  max-height: 320px;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+:is(html[data-theme]) .folder-list[hidden] {
+  display: none;
+}
+
+:is(html[data-theme]) .folder-row {
+  align-items: center;
+  border-radius: var(--radius-field);
+  display: flex;
+  gap: var(--gap-tight);
+  min-width: 0;
+  padding: 2px;
+}
+
+:is(html[data-theme]) .folder-row:hover {
+  background: var(--surface-contrast, var(--surface-field));
+}
+
+/* A escolhida ganha o tom do sistema — o mesmo do segmento escolhido no
+   `toggle` e do item marcado no picker. */
+:is(html[data-theme]) .folder-row.is-selected {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+:is(html[data-theme]) .folder-row__select {
+  align-items: center;
+  background: none;
+  border: 0;
+  border-radius: var(--radius-field);
+  color: var(--text-strong);
+  cursor: pointer;
+  display: flex;
+  flex: 1 1 auto;
+  font: inherit;
+  font-size: var(--text-size-base);
+  gap: 10px;
+  min-width: 0;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+:is(html[data-theme]) .folder-row__icon {
+  align-items: center;
+  color: var(--text-muted);
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+:is(html[data-theme]) .folder-row__icon svg {
+  height: 18px;
+  width: 18px;
+}
+
+:is(html[data-theme]) .folder-row.is-selected .folder-row__icon {
+  color: var(--accent);
+}
+
+:is(html[data-theme]) .folder-row__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* "Abrir" é o secundário do sistema em tamanho de linha: aparece sempre, e não
+   só no hover — numa lista de doze pastas, ação que só existe sob o cursor é
+   ação que ninguém encontra. */
+:is(html[data-theme]) .folder-row__enter {
+  background: var(--surface-contrast, var(--surface-field));
+  border: 0;
+  border-radius: var(--radius-field);
+  color: var(--text-muted);
+  cursor: pointer;
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  padding: 6px 12px;
+}
+
+:is(html[data-theme]) .folder-row__enter:hover {
+  color: var(--text-strong);
+}
+
+:is(html[data-theme]) .folder-row__select:focus-visible,
+:is(html[data-theme]) .folder-row__enter:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+:is(html[data-theme]) .folder-list__empty {
+  color: var(--text-muted);
+  font-size: var(--text-size-base);
+  margin: 0;
+  padding: 12px;
+}
+
+:is(html[data-theme]) .folder-list__empty[hidden] {
+  display: none;
+}
+
+/* A pasta escolhida e o atalho para o Drive, na mesma linha. */
+:is(html[data-theme]) .folder-browser__current {
+  align-items: end;
+  display: flex;
+  gap: var(--gap);
+  justify-content: space-between;
+  min-width: 0;
+}
+
+/* ---- a casca do navegador -------------------------------------------------
+ *
+ * Barra de origem (Meu Drive / compartilhados), linha de navegação com o
+ * caminho, a lista, e o rodapé com criar/usar. As classes são emitidas pela
+ * tela do Drive; a linha e a lista, pelo `folder_row` e pelo motor.
+ */
+
+:is(html[data-theme]) .folder-browser {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .folder-browser__toolbar {
+  display: grid;
+  gap: var(--gap-tight);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .folder-browser__nav {
+  align-items: center;
+  display: flex;
+  gap: var(--gap-tight);
+  min-width: 0;
+}
+
+/* O caminho cede a largura: numa pasta funda ele é a parte que pode encurtar
+   sem perder o sentido — o fim do caminho é o que importa. */
+:is(html[data-theme]) .folder-browser__path {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:is(html[data-theme]) .folder-browser__body[hidden],
+:is(html[data-theme]) .folder-browser__actions[hidden],
+:is(html[data-theme]) .folder-browser__new[hidden] {
+  display: none;
+}
+
+:is(html[data-theme]) .folder-browser__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-tight);
+  justify-content: flex-end;
+}
+
+:is(html[data-theme]) .folder-browser__new {
+  display: grid;
+  gap: var(--gap-tight);
+}
+
+:is(html[data-theme]) .folder-browser__new-row {
+  display: flex;
+  gap: var(--gap-tight);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .folder-browser__new-row .field {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* A prévia da reorganização reusa a lista: são linhas de texto, com a mesma
+   rolagem e o mesmo ritmo das pastas. */
+:is(html[data-theme]) .folder-list__line {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  padding: 4px 10px;
+}

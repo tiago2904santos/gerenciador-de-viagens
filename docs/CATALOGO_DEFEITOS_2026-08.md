@@ -10116,3 +10116,98 @@ compor dados pessoais, senha, áreas de trabalho, Google Drive e encerramento da
 **Correção:** a tela foi recomposta com cabeçalho, painéis, blocos de formulário, campos, registros
 e rodapés globais V2. Os dois POSTs, nomes das ações, validações, integração do Drive e logout foram
 preservados; a folha de estilo antiga do perfil deixou de ser carregada.
+
+### NOVO-20260820-021955-afb0038a3cf6 🟢 RESOLVIDO · `NOVO` Perfil de CSS descartava em silêncio toda regra cujo texto mudasse · FE · risco alto
+
+`scripts/css_profiles_manifest.json` identifica cada regra pelo sha256 do texto SERIALIZADO. Editar
+o prelúdio de uma regra — tirar um seletor morto de uma lista, por exemplo — muda o hash, e a regra
+deixa de constar no manifesto: ela some de TODOS os perfis, sem erro nenhum. Aconteceu numa poda de
+CSS morto: `.sr-only`, `.alert` e o cartão de módulo perderam a folha nas páginas de lista, que são
+justamente as que carregam perfil em vez do bundle inteiro.
+
+**Correção:** a poda passou a preservar o texto de toda regra que sobrevive — regra com um seletor
+morto ao lado de um vivo fica intacta. Quem edita CSS de shell precisa saber disto: mudança de
+prelúdio exige recapturar o manifesto (`build_css_profiles.py --capture`).
+
+### NOVO-20260820-021955-af3ce783c54c 🟢 RESOLVIDO · `NOVO` O alerta do V2 dependia de duas folhas legadas para ter forma · UI · risco médio
+
+`v2/alert.css` pintava fundo, fitinha e cor, mas a GEOMETRIA vinha de `feedback/notice.css` e de uma
+segunda cópia em `base/utilities.css`: grade de duas colunas, marcador em `::before`, sombra e peso
+do texto. O alerta com lista (pendências de etapa) caía na coluna do marcador — título, frase e itens
+apareciam empurrados para a direita, com metade da caixa vazia.
+
+**Correção:** o componente passou a declarar a própria forma (`display: block`, sem sombra, `::before`
+desligado) e os apelidos de `.alert` saíram das duas folhas legadas. `feedback/dialog.css`,
+`lists/cards.css`, `lists/record-list.css`, `layout/layout.css`, `layout/app-shell.css`,
+`base/domain.css`, `fields/form-sections.css`, `feedback/document-download-loading.css` e
+`pages/oficios-documentos-inline.css` foram extintas na mesma passagem.
+
+### NOVO-20260820-021955-e28da04b8baf 🟢 RESOLVIDO · `NOVO` Três telas emitiam classes de grade que não existiam em folha nenhuma · UI · risco baixo
+
+O resumo de diárias do Plano de Trabalho (`pt-diarias-summary`), o resumo do ofício
+(`document-summary__fact-panel--identity`) e o hub de Cadastros (`catalog-grid`, `catalog-section`)
+usavam classes sem uma única regra de CSS no projeto. Os painéis que deviam formar uma faixa vinham
+empilhados, um por linha.
+
+**Correção:** a faixa virou modificador do próprio bloco (`fact-list--band-3` e `--band-4`, em
+`v2/fact.css`) e o hub passou a usar a grade do cartão de módulo. As classes sem regra foram
+apagadas dos três templates.
+
+### NOVO-20260820-022022-f85d5b09688d 🟢 RESOLVIDO · `NOVO` Perfil de CSS descartava em silêncio toda regra cujo texto mudasse · FE · risco alto
+
+`scripts/css_profiles_manifest.json` identifica cada regra pelo sha256 do texto SERIALIZADO. Editar
+o prelúdio de uma regra — tirar um seletor morto de uma lista, por exemplo — muda o hash, e a regra
+deixa de constar no manifesto: ela some de TODOS os perfis, sem erro nenhum. Aconteceu numa poda de
+CSS morto: `.sr-only`, `.alert` e o cartão de módulo perderam a folha nas páginas de lista, que são
+justamente as que carregam perfil em vez do bundle inteiro.
+
+**Correção:** a poda passou a preservar o texto de toda regra que sobrevive — regra com um seletor
+morto ao lado de um vivo fica intacta. Quem edita CSS de shell precisa saber disto: mudança de
+prelúdio exige recapturar o manifesto (`build_css_profiles.py --capture`).
+
+### NOVO-20260820-022022-1af4afc803b1 🟢 RESOLVIDO · `NOVO` O alerta do V2 dependia de duas folhas legadas para ter forma · UI · risco médio
+
+`v2/alert.css` pintava fundo, fitinha e cor, mas a GEOMETRIA vinha de `feedback/notice.css` e de uma
+segunda cópia em `base/utilities.css`: grade de duas colunas, marcador em `::before`, sombra e peso
+do texto. O alerta com lista (pendências de etapa) caía na coluna do marcador — título, frase e itens
+apareciam empurrados para a direita, com metade da caixa vazia.
+
+**Correção:** o componente passou a declarar a própria forma (`display: block`, sem sombra, `::before`
+desligado) e os apelidos de `.alert` saíram das duas folhas legadas. `feedback/dialog.css`,
+`lists/cards.css`, `lists/record-list.css`, `layout/layout.css`, `layout/app-shell.css`,
+`base/domain.css`, `fields/form-sections.css`, `feedback/document-download-loading.css` e
+`pages/oficios-documentos-inline.css` foram extintas na mesma passagem.
+
+### NOVO-20260820-022022-226fc7e5baeb 🟢 RESOLVIDO · `NOVO` Três telas emitiam classes de grade que não existiam em folha nenhuma · UI · risco baixo
+
+O resumo de diárias do Plano de Trabalho (`pt-diarias-summary`), o resumo do ofício
+(`document-summary__fact-panel--identity`) e o hub de Cadastros (`catalog-grid`, `catalog-section`)
+usavam classes sem uma única regra de CSS no projeto. Os painéis que deviam formar uma faixa vinham
+empilhados, um por linha.
+
+**Correção:** a faixa virou modificador do próprio bloco (`fact-list--band-3` e `--band-4`, em
+`v2/fact.css`) e o hub passou a usar a grade do cartão de módulo. As classes sem regra foram
+apagadas dos três templates.
+
+### NOVO-20260820-082648-709414ba4942 🟢 RESOLVIDO · `NOVO` Um terço das folhas de tema era a pele de UMA tela · FE · risco médio
+
+`components/theme-shared-components.css` e `theme-dark-components.css` guardavam
+130 regras (1.084 linhas) escritas sob `[data-travel-document-wizard-roteiro]`,
+`.roteiro-editor--*` e `.route-sede-block` — a pele do EDITOR DE ROTEIRO dentro
+do wizard de ofício. Outras 156 descreviam componentes do v2 de fora deles: a
+lista de opções, o picker, o bloco de formulário, o calendário e a grade de
+campos. Enquanto ficaram lá, toda tela migrada carregava as folhas do sistema
+antigo por causa dos próprios componentes do v2, e as duas folhas pareciam vivas.
+
+**Correção:** cada regra foi para a folha do seu dono, com o texto intacto e
+ANTES da divisa `=== DELTA v2 ===` — elas chegavam pelo bundle do shell, que é
+anterior ao `ui.bundle.css`, e por isso perdiam para o v2; anexadas no fim,
+inverteriam a disputa sem mudar um valor. Duas medições pegaram isso: o menu do
+select voltou ao desenho antigo, e o `@media` perdido fez o cabeçalho do bloco
+virar coluna no desktop em dez telas. `pages/roteiros.css` (1.923 linhas) foi
+apagada — nenhuma página a carregava desde a migração do editor, em 17/08.
+
+**Como conferir:** impressão digital de estilo computado em 20 telas, antes e
+depois. Atenção: o iframe reusa o cache do renderizador — sem
+`fetch(folha, {cache: "reload"})` antes de medir, a comparação passa em falso.
+

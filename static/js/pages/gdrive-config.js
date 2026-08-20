@@ -80,7 +80,7 @@
       selectedFolder = null;
       btnSelecionar.disabled = true;
       btnSelecionar.textContent = "Usar esta pasta como destino";
-      folderList.querySelectorAll(".gdrive-folder-item").forEach((el) => {
+      folderList.querySelectorAll(".folder-row").forEach((el) => {
         el.classList.remove("is-selected");
         el.setAttribute("aria-pressed", "false");
       });
@@ -102,7 +102,9 @@
 
       pastas.forEach((pasta) => {
         const item = document.createElement("div");
-        item.className = "gdrive-folder-item";
+        /* Classes de `cotton/v2/folder_row.html` — o template é o contrato, este
+           motor é quem o repete em tempo real. Ver `v2/folder-browser.css`. */
+        item.className = "folder-row";
         item.role = "listitem";
         item.dataset.id = pasta.id;
         item.dataset.nome = pasta.name;
@@ -112,21 +114,21 @@
         // mantêm o valor como texto/atributo, sem reinterpretá-lo como HTML.
         const btnSelect = document.createElement("button");
         btnSelect.type = "button";
-        btnSelect.className = "gdrive-folder-item__select";
+        btnSelect.className = "folder-row__select";
         btnSelect.setAttribute("aria-label", `Selecionar pasta ${pasta.name}`);
         const iconWrap = document.createElement("span");
-        iconWrap.className = "gdrive-folder-item__icon";
+        iconWrap.className = "folder-row__icon";
         iconWrap.setAttribute("aria-hidden", "true");
         const parsedIcon = new DOMParser().parseFromString(icon, "image/svg+xml");
         iconWrap.appendChild(document.importNode(parsedIcon.documentElement, true));
         const name = document.createElement("span");
-        name.className = "gdrive-folder-item__name";
+        name.className = "folder-row__name";
         name.textContent = pasta.name;
         btnSelect.append(iconWrap, name);
 
         const btnEnter = document.createElement("button");
         btnEnter.type = "button";
-        btnEnter.className = "gdrive-folder-item__enter button button--secondary";
+        btnEnter.className = "folder-row__enter";
         btnEnter.setAttribute("aria-label", `Abrir pasta ${pasta.name}`);
         btnEnter.textContent = "Abrir →";
         item.append(btnSelect, btnEnter);
@@ -179,7 +181,7 @@
         if (!result.ok) throw new Error(data.erro || "Erro ao carregar pastas");
         renderFolders(data.pastas || []);
       } catch (err) {
-        folderList.innerHTML = `<p class="gdrive-error">Erro: ${window.CV.util.escapeHtml(String(err.message))}</p>`;
+        folderList.innerHTML = `<p class="alert" data-tone="error">Erro: ${window.CV.util.escapeHtml(String(err.message))}</p>`;
         folderList.hidden = false;
         folderEmpty.hidden = true;
       } finally {
@@ -201,7 +203,7 @@
         if (!result.ok) throw new Error(data.erro || "Erro ao carregar Drives compartilhados");
         renderFolders(data.pastas || [], { sharedDriveIcon: true });
       } catch (err) {
-        folderList.innerHTML = `<p class="gdrive-error">Erro: ${window.CV.util.escapeHtml(String(err.message))}</p>`;
+        folderList.innerHTML = `<p class="alert" data-tone="error">Erro: ${window.CV.util.escapeHtml(String(err.message))}</p>`;
         folderList.hidden = false;
         folderEmpty.hidden = true;
       } finally {
@@ -223,7 +225,7 @@
         if (!result.ok) throw new Error(data.erro || "Erro ao carregar pastas compartilhadas comigo");
         renderFolders(data.pastas || []);
       } catch (err) {
-        folderList.innerHTML = `<p class="gdrive-error">Erro: ${window.CV.util.escapeHtml(String(err.message))}</p>`;
+        folderList.innerHTML = `<p class="alert" data-tone="error">Erro: ${window.CV.util.escapeHtml(String(err.message))}</p>`;
         folderList.hidden = false;
         folderEmpty.hidden = true;
       } finally {
@@ -278,7 +280,7 @@
       // é "mock-nova-" + o nome digitado (`services.py:200`), e uma aspa no nome
       // fazia o `querySelector` estourar `SyntaxError`.
       const item = folderList.querySelector(`[data-id="${CSS.escape(String(id))}"]`);
-      if (item) item.querySelector(".gdrive-folder-item__select")?.click();
+      if (item) item.querySelector(".folder-row__select")?.click();
     }
 
     btnCriar.addEventListener("click", async () => {
@@ -357,11 +359,13 @@
           const linhas = data.linhas || [];
           if (linhas.length === 0) {
             const li = document.createElement("li");
+            li.className = "folder-list__line";
             li.textContent = "Nenhum arquivo a organizar.";
             previaLista.appendChild(li);
           } else {
             linhas.forEach((linha) => {
               const li = document.createElement("li");
+              li.className = "folder-list__line";
               li.textContent = linha;
               previaLista.appendChild(li);
             });
@@ -411,15 +415,16 @@
     const box = document.getElementById("gdrive-status");
     const texto = document.getElementById("gdrive-status-texto");
     const percentEl = document.getElementById("gdrive-status-percent");
-    const progressEl = document.getElementById("gdrive-progress");
-    const progressFill = document.getElementById("gdrive-progress-fill");
+    /* `<progress>` nativo desde 2026-08-20 (`cotton/v2/progress.html`): o valor
+       é atributo, e o elemento anuncia o progresso sozinho. Antes eram dois nós
+       — um trilho com `aria-valuenow` e um preenchimento com `style.width`. */
+    const progressEl = document.getElementById("gdrive-progress-fill");
     if (!urlStatus || !box || !texto) return;
 
     let timer = null;
 
     function setProgress(pct) {
-      if (progressFill) progressFill.style.width = pct + "%";
-      if (progressEl) progressEl.setAttribute("aria-valuenow", String(pct));
+      if (progressEl) progressEl.value = pct;
       if (percentEl) percentEl.textContent = pct + "%";
     }
 

@@ -278,8 +278,10 @@ class OficioViewsTests(TestCase):
         # dizem depois.
         preview_start = html.index("Documentos para conferência")
         self.assertIn("Resumo do ofício", html[preview_start:])
-        self.assertEqual(html.count("document-summary__fact-panel--identity"), 4)
-        self.assertEqual(html.count("document-summary__fact-panel--vehicle"), 4)
+        # As duas faixas de quatro fatos: identificação e viatura. A contagem
+        # era feita em `document-summary__fact-panel--*`, uma classe que **não
+        # tinha CSS em folha nenhuma** — só existia para este teste contar.
+        self.assertEqual(html.count("fact-list fact-list--band-4"), 2)
         self.assertIn("Viajantes", html[preview_start:])
         self.assertIn("Viatura e condução", html[preview_start:])
         footer_start = html.index('<footer class="card-footer">', preview_start)
@@ -299,18 +301,8 @@ class OficioViewsTests(TestCase):
     def test_resumo_do_oficio_mantem_quatro_fatos_na_mesma_linha(self):
         css = Path("static/css/v2/fact.css").read_text(encoding="utf-8")
 
-        self.assertIn(
-            ":is(html[data-theme]) .fact-list.document-summary--identity",
-            css,
-        )
-        self.assertIn(
-            "grid-template-columns: repeat(4, minmax(0, 1fr));",
-            css,
-        )
-        self.assertIn(
-            ":is(html[data-theme]) .fact-list.document-summary--vehicle",
-            css,
-        )
+        self.assertIn(":is(html[data-theme]) .fact-list--band-4", css)
+        self.assertIn("grid-template-columns: repeat(4, minmax(0, 1fr));", css)
 
     def test_viajantes_do_resumo_usam_duas_colunas_com_ultimo_impar_inteiro(self):
         source = Path(

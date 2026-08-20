@@ -358,3 +358,16 @@
   font-size: var(--text-size-eyebrow);
   margin: 0;
 }
+
+/* A PILHA de registros. Veio de `lists/record-list.css` em 2026-08-20, que
+   morreu com ela: as outras oito regras da folha vestiam `record-row`,
+   `list-panel` e `collection-panel` — vocabulário que nenhum template emite
+   desde que a linha de catálogo virou `c-v2.catalog_row`.
+
+   O vão é 8px, e não `--gap`: esta pilha vive DENTRO de um painel (modelos de
+   texto, vínculos da área), onde o `--gap` do painel já separa as seções. */
+:is(html[data-theme]) .record-list {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}

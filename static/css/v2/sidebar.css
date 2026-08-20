@@ -46,7 +46,13 @@
 }
 
 :is(html[data-theme]) .sidebar-header {
+  /* A linha do topo: marca à esquerda, fechar da gaveta à direita. As três
+     primeiras declarações vieram de `layout/app-shell.css` em 2026-08-20 — sem
+     elas o botão de fechar cai embaixo da marca no celular. */
+  align-items: center;
   border-bottom: 1px solid var(--line-on-brand);
+  display: flex;
+  justify-content: space-between;
   padding: var(--pad-rail);
 }
 
@@ -460,5 +466,114 @@
   :is(html[data-theme]) .sidebar-link,
   :is(html[data-theme]) .sidebar-module-expand__chevron {
     transition: none;
+  }
+}
+
+/* ---- a gaveta (abaixo de 840px) -------------------------------------------
+ *
+ * Veio de `layout/app-shell.css` em 2026-08-20, quando a pasta `layout/` foi
+ * extinta. É comportamento da BARRA, e não da casca: fora da tela por padrão,
+ * entra deslizando quando `body` recebe `has-sidebar-open` — a classe que
+ * `js/components/sidebar.js` acende.
+ *
+ * O fundo escurecido (`sidebar-scrim`) e o fechar (`sidebar-drawer-close`)
+ * nascem escondidos em `v2/shell.css`; aqui eles aparecem.
+ */
+
+:is(html[data-theme]) .sidebar-accordion[hidden] {
+  display: none;
+}
+
+@media (max-width: 840px) {
+  :is(html[data-theme]) body.has-sidebar-open {
+    overflow: hidden;
+  }
+
+  :is(html[data-theme]) .sidebar {
+    height: 100dvh;
+    left: 0;
+    max-height: 100dvh;
+    max-width: min(88vw, 320px);
+    position: fixed;
+    top: 0;
+    transform: translateX(-105%);
+    transition: transform 180ms cubic-bezier(.2, .8, .2, 1);
+    width: 100%;
+    z-index: var(--z-sidebar, 20);
+  }
+
+  :is(html[data-theme]) body.has-sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  :is(html[data-theme]) .sidebar-scrim {
+    background: rgba(2, 9, 16, 0.7);
+    border: 0;
+    cursor: pointer;
+    display: block;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: fixed;
+    transition: opacity 180ms ease;
+    z-index: calc(var(--z-sidebar, 20) - 1);
+  }
+
+  :is(html[data-theme]) body.has-sidebar-open .sidebar-scrim {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  :is(html[data-theme]) .sidebar-drawer-close {
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: 1.55rem;
+  }
+
+  :is(html[data-theme]) .sidebar-nav {
+    display: flex;
+    max-height: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(html[data-theme]) .sidebar,
+  :is(html[data-theme]) .sidebar-scrim {
+    transition: none;
+  }
+}
+
+
+/* ---- vindas das folhas de tema, em 2026-08-20 ------------------------------
+ *
+ * O seletor de tema da barra lateral e a gaveta do celular eram desenhados em
+ * `theme-shared-components.css`/`theme-dark-components.css`. São CASCA, e a
+ * casca do v2 mora aqui — enquanto ficaram lá, toda tela migrada carregava a
+ * folha de tema por causa da barra.
+ *
+ * O texto veio intacto; elas entram no fim porque no shell também vinham
+ * depois da folha da barra.
+ */
+
+@media (max-width: 840px) {
+html[data-theme] .sidebar {
+    height: 100dvh;
+    max-height: 100dvh;
+    position: fixed;
+  }
+}
+
+@media (max-width: 600px) {
+html[data-theme] .app-theme-grid {
+    grid-template-columns: 1fr;
+  }
+
+html[data-theme] .app-theme-grid__btn {
+    min-height: 36px;
+    padding: 5px 6px;
+  }
+
+html[data-theme] .app-theme-grid__btn small {
+    display: none;
   }
 }

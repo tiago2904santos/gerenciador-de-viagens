@@ -1,4 +1,4 @@
-{% cotton:vars actions aria_label body extra_class hook modal_id own_form title title_class title_id vinculo_mode %}
+{% cotton:vars actions aria_label body extra_class hook modal_id own_form title title_hook title_id vinculo_mode %}
 {% comment %}
   Modal v2 — diálogo. Par de `static/css/v2/modal.css`.
 
@@ -43,12 +43,17 @@
   {% if own_form %}<div class="modal__shell">{% else %}<form method="dialog" class="modal__shell">{% endif %}
     <header class="modal__header">
       {% comment %}
-        `title_class` existe porque em um dos diálogos a classe do título é
-        SELETOR DE JS: o `overlay.js` escreve o título vindo do gatilho em
-        `.delete-confirm-modal__title`. Sem ela o diálogo abre com o título fixo do
-        template e ninguém acusa — o JS só não acha onde escrever.
+        `title_hook` existe porque em um dos diálogos o título é ESCRITO por JS:
+        o `overlay.js` copia para lá o título que veio do gatilho, porque um
+        diálogo serve a lista inteira. Sem o gancho o diálogo abre com o título
+        fixo do template e ninguém acusa — o JS só não acha onde escrever.
+
+        É ATRIBUTO, e não classe. Até 2026-08-20 era `delete-confirm-modal__title`,
+        uma classe do sistema antigo que existia só para o JS achar o `<h2>` — e
+        que sozinha mantinha vivas as regras `delete-confirm-modal*` em duas
+        folhas legadas.
       {% endcomment %}
-      <h2 class="modal__title{% if title_class %} {{ title_class }}{% endif %}"{% if title_id %} id="{{ title_id }}"{% endif %}>{{ title }}</h2>
+      <h2 class="modal__title"{% if title_hook %} {{ title_hook }}{% endif %}{% if title_id %} id="{{ title_id }}"{% endif %}>{{ title }}</h2>
     </header>
     <div class="modal__body">{{ body }}</div>
     {% if actions %}<footer class="modal__actions">{{ actions }}</footer>{% endif %}

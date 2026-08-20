@@ -113,4 +113,5 @@ class ComponentesCadastrosV2RenderTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'class="header"')
-        self.assertContains(response, "module-card-v2", count=7)
+        self.assertContains(response, 'class="module-card-grid"')
+        self.assertContains(response, 'class="module-card"', count=7)

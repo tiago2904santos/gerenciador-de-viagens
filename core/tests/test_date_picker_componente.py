@@ -24,6 +24,21 @@ CSS = ROOT / "static" / "css" / "v2" / "date-picker.css"
 JS = ROOT / "static" / "js" / "components" / "date-picker.js"
 COMPONENTE = ROOT / "templates" / "cotton" / "v2" / "date_picker.html"
 
+DIVISA = "/* === DELTA v2 === */"
+
+
+def delta(caminho: Path) -> str:
+    """A metade v2 da folha — o que vem depois da divisa.
+
+    As folhas do v2 passaram a guardar a BASE do componente junto com o delta
+    (fusão de 2026-08-20, que apagou a pasta `fields/`). Sem o corte, cada
+    asserção daqui encontra primeiro a regra base que o delta sobrescreve — e
+    reprova descrevendo corretamente o que a tela mostra.
+    """
+    texto = caminho.read_text(encoding="utf-8")
+    return texto[texto.index(DIVISA) + len(DIVISA) :]
+
+
 
 def render(source: str, **contexto) -> str:
     return Template("{% load cotton %}" + source).render(Context(contexto))
@@ -76,7 +91,7 @@ class AparenciaTests(SimpleTestCase):
     """As regras que a folha precisa declarar, e o que ela não pode ter."""
 
     def setUp(self):
-        self.css = CSS.read_text(encoding="utf-8")
+        self.css = delta(CSS)
         self.sem_comentario = re.sub(r"/\*.*?\*/", "", self.css, flags=re.DOTALL)
 
     def test_nao_usa_cor_literal(self):

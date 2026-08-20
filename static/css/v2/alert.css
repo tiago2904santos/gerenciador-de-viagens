@@ -31,6 +31,28 @@
   /* Recuo menor à esquerda: a fitinha já ocupa parte do espaço, e o padding
      cheio dos dois lados afastava o texto do sinal. */
   padding: 12px 14px 12px 10px;
+  /* ---- as quatro declarações abaixo vieram de `feedback/notice.css` ----
+   *
+   * Até 2026-08-20 elas chegavam de lá, e o componente do v2 dependia de uma
+   * folha do sistema antigo para saber que forma tinha. Duas ficaram como
+   * estavam (o peso do texto e o `position`, âncora da animação de saída) e
+   * duas mudaram para o que o v2 diz:
+   *
+   * - `display: block` no lugar de uma grade de duas colunas `auto minmax(0,
+   *   1fr)`. A segunda coluna existia para o PONTO de `::before`, e o sinal do
+   *   v2 é a fitinha lateral — o ponto sai logo abaixo.
+   * - `box-shadow: none`: o v2 separa camadas por superfície, não por
+   *   profundidade. Era a última sombra de bloco do sistema. */
+  box-shadow: none;
+  display: block;
+  font-weight: 600;
+  position: relative;
+}
+
+/* O ponto de 8px do aviso antigo. O sinal do v2 é a fitinha, e dois sinais na
+   mesma caixa dizem a mesma coisa duas vezes. */
+:is(html[data-theme]) .alert::before {
+  content: none;
 }
 
 :is(html[data-theme]) .alert[data-tone="success"] {

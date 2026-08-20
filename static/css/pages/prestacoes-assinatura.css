@@ -1,42 +1,10 @@
-/* Assinatura eletrônica — páginas públicas (mobile-first, isoladas do app). */
-
-@font-face {
-  font-family: "Great Vibes";
-  src: url("../../vendor/fonts/GreatVibes-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Alex Brush";
-  src: url("../../vendor/fonts/AlexBrush-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Parisienne";
-  src: url("../../vendor/fonts/Parisienne-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Sacramento";
-  src: url("../../vendor/fonts/Sacramento-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Allura";
-  src: url("../../vendor/fonts/Allura-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Herr Von Muellerhoff";
-  src: url("../../vendor/fonts/HerrVonMuellerhoff-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-display: swap;
-}
-
+/* Assinatura eletrônica — páginas públicas (mobile-first, isoladas do app).
+ *
+ * As seis `@font-face` e os chips de fonte saíram daqui em 2026-08-20: eles são
+ * do componente `c-v2.signature_fonts`, e viviam DUPLICADOS entre esta folha e
+ * `v2/signature-fonts.css` — as mesmas seis declarações de fonte em dois
+ * arquivos, com caminhos relativos diferentes.
+ */
 :root {
   --asgn-bg: var(--color-bg);
   --asgn-card: var(--color-surface);
@@ -295,29 +263,6 @@ body.asgn {
 .asgn-tab.is-active { background: var(--asgn-primary); color: #fff; border-color: var(--asgn-primary); }
 
 .asgn-tabpane { display: grid; gap: 0.8rem; }
-.asgn-fontlist { display: grid; gap: 0.6rem; }
-.asgn-fontchip {
-  border: 1px solid var(--asgn-line);
-  border-radius: 0.7rem;
-  background: var(--asgn-card);
-  padding: 0.5rem 1rem;
-  font-size: 2rem;
-  line-height: 1.4;
-  color: var(--asgn-ink);
-  cursor: pointer;
-  text-align: center;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.asgn-fontchip--classica { font-family: "Great Vibes", cursive; }
-.asgn-fontchip--profissional { font-family: "Alex Brush", cursive; }
-.asgn-fontchip--moderna { font-family: "Parisienne", cursive; }
-.asgn-fontchip--simples { font-family: "Sacramento", cursive; }
-.asgn-fontchip--natural { font-family: "Allura", cursive; }
-.asgn-fontchip--luxuosa { font-family: "Herr Von Muellerhoff", cursive; }
-.asgn-fontchip.is-selected { border-color: var(--asgn-primary); box-shadow: 0 0 0 2px rgba(31, 111, 235, 0.2); }
 
 .asgn-drawwrap {
   border: 1px dashed var(--asgn-line);

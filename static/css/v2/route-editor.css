@@ -396,3 +396,1279 @@
 :is(html[data-theme]) .route-map__canvas .leaflet-interactive {
   paint-order: stroke;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * A PELE DO EDITOR DENTRO DO WIZARD DE OFÍCIO — vinda dos dois arquivos de tema
+ * em 2026-08-20.
+ *
+ * Eram 130 regras (1.084 linhas) espalhadas entre
+ * `components/theme-shared-components.css` e `components/theme-dark-components.css`,
+ * todas escritas sob `[data-travel-document-wizard-roteiro]`,
+ * `.roteiro-editor--*`, `.route-sede-block` e as outras classes DESTE editor. Elas
+ * viviam lá porque o sistema antigo separava "geometria compartilhada" de
+ * "aparencia por tema" — e o preço era que um terco da folha de tema fosse, na
+ * verdade, uma tela só.
+ *
+ * O texto veio INTACTO, `!important` inclusive: mover de arquivo e mudar valor
+ * na mesma passagem torna impossível atribuir qualquer diferença a uma das duas
+ * coisas. Medido antes e depois nas três telas do editor (avulso novo, avulso
+ * editar, etapa do ofício): nenhuma diferença.
+ *
+ * O que fica para depois é o de sempre: as regras que começam com
+ * `[data-travel-document-wizard-roteiro]` só existem porque o editor se veste
+ * diferente dentro do wizard. Quando as duas telas convergirem, some metade
+ * disto.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── de `components/theme-shared-components.css` ── */
+
+:is(html[data-theme])
+  .roteiro-editor--oficio .roteiro-editor__oficio-card > .form-section-body {
+  line-height: normal;
+}
+
+:is(html[data-theme])
+  .roteiro-editor--oficio .roteiro-editor__oficio-card > .form-section-body > .form-block {
+  line-height: normal;
+}
+
+:is(html[data-theme])
+  .roteiro-editor--oficio .roteiro-editor__section--fonte {
+  margin-top: 0;
+}
+
+/* ========================================================================
+   Etapas Ofício (Dados / Roteiro / Justificativa / Documentos) — card + camada intermediária
+   Card externo escuro; blocos em surface-soft; campos no tom do card
+   (poço inset dentro de cada seção).
+   ======================================================================== */
+/* NOVO-100 (E9-c): as quatro variaveis do sistema de superficie do wizard eram
+   ligadas SO no escuro. No claro elas nao existiam neste escopo, e as 32
+   leituras sem `fallback` que moram dentro do wizard nao resolviam nada.
+
+   Esta e a razao pela qual a familia 8b ficou bloqueada (`NOVO-93`): no escuro
+   `border: 0` funciona porque o fundo separa; levar so a borda para o claro
+   tirava a fronteira sem por nada no lugar, porque o fundo dependia de um token
+   que o claro nao tinha.
+
+   O NOVO-93 resolveu a decisao pendente: o claro adotou tres niveis de
+   superficie e os componentes da familia 8b passaram a consumir estes tokens
+   nos dois temas. A regra abaixo continua sendo a ligacao semantica comum. */
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1] .travel-document-card, [data-travel-document-wizard-rt] .travel-document-card, [data-travel-document-wizard-diario] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card, [data-travel-document-wizard-roteiro] .oficio-roteiro-card, [data-travel-document-wizard-justificativa] .oficio-justificativa-card, [data-travel-document-wizard-documentos] .oficio-documentos-unified-card, [data-travel-document-wizard-documentos] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card) {
+  --step1-surface: var(--wizard-card-bg);
+  --step1-panel: var(--wizard-panel-bg);
+  --step1-field: var(--wizard-field-bg);
+  --step1-empty: var(--step1-field);
+  --color-input-bg: var(--step1-field);
+  background: var(--step1-surface);
+  border-color: color-mix(in srgb, var(--color-border) 40%, transparent);
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1] .travel-document-card, [data-travel-document-wizard-rt] .travel-document-card, [data-travel-document-wizard-diario] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card, [data-travel-document-wizard-roteiro] .oficio-roteiro-card, [data-travel-document-wizard-justificativa] .oficio-justificativa-card, [data-travel-document-wizard-documentos] .oficio-documentos-unified-card, [data-travel-document-wizard-documentos] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card) > .cv-form-section-header {
+  background: transparent;
+  min-height: 64px;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1] .travel-document-card, [data-travel-document-wizard-rt] .travel-document-card, [data-travel-document-wizard-diario] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card, [data-travel-document-wizard-roteiro] .oficio-roteiro-card, [data-travel-document-wizard-justificativa] .oficio-justificativa-card, [data-travel-document-wizard-documentos] .oficio-documentos-unified-card, [data-travel-document-wizard-documentos] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card) > .cv-form-section-header .form-section-title {
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1] .travel-document-card, [data-travel-document-wizard-rt] .travel-document-card, [data-travel-document-wizard-diario] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card, [data-travel-document-wizard-roteiro] .oficio-roteiro-card, [data-travel-document-wizard-justificativa] .oficio-justificativa-card, [data-travel-document-wizard-documentos] .oficio-documentos-unified-card, [data-travel-document-wizard-documentos] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card) > .cv-form-section-header .form-section-subtitle {
+  color: var(--color-muted);
+  display: block;
+  font-size: var(--font-size-xs);
+  margin: 4px 0 0;
+  max-width: 56ch;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block) > .form-block__header {
+  align-items: flex-start;
+  gap: 12px;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block) > .form-block__header .form-block__copy {
+  align-items: start;
+  display: grid;
+  gap: 3px;
+  justify-content: start;
+  width: auto;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block) .form-block__description {
+  text-align: left;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block).form-block--split {
+  align-items: center;
+  gap: 16px;
+  grid-template-columns: minmax(148px, 0.62fr) minmax(0, 2.1fr);
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block).form-block--split > .form-block__body {
+  align-self: center;
+}
+
+/* Pickers sem casca extra — o painel da seção já é a camada intermediária. */
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) :is(
+    .search-picker,
+    .search-picker--people,
+    .search-picker--people.search-picker--roster,
+    .search-picker--vehicle
+  ) {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none !important;
+  gap: 10px;
+  padding: 0 !important;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .search-picker__selected-panel {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  gap: 8px;
+  padding: 0 !important;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .search-picker__selected-empty {
+  border-radius: 10px;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .search-picker__selected-empty {
+  background: var(--step1-empty) !important;
+  border: 0 !important;
+  color: var(--color-muted);
+  padding: 12px 14px !important;
+  text-align: left;
+}
+
+/* Sugestões de viatura: mesmo poço dos campos; ativo = linguagem do card motorista. */
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip {
+  background: var(--step1-field);
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+  color: var(--color-text);
+  min-height: 40px;
+  padding: 8px 12px 8px 14px;
+  transition: background-color 140ms ease, box-shadow 140ms ease;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip:hover,
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field));
+  outline: 0;
+}@media (max-width: 900px) {
+  :is(html[data-theme])
+    :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block).form-block--split {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .route-sede-block.form-block--split > .form-block__header {
+  max-width: 14rem;
+  min-width: 14rem;
+  width: 14rem;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .route-sede-block.form-block--split > .form-block__body {
+  align-self: center;
+  min-width: 0;
+  width: 100%;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .route-sede-block .field-grid.roteiro-sede-grid {
+  gap: 10px 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  width: 100%;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block--split .field-grid.field-grid--cols-2 {
+  gap: 12px 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  width: 100%;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block--split .cv-field {
+  margin: 0;
+  min-width: 0;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block--split + .route-destinos-block--split,
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block--split + .form-subsection {
+  border-top: 0;
+  padding-top: 0;
+}
+
+/* Destinos: mesmo card/split da Sede; rail 14rem | editor. */
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block.route-destinos-block--split,
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block.route-destinos-block--split:hover {
+  align-items: start;
+  background: var(--step1-surface) !important;
+  border: 0 !important;
+  border-radius: 14px;
+  box-shadow: none !important;
+  column-gap: 16px;
+  display: grid;
+  filter: none !important;
+  grid-template-columns: 14rem minmax(0, 1fr);
+  margin: 14px 0 0;
+  padding: 14px;
+  row-gap: 0;
+  transform: none !important;
+  transition: none !important;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1])
+  .travel-schedule
+  .route-destinos-block.route-destinos-block--split {
+  margin-top: 0;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split > .route-destinos-block__rail {
+  align-self: start;
+  display: grid;
+  gap: 4px;
+  max-width: 14rem;
+  min-width: 14rem;
+  width: 14rem;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split .route-destinos-block__copy {
+  display: grid;
+  gap: 3px;
+  min-height: 44px;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split .route-destinos-block__title {
+  color: var(--color-heading);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-black);
+  letter-spacing: 0;
+  line-height: 1.2;
+  margin: 0;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split .route-destinos-block__subtitle,
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split .route-destinos-block__description {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+  margin: 0;
+  text-align: left;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split .route-destinos-trechos {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split .route-destinos-trechos[hidden] {
+  display: none !important;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split .route-destinos-trechos__item {
+  align-items: center;
+  color: var(--color-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--font-size-xs);
+  gap: 0.35em;
+  line-height: 1.35;
+  min-height: 44px;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split .route-destinos-block__subtitle:has(.route-destinos-trechos__from) {
+  /* Primeiro trecho ocupa o lugar do subtítulo — sem altura de linha. */
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+  min-height: 0;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split > .route-destinos-block__body {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  width: 100%;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split .route-destinos-block__editor,
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split .ordered-field-collection__list {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single,
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single:hover {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row__half {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+  width: 100%;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row__field {
+  flex: 1 1 auto;
+  margin: 0;
+  min-width: 0;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .ordered-field-row__badge.sr-only {
+  clip: rect(0, 0, 0, 0);
+  display: none !important;
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .ordered-field-row__drag-handle .icon {
+  display: block;
+  height: 16px;
+  width: 16px;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single .ordered-field-row__drag-handle {
+  display: none;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .route-destinos-add,
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .ordered-field-row__add,
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .ordered-field-row__remove,
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-remove-button {
+  align-items: center;
+  border: 0 !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 44px;
+  justify-content: center;
+  line-height: 1;
+  margin: 0 !important;
+  min-width: 44px;
+  opacity: 1 !important;
+  padding: 0 !important;
+  transform: none !important;
+  transition: none;
+  width: 44px;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .ordered-field-row__remove::before {
+  content: none !important;
+  display: none !important;
+}@media (max-width: 720px) {
+  :is(html[data-theme])
+    [data-travel-document-wizard-roteiro] .route-sede-block.form-block--split,
+  :is(html[data-theme])
+    :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block.travel-period-block--split,
+  :is(html[data-theme])
+    :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block.route-destinos-block--split {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 12px;
+  }
+
+  :is(html[data-theme])
+    [data-travel-document-wizard-roteiro] .route-sede-block.form-block--split > .form-block__header,
+  :is(html[data-theme])
+    :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block--split > .travel-period-block__rail,
+  :is(html[data-theme])
+    :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split > .route-destinos-block__rail {
+    max-width: none;
+    min-width: 0;
+    width: auto;
+  }
+
+  :is(html[data-theme])
+    [data-travel-document-wizard-roteiro] .route-sede-block .field-grid.roteiro-sede-grid,
+  :is(html[data-theme])
+    :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block--split .field-grid.field-grid--cols-2 {
+    grid-template-columns: 1fr !important;
+  }}
+@media (max-width: 600px) {
+  :is(html[data-theme])
+    [data-travel-document-wizard-roteiro] .route-sede-block .field-grid.roteiro-sede-grid {
+    grid-template-columns: 1fr !important;
+  }}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-documentos]
+  :is(
+    .summary-item:not(.oficio-documentos-route-trecho-scroll-item),
+    .oficio-documentos-fact,
+    .oficio-documentos-traveller-tile:not(.oficio-documentos-traveller-tile--motorista),
+    .oficio-documentos-traveller-line:not(.oficio-documentos-traveller-line--motorista),
+    .oficio-documentos-vehicle-executive__driver,
+    .document-inline-card,
+    .oficio-documentos-route-card__diarias-subblock,
+    .oficio-documentos-route-card__fallback-fact,
+    .oficio-documentos-route-card__trecho
+  ) {
+  border-radius: 10px;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__selected-list {
+  display: grid;
+  gap: 8px;
+  max-height: 280px;
+  overflow: auto;
+}
+
+/* Busca de roteiro salvo: mesma altura do picker de Equipe. */
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__field {
+  gap: 7px;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row.destination-row--single,
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row.destination-row--single:hover {
+  grid-template-columns: 42px minmax(0, 1fr);
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row__fields > .field {
+  gap: 6px;
+  margin: 0;
+  min-width: 0;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row.destination-row--single .ordered-field-row__remove {
+  display: none;
+}@media (max-width: 720px) {
+  :is(html[data-theme])
+    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row.destination-row,
+:is(html[data-theme])
+    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row.destination-row:hover,
+:is(html[data-theme])
+    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row.destination-row--single,
+:is(html[data-theme])
+    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row.destination-row--single:hover {
+    grid-template-columns: 42px minmax(0, 1fr);
+    row-gap: 8px;
+  }
+
+  :is(html[data-theme])
+    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row.destination-row--single .ordered-field-row__remove {
+    display: none;
+  }}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row,
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row:hover {
+  align-items: center;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none !important;
+  column-gap: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 0;
+  padding: 0 !important;
+  row-gap: 0;
+  transition: none !important;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single,
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single:hover {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row__half {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+  width: 100%;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single .ordered-field-row__drag-handle {
+  display: none;
+}@media (max-width: 720px) {
+  :is(html[data-theme])
+    :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row,
+  :is(html[data-theme])
+    :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row:hover,
+  :is(html[data-theme])
+    :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single,
+  :is(html[data-theme])
+    :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single:hover {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 8px;
+  }}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  #sec-mapa-rota > .form-block__header {
+  display: none !important;
+}
+
+:is(html[data-theme])
+  .roteiro-editor--oficio :is(
+    .roteiro-mapa__frame,
+    .roteiro-mapa__frame #map,
+    .roteiro-mapa__frame .leaflet-container
+  ) {
+  height: 600px;
+  min-height: 600px;
+}@media (max-width: 720px) {
+  :is(html[data-theme])
+    .roteiro-editor--oficio :is(
+      .roteiro-mapa__frame,
+      .roteiro-mapa__frame #map,
+      .roteiro-mapa__frame .leaflet-container
+    ) {
+    height: 420px;
+    min-height: 420px;
+  }}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg.route-bate-volta-leg.form-block--split > .form-block__header {
+  max-width: 14rem;
+  min-width: 14rem;
+  width: 14rem;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg.route-bate-volta-leg.form-block--split > .form-block__body {
+  align-self: center;
+  min-width: 0;
+  width: 100%;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__fields > .field {
+  gap: 6px;
+  margin: 0;
+  min-width: 0;
+}@media (max-width: 720px) {
+  :is(html[data-theme])
+    [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg.route-bate-volta-leg.form-block--split {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 10px;
+  }
+
+  :is(html[data-theme])
+    [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg.route-bate-volta-leg.form-block--split > .form-block__header {
+    max-width: none;
+    min-width: 0;
+    width: auto;
+  }}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .roteiro-editor__section--trecho
+  > .form-block__header {
+  align-items: center;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .roteiro-editor__section--trecho
+  > .form-block__header
+  .form-block__actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+/* Dentro de cada bloco de trecho: conteúdo plano (sem mini-card aninhado). */
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .roteiro-editor__section--trecho .roteiro-deslocamento,
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .roteiro-editor__section--trecho .roteiro-trecho-card,
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .roteiro-editor__section--trechos-empty .roteiro-editor__empty {
+  border-radius: 0;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .roteiro-editor__section--trecho .roteiro-deslocamento,
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .roteiro-editor__section--trecho .roteiro-trecho-card,
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .roteiro-editor__section--trechos-empty .roteiro-editor__empty {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .roteiro-editor__section--trecho .roteiro-trecho-card {
+  gap: var(--space-3, 12px);
+}
+
+/* Saída/Chegada: poço escuro (= inputs do wizard); sem borda. */
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .roteiro-trecho-card__leg {
+  border-radius: 12px;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .roteiro-trecho-card__leg {
+  background: var(--step1-field, var(--color-input-bg));
+  border: 0;
+  box-shadow: none;
+}
+
+/* Stepper −/+: mesmo secondary filled soft do "Preencher datas"
+   (.form-block__actions .cv-btn--secondary). */
+
+/* Toggle bate-volta (ofício): pill compacta — controle real, não texto dourado. */
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .field-side-action--toggle {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  box-shadow: none !important;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.8125rem;
+  font-weight: var(--font-weight-bold, 700);
+  gap: 8px;
+  height: 38px;
+  justify-content: center;
+  letter-spacing: 0;
+  line-height: 1.2;
+  min-height: 38px;
+  min-width: 11.5rem;
+  padding: 0 14px;
+  text-transform: none;
+  transform: none !important;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+  white-space: nowrap;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .field-side-action--toggle:is(:hover, :focus, :focus-visible, :active) {
+  box-shadow: none !important;
+  filter: none;
+  transform: none !important;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .field-side-action--toggle:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  outline-offset: 2px;
+}
+
+/* OFF — painel muted */
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .field-side-action--toggle:is(.field-side-action--danger, .is-inactive),
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .field-side-action--toggle:is(.field-side-action--danger, .is-inactive):is(:hover, :focus, :focus-visible) {
+  background: var(--step1-panel, var(--color-surface-soft)) !important;
+  border-color: color-mix(in srgb, var(--color-border) 55%, transparent) !important;
+  color: var(--color-muted-strong) !important;
+}
+
+/* ON — success soft filled (evita texto/fill dourado do accent) */
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .field-side-action--toggle:is(.field-side-action--success, .is-active, [aria-pressed="true"]),
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .field-side-action--toggle:is(.field-side-action--success, .is-active, [aria-pressed="true"]):is(:hover, :focus, :focus-visible) {
+  background: color-mix(in srgb, var(--color-success) 22%, var(--step1-panel, var(--color-surface-soft))) !important;
+  border-color: var(--color-success-border-soft, color-mix(in srgb, var(--color-success) 40%, transparent)) !important;
+  color: var(--color-heading) !important;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .field-side-action--toggle:is(.field-side-action--danger, .is-inactive):is(:hover, :focus-visible) {
+  background: color-mix(in srgb, var(--color-white) 4%, var(--step1-panel, var(--color-surface-soft))) !important;
+  border-color: color-mix(in srgb, var(--color-border) 70%, transparent) !important;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .field-side-action--state::before {
+  border-radius: 999px;
+  box-shadow: none !important;
+  flex: 0 0 auto;
+  height: 7px;
+  width: 7px;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .field-side-action--state:is(.field-side-action--success, .is-active)::before {
+  background: var(--color-success) !important;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .field-side-action--state:is(.field-side-action--danger, .is-inactive)::before {
+  background: var(--color-muted) !important;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .roteiro-editor__section--bate-volta.route-section-block:has(#bate-volta-body[hidden]) {
+  align-content: center;
+  gap: 0;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .roteiro-editor__section--bate-volta.route-section-block:has(#bate-volta-body[hidden])
+  > .form-block__body {
+  display: none;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .roteiro-editor__section--bate-volta.route-section-block:has(#bate-volta-body[hidden])
+  > .form-block__header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  max-width: none;
+  text-align: left;
+  width: 100%;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .roteiro-editor__section--bate-volta.route-section-block:has(#bate-volta-body[hidden])
+  > .form-block__header .form-block__copy {
+  align-items: start;
+  justify-content: start;
+  text-align: left;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .roteiro-editor__section--bate-volta.route-section-block:has(#bate-volta-body[hidden])
+  > .form-block__header .form-block__description {
+  text-align: left;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  .roteiro-editor__section--bate-volta.route-section-block:has(#bate-volta-body[hidden])
+  > .form-block__header .form-block__actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker.search-picker--people.search-picker--roster
+  .search-picker__selected-card.related-route-item,
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker.search-picker--people.search-picker--roster
+  .search-picker__selected-card.related-route-item:hover {
+  appearance: none;
+  -webkit-appearance: none;
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  font: inherit;
+  grid-template-columns: 42px minmax(0, 1fr);
+  text-align: left;
+  width: 100%;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__selected-avatar {
+  font-size: 0;
+  letter-spacing: 0;
+  line-height: 0;
+  overflow: hidden;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__selected-avatar .related-route-icon,
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__selected-avatar .icon {
+  color: inherit;
+  display: block;
+  flex: 0 0 20px;
+  height: 20px !important;
+  max-height: 20px;
+  max-width: 20px;
+  min-height: 20px;
+  min-width: 20px;
+  overflow: visible;
+  width: 20px !important;
+}
+
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker.search-picker--people.search-picker--roster
+  .search-picker__selected-list:is(#roteiro-lista, #termo-oficio-lista, #os-oficio-lista) {
+  display: grid;
+  gap: 8px;
+  max-height: 280px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 2px;
+  scrollbar-gutter: stable;
+}
+
+:is(html[data-theme])
+  :is(.oficio-external-driver, [data-travel-document-wizard-roteiro]) .segment-toggle {
+  border-radius: 10px;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-diario]
+  .diario-trecho-block
+  .roteiro-trecho-card__leg {
+  background: var(--step1-field, var(--color-input-bg));
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+:is(html[data-theme])
+  [data-travel-document-wizard-diario]
+  .diario-trecho-block
+  :is(.roteiro-time-calc-grid, .oficio-roteiro-time-calc-grid, .roteiro-trecho-card__time-grid) {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+/* ── de `components/theme-dark-components.css` ── */
+
+/* =========================================================
+   Canonical dark wizard and form composition
+   Header de wizard passou a ser `.list-header--wizard` (NOVO-20).
+   O contrato visual do band/rail antigo (grid horizontal) foi removido.
+   ========================================================= */
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-step1] .travel-document-card, [data-travel-document-wizard-rt] .travel-document-card, [data-travel-document-wizard-diario] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card, [data-travel-document-wizard-roteiro] .oficio-roteiro-card, [data-travel-document-wizard-justificativa] .oficio-justificativa-card, [data-travel-document-wizard-documentos] .oficio-documentos-unified-card, [data-travel-document-wizard-documentos] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card) {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+/* A regra que pintava a LISTA ABERTA dentro dos wizards saiu em 2026-08-20.
+
+   Ela vinha de `theme-dark-components.css`, qualificava
+   `.custom-select__menu--v2.floating-dropdown--active` com os sete escopos de
+   wizard e por isso vencia a folha do componente. `v2/listbox.css` é o dono
+   único da aparência da lista de opções — há contrato que o cobra
+   (`test_nenhuma_outra_folha_v2_descreve_a_lista`), e foi assim que as duas
+   listas do sistema divergiram da primeira vez. */
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-sede-block.form-block--split,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-sede-block.form-block--split:hover {
+  align-items: center;
+  background: var(--step1-surface) !important;
+  border: 0 !important;
+  border-radius: 14px;
+  box-shadow: none !important;
+  column-gap: 16px;
+  filter: none !important;
+  grid-template-columns: 14rem minmax(0, 1fr);
+  margin: 0;
+  padding: 14px;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Calendário do período: mesmo filled soft de "Novo viajante". */
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1])
+  .travel-period-block--split
+  :is(
+    .date-picker__control:hover .date-picker__trigger--icon,
+    .date-picker__control:focus-within .date-picker__trigger--icon,
+    .date-picker--open .date-picker__trigger--icon
+  ) {
+  background: var(--step1-surface) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--color-heading) !important;
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1])
+  .travel-period-block--split
+  .date-picker__trigger--icon:is(:hover, :focus-visible) {
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted)) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--color-accent-text) !important;
+  outline: 0;
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split .route-destinos-trechos__sep {
+  opacity: 0.7;
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row,
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row:hover {
+  align-items: center;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  /* Duas metades iguais à sede: [drag + add + UF] | [Cidade + ×] */
+  column-gap: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 0;
+  padding: 0 !important;
+  transition: none !important;
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .ordered-field-row__drag-handle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  color: var(--color-muted);
+  cursor: grab;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 44px;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  touch-action: none;
+  user-select: none;
+  width: 28px;
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .ordered-field-row__drag-handle:active {
+  cursor: grabbing;
+  color: var(--color-heading);
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .route-destinos-add {
+  background: color-mix(in srgb, var(--color-success) 14%, var(--step1-panel)) !important;
+  color: var(--color-heading) !important;
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .ordered-field-row__remove,
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-remove-button {
+  background: color-mix(in srgb, var(--color-danger) 12%, var(--step1-panel)) !important;
+  color: var(--color-heading) !important;
+  font-size: 1.25rem;
+  justify-self: auto;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] :is(.roteiro-editor__empty, .summary-item) {
+  background: var(--step1-field, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
+  border-color: transparent;
+  box-shadow: none;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-documentos]
+  :is(
+    .summary-item:not(.oficio-documentos-route-trecho-scroll-item),
+    .oficio-documentos-fact,
+    .oficio-documentos-traveller-tile:not(.oficio-documentos-traveller-tile--motorista),
+    .oficio-documentos-traveller-line:not(.oficio-documentos-traveller-line--motorista),
+    .oficio-documentos-vehicle-executive__driver,
+    .document-inline-card,
+    .oficio-documentos-route-card__diarias-subblock,
+    .oficio-documentos-route-card__fallback-fact,
+    .oficio-documentos-route-card__trecho
+  ) {
+  background: var(--step1-field, var(--color-input-bg)) !important;
+  border-color: transparent !important;
+}
+
+/* Depois do poço geral: itens do scroll usam o mesmo fundo do form-block da seção */
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-documentos]
+  .oficio-documentos-route-section
+  .oficio-documentos-route-trecho-scroll-item {
+  background: var(--step1-panel, var(--color-surface-soft)) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker {
+  --form-control-height: var(--control-height-md, 44px);
+  --search-picker-height: var(--control-height-md, 44px);
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__label {
+  color: var(--color-heading);
+  font-size: 0.78rem;
+  font-weight: var(--font-weight-black);
+  text-transform: none;
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row.destination-row,
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row.destination-row:hover {
+  align-items: center;
+  background: color-mix(in srgb, #fff 3.5%, var(--step1-panel, var(--color-surface-soft)));
+  border: 1px solid color-mix(in srgb, var(--color-border) 40%, transparent);
+  border-radius: 12px;
+  box-shadow: none;
+  column-gap: 12px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 40px;
+  min-height: 78px;
+  padding: 11px 10px 11px 12px;
+  row-gap: 0;
+  transition: background-color 140ms ease, border-color 140ms ease;
+  user-select: none;
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row.destination-row:hover {
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--step1-panel, var(--color-surface-soft)));
+  border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row__fields .app-form-label {
+  color: var(--color-muted-strong);
+  font-size: 0.72rem;
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row__remove:hover,
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row__remove:focus-visible,
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .destination-row > .ordered-field-row__remove:hover,
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .destination-row > .ordered-field-row__remove:focus-visible {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--color-border) 55%, transparent);
+  border-left-color: color-mix(in srgb, var(--color-border) 55%, transparent);
+  box-shadow: none;
+  color: transparent;
+  outline: 0;
+  transform: none;
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row.is-dragging {
+  opacity: 0.72;
+  transform: scale(0.985);
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row.is-drop-target {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-accent) 55%, transparent);
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .route-destinos-add,
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .ordered-field-row__add,
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .ordered-field-row__remove,
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-remove-button {
+  align-self: center;
+  border: 0 !important;
+  border-radius: 10px !important;
+  cursor: pointer;
+  flex: 0 0 auto;
+  height: 44px;
+  margin: 0 !important;
+  min-width: 44px;
+  opacity: 1 !important;
+  transform: none !important;
+  width: 44px;
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .ordered-field-row.is-drop-target {
+  box-shadow: none;
+}
+
+:is(html[data-theme="dark"])
+  .roteiro-editor--oficio .roteiro-editor__switch-row .field-side-action--danger {
+  background: var(--color-input-bg);
+  border-color: var(--color-border);
+  box-shadow: none;
+  color: var(--color-muted-strong);
+}
+
+:is(html[data-theme="dark"])
+  .roteiro-editor--oficio .roteiro-editor__switch-row .field-side-action--danger:hover {
+  background: var(--color-input-bg);
+  border-color: color-mix(in srgb, var(--color-border) 78%, var(--color-text) 22%);
+  box-shadow: none;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg.route-bate-volta-leg.form-block--split {
+  align-items: center;
+  background: var(--step1-surface, var(--color-surface-muted));
+  border: 0;
+  border-radius: 14px;
+  box-shadow: none;
+  column-gap: 16px;
+  /* Mesma coluna fixa da Sede (14rem) — Ida/Volta não encolhem no texto. */
+  grid-template-columns: 14rem minmax(0, 1fr);
+  margin: 0;
+  padding: 12px 14px;
+  row-gap: 0;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg .form-block__title {
+  color: var(--color-heading);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-black);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__fields .cv-field__label {
+  color: var(--color-muted-strong);
+  font-size: 0.72rem;
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__selected-avatar .related-route-icon path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.2;
+}
+
+:is(html[data-theme="dark"])
+  :is(.oficio-external-driver, [data-travel-document-wizard-roteiro]) .segment-toggle {
+  background: var(--step1-field, var(--color-input-bg));
+  border-color: transparent;
+  box-shadow: none;
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 3px;
+}
+
+/* ── de `fields/forms.css` ── */
+
+.roteiro-editor__actions .btn-outline-secondary {
+  background: var(--route-button-secondary-bg);
+  border-color: var(--route-button-secondary-border);
+  color: var(--route-button-secondary-text);
+}
+
+.roteiro-editor__actions .btn-outline-secondary:hover,
+.roteiro-editor__actions .btn-outline-secondary:focus-visible {
+  background: var(--route-button-secondary-hover-bg);
+  border-color: var(--route-button-secondary-hover-border);
+  color: var(--route-button-secondary-text);
+}

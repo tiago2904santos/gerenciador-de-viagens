@@ -1,0 +1,27 @@
+{% cotton:vars enter_label folder_id name selected shared %}
+{% load icones %}
+{% comment %}
+  Uma linha do navegador de pastas: escolher esta, ou entrar nela.
+
+  Nasceu em 2026-08-20 com a migração da tela do Drive. É a única lista do
+  sistema com DUAS ações de mesmo peso na mesma linha — escolher não é abrir —,
+  e por isso não é um `record`: o registro tem título, selo e meta, e uma pasta
+  tem só um nome; um `record` daria 68px de altura para mostrar uma palavra.
+
+  Quem monta as linhas em tempo real é `js/pages/gdrive-config.js`, a partir da
+  resposta da API do Drive. Este template existe para a vitrine e para o
+  contrato: o JS emite EXATAMENTE estas classes, e é aqui que se lê qual é a
+  estrutura certa. Renomear de um lado sem o outro deixa a lista sem desenho e
+  nada acusa.
+
+  Botões CRUS porque `data-id` e `data-nome` carregam VALOR, e valor dentro do
+  `hook` do `c-v2.button` sai escapado — dentro de `templates/cotton/` esse é o
+  caminho previsto.
+{% endcomment %}
+<div class="folder-row{% if selected %} is-selected{% endif %}" role="listitem" data-id="{{ folder_id }}" data-nome="{{ name }}" aria-pressed="{% if selected %}true{% else %}false{% endif %}">
+  <button type="button" class="folder-row__select" aria-label="Selecionar pasta {{ name }}">
+    <span class="folder-row__icon" aria-hidden="true">{% if shared %}{% icone_svg "cloud" %}{% else %}{% icone_svg "folder" %}{% endif %}</span>
+    <span class="folder-row__name">{{ name }}</span>
+  </button>
+  <button type="button" class="folder-row__enter" aria-label="Abrir pasta {{ name }}">{{ enter_label|default:"Abrir" }}</button>
+</div>

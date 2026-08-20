@@ -937,6 +937,955 @@
 }
 
 
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * VINDAS DAS FOLHAS DE TEMA E DO CASCO ANTIGO, em 2026-08-20.
+ *
+ * Descreviam este componente DE FORA dele — em `theme-shared-components.css`,
+ * `theme-dark-components.css`, `layout/page-shell.css`, `fields/forms.css` ou
+ * `lists/list-header.css`. Enquanto ficaram lá, o componente do v2 dependia de
+ * folhas do sistema antigo para ter forma, e toda tela migrada carregava
+ * aquelas folhas por causa dele.
+ *
+ * Vieram com o texto INTACTO — `!important` e escopo de wizard inclusive —, e
+ * ANTES da divisa: elas chegavam pelo bundle do shell, que é anterior ao
+ * `ui.bundle.css`, e por isso perdiam para o delta do v2. Anexá-las no fim
+ * inverteria a disputa sem mudar um valor sequer. Medido antes e depois em 20
+ * telas: nenhuma diferença.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+:is(html[data-theme])
+  .search-picker__input,
+:is(html[data-theme])
+  .search-picker__input:focus,
+:is(html[data-theme])
+  .search-picker__input:focus-visible {
+  border-radius: 0;
+}
+
+:is(html[data-theme])
+  .form-card .search-picker__selected-panel {
+  gap: 8px;
+  padding: 12px;
+}
+
+:is(html[data-theme])
+  .form-card .search-picker__selected-empty {
+  padding: 9px 12px;
+  text-align: left;
+}
+
+:is(html[data-theme])
+  :is(.app-form-label, .cv-field__label, .search-picker__label) {
+  color: var(--color-heading);
+  font-size: 0.78rem;
+  font-weight: var(--font-weight-black);
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-transform: none;
+}
+
+:is(html[data-theme])
+  .search-picker--people {
+  gap: 12px;
+}
+
+:is(html[data-theme])
+  .search-picker--people .search-picker__selected-panel {
+  border-radius: 0;
+}
+
+:is(html[data-theme])
+  .search-picker--people .search-picker__selected-list {
+  gap: 8px;
+}
+
+:is(html[data-theme])
+  .search-picker--people .search-picker__selected-main {
+  gap: 2px;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+:is(html[data-theme])
+  .search-picker--people .search-picker__selected-name {
+  white-space: normal;
+}
+
+:is(html[data-theme])
+  .search-picker--people .search-picker__driver-chip {
+  display: none;
+}
+
+:is(html[data-theme])
+  .search-picker--people .search-picker__driver-toggle {
+  border-radius: var(--radius-pill);
+}
+
+:is(html[data-theme])
+  .search-picker--people .search-picker__term-control {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: auto;
+}
+
+:is(html[data-theme])
+  .search-picker--people .search-picker__selected-card > .search-picker__remove,
+:is(html[data-theme])
+  .search-picker--people .search-picker__selected-card:hover > .search-picker__remove {
+  align-self: center;
+  background: transparent;
+  border: 1px solid var(--color-danger-border-soft);
+  border-radius: var(--radius-pill);
+  color: var(--color-danger);
+  grid-column: 4;
+  grid-row: 1;
+  height: 34px;
+  margin: 0;
+  opacity: 1;
+  transform: none;
+  width: 34px;
+}
+
+:is(html[data-theme])
+  .search-picker--people .search-picker__selected-empty {
+  background: var(--color-surface-muted);
+  border-style: solid;
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle {
+  background: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  border: 1px dashed var(--color-input-border);
+  border-radius: 16px;
+  gap: 13px;
+  padding: 14px;
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__field {
+  gap: 7px;
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__label {
+  color: var(--color-heading);
+  font-size: 0.78rem;
+  text-transform: none;
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__control {
+  background: var(--color-input-bg);
+  border-color: var(--color-input-border);
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-panel {
+  border-radius: 0;
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-panel {
+  background: transparent;
+  border: 0;
+  gap: 8px;
+  padding: 0;
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-title {
+  color: var(--color-muted-strong);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-list {
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-card,
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-card:hover {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-muted));
+  border: 0 !important;
+  border-color: transparent !important;
+  border-radius: 12px;
+  box-shadow: inset 4px 0 0 var(--color-accent);
+  column-gap: 12px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  min-height: 78px;
+  outline: 0;
+  padding: 11px 12px;
+  position: relative;
+  row-gap: 0;
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-avatar {
+  border-radius: 12px;
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-avatar {
+  align-items: center;
+  background: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  color: var(--color-on-accent);
+  display: inline-flex;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-black);
+  grid-column: 1;
+  height: 42px;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  width: 42px;
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-main {
+  gap: 3px;
+  grid-column: 2;
+  grid-row: 1;
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-title-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-name {
+  color: var(--color-heading);
+  font-weight: var(--font-weight-bold);
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__vehicle-chip {
+  border-radius: 999px;
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__vehicle-chip {
+  align-items: center;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  display: inline-flex;
+  font-size: 10px;
+  font-weight: var(--font-weight-black);
+  letter-spacing: 0.04em;
+  min-height: 21px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-meta {
+  color: var(--color-muted-strong);
+  font-size: var(--font-size-xs);
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-card > .search-picker__remove,
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-card:hover > .search-picker__remove {
+  border-radius: 0;
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-card > .search-picker__remove,
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-card:hover > .search-picker__remove {
+  align-self: center;
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--color-border-soft);
+  color: var(--color-muted);
+  grid-column: 3;
+  grid-row: 1;
+  height: 34px;
+  margin: 0;
+  opacity: 1;
+  transform: none;
+  width: 38px;
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-card > .search-picker__remove:hover {
+  background: transparent;
+  color: var(--color-muted-strong);
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-empty {
+  background: transparent;
+  border: 0;
+  padding: 9px 12px;
+  text-align: left;
+}
+
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster {
+  background: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  border: 1px dashed var(--color-input-border);
+  border-radius: 16px;
+  gap: 13px;
+  padding: 14px;
+}
+
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__field {
+  gap: 7px;
+}
+
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__label {
+  color: var(--color-heading);
+  font-size: 0.78rem;
+  text-transform: none;
+}
+
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__control {
+  background: var(--color-input-bg);
+  border-color: var(--color-input-border);
+}
+
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-panel {
+  border-radius: 0;
+}
+
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-panel {
+  background: transparent;
+  border: 0;
+  gap: 8px;
+  padding: 0;
+}
+
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-title {
+  color: var(--color-accent-text);
+  padding: 0 2px;
+}
+
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-list {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  gap: 8px;
+  overflow: visible;
+}
+
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-card,
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-card:hover {
+  border-radius: 12px;
+}
+
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-card,
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-card:hover {
+  align-items: center;
+  background: var(--color-input-bg);
+  border: 0;
+  box-shadow: none;
+  column-gap: 12px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  min-height: 78px;
+  padding: 11px 12px;
+  position: relative;
+  row-gap: 0;
+  transition: background-color 140ms ease, box-shadow 140ms ease;
+}
+
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-card:hover {
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--color-input-bg));
+}
+
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-card--driver,
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-card--driver:hover {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-muted));
+  border: 0;
+  box-shadow: inset 4px 0 0 var(--color-accent);
+}
+
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-card:last-child {
+  border-bottom: 0;
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__selected-avatar {
+  border-radius: 12px;
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__selected-avatar {
+  align-items: center;
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-accent-border-soft);
+  color: var(--color-accent-text);
+  display: inline-flex;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-black);
+  grid-column: 1;
+  height: 42px;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  position: relative;
+  width: 42px;
+  z-index: 2;
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__selected-card--driver .search-picker__selected-avatar {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__selected-main {
+  gap: 3px;
+  grid-column: 2;
+  grid-row: 1;
+  pointer-events: none;
+  position: relative;
+  z-index: 2;
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__driver-chip {
+  align-items: center;
+  background: var(--color-accent);
+  border-radius: 999px;
+  color: var(--color-on-accent);
+  display: none;
+  font-size: 10px;
+  font-weight: var(--font-weight-black);
+  letter-spacing: 0.04em;
+  min-height: 21px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__selected-card--driver .search-picker__driver-chip {
+  display: inline-flex;
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__driver-surface {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+  inset: 0;
+  padding: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__selected-actions {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  display: flex;
+  gap: 10px;
+  grid-column: 3;
+  grid-row: 1;
+  padding: 0;
+  position: relative;
+  z-index: 3;
+}
+
+:is(html[data-theme])
+  .search-picker--roster :is(.search-picker__driver-control, .search-picker__term-control) {
+  border: 0;
+  display: block;
+  grid-column: auto;
+  grid-row: auto;
+  justify-self: auto;
+  max-height: none;
+  opacity: 1;
+  overflow: visible;
+  padding: 0;
+  transform: none;
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__driver-control {
+  display: none;
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__selected-actions :is(.search-picker__driver-toggle, .field-side-action) {
+  border-radius: 0;
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__selected-actions :is(.search-picker__driver-toggle, .field-side-action) {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--color-muted-strong);
+  min-height: 30px;
+  min-width: 0;
+  padding: 0 3px;
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__selected-actions :is(.search-picker__driver-toggle, .field-side-action)[aria-pressed="true"] {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-accent-text);
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__term-control .field-side-action {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--color-muted-strong);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  gap: 6px;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  min-height: 28px;
+  min-width: 0;
+  padding: 0 3px;
+  transform: none;
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__term-control .field-side-action:is(:hover, :focus-visible) {
+  transform: none;
+}
+
+:is(html[data-theme])
+  .search-picker--roster
+  .search-picker__term-control
+  .field-side-action:is(.field-side-action--success, .is-active, [aria-pressed="true"]) {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-success);
+}
+
+:is(html[data-theme])
+  .search-picker--roster
+  .search-picker__term-control
+  .field-side-action.field-side-action--danger,
+:is(html[data-theme])
+  .search-picker--roster
+  .search-picker__term-control
+  .field-side-action.is-inactive {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-danger);
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__selected-actions .field-side-action--state::before {
+  background: currentColor;
+  box-shadow: none;
+  flex: 0 0 auto;
+  height: 6px;
+  width: 6px;
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__selected-actions .search-picker__remove {
+  border-radius: 0;
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__selected-actions .search-picker__remove {
+  align-self: center;
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--color-border-soft);
+  color: var(--color-muted);
+  height: 32px;
+  margin: 0;
+  opacity: 1;
+  position: static;
+  transform: none;
+  padding-left: 10px;
+  width: 38px;
+}
+
+:is(html[data-theme])
+  .search-picker--roster .search-picker__selected-actions .search-picker__remove:hover {
+  background: transparent;
+  color: var(--color-muted-strong);
+}
+
+@media (max-width: 720px) {
+:is(html[data-theme])
+    .search-picker--people.search-picker--roster .search-picker__selected-card,
+:is(html[data-theme])
+    .search-picker--people.search-picker--roster .search-picker__selected-card:hover {
+    grid-template-columns: 42px minmax(0, 1fr);
+    row-gap: 8px;
+  }
+
+:is(html[data-theme])
+    .search-picker--roster .search-picker__selected-actions {
+    background: transparent;
+    border: 0;
+    grid-column: 2;
+    grid-row: 2;
+    justify-content: flex-start;
+    padding: 0;
+  }
+}
+
+@media (max-width: 640px) {
+:is(html[data-theme])
+    .search-picker--people .search-picker__selected-card,
+:is(html[data-theme])
+    .search-picker--people .search-picker__selected-card:hover {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 8px;
+  }
+
+:is(html[data-theme])
+    .search-picker--people .search-picker__driver-control {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+  }
+
+:is(html[data-theme])
+    .search-picker--people .search-picker__term-control {
+    border-top: 0;
+    grid-column: 2;
+    grid-row: 2;
+    padding-top: 0;
+  }
+
+:is(html[data-theme])
+    .search-picker--people .search-picker__selected-card > .search-picker__remove {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+:is(html[data-theme])
+  .search-picker__selected-list {
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-card,
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-card:hover,
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-card,
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-card:hover {
+  border: 0;
+  border-color: transparent;
+}
+
+:is(html[data-theme])
+  .oficio-external-driver .search-picker__control {
+  border-radius: 10px;
+}
+
+:is(html[data-theme="dark"])
+  .termo-oficio-summary-panel .search-picker__selected-header {
+  background: transparent;
+  border: 0;
+  padding: 0 0 var(--space-2);
+}
+
+:is(html[data-theme="dark"])
+  .search-picker {
+  --search-picker-focus-shadow: none;
+  --field-border-focus: var(--color-accent-border-strong);
+}
+
+:is(html[data-theme="dark"])
+  .search-picker__input,
+:is(html[data-theme="dark"])
+  .search-picker__input:focus,
+:is(html[data-theme="dark"])
+  .search-picker__input:focus-visible {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  outline: none;
+}
+
+:is(html[data-theme="dark"])
+  .search-picker--people .search-picker__selected-panel {
+  background: transparent;
+  border: 0;
+  gap: 10px;
+  padding: 0;
+}
+
+:is(html[data-theme="dark"])
+  .search-picker--people .search-picker__selected-title {
+  color: var(--color-muted-strong);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+:is(html[data-theme="dark"])
+  .search-picker--people .search-picker__selected-card,
+:is(html[data-theme="dark"])
+  .search-picker--people .search-picker__selected-card:hover,
+:is(html[data-theme="dark"])
+  .search-picker--people .search-picker__selected-card--with-term:hover {
+  align-items: center;
+  background: var(--color-surface-soft);
+  border-color: var(--color-border);
+  box-shadow: none;
+  column-gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  min-height: 64px;
+  padding: 9px 10px 9px 12px;
+  row-gap: 0;
+}
+
+:is(html[data-theme="dark"])
+  .search-picker--people .search-picker__driver-control {
+  grid-column: 2;
+  grid-row: 1;
+  max-height: none;
+  opacity: 1;
+  overflow: visible;
+  transform: none;
+}
+
+:is(html[data-theme="dark"])
+  .search-picker--people .search-picker__driver-toggle {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border-strong);
+  box-shadow: none;
+  min-height: 34px;
+  padding: 0 11px;
+  width: auto;
+}
+
+:is(html[data-theme="dark"])
+  .search-picker--people .search-picker__driver-toggle--active {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent-border-strong);
+  color: var(--color-accent-text);
+}
+
+:is(html[data-theme="dark"])
+  .search-picker--people .search-picker__term-control .field-side-action {
+  box-shadow: none;
+  min-height: 34px;
+  white-space: nowrap;
+}
+
+html[data-theme="dark"] :is(.search-picker__selected-panel, .search-picker__selected-card) {
+  background: var(--color-surface-soft);
+  border-color: var(--color-border-strong);
+  box-shadow: none;
+}
+
+:is(html[data-theme="dark"])
+  .search-picker__list {
+  display: grid;
+  gap: 4px;
+  padding: 0;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+:is(html[data-theme="dark"])
+  .search-picker__selected-card,
+:is(html[data-theme="dark"])
+  .search-picker__selected-card:hover {
+  background: var(--color-input-bg);
+  border-color: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+:is(html[data-theme="dark"])
+  .search-picker__selected-card > .search-picker__remove,
+:is(html[data-theme="dark"])
+  .search-picker__selected-card > .search-picker__remove:hover,
+:is(html[data-theme="dark"])
+  .search-picker__selected-card > .search-picker__remove:focus-visible {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--color-muted-strong);
+  outline: none;
+}
+
+:is(html[data-theme="dark"])
+  .oficio-external-driver__identity > .search-picker {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+}
+
+:is(html[data-theme="dark"])
+  .oficio-external-driver .search-picker__control {
+  background: var(--color-input-bg) !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: none !important;
+  min-height: var(--control-height-md);
+  padding: 0 12px;
+}
+
+:is(html[data-theme="dark"])
+  .oficio-external-driver .search-picker__input {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  min-height: 44px;
+  padding: 0;
+}
+
+:is(html[data-theme="dark"])
+  .termos-page .termo-oficio-summary-panel.search-picker__selected-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.main-form-panel .search-picker__input {
+  line-height: 1.25;
+  min-height: 0;
+  padding: 0 5px;
+}
+
+.main-form-panel .field-with-action--search-picker .search-picker__field {
+  position: relative;
+}
+
+.main-form-panel .field-with-action--search-picker .search-picker__control {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+  transition: width var(--transition-fast), max-width var(--transition-fast);
+  width: 100%;
+}
+
+.main-form-panel .field-with-action--search-picker:hover .search-picker__control,
+.main-form-panel .field-with-action--search-picker:focus-within .search-picker__control {
+  max-width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
+  width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
+}
+
+.main-form-panel .search-picker:not(:has(.search-picker__selected-panel)) {
+  gap: var(--space-2);
+}
+
+.main-form-panel .search-picker__field {
+  gap: var(--space-2);
+}
+
+.main-form-panel .search-picker:has(.search-picker__selected-panel) {
+  gap: var(--space-3);
+}
+
+.list-header--inline-create .inline-create__panel
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .custom-select__trigger,
+    .search-picker__control,
+    .search-picker__input
+  ) {
+  background: var(--step1-field, var(--list-header-control-bg, var(--color-input-bg)));
+  border: 0;
+  border-radius: var(--radius-control);
+  box-shadow: none;
+  box-sizing: border-box;
+  color: var(--text-filter);
+  font-size: var(--font-size-sm);
+  transition: none;
+}
+
+.list-header--inline-create .inline-create__panel
+  :is(
+    input.form-control,
+    select.form-control,
+    .form-select,
+    input.cv-field__control,
+    select.cv-field__control,
+    .custom-select__trigger,
+    .search-picker__control
+  ) {
+  height: var(--list-header-control-height);
+  min-height: var(--list-header-control-height);
+}
+
+.list-header--inline-create .inline-create__panel
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .custom-select__trigger,
+    .search-picker__control
+  ):is(.is-invalid, [aria-invalid="true"]),
+.list-header--inline-create .inline-create__panel
+  :is(.app-form-field, .cv-field):has(.field-error)
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .custom-select__trigger,
+    .search-picker__control
+  ) {
+  border: 1px solid var(--color-danger);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * DELTA v2 — daqui para baixo é o redesenho, sob a raiz `html[data-theme]`.
+ *
+ * A divisa é lida por teste — a linha `=== DELTA v2 ===`: as asserções de
+ * aparência do v2 descrevem ESTA metade. Medir o arquivo inteiro faria o teste
+ * ler a regra base que o delta sobrescreve — foi o que aconteceu na fusão de
+ * 2026-08-20, com sete asserções apontando para a declaração antiga da mesma
+ * classe, três telas acima.
+ * ══════════════════════════════════════════════════════════════════════════ */
+/* === DELTA v2 === */
+
 /* Picker — busca de entidade. Depende de `v2/tokens.css`.
  *
  * As classes `search-picker__*` são geradas por `js/components/picker.js` e
@@ -1783,4 +2732,160 @@
 :is(html[data-theme]) .evento-cancelado .alert {
   flex: 1 1 320px;
   margin: 0;
+}
+
+/* ---- o picker de DOCUMENTO VINCULADO --------------------------------------
+ *
+ * Veio de `fields/related-route-picker.css` em 2026-08-20. É o mesmo picker
+ * desta folha noutro papel: em vez de pessoas ou viaturas, os candidatos são
+ * documentos — o roteiro que o ofício vai usar, o ofício que o termo vai citar.
+ * Quem monta as linhas é `js/components/picker-parts.js`, e o gêmeo declarativo
+ * delas é `cotton/v2/related_row.html`.
+ *
+ * As classes `related-route-*` e `termo-oficio-*` são do sistema antigo e
+ * FICARAM: os três motores de tela (`termos-form.js`, `ordens-servico-form.js`,
+ * `justificativas-index.js`) acham a lista e o item por elas. Renomear sem
+ * tocar os três deixa a lista sem desenho, em silêncio.
+ *
+ * Medido em 2026-08-20 no editor de roteiro: desligar estas vinte regras não
+ * muda um pixel lá — o `.picker--related` do v2 já desenha o cartão. Elas
+ * seguem porque as OUTRAS três telas do picker (termo, OS, justificativa) ainda
+ * dependem delas.
+ */
+
+.related-route-picker.search-picker--people.search-picker--roster {
+  gap: 0 !important;
+}
+
+.related-route-picker .search-picker__field {
+  gap: 7px;
+}
+
+.related-route-picker .search-picker__selected-list.roteiro-editor__route-list {
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* A cor da barra vinha em `rgba()` literal, do desenho antigo. Aqui ela é o
+   texto apagado misturado com transparente — o mesmo par que o resto do v2
+   usa para traço discreto, e que acompanha a troca de tema. */
+.related-route-list {
+  scrollbar-color: color-mix(in srgb, var(--text-muted) 60%, transparent) transparent;
+}
+
+.related-route-list::-webkit-scrollbar {
+  width: 28px;
+}
+
+.related-route-list::-webkit-scrollbar-track {
+  background: transparent;
+  margin: var(--space-1) 0;
+}
+
+.related-route-list::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-muted) 45%, transparent);
+  border-radius: var(--radius-pill);
+  transition: background 0.2s;
+}
+
+.related-route-list::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
+
+.related-route-list::-webkit-scrollbar-button {
+  display: none;
+}
+
+.related-route-item {
+  background: var(--route-card-inner-bg);
+  border: 1px solid var(--route-section-border);
+  border-radius: var(--radius-md);
+  color: var(--theme-text-body);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.related-route-item:hover {
+  background: var(--route-card-inner-bg);
+  border-color: var(--route-button-secondary-hover-border);
+}
+
+.related-route-item.is-active {
+  border-color: var(--re-accent-border);
+  box-shadow: 0 0 0 2px var(--re-choice-ring);
+}
+
+.related-route-item .related-route-title {
+  color: var(--theme-text-heading);
+  font-weight: 700;
+}
+
+.related-route-item .related-route-period {
+  color: var(--theme-text-muted);
+  font-size: 12px;
+}
+
+.related-route-empty {
+  border: 1px dashed var(--theme-border-card);
+  border-radius: var(--radius-md);
+  color: var(--theme-text-muted);
+  font-size: 13px;
+  padding: var(--space-4);
+  text-align: center;
+}
+
+.termo-oficio-source-select {
+  display: none;
+}
+
+.termo-oficio-picker {
+  display: grid;
+  gap: 0;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-step1]
+  .related-route-picker.termo-oficio-picker.search-picker--people.search-picker--roster,
+.document-form-page .related-route-picker.termo-oficio-picker.search-picker--people.search-picker--roster,
+.termo-oficio-picker.search-picker--people.search-picker--roster {
+  gap: 0 !important;
+}
+
+.termo-oficio-picker .search-picker__field,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-step1]
+  .related-route-picker.termo-oficio-picker
+  .search-picker__field {
+  gap: 7px !important;
+}
+
+.termo-oficio-summary-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  margin-top: 0;
+  padding: 0;
+}
+
+.termo-oficio-picker .search-picker__selected-list,
+.termo-oficio-picker .roteiro-editor__route-list,
+.termo-oficio-summary-panel .search-picker__selected-list,
+.termo-oficio-summary-panel .related-route-list,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-step1]
+  .related-route-picker.termo-oficio-picker
+  :is(.search-picker__selected-list, #termo-oficio-lista, #os-oficio-lista) {
+  display: grid;
+  gap: 8px !important;
+  margin-top: 8px;
+  max-height: 280px;
+  overflow: auto;
 }

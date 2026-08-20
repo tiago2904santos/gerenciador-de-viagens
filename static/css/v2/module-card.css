@@ -1,0 +1,110 @@
+/* Cartão de módulo — o atalho para uma área do sistema. Par de
+ * `cotton/v2/module_card.html`.
+ *
+ * Aparece no Início e no hub de Cadastros: marca de duas letras, sobrancelha,
+ * nome, uma linha do que há lá dentro e o botão de entrar.
+ *
+ * Veio de `lists/content-cards.css` em 2026-08-20, que era uma folha-sacola —
+ * desenhava também cartão de resumo, cartão de documento e cartão de
+ * assinatura, todos já extintos. Aqui ficou só o que ainda existe, com o
+ * vocabulário do v2 (`module-card__*`) no lugar do `cv-module-card__*`.
+ *
+ * A GRADE mora aqui também. Ela era `metric-grid--4`, de uma folha de
+ * indicadores que o painel antigo usava; agora o próprio cartão diz como se
+ * arruma em fileira, que é a única coisa que se faz com ele.
+ */
+
+:is(html[data-theme]) .module-card-grid {
+  display: grid;
+  gap: var(--gap);
+  /* `auto-fit` com piso de 220px, e não quatro colunas fixas: dentro de um
+     painel os quatro atalhos ficavam com 174px cada, e "Combustíveis" não cabia
+     numa linha. A fileira decide quantos cabem pela largura que ela tem. */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  min-width: 0;
+}
+
+/* Em tela estreita o piso de 220px sozinho já colapsaria para uma coluna, mas
+   declaro para não depender do arredondamento do navegador. */
+@media (max-width: 520px) {
+  :is(html[data-theme]) .module-card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* O cartão é a caixa de conteúdo do sistema — mesma superfície, mesmo raio do
+   `form_block`. Antes ele acumulava quatro classes (`module-card-v2`,
+   `cv-module-card`, `module-card`, `app-card`) para conseguir isso de folhas
+   diferentes. */
+:is(html[data-theme]) .module-card {
+  background: var(--surface-rail);
+  border-radius: var(--radius-field);
+  display: grid;
+  /* Cabeçalho e rodapé do tamanho do conteúdo; o corpo estica. É o que mantém o
+     botão "Abrir" na mesma altura em cartões de descrição curta e longa. */
+  grid-template-rows: auto 1fr auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+:is(html[data-theme]) .module-card__header,
+:is(html[data-theme]) .module-card__body,
+:is(html[data-theme]) .module-card__footer {
+  padding: var(--gap) 18px;
+}
+
+:is(html[data-theme]) .module-card__header {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+/* A marca de duas letras: o mesmo quadrado do avatar da linha de pessoa, na
+   medida pequena. */
+:is(html[data-theme]) .module-card__mark {
+  align-items: center;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border-radius: 8px;
+  color: var(--accent);
+  display: flex;
+  flex: 0 0 auto;
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  height: 32px;
+  justify-content: center;
+  width: 32px;
+}
+
+:is(html[data-theme]) .module-card__eyebrow {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+:is(html[data-theme]) .module-card__body {
+  display: grid;
+  gap: 7px;
+}
+
+:is(html[data-theme]) .module-card__title {
+  color: var(--text-strong);
+  /* O título do CARTÃO, não o da página: `--text-size-title` são 24px e faziam
+     "Configuração do sistema" ocupar três linhas dentro do atalho. */
+  font-size: 17px;
+  font-weight: var(--weight-strong);
+  line-height: 1.25;
+  margin: 0;
+}
+
+:is(html[data-theme]) .module-card__description {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+:is(html[data-theme]) .module-card__footer {
+  align-items: center;
+  display: flex;
+}

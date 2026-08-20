@@ -50,7 +50,10 @@
     if (!modal || modal.getAttribute(BOUND) === "true") return false;
     modal.setAttribute(BOUND, "true");
 
-    var dialog = modal.querySelector(".delete-confirm-modal__dialog");
+    /* A casca do `<dialog>` do v2. Era `.delete-confirm-modal__dialog`, do
+       desenho antigo — o seletor não casava com nada desde que o diálogo virou
+       `c-v2.modal`, e o foco inicial caía no `<dialog>` por acaso. */
+    var dialog = modal.querySelector(".modal__shell");
     var form = modal.querySelector("[data-attach-signed-form]");
     var label = modal.querySelector("[data-attach-signed-label]");
     var nextInput = modal.querySelector("[data-attach-signed-next]");
@@ -154,19 +157,17 @@
      * no template: era ali que o número de documentos anexáveis ficava fixo em 5. */
     function montarBotoesDeTipo() {
       if (!kindOptions) return;
-      var ehToggle = kindOptions.hasAttribute("data-attach-signed-kind-toggle");
+
       kindOptions.innerHTML = "";
       kindsAtivos.forEach(function (item) {
         var button = document.createElement("button");
         button.type = "button";
-        /* A classe do segmento vem do GRUPO, não daqui: no v2 o grupo é o
-         * `toggle` do sistema e os itens são `toggle__item`; nas telas legadas
-         * segue a classe antiga, que as folhas de lá esperam. O sinalizador é
-         * SEM VALOR de propósito — atributo com valor dentro do `hook` do
-         * componente sai escapado e o seletor nunca casa. */
-        button.className = ehToggle
-          ? "toggle__item"
-          : "attach-signed-modal__kind-option";
+        /* Segmento do `toggle` do sistema. Havia uma segunda classe aqui
+         * (`attach-signed-modal__kind-option`, do desenho antigo) escolhida por
+         * um sinalizador no grupo; ela saiu em 2026-08-20 junto com a folha que
+         * a desenhava — o diálogo de anexar é `c-v2.modal` desde a migração, e
+         * o grupo é sempre o `c-v2.toggle`. */
+        button.className = "toggle__item";
         button.setAttribute("aria-pressed", "false");
         button.setAttribute("data-attach-signed-kind", item.key);
         var rotulo = document.createElement("span");

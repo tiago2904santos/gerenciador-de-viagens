@@ -113,23 +113,19 @@
     return value;
   }
 
-  /* ── Sincroniza visual do segment-toggle ─────────────────── */
+  /* ── Sincroniza o alternador do modo ─────────────────────── */
 
+  /* `aria-pressed` é TUDO o que o alternador do v2 lê: `v2/toggle.css` pinta o
+     segmento escolhido por ele. Até 2026-08-20 esta função também acendia
+     `segment-toggle__btn--pop` — a classe de animação do alternador ANTIGO, que
+     este componente deixou de emitir quando virou `c-v2.toggle`. O botão
+     recebia uma classe que nenhuma folha desenhava. */
   function syncModoButtons(root) {
     var modoInput = root.querySelector(MODO_SEL);
     var modo = (modoInput && modoInput.value) || 'SERVIDOR';
     root.querySelectorAll(MODO_BTN).forEach(function (btn) {
-      var active    = (btn.dataset.value || 'SERVIDOR') === modo;
-      var wasActive = btn.getAttribute('aria-pressed') === 'true';
-
+      var active = (btn.dataset.value || 'SERVIDOR') === modo;
       btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-
-      /* Dispara animação de entrada apenas na troca (não no carregamento) */
-      if (active && !wasActive) {
-        btn.classList.remove('segment-toggle__btn--pop');
-        void btn.offsetWidth;   /* reinicia o keyframe */
-        btn.classList.add('segment-toggle__btn--pop');
-      }
     });
   }
 

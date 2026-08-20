@@ -5,17 +5,17 @@
   mesma peça que o cartão da lista usa para dizer placa e valor. Um par
   rótulo/valor não muda de desenho por estar numa etapa em vez de numa lista.
 {% endcomment %}
-<div class="document-summary document-summary--identity fact-list">
-  <c-v2.form_block aria_label="Número do ofício" extra_class="document-summary__fact-panel document-summary__fact-panel--identity">
+<div class="fact-list fact-list--band-4">
+  <c-v2.form_block aria_label="Número do ofício">
     <c-slot name="body"><c-v2.fact label="Número do ofício" :value="documentos_ctx.detalhe.numero_formatado" /></c-slot>
   </c-v2.form_block>
-  <c-v2.form_block aria_label="Protocolo" extra_class="document-summary__fact-panel document-summary__fact-panel--identity">
+  <c-v2.form_block aria_label="Protocolo">
     <c-slot name="body"><c-v2.fact label="Protocolo" :value="documentos_ctx.detalhe.protocolo" /></c-slot>
   </c-v2.form_block>
-  <c-v2.form_block aria_label="Data de criação" extra_class="document-summary__fact-panel document-summary__fact-panel--identity">
+  <c-v2.form_block aria_label="Data de criação">
     <c-slot name="body"><c-v2.fact label="Data de criação" :value="documentos_ctx.detalhe.data_criacao" /></c-slot>
   </c-v2.form_block>
-  <c-v2.form_block aria_label="Custeio" extra_class="document-summary__fact-panel document-summary__fact-panel--identity">
+  <c-v2.form_block aria_label="Custeio">
     <c-slot name="body"><c-v2.fact label="Custeio" :value="documentos_ctx.detalhe.custeio" /></c-slot>
   </c-v2.form_block>
 </div>

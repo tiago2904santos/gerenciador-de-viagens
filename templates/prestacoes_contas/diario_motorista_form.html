@@ -1,19 +1,6 @@
 {% extends "prestacoes_contas/flow_base.html" %}
 {% load static %}
 
-{% block extra_css %}
-  {% comment %}
-    Além da folha do casco, esta tela tem a sua: os 15 `dmv-*` — a escolha de
-    motorista, o preenchimento a partir do ofício e a grade de campos — ainda
-    são desenho próprio dela.
-
-    `block.super` porque o casco declara `extra_css`: sem ele, esta tela
-    substituiria a folha de prestações em vez de somar a dela.
-  {% endcomment %}
-  {{ block.super }}
-  <link rel="stylesheet" href="{% static 'css/pages/diario-troca.css' %}">
-{% endblock %}
-
 {% block extra_js %}
   {# masks.js ja vem do base.html; carregar de novo executaria o mesmo motor duas vezes. #}
   <script src="{% static 'js/pages/diario-motorista.js' %}" defer></script>
@@ -21,23 +8,23 @@
 
 {% block flow_body %}
   {{ oficios_prefill|json_script:"dmv-oficios-source" }}
-  <form method="post" class="travel-document-wizard__form dmv-form"
+  <form method="post" class="travel-document-wizard__form"
         novalidate
         data-diario-motorista-form>
     {% csrf_token %}
 
     <c-v2.form_errors :form="form" only />
 
-    <p class="dmv-lede">
+    <p class="field__help">
       Ajuste o <strong>motorista</strong> e a <strong>viatura</strong> apenas deste diário — o
       ofício {{ identificacao.numero }} original não é alterado. Se houver troca, geramos uma prévia
       da justificativa em <strong>Informações complementares</strong> do Relatório Técnico.
     </p>
 
     {# ═══════════════ MOTORISTA ═══════════════ #}
-    <c-v2.form_block shell="card" section_id="dmv-motorista-title" title="Motorista" description="Quem dirigiu o veículo nesta viagem?" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :element_id="element_id" :extra_class="extra_class" :heading_level="heading_level" :variant="variant"><c-slot name="body">{% include "prestacoes_contas/partials/_dmv_motorista_body.html" with form=form motorista_oficio_cpf=motorista_oficio_cpf motorista_oficio_nome=motorista_oficio_nome oficios_prefill=oficios_prefill only %}</c-slot></c-v2.form_block>
+    <c-v2.form_block shell="card" section_id="dmv-motorista-title" title="Motorista" description="Quem dirigiu o veículo nesta viagem?" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :element_id="element_id" :extra_class="extra_class" :heading_level="heading_level" :variant="variant"><c-slot name="body">{% include "prestacoes_contas/partials/_dmv_motorista_body.html" with form=form motorista_oficio_nome=motorista_oficio_nome motorista_oficio_sufixo_cpf=motorista_oficio_sufixo_cpf oficios_prefill=oficios_prefill only %}</c-slot></c-v2.form_block>
 
     {# ═══════════════ VIATURA ═══════════════ #}
-    <c-v2.form_block shell="card" section_id="dmv-viatura-title" title="Viatura" description="Qual veículo foi usado nesta viagem?" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :element_id="element_id" :extra_class="extra_class" :heading_level="heading_level" :variant="variant"><c-slot name="body">{% include "prestacoes_contas/partials/_dmv_viatura_body.html" with form=form viatura_oficio=viatura_oficio only %}</c-slot><c-slot name="footer">{% include "prestacoes_contas/partials/_dmv_viatura_footer.html" with diario_url=diario_url only %}</c-slot></c-v2.form_block>
+    <c-v2.form_block shell="card" section_id="dmv-viatura-title" title="Viatura" description="Qual veículo foi usado nesta viagem?" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :element_id="element_id" :extra_class="extra_class" :heading_level="heading_level" :variant="variant"><c-slot name="body">{% include "prestacoes_contas/partials/_dmv_viatura_body.html" with form=form viatura_oficio=viatura_oficio viatura_oficio_sufixo_placa=viatura_oficio_sufixo_placa only %}</c-slot><c-slot name="footer">{% include "prestacoes_contas/partials/_dmv_viatura_footer.html" with diario_url=diario_url only %}</c-slot></c-v2.form_block>
   </form>
 {% endblock %}

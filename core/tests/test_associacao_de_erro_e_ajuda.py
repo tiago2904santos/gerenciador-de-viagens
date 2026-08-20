@@ -350,19 +350,31 @@ class ContratoDosChamadoresTests(SimpleTestCase):
         quantidade) e o campo de atividades do cadastro rápido de modelos. Todos
         passaram ao `c-v2.form_field` ou ao `c-v2.field`, que trazem o erro
         embutido e emitem o `id` que o `aria-describedby` do Django aponta.
+
+        2026-08-20, troca de motorista/viatura do Diário: **12**. Os oito
+        chamadores dos dois parciais `_dmv_*` saíram quando os campos escritos à
+        mão (`cv-field` + `<label>` + widget + erro) viraram `c-v2.form_field`.
+        Sobraram doze, e sete deles estão DENTRO de componentes do v2 — que é
+        onde este chamador deve estar.
         """
         achados = list(chamadores_de_field_error())
 
-        self.assertGreaterEqual(len(achados), 20)
-        self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 15)
+        self.assertGreaterEqual(len(achados), 10)
+        self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 9)
 
 
 class DicaEscritaAMaoTests(SimpleTestCase):
-    """`_dmv_motorista_body.html` escreve a dica à mão, fora de `field.html`.
+    """A dica do ofício do motorista continua ancorada no campo.
 
-    O texto já estava na tela; o que faltava era o `id`. Como o parcial não passa
-    por `field.html`, nenhuma das travas de componente o alcança — ele é renderizado
-    aqui, direto, com o form de verdade.
+    Ela era escrita à mão no parcial, fora de `field.html`, e por isso nenhuma
+    trava de componente a alcançava — daí este teste, que renderiza o parcial
+    direto, com o form de verdade.
+
+    2026-08-20: o parcial passou a usar `c-v2.form_field`, e a âncora agora é
+    responsabilidade DELE (`{id_for_label}_helptext`). O teste fica: é o mesmo
+    `id` que o `aria-describedby` do Django aponta, e provar isso na tela real
+    continua valendo — foi por falta dele que a dica existia e o ponteiro caía
+    no vazio.
     """
 
     def test_a_dica_do_oficio_do_motorista_tem_ancora(self):
@@ -375,7 +387,14 @@ class DicaEscritaAMaoTests(SimpleTestCase):
         )
 
         html = render_to_string(
-            "prestacoes_contas/partials/_dmv_motorista_body.html", {"form": form},
+            "prestacoes_contas/partials/_dmv_motorista_body.html",
+            {
+                "form": form,
+                # As duas frases prontas que a tela monta na view: em atributo de
+                # componente Cotton não se pode compor texto.
+                "motorista_oficio_nome": "ADEMAR SCHONS",
+                "motorista_oficio_sufixo_cpf": " · CPF 000.000.000-00",
+            },
         )
 
         self.assertIn('id="id_motorista_oficio_referencia_helptext"', html)

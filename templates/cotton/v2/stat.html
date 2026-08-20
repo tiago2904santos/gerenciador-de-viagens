@@ -1,0 +1,19 @@
+{% cotton:vars icon label value %}
+{% load icones %}
+{% comment %}
+  Um número com ícone — quantos arquivos foram enviados, quantos eventos existem.
+
+  Nasceu em 2026-08-20 com a migração da tela do Drive, que tinha o seu
+  (`gdrive-stat`). É diferente do `fact`: o fato descreve um REGISTRO ("Placa:
+  ABC-1234", dentro de um cartão), e este descreve uma CONTAGEM do sistema, com
+  o ícone dizendo de que assunto ela é.
+
+  É o que sobrou de bom do `metric` antigo, que morreu com o painel de `/`
+  (2026-08-20): aquele desenhava um cartão inteiro por número, com borda e
+  sombra, e três deles ocupavam a primeira dobra da tela.
+{% endcomment %}
+<div class="stat">
+  {% if icon %}<span class="stat__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
+  <span class="stat__label">{{ label }}</span>
+  <span class="stat__value">{{ value }}</span>
+</div>

@@ -427,6 +427,17 @@ html[data-theme="dark"] .custom-select--v2 .custom-select__chevron svg {
 }
 
 
+/* ══════════════════════════════════════════════════════════════════════════
+ * DELTA v2 — daqui para baixo é o redesenho, sob a raiz `html[data-theme]`.
+ *
+ * A divisa é lida por teste — a linha `=== DELTA v2 ===`: as asserções de
+ * aparência do v2 descrevem ESTA metade. Medir o arquivo inteiro faria o teste
+ * ler a regra base que o delta sobrescreve — foi o que aconteceu na fusão de
+ * 2026-08-20, com sete asserções apontando para a declaração antiga da mesma
+ * classe, três telas acima.
+ * ══════════════════════════════════════════════════════════════════════════ */
+/* === DELTA v2 === */
+
 /* Select — gatilho e menu. Depende de `v2/tokens.css`.
  *
  * O gatilho e o menu são criados em tempo de execução por

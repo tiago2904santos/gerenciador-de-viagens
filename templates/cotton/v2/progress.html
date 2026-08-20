@@ -1,0 +1,35 @@
+{% cotton:vars element_id fill_id hidden hint hint_id label percent percent_id state state_id value %}
+{% comment %}
+  Barra de progresso — um trabalho longo que o servidor toca em segundo plano.
+
+  Nasceu em 2026-08-20 para a reorganização em massa do Google Drive, que era a
+  única tela do sistema com barra e a desenhava sozinha (`gdrive-progress`,
+  `gdrive-status`, 60 linhas de folha de página).
+
+  NÃO é um `alert`: o alerta diz uma coisa e some; isto acompanha um número que
+  muda a cada consulta. Também não é um `chip`: o selo cabe numa linha de lista,
+  a barra precisa da largura para significar alguma coisa.
+
+  Os quatro `*_id` existem porque quem escreve os números é JS, e cada motor tem
+  o seu: o do Drive procura `#gdrive-status-texto`, `#gdrive-status-percent` e
+  `#gdrive-progress-fill` por id. Passar o id pelo componente é o que evita o
+  motor conhecer a estrutura interna dele.
+
+  `state` é o texto do estado ("Em andamento", "Concluído"), e `percent` o
+  número já formatado.
+
+  A barra é o `<progress>` NATIVO. Não é purismo: o valor precisa entrar por
+  ATRIBUTO, e não por `style` — estilo em linha em template é desenho fora da
+  folha, e há contrato que o proíbe. De quebra o elemento anuncia o progresso
+  para leitor de tela sem `role` nem `aria-value*` escritos à mão, e o motor só
+  faz `el.value = pct`.
+{% endcomment %}
+<div class="progress{% if state_id %} progress--live{% endif %}"{% if element_id %} id="{{ element_id }}"{% endif %}{% if hidden %} hidden{% endif %}>
+  <div class="progress__head">
+    <span class="progress__label">{{ label|default:"Progresso" }}</span>
+    <span class="progress__state"{% if state_id %} id="{{ state_id }}"{% endif %}>{{ state }}</span>
+    <span class="progress__percent"{% if percent_id %} id="{{ percent_id }}"{% endif %}>{{ percent }}</span>
+  </div>
+  <progress class="progress__track"{% if fill_id %} id="{{ fill_id }}"{% endif %} max="100" value="{{ value|default:0 }}"{% if state_id %} aria-labelledby="{{ state_id }}"{% endif %}></progress>
+  {% if hint or hint_id %}<p class="progress__hint"{% if hint_id %} id="{{ hint_id }}"{% endif %}{% if not hint %} hidden{% endif %}>{{ hint }}</p>{% endif %}
+</div>

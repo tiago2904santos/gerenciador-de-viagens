@@ -126,10 +126,7 @@ class ShellBundleGateTests(SimpleTestCase):
         form_shell = (
             ROOT / "static/css/shell.form-components.bundle.css"
         ).read_text(encoding="utf-8")
-        sources = (
-            "css/fields/file-picker.css",
-            "css/fields/related-route-picker.css",
-        )
+        sources = ("css/fields/related-route-picker.css",)
 
         self.assertIn("{% block shell_css %}", base)
         for source in sources:
@@ -138,10 +135,6 @@ class ShellBundleGateTests(SimpleTestCase):
                 self.assertIn(f">>> {source} >>>", form_shell)
 
         self.assertLess(
-            form_shell.index(">>> css/fields/file-picker.css >>>"),
-            form_shell.index(">>> css/actions/action-system.css >>>"),
-        )
-        self.assertLess(
             form_shell.index(">>> css/lists/list-header.css >>>"),
             form_shell.index(">>> css/fields/related-route-picker.css >>>"),
         )
@@ -149,13 +142,14 @@ class ShellBundleGateTests(SimpleTestCase):
         # As bases fundidas não voltaram a ser folha própria.
         for extinta in ("fields/search-picker.css", "fields/date-picker.css",
                         "fields/custom-select.css", "fields/select.css",
-                        "fields/field.css"):
+                        "fields/field.css", "fields/file-picker.css"):
             with self.subTest(extinta=extinta):
                 self.assertFalse((ROOT / "static/css" / extinta).exists())
 
         # E o que elas declaravam continua chegando à tela, pelo pacote do v2.
         ui = (ROOT / "static/css/ui.bundle.css").read_text(encoding="utf-8")
-        for marca in (".search-picker__control", ".date-picker__panel", ".custom-select__menu"):
+        for marca in (".search-picker__control", ".date-picker__panel",
+                      ".custom-select__menu", ".file-picker"):
             with self.subTest(marca=marca):
                 self.assertIn(marca, ui)
 
@@ -183,22 +177,37 @@ class ShellBundleGateTests(SimpleTestCase):
             with self.subTest(obsolete=obsolete):
                 self.assertNotIn(obsolete, template)
 
-        shared = (
-            ROOT / "static/css/fields/related-route-picker.css"
+        # O `UI-04` tirou três famílias das folhas de página e as juntou numa
+        # folha compartilhada. Em 2026-08-20 elas se mudaram de novo — desta vez
+        # para o DONO de cada uma, que é o que a folha compartilhada nunca teve:
+        #
+        #   - o picker de documento vinculado → `v2/picker.css`, com o resto do
+        #     picker (as classes `related-route-*`/`termo-oficio-*` ficaram: são
+        #     contrato dos três motores de tela que as procuram);
+        #   - o painel que se revela → `pages/justificativas.css`, a tela que o
+        #     emite.
+        #
+        # O que o `UI-04` proibia continua proibido: nenhuma das três volta a
+        # ser desenhada na folha de página de outro módulo.
+        picker = (ROOT / "static/css/v2/picker.css").read_text(encoding="utf-8")
+        self.assertIn(".related-route-item {", picker)
+        self.assertIn(".termo-oficio-picker {", picker)
+        justificativas = (
+            ROOT / "static/css/pages/justificativas.css"
         ).read_text(encoding="utf-8")
-        self.assertIn(".oficio-reveal-panel {", shared)
-        self.assertIn(".related-route-item {", shared)
-        self.assertIn(".termo-oficio-picker {", shared)
+        self.assertIn(".oficio-reveal-panel {", justificativas)
 
-        moved_selectors = {
+        for relative, selector in {
             "static/css/pages/oficios.css": "\n.oficio-reveal-panel {",
-            "static/css/pages/roteiros.css": "\n.related-route-item {",
             "static/css/pages/termos.css": "\n.termo-oficio-picker {",
-        }
-        for relative, selector in moved_selectors.items():
+        }.items():
             with self.subTest(source=relative):
                 source = (ROOT / relative).read_text(encoding="utf-8")
                 self.assertNotIn(selector, source)
+
+        # `pages/roteiros.css` foi APAGADA em 2026-08-20: o editor migrou para o
+        # v2 em 17/08 e nenhuma página a carregava desde então.
+        self.assertFalse((ROOT / "static/css/pages/roteiros.css").exists())
 
     def test_ui04_terms_list_nao_carrega_folha_de_pagina(self):
         """UI-04 proibia a lista de termos puxar a folha das prestações.
@@ -246,7 +255,6 @@ class ShellBundleGateTests(SimpleTestCase):
         self.assertIn(">>> js/core/component-loader.js >>>", bundle)
         for name in (
             "card-toggle",
-            "segment-nav",
             "file-picker",
             "signature-actions",
             "extra-download",

@@ -1,0 +1,182 @@
+/* Aviso de download em curso — a caixa que aparece no canto inferior enquanto
+ * o documento é gerado, e vira erro quando a geração falha.
+ *
+ * Veio de `feedback/document-download-loading.css` em 2026-08-20, com as regras
+ * intactas: a marcação é de `templates/base.html` e o estado é aceso por
+ * `js/components/document-download.js` — a peça já era do sistema, faltava-lhe
+ * o endereço.
+ *
+ * Não é um `alert`: aquele ocupa uma faixa no fluxo da página e some com a
+ * navegação; este flutua sobre a tela porque o download continua enquanto se lê
+ * outra coisa.
+ */
+
+:is(html[data-theme]) .document-loading {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 10050;
+  width: min(360px, calc(100vw - 32px));
+  pointer-events: none;
+}
+
+:is(html[data-theme]) .document-loading[hidden] {
+  display: none;
+}
+
+:is(html[data-theme]) .document-loading__panel {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--theme-border-card);
+  border-radius: 18px;
+  background: var(--theme-surface-card);
+  color: var(--color-text);
+  box-shadow: var(--theme-shadow-block);
+  text-align: left;
+}
+
+:is(html[data-theme]) .document-loading__spinner {
+  grid-row: 1 / span 2;
+  width: 30px;
+  height: 30px;
+  border: 3px solid color-mix(in srgb, var(--color-primary) 24%, transparent);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: cv-document-loading-spin 0.72s linear infinite;
+}
+
+:is(html[data-theme]) .document-loading__title {
+  margin: 0;
+  color: var(--color-heading);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+:is(html[data-theme]) .document-loading__detail {
+  margin: -8px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+:is(html[data-theme]) .document-loading.is-error .document-loading__spinner {
+  border-color: var(--color-danger);
+  animation: none;
+}
+
+:is(html[data-theme]) .document-loading.is-error .document-loading__spinner::after {
+  content: "!";
+  display: grid;
+  height: 100%;
+  place-items: center;
+  color: var(--color-danger);
+  font-weight: 900;
+}
+
+:is(html[data-theme]) [data-document-download-active] {
+  cursor: wait;
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  :is(html[data-theme]) .document-loading {
+    right: 16px;
+    bottom: 16px;
+    left: 16px;
+    width: auto;
+  }
+}
+
+@keyframes cv-document-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(html[data-theme]) .document-loading__spinner {
+    animation-duration: 1.8s;
+  }
+}
+
+/* ---- a espera EMBUTIDA -----------------------------------------------------
+ *
+ * A mesma espera, na tela inteira: a prévia do plano de trabalho abre num
+ * `<iframe>`, e enquanto o servidor gera o arquivo é esta página que ocupa o
+ * quadro. Veio de `pages/document-generation-embedded.css` em 2026-08-20 — o
+ * assunto é o mesmo do aviso flutuante acima (documento em preparação), e
+ * manter dois desenhos para ele era manter duas folhas.
+ *
+ * Aqui o painel é CENTRADO e não flutua: não há página por trás para continuar
+ * lendo — a espera é a tela.
+ */
+
+:is(html[data-theme]) .document-loading--embedded {
+  background: var(--surface-rail);
+  color: var(--text-strong);
+  display: grid;
+  margin: 0;
+  min-height: 100vh;
+  padding: clamp(1.5rem, 6vw, 4rem);
+  place-items: center;
+  pointer-events: auto;
+  position: static;
+  width: auto;
+}
+
+:is(html[data-theme]) .document-loading--embedded .document-loading__panel {
+  align-items: center;
+  background: var(--surface-field);
+  border: 0;
+  border-radius: var(--radius-rail);
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.75rem, 5vw, 3rem);
+  text-align: center;
+  width: min(100%, 31rem);
+}
+
+:is(html[data-theme]) .document-loading__mark {
+  align-items: center;
+  background: var(--surface-rail);
+  border-radius: var(--radius-field);
+  color: var(--accent);
+  display: grid;
+  height: 3.5rem;
+  margin-bottom: var(--gap);
+  place-items: center;
+  width: 3.5rem;
+}
+
+:is(html[data-theme]) .document-loading__mark svg {
+  height: 1.65rem;
+  width: 1.65rem;
+}
+
+:is(html[data-theme]) .document-loading--embedded .document-loading__spinner {
+  grid-row: auto;
+  margin-bottom: var(--gap-tight);
+}
+
+:is(html[data-theme]) .document-loading__eyebrow {
+  color: var(--accent);
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  letter-spacing: 0.08em;
+  margin: 0 0 var(--gap-tight);
+  text-transform: uppercase;
+}
+
+:is(html[data-theme]) .document-loading--embedded .document-loading__title {
+  font-size: clamp(1.25rem, 4vw, 1.65rem);
+  margin: 0;
+}
+
+:is(html[data-theme]) .document-loading--embedded .document-loading__detail {
+  margin: var(--gap-tight) 0 0;
+  max-width: 27rem;
+}

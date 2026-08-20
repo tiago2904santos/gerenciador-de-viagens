@@ -102,9 +102,11 @@ class PlanoWizardViewsTests(TestCase):
 
         Antes eram `summary-item--principal`/`--secondary` e três grades
         (`pt-diarias-summary-*`), vocabulário que só esta tela usava. A
-        hierarquia que o teste guarda é a mesma — UM valor grita, os outros três
-        acompanham —, agora dita pela peça que o cartão de lista e o resumo do
-        evento também usam.
+        hierarquia que o teste guarda é a mesma — o DINHEIRO grita, o resto
+        acompanha —, agora dita pela peça que o cartão de lista e o resumo do
+        evento também usam. São dois valores em destaque desde a reescrita dos
+        três painéis: o total do plano e o valor por servidor. A quantidade de
+        diárias e o efetivo são apoio, e continuam em corpo normal.
 
         Os quatro ganchos `data-pt-resultado-*` continuam, um por número:
         `js/pages/planos-trabalho-wizard.js` procura cada um por nome para
@@ -115,8 +117,10 @@ class PlanoWizardViewsTests(TestCase):
             reverse("planos_trabalho:wizard_efetivo_diarias", args=[plano.pk])
         )
 
-        self.assertContains(response, 'class="fact-list" data-pt-diarias-resultado')
-        self.assertContains(response, "fact__value--strong", count=1)
+        self.assertContains(
+            response, 'class="fact-list fact-list--band-3" data-pt-diarias-resultado'
+        )
+        self.assertContains(response, "fact__value--strong", count=2)
         self.assertContains(response, "data-pt-resultado-total")
         self.assertContains(response, "data-pt-resultado-total-extenso")
         self.assertContains(response, "data-pt-resultado-unitario")

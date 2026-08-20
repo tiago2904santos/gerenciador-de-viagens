@@ -67,7 +67,6 @@ AJAX.
 | `data-cv-lazy-components` | script do shell | Declara a configuração única do loader |
 | `data-cv-lazy-form-components-src` | script do shell | URL de `form-components.bundle.js` |
 | `data-cv-lazy-card-toggle-src` | script do shell | URL de `card-toggle.js` |
-| `data-cv-lazy-segment-nav-src` | script do shell | URL de `segment-nav.js` |
 | `data-cv-lazy-file-picker-src` | script do shell | URL de `file-picker.js` |
 | `data-cv-lazy-attach-signed-modal-src` | script do shell | URL de `attach-signed-modal.js` |
 | `data-cv-lazy-signature-actions-src` | script do shell | URL de `signature-actions.js` |
@@ -188,7 +187,7 @@ Checkbox renderizado como cartão clicável (`components/ui/forms/card_toggle.ht
 | `data-overlay-target` | id do overlay alvo |
 | `data-overlay-kind` | tipo do overlay |
 | `data-overlay-close` | botão que fecha |
-| `data-delete-confirm-modal`, `data-delete-confirm-form`, `data-delete-confirm-label` | modal de exclusão |
+| `data-delete-confirm-modal`, `data-delete-confirm-form`, `data-delete-confirm-label`, `data-delete-modal-title` | modal de exclusão (o último recebe o título vindo do gatilho; era a classe `delete-confirm-modal__title` até 2026-08-20) |
 | `data-confirm-action-modal`, `data-confirm-action-form`, `data-confirm-action-label` | modal de confirmação genérica |
 | `data-cancel-reason-modal`, `data-cancel-reason-form`, `data-cancel-reason-label` | modal de cancelamento com motivo |
 | `data-vincular-usuario-modal`, `data-vincular-usuario-form`, `data-vincular-usuario-label` | modal de vínculo de usuário |
@@ -326,7 +325,6 @@ window.CV.fields.init(panelElement);
 |---|---|---|
 | `data-diaria-base`, `data-diaria-derivado` | `components/diaria-derivados.js` | Espelha na tela a derivação de 15% e 30% que o modelo faz no `save()` — é pré-visualização, o servidor continua dono do valor |
 | `data-cv-signature-card`, `data-cv-signature-link`, `data-cv-signature-copy`, `data-cv-signature-wa` | `components/signature-actions.js` | Cartão de assinatura: copiar link e enviar por WhatsApp |
-| `data-cv-segment-nav-bound` | `components/segment-nav.js` | Navegação por segmentos — marcador de idempotência (o motor liga por classe, não por atributo) |
 | `data-font-try`, `data-font-sample`, `data-font-try-current`, `data-font-weight-step`, `data-font-weight-current`, `data-font-try-reset` | `components/font-try.js` | Provador de fontes do UI Lab: reescreve `--font-sans` no `<html>` e a interface inteira troca de família, ao vivo. A pilha é lida da amostra vizinha (`data-font-sample`) por `getComputedStyle`, e não de um atributo do botão — gancho impresso com escape quebrava as aspas da pilha. Nada é gravado — recarregar volta ao padrão. Carregado só na galeria |
 | `data-fit-text`, `data-fit-text-min`, `data-fit-text-max` | `components/fit-text.js` | Texto que encolhe até caber em UMA linha, e só o necessário: o CSS declara o corpo ideal, o JS desce dali. `-min` é o piso (padrão 11px); `-max` é gravado pelo próprio motor no primeiro ajuste, para o texto voltar a crescer quando o bloco alargar. Reage a mudança de largura por `ResizeObserver` |
 | `data-download-picker`, `data-download-picker-trigger`, `data-download-picker-list`, `data-download-picker-item`, `data-download-picker-queue`, `data-download-picker-confirm`, `data-download-picker-error` | `components/download-queue.js` | Seletor de download do termo: o gatilho pergunta ao `data-src` o que existe (com um documento só, baixa direto), e a confirmação baixa em FILA, um arquivo de cada vez |

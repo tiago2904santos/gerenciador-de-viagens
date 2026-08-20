@@ -1,33 +1,31 @@
+{% comment %}
+  Migrado para o v2 em 2026-08-20 com o resto da tela do Drive: o aviso de escopo
+  era `gdrive-scope-alert` (título + texto, folha própria) e virou o alerta do
+  sistema, com lista; a ficha da conta era uma `<dl>` com `gdrive-meta` e virou
+  a lista de fatos.
+{% endcomment %}
 {% if drive_escopo_faltante %}
-  <div class="gdrive-scope-alert" role="alert">
-    <p class="gdrive-scope-alert__title">Reconexão necessária</p>
-    <p class="gdrive-scope-alert__text">
-      A autorização salva não inclui todas as permissões necessárias
-      (falta: <strong>{{ drive_escopo_faltante|join:", " }}</strong>). A renovação
-      do token vai falhar e os documentos <strong>não chegam ao Drive</strong>.
-      Clique em <strong>Trocar conta</strong> para reautorizar.
-    </p>
-  </div>
+  <c-v2.alert
+    tone="error"
+    message="Reconexão necessária: a autorização salva não inclui todas as permissões (falta: {{ drive_escopo_faltante|join:', ' }}). A renovação do token vai falhar e os documentos NÃO chegam ao Drive. Clique em Trocar conta para reautorizar."
+  />
 {% endif %}
 {% if drive_autorizado and drive_creds %}
-  <dl class="gdrive-meta">
-    <div class="gdrive-meta__item">
-      <dt class="gdrive-meta__label">Autorizado em</dt>
-      <dd class="gdrive-meta__value">{{ drive_creds.criado_em|date:"d/m/Y H:i" }}</dd>
-    </div>
-    <div class="gdrive-meta__item">
-      <dt class="gdrive-meta__label">Última renovação</dt>
-      <dd class="gdrive-meta__value">{{ drive_creds.atualizado_em|date:"d/m/Y H:i" }}</dd>
-    </div>
+  <div class="fact-list fact-list--band-3">
+    {% with autorizado=drive_creds.criado_em|date:"d/m/Y H:i" %}
+      <c-v2.fact label="Autorizado em" :value="autorizado" />
+    {% endwith %}
+    {% with renovado=drive_creds.atualizado_em|date:"d/m/Y H:i" %}
+      <c-v2.fact label="Última renovação" :value="renovado" />
+    {% endwith %}
     {% if drive_creds.token_expiry %}
-      <div class="gdrive-meta__item">
-        <dt class="gdrive-meta__label">Token expira em</dt>
-        <dd class="gdrive-meta__value">{{ drive_creds.token_expiry|date:"d/m/Y H:i" }}</dd>
-      </div>
+      {% with expira=drive_creds.token_expiry|date:"d/m/Y H:i" %}
+        <c-v2.fact label="Token expira em" :value="expira" />
+      {% endwith %}
     {% endif %}
-  </dl>
+  </div>
 {% else %}
-  <p class="gdrive-hint">
+  <p class="field__help">
     Clique em <strong>Conectar</strong> para autorizar o acesso ao Drive. Você será
     redirecionado ao Google e voltará automaticamente após confirmar.
   </p>

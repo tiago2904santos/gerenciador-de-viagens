@@ -18,6 +18,7 @@ from core import entity_cards
 from core import login_throttle
 from core.errors import capture
 from eventos.models import Evento
+from prestacoes_contas.assinatura_views import FONTES_ASSINATURA
 
 from .forms import AlterarSenhaForm
 from .forms import LoginForm
@@ -286,6 +287,10 @@ def main_preview(request, secao=None):
                 "O período do evento é obrigatório quando não vem do ofício.",
             ),
             "v2_erros_de_campo": ("Este campo é obrigatório.",),
+            # As fontes de assinatura. São as MESMAS de
+            # `prestacoes_contas/assinatura_views.py` — importadas de lá para a
+            # vitrine não inventar uma segunda lista que envelhece sozinha.
+            "v2_fontes_de_assinatura": FONTES_ASSINATURA,
             "v2_etapas": (
                 {"label": "Dados e viajantes", "status": "Concluída", "state": "done"},
                 {"label": "Roteiro e diárias", "status": "Em andamento", "state": "current"},

@@ -10,7 +10,7 @@
   atrás de um `<details>` — quem lê a lista quer saber o que fazer, não a
   mensagem da API do Google.
 {% endcomment %}
-<div class="gdrive-pendencias-list">
+<div class="record-list">
   {% for p in drive_pendencias %}
     <c-v2.record
       :title="p.titulo"
@@ -30,9 +30,11 @@
         </div>
 
         {% if p.detalhe %}
-          <details class="gdrive-pendencia__detalhe">
-            <summary>Detalhes técnicos</summary>
-            <pre class="gdrive-pendencia__erro">{{ p.detalhe }}</pre>
+          <details class="document-inline-card document-inline-card--nested">
+            <summary class="document-inline-card__header">
+              <span class="document-inline-card__title">Detalhes técnicos</span>
+            </summary>
+            <pre class="document-inline-card__body">{{ p.detalhe }}</pre>
           </details>
         {% endif %}
       </c-slot>

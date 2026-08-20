@@ -6,18 +6,6 @@
    Form system — referência visual: Roteiros
    ============================================================ */
 
-.app-page__shell > .roteiro-form-shell {
-  background: var(--route-card-bg);
-  border: 1px solid var(--route-section-border);
-  border-radius: var(--radius-shell);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.65) inset,
-    0 20px 44px rgba(15, 34, 54, 0.1);
-  box-sizing: border-box;
-  padding: clamp(18px, 2.2vw, 26px) clamp(18px, 2.5vw, 28px);
-  width: 100%;
-}
-
 /* --------------------------------------------------------------------------
    1. Estrutura de pagina e secoes
    -------------------------------------------------------------------------- */
@@ -42,76 +30,24 @@
   margin-bottom: 0;
 }
 
-.form-grid {
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-}
-
-.form-grid > * {
-  grid-column: span 6;
-}
-
-.field-span-12 {
-  grid-column: span 12;
-}
-
 /* ============================================================
    Painel grid do design system.
    Tokens de rota; caixa extra só em .app-form-grid-panel.
    ============================================================ */
 
-.app-form-grid-panel {
-  background: var(--route-card-inner-bg);
-  box-sizing: border-box;
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  min-width: 0;
-}
-
-.app-form-grid-panel {
-  border: 1px solid var(--route-card-inner-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-4);
-}
-
 .app-form-grid-panel.align-items-end {
   align-items: end;
 }
 
-.app-form-grid-panel > .field-span-6 {
-  grid-column: span 6;
-}
-
-.app-form-grid-panel > .field-span-4 {
-  grid-column: span 4;
-}
-
-.app-form-grid-panel > .field-span-12 {
-  grid-column: span 12;
-}
-
-@media (max-width: 720px) {
-  .app-form-grid-panel > .field-span-6,
-  .app-form-grid-panel > .field-span-4 {
-    grid-column: span 12;
-  }
-}
 /* --------------------------------------------------------------------------
    2. Campos e controles
    -------------------------------------------------------------------------- */
-.field {
-  display: grid;
-  gap: var(--space-field-gap);
-}
+/* `.field` e `.field label` saíram daqui em 2026-08-20.
 
-.field label {
-  color: var(--color-label);
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  letter-spacing: 0.01em;
-}
+   A classe é do `c-v2.field`, e `v2/field.css` já declarava a grade e o rótulo
+   — menos o `letter-spacing`, a única declaração desta folha que ainda chegava
+   a uma tela migrada (medido no editor de roteiro: era a ÚNICA). O v2 passou a
+   declará-lo, e as telas legadas seguem com `.app-form-field label`. */
 
 .form-control {
   background: var(--color-input-bg);
@@ -138,44 +74,17 @@
   width: 18px;
 }
 
-.field-error {
-  color: var(--color-danger);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  margin-bottom: 0;
-}
-.app-page--roteiros-form .btn-primary {
-  background: var(--route-button-primary-bg);
-  border-color: var(--route-button-primary-border);
-  color: var(--route-button-primary-text);
-}
-
-.app-page--roteiros-form .btn-primary:hover,
-.app-page--roteiros-form .btn-primary:focus-visible {
-  background: var(--route-button-primary-hover-bg);
-  border-color: var(--route-button-primary-hover-border);
-  color: var(--route-button-primary-text);
-}
-
-.app-page--roteiros-form .btn-secondary,
 .app-page--roteiros-form .btn-outline-secondary {
   background: var(--route-button-secondary-bg);
   border-color: var(--route-button-secondary-border);
   color: var(--route-button-secondary-text);
 }
 
-.app-page--roteiros-form .btn-secondary:hover,
-.app-page--roteiros-form .btn-secondary:focus-visible,
 .app-page--roteiros-form .btn-outline-secondary:hover,
 .app-page--roteiros-form .btn-outline-secondary:focus-visible {
   background: var(--route-button-secondary-hover-bg);
   border-color: var(--route-button-secondary-hover-border);
   color: var(--route-button-secondary-text);
-}
-
-.app-page--roteiros-form .btn:focus-visible {
-  box-shadow: 0 0 0 3px var(--route-focus-ring), var(--shadow-xs);
-  outline: none;
 }
 
 .form-actions,
@@ -186,64 +95,6 @@
   gap: var(--space-3);
   justify-content: flex-end;
   padding: var(--space-3) var(--space-5) var(--space-3) 0;
-}
-
-.roteiro-form--legacy-roteiro .travel-document-wizard-footer-actions .btn,
-.roteiro-editor__actions .btn {
-  border-radius: var(--radius-pill);
-  min-height: var(--control-height-md);
-  padding-left: var(--space-5);
-  padding-right: var(--space-5);
-}
-
-.roteiro-editor__actions .btn-primary {
-  background: var(--route-button-primary-bg);
-  border-color: var(--route-button-primary-border);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.12) inset,
-    0 8px 18px rgba(11, 58, 102, 0.28);
-  color: var(--route-button-primary-text);
-}
-
-.roteiro-editor__actions .btn-primary:hover,
-.roteiro-editor__actions .btn-primary:focus-visible {
-  background: var(--route-button-primary-hover-bg);
-  border-color: var(--route-button-primary-hover-border);
-  color: var(--route-button-primary-text);
-}
-
-.roteiro-editor__actions .btn-outline-secondary,
-.roteiro-editor__actions .btn-secondary {
-  background: var(--route-button-secondary-bg);
-  border-color: var(--route-button-secondary-border);
-  color: var(--route-button-secondary-text);
-}
-
-.roteiro-editor__actions .btn-outline-secondary:hover,
-.roteiro-editor__actions .btn-outline-secondary:focus-visible,
-.roteiro-editor__actions .btn-secondary:hover,
-.roteiro-editor__actions .btn-secondary:focus-visible {
-  background: var(--route-button-secondary-hover-bg);
-  border-color: var(--route-button-secondary-hover-border);
-  color: var(--route-button-secondary-text);
-}
-
-/* --------------------------------------------------------------------------
-   3. Responsividade da grade
-   -------------------------------------------------------------------------- */
-@media (max-width: 900px) {
-  .form-grid > * {
-    grid-column: span 12;
-  }
-}
-
-/* --------------------------------------------------------------------------
-   4. Card-toggle (BooleanField)
-   -------------------------------------------------------------------------- */
-/* Card toggle global para BooleanFields visiveis.
-   Usa tokens danger/success (adaptam light/dark) — sem pastéis claros fixos. */
-.field-card-toggle {
-  grid-column: span 6;
 }
 
 .app-card-toggle {
@@ -282,68 +133,6 @@
   outline-offset: 2px;
 }
 
-.app-card-toggle__icon {
-  align-items: center;
-  background: var(--color-danger-soft);
-  border: 1px solid var(--color-danger-border-strong);
-  border-radius: 10px;
-  /* Mix com heading: escurece no light e clareia no dark (≥ 4,5:1). */
-  color: color-mix(in srgb, var(--color-danger) 75%, var(--color-heading));
-  display: inline-flex;
-  font-size: 12px;
-  font-weight: 900;
-  height: 32px;
-  justify-content: center;
-  letter-spacing: 0;
-  min-width: 32px;
-  padding: 0 8px;
-}
-
-.app-card-toggle__content {
-  display: grid;
-  gap: 1px;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.app-card-toggle__title {
-  color: var(--color-heading);
-  font-size: 15px;
-  font-weight: 800;
-  line-height: 1.1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.app-card-toggle__description {
-  color: var(--color-description);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.15;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.app-card-toggle__state {
-  align-items: center;
-  background: color-mix(in srgb, var(--color-danger) 16%, var(--color-danger-soft));
-  border: 0;
-  border-radius: var(--radius-pill);
-  color: color-mix(in srgb, var(--color-danger) 75%, var(--color-heading));
-  display: inline-flex;
-  font-size: 12px;
-  font-weight: 900;
-  height: 26px;
-  justify-content: center;
-  letter-spacing: 0;
-  min-width: 74px;
-  padding: 0 12px;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
 .app-card-toggle:hover {
   border-color: var(--color-danger-border-strong);
   box-shadow: var(--shadow-xs);
@@ -379,62 +168,6 @@
   transform: none;
 }
 
-/* --------------------------------------------------------------------------
-   4.1 Field option card — checkbox compacto em linha (variante leve)
-   Usar compact=True no include de card_toggle.html.
-   -------------------------------------------------------------------------- */
-.field-option-card-wrap {
-  display: grid;
-}
-
-.field-option-card {
-  align-items: center;
-  background: var(--color-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-control);
-  cursor: pointer;
-  display: flex;
-  gap: var(--space-3);
-  min-height: var(--control-height-md);
-  padding: 0 var(--space-3);
-  transition:
-    border-color var(--transition-base),
-    background var(--transition-base);
-  user-select: none;
-  width: 100%;
-}
-
-.field-option-card:hover {
-  border-color: var(--color-primary);
-}
-
-.field-option-card:focus-within {
-  box-shadow: 0 0 0 3px var(--color-focus-ring, rgba(21, 91, 154, 0.22));
-  outline: none;
-}
-
-.field-option-card input[type="checkbox"] {
-  accent-color: var(--color-accent);
-  flex-shrink: 0;
-  height: 18px;
-  width: 18px;
-}
-
-.field-option-card__label {
-  color: var(--color-heading);
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.field-option-card__hint {
-  color: var(--color-help);
-  font-size: var(--font-size-xs);
-  font-weight: 500;
-  line-height: 1.3;
-  margin-top: 2px;
-}
-
 .field-control-row .form-select,
 .field-control-row .form-control {
   flex: 1 1 0;
@@ -445,19 +178,10 @@
    5. Responsividade de acao lateral
    -------------------------------------------------------------------------- */
 @media (max-width: 640px) {
-  .form-field-with-action__button {
-    width: 100%;
-  }
-
   .app-card-toggle {
     align-items: start;
     grid-template-columns: auto minmax(0, 1fr);
     width: 100%;
-  }
-
-  .app-card-toggle__state {
-    grid-column: 2;
-    justify-self: start;
   }
 }
 
@@ -512,8 +236,7 @@ html[data-theme="dark"] input[type="checkbox"] {
    existentes. Classes legadas (.field, .form-grid, etc.) nao removidas.
    ========================================================================== */
 
-.app-form-field,
-.field {
+.app-form-field {
   align-content: start;
   align-self: start;
   display: grid;
@@ -521,8 +244,7 @@ html[data-theme="dark"] input[type="checkbox"] {
 }
 
 .app-form-label,
-.app-form-field label,
-.field label {
+.app-form-field label {
   color: var(--color-label);
   font-size: var(--font-size-sm);
   font-weight: 700;
@@ -534,43 +256,6 @@ html[data-theme="dark"] input[type="checkbox"] {
   color: var(--color-help);
   font-size: var(--font-size-sm);
   margin-bottom: 0;
-}
-
-.app-form-error,
-.field-error {
-  color: var(--color-danger);
-  font-size: var(--font-size-sm);
-  margin-top: var(--space-1);
-}
-
-.app-form-grid {
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-}
-
-.app-form-grid > * {
-  grid-column: span 6;
-}
-
-.app-form-grid > .field-span-12 {
-  grid-column: span 12;
-}
-
-.app-form-grid > .field-span-8 {
-  grid-column: span 8;
-}
-
-.app-form-grid > .field-span-6 {
-  grid-column: span 6;
-}
-
-.app-form-grid > .field-span-4 {
-  grid-column: span 4;
-}
-
-.app-form-grid > .field-span-2 {
-  grid-column: span 2;
 }
 
 .app-form-section {
@@ -591,63 +276,6 @@ html[data-theme="dark"] input[type="checkbox"] {
 
 .app-wizard {
   container-type: inline-size;
-}
-
-.app-wizard__top {
-  background: var(--color-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-panel);
-  overflow: hidden;
-}
-
-.app-wizard__header {
-  align-items: center;
-  background:
-    linear-gradient(135deg, rgba(11, 58, 102, 0.96), rgba(21, 91, 154, 0.92)),
-    var(--color-primary);
-  border: 0;
-  color: var(--color-white);
-  display: flex;
-  gap: var(--space-4);
-  justify-content: space-between;
-  min-height: 108px;
-  padding: var(--space-5) var(--space-5) var(--space-6);
-}
-
-.app-wizard__header-copy {
-  display: grid;
-  gap: var(--space-1);
-  min-width: 0;
-}
-
-.app-wizard__title {
-  color: var(--color-white);
-  font-size: var(--font-size-2xl);
-  font-weight: 800;
-  line-height: 1.1;
-  margin: 0;
-}
-
-.app-wizard__subtitle {
-  color: var(--color-accent-soft);
-  font-size: var(--font-size-lg);
-  font-weight: 800;
-  margin: 0;
-}
-
-.app-wizard__layout {
-  align-items: start;
-  display: grid;
-  gap: var(--space-5);
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.app-wizard__actions {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
 }
 
 /* ==========================================================================
@@ -778,12 +406,6 @@ html[data-theme="dark"] input[type="checkbox"] {
   min-height: var(--form-control-height);
 }
 
-.main-form-panel .search-picker__input {
-  line-height: 1.25;
-  min-height: 0;
-  padding: 0 5px;
-}
-
 .main-form-panel .field-with-action {
   align-items: center;
   min-height: var(--form-control-height);
@@ -837,85 +459,6 @@ html[data-theme="dark"] input[type="checkbox"] {
 
 .main-form-panel .field-with-action--manage-reveal .custom-select__trigger {
   width: 100%;
-}
-
-.main-form-panel .field-with-action--manage-reveal > .icon-btn--field-manage {
-  height: var(--field-manage-btn-size);
-  max-height: var(--field-manage-btn-size);
-  min-height: var(--field-manage-btn-size);
-  opacity: 0;
-  pointer-events: none;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  transition: opacity var(--transition-fast);
-  width: var(--field-manage-btn-size);
-  z-index: 1;
-}
-
-.main-form-panel .field-with-action--manage-reveal:hover > .icon-btn--field-manage,
-.main-form-panel .field-with-action--manage-reveal:focus-within > .icon-btn--field-manage {
-  opacity: 1;
-  pointer-events: auto;
-  z-index: 5;
-}
-
-/* Search picker + gerenciar: mesmo padrão do cargo (reveal no hover).
-   O botão fica irmão do controle dentro de `.search-picker__field`,
-   alinhado à linha do input — não dentro do controle. */
-.main-form-panel .field-with-action--search-picker .search-picker__field {
-  position: relative;
-}
-
-.main-form-panel .field-with-action--search-picker .search-picker__control {
-  box-sizing: border-box;
-  max-width: 100%;
-  min-width: 0;
-  transition: width var(--transition-fast), max-width var(--transition-fast);
-  width: 100%;
-}
-
-.main-form-panel .field-with-action--search-picker:hover .search-picker__control,
-.main-form-panel .field-with-action--search-picker:focus-within .search-picker__control {
-  max-width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
-  width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
-}
-
-.main-form-panel .field-with-action--search-picker .search-picker__field > .icon-btn--field-manage {
-  height: var(--field-manage-btn-size);
-  max-height: var(--field-manage-btn-size);
-  min-height: var(--field-manage-btn-size);
-  opacity: 0;
-  pointer-events: none;
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  transform: none;
-  transition: opacity var(--transition-fast);
-  width: var(--field-manage-btn-size);
-  z-index: 1;
-}
-
-.main-form-panel .field-with-action--search-picker:hover .search-picker__field > .icon-btn--field-manage,
-.main-form-panel .field-with-action--search-picker:focus-within .search-picker__field > .icon-btn--field-manage {
-  opacity: 1;
-  pointer-events: auto;
-  z-index: 5;
-}
-
-/* Search picker single: só label interna + controle (sem painel de selecionados) */
-.main-form-panel .search-picker:not(:has(.search-picker__selected-panel)) {
-  gap: var(--space-2);
-}
-
-.main-form-panel .search-picker__field {
-  gap: var(--space-2);
-}
-
-/* Motoristas / multiselect: busca alinhada; painel de chips abaixo */
-.main-form-panel .search-picker:has(.search-picker__selected-panel) {
-  gap: var(--space-3);
 }
 
 /* Painel de motoristas fixos — desce ao ativar "Com Motorista" */

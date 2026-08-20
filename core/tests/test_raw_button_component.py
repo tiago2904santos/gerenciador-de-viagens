@@ -68,21 +68,16 @@ class RawButtonComponentTests(SimpleTestCase):
 
         self.assertEqual(failures, [])
 
-    def test_primitiva_flat_e_a_unica_excecao_e_preserva_acessibilidade(self):
-        self.assertEqual(
-            migrar_botoes_cotton.CANONICAL_RAW_BUTTON_TEMPLATES,
-            {"includes/performance/icon_control_flat.html"},
-        )
-        source = (
-            migrar_botoes_cotton.ROOT
-            / "templates"
-            / "includes"
-            / "performance"
-            / "icon_control_flat.html"
-        ).read_text(encoding="utf-8")
+    def test_a_primitiva_flat_nao_voltou(self):
+        """`includes/performance/` foi apagado em 2026-08-20.
 
-        self.assertIn('type="button"', source)
-        self.assertIn('aria-label="{{ aria_label }}"', source)
+        Eram dois parciais com botão cru — a exceção ao contrato — e **nenhum
+        template os incluía**. Eles sustentavam sozinhos a última classe
+        `icon-btn` do sistema, e com ela a folha `actions/buttons.css`.
+        """
+        self.assertFalse(
+            (migrar_botoes_cotton.ROOT / "templates" / "includes" / "performance").exists()
+        )
 
     def test_templates_migrados_compilam(self):
         for path in migrar_botoes_cotton.targets():

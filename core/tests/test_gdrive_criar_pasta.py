@@ -126,6 +126,6 @@ class CriacaoContinuaAcontecendoTests(SimpleTestCase):
         self.assertIn("window.CV.http.fetchJson(urlCriar", corpo)
         self.assertIn('method: "POST"', corpo)
         self.assertIn("await loadPastas(currentPaiId())", corpo)
-        self.assertIn(".gdrive-folder-item__select", _bloco_a_partir_de(
+        self.assertIn(".folder-row__select", _bloco_a_partir_de(
             "function selecionarPastaCriada("
         ))

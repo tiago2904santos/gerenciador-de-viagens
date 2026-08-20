@@ -36,8 +36,7 @@ _CSS_VALUE = re.compile(r":\s*.+")
 # Arquivos novos da fase 13 — devem estar 100% livres de literais.
 STRICT_COLOR_LITERAL_FILES = {
     "static/css/feedback/notice.css",
-    "static/css/feedback/metric.css",
-}
+    }
 
 # Baseline medido em 30/07/2026 antes da fase 14; o gate falha se a dívida subir.
 COLOR_LITERAL_BASELINE = 660
@@ -59,10 +58,6 @@ CRITICAL_CANONICAL_CLASSES = {
     "notice--warning",
     "notice--danger",
     "notice-stack",
-    "metric",
-    "metric--tile",
-    "metric-grid",
-    "metric-grid--4",
 }
 
 
@@ -138,7 +133,9 @@ def _css_bundle_text() -> str:
 class CssTokenGateTests(SimpleTestCase):
     def test_form_block_usa_o_passo_de_14px_da_escala(self):
         tokens = (CSS_DIR / "base" / "tokens.css").read_text(encoding="utf-8")
-        sections = (CSS_DIR / "fields" / "form-sections.css").read_text(encoding="utf-8")
+        # `fields/form-sections.css` era a BASE do `form_block` do v2 e foi
+        # fundida na folha do componente em 2026-08-20, com a pasta `fields/`.
+        sections = (CSS_DIR / "v2" / "form-block.css").read_text(encoding="utf-8")
 
         self.assertIn("--space-3-5: 14px;", tokens)
         self.assertIn("padding: var(--space-3-5);", sections)
@@ -211,14 +208,14 @@ class CssTokenGateTests(SimpleTestCase):
         )
 
     def test_critical_templates_emit_canonical_notice_and_metric_classes(self):
-        """Templates migrados emitem os contratos v2 de alerta e métrica."""
+        """Templates migrados emitem os contratos v2 de alerta e grade."""
         expectations = {
             "templates/cotton/v2/alert.html": ("alert", "data-tone"),
             "templates/base.html": ("<c-v2.alert",),
-            # `summary_card.html` saiu com o painel de `/`; `metric` continua
-            # sendo o canônico e é medido em quem ainda o usa.
+            # `summary_card.html` saiu com o painel de `/`, e `metric` saiu
+            # com ele: o painel era o único consumidor da folha.
             "templates/planos_trabalho/partials/_resumo_evento_body.html": ("fact-list",),
-            "templates/core/dashboard.html": ("metric-grid",),
+            "templates/core/dashboard.html": ("module-card-grid",),
         }
         for rel_path, tokens in expectations.items():
             text = (ROOT / rel_path).read_text(encoding="utf-8")
@@ -226,14 +223,12 @@ class CssTokenGateTests(SimpleTestCase):
                 with self.subTest(template=rel_path, token=token):
                     self.assertIn(token, text)
 
-    def test_base_html_links_shell_bundle_with_notice_and_metric(self):
-        """NOVO-12: o shell entrega um CSS; notice/metric entram via bundle gerado."""
+    def test_base_html_links_shell_bundle_with_notice(self):
+        """NOVO-12: o shell entrega um CSS; o alerta entra via bundle gerado."""
         base = (ROOT / "templates" / "base.html").read_text(encoding="utf-8")
         self.assertIn("css/shell.bundle.css", base)
         self.assertNotIn("css/feedback/notice.css", base)
-        self.assertNotIn("css/feedback/metric.css", base)
         bundle = (ROOT / "static" / "css" / "shell.bundle.css").read_text(
             encoding="utf-8"
         )
         self.assertIn(">>> css/feedback/notice.css >>>", bundle)
-        self.assertIn(">>> css/feedback/metric.css >>>", bundle)

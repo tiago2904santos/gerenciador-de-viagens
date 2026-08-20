@@ -24,6 +24,21 @@ COMPONENTE = ROOT / "templates" / "cotton" / "v2" / "picker.html"
 
 MINIMO = '{% cotton v2.picker mode="multi" name="equipe" only / %}'
 
+DIVISA = "/* === DELTA v2 === */"
+
+
+def delta(caminho: Path) -> str:
+    """A metade v2 da folha — o que vem depois da divisa.
+
+    As folhas do v2 passaram a guardar a BASE do componente junto com o delta
+    (fusão de 2026-08-20, que apagou a pasta `fields/`). Sem o corte, cada
+    asserção daqui encontra primeiro a regra base que o delta sobrescreve — e
+    reprova descrevendo corretamente o que a tela mostra.
+    """
+    texto = caminho.read_text(encoding="utf-8")
+    return texto[texto.index(DIVISA) + len(DIVISA) :]
+
+
 
 def render(source: str, **contexto) -> str:
     return Template("{% load cotton %}" + source).render(Context(contexto))
@@ -106,9 +121,7 @@ class ContratoComOMotorTests(SimpleTestCase):
 
 class AparenciaTests(SimpleTestCase):
     def setUp(self):
-        self.css = re.sub(
-            r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.DOTALL
-        )
+        self.css = re.sub(r"/\*.*?\*/", "", delta(CSS), flags=re.DOTALL)
 
     def _bloco(self, marca: str) -> str:
         i = self.css.index(marca)

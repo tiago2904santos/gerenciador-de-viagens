@@ -7,17 +7,17 @@
   `danger`, que é o que ele faz: apaga os tokens salvos.
 {% endcomment %}
 {% if drive_autorizado and drive_creds %}
-  <div class="gdrive-actions gdrive-actions--head">
+  <div class="form-block__actions">
     {% url 'google_drive:oauth_iniciar' as trocar_url %}
     <c-v2.button label="Trocar conta" variant="secondary" :href="trocar_url" />
     <form method="post" action="{% url 'google_drive:oauth_revogar' %}"
           data-confirm-submit data-confirm-message="Desconectar a conta Google vai remover os tokens salvos. Continuar?">
       {% csrf_token %}
-      <c-v2.button label="Desconectar" variant="danger" type="submit" extra_class="gdrive-btn-unlink" />
+      <c-v2.button label="Desconectar" variant="danger" type="submit" />
     </form>
   </div>
 {% else %}
-  <div class="gdrive-actions gdrive-actions--head">
+  <div class="form-block__actions">
     {% url 'google_drive:oauth_iniciar' as conectar_url %}
     <c-v2.button label="Conectar conta Google" variant="primary" :href="conectar_url" />
   </div>

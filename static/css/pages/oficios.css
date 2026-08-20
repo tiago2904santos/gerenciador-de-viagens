@@ -96,81 +96,10 @@
   line-height: 1.5;
 }
 
-/* Wizard Ofício: wrappers empilham linhas internas, não field-span no container */
-.oficio-data-block.app-form-grid-panel {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.oficio-equipe-picker__selected-panel.app-form-grid-panel {
-  gap: var(--space-3);
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.app-multiselect {
-  position: relative;
-  width: 100%;
-}
-
-.oficio-equipe-section {
-  display: grid;
-  gap: var(--space-5);
-}
-
-.oficio-equipe-section__header {
-  align-items: flex-start;
-  border-bottom: 1px solid var(--color-border-soft);
-  display: flex;
-  gap: var(--space-4);
-  justify-content: space-between;
-  padding-bottom: var(--space-4);
-}
-
-.oficio-equipe-section__copy {
-  display: grid;
-  gap: var(--space-2);
-  min-width: 0;
-}
-
-.oficio-equipe-section__copy h3,
-.oficio-equipe-section__copy p {
-  margin: 0;
-}
-
-.oficio-equipe-section__copy h3 {
-  color: var(--color-heading);
-  font-size: var(--font-size-lg);
-  font-weight: 800;
-}
-
-.oficio-equipe-section__copy p {
-  color: var(--color-description);
-  font-size: var(--font-size-md);
-  line-height: 1.45;
-}
-
 @media (max-width: 720px) {
-  .oficio-equipe-section__header {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
   .oficio-equipe-section__header .btn {
     justify-content: center;
     width: 100%;
-  }
-
-  .oficio-equipe-picker__selected-list {
-    grid-template-columns: 1fr;
-  }
-
-  .oficio-equipe-picker__selected-card:only-child,
-  .oficio-equipe-picker__selected-card:last-child:nth-child(odd) {
-    grid-column: auto;
-  }
-
-  .oficio-viajante-card__termo {
-    align-items: stretch;
-    grid-template-columns: 1fr;
   }
 }
 
@@ -179,13 +108,6 @@
 }
 
 /* Botões do footer: altura padrão do sistema de botões */
-.travel-document-wizard__actions .cv-btn {
-  font-size:  var(--font-size-sm);
-  height:     var(--control-height-md);
-  min-height: var(--control-height-md);
-  max-height: var(--control-height-md);
-  padding:    0 var(--space-4);
-}
 
 .travel-document-wizard__main .form-section-stack--comfortable {
   --_stack-gap: var(--space-6);
@@ -197,51 +119,7 @@
   margin-top: calc(-1 * var(--space-6));
 }
 
-@media (max-width: 900px) {
-  .travel-document-wizard__layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 640px) {
-  .travel-document-wizard__header {
-    align-items: flex-start;
-  }
-
-  .travel-document-wizard__title {
-    font-size: var(--font-size-xl);
-  }
-
-  .travel-document-wizard__subtitle {
-    font-size: var(--font-size-md);
-  }
-
-  .travel-document-wizard__actions > * {
-    width: 100%;
-  }
-}
-
 .travel-document-wizard__main {
-  min-width: 0;
-}
-
-.oficio-data-grid--two {
-  align-items: stretch;
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.oficio-data-grid--full {
-  align-items: stretch;
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.oficio-data-grid__field {
-  display: flex;
-  flex-direction: column;
   min-width: 0;
 }
 
@@ -251,33 +129,6 @@
 
 .oficio-data-observacao .field {
   max-width: none;
-}
-
-@media (max-width: 1080px) {
-  .oficio-data-grid--four,
-  .oficio-data-grid--three,
-  .oficio-data-grid--two {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 600px) {
-  .oficio-data-grid--four,
-  .oficio-data-grid--three,
-  .oficio-data-grid--two {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-.oficio-transporte-card__header-actions {
-  display: flex;
-  flex-shrink: 0;
-  gap: var(--space-2);
-  justify-content: flex-end;
-}
-
-.oficio-transporte-card__header-actions--split {
-  flex-wrap: wrap;
 }
 
 .oficio-viatura-busca__wrap {
@@ -295,20 +146,6 @@
    especificidade em alguns contextos do wizard. */
 .oficio-viatura-manual.form-field--hidden {
   display: none !important;
-}
-
-/* Picker de viatura: variação tonal do chip de motivo (Motorista / Unidade)
-   sobre a base visual do .search-picker__driver-chip. */
-.oficio-viatura-reason--motorista {
-  background: color-mix(in srgb, var(--color-accent, #d8a21b) 18%, transparent);
-  border-color: var(--stepper-done-border, var(--border-subtle));
-  color: var(--color-accent, var(--stepper-done-color));
-}
-
-.oficio-viatura-reason--unidade {
-  background: color-mix(in srgb, var(--color-primary, #0b3a66) 14%, transparent);
-  border-color: var(--border-stepper, var(--border-subtle));
-  color: var(--color-primary-bright, var(--text-primary));
 }
 
 /* Card da viatura selecionada — usa o slot do __driver-control para o
@@ -349,11 +186,6 @@
 }
 
 @media (max-width: 600px) {
-  .motivo-card__actions {
-    margin-left: 0;
-    width: 100%;
-  }
-
   .motivo-card__actions .btn {
     width: 100%;
   }
@@ -363,29 +195,12 @@
    Wizard — Etapa 5 Documentos / resumo executivo
    -------------------------------------------------------------------------- */
 
-.oficio-documentos-summary {
-  align-items: flex-start;
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-panel);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4);
-  justify-content: space-between;
-  margin-bottom: var(--space-4);
-  padding: var(--space-4);
-}
-
 /* ── Viajantes (Documentos) — tiles iguais aos facts do Resumo ──────── */
 .oficio-documentos-travellers-grid {
   display: grid;
   gap: var(--space-2);
   grid-template-columns: repeat(2, minmax(0, 1fr));
   min-width: 0;
-}
-
-.oficio-documentos-travellers-grid--single {
-  grid-template-columns: 1fr;
 }
 
 .oficio-documentos-travellers-grid:not(.oficio-documentos-travellers-grid--single)
@@ -403,13 +218,6 @@
   grid-template-columns: 40px minmax(0, 1fr) auto;
   min-width: 0;
   padding: 10px 12px;
-}
-
-/* Motorista: mesmos tokens do roster Equipe (tint + borda + filete) */
-.oficio-documentos-traveller-tile--motorista {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-muted, var(--color-card-muted)));
-  border-color: var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 40%, var(--color-border-soft)));
-  box-shadow: inset 4px 0 0 var(--color-accent);
 }
 
 .oficio-documentos-traveller-tile__avatar {
@@ -485,110 +293,11 @@
   white-space: nowrap;
 }
 
-.oficio-documentos-traveller-tile__termo {
-  align-items: center;
-  align-self: center;
-  border-left: 1px solid var(--color-border-soft);
-  color: var(--color-muted-strong, var(--color-muted));
-  display: inline-flex;
-  flex-shrink: 0;
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  gap: 6px;
-  grid-column: 3;
-  line-height: 1.3;
-  margin-left: auto;
-  min-height: 32px;
-  padding-left: 10px;
-  white-space: nowrap;
-}
-
-.oficio-documentos-traveller-tile__termo-dot {
-  background: currentColor;
-  border-radius: 50%;
-  flex-shrink: 0;
-  height: 7px;
-  width: 7px;
-}
-
-.oficio-documentos-traveller-tile__termo--sim {
-  color: var(--color-success);
-}
-
-.oficio-documentos-traveller-tile__termo--nao {
-  color: var(--color-danger);
-}
-
-.oficio-documentos-travellers-empty {
-  color: var(--color-muted);
-  font-size: var(--font-size-sm);
-  font-style: italic;
-  font-weight: 500;
-  grid-column: 1 / -1;
-  line-height: 1.45;
-  margin: 0;
-}
-
-.oficio-documentos-vehicle-executive {
-  display: grid;
-  gap: var(--space-3);
-  grid-template-columns: 1fr;
-}
-
-.oficio-documentos-vehicle-executive__hero,
-.oficio-documentos-vehicle-executive__facts,
-.oficio-documentos-vehicle-executive__driver {
-  background: var(--color-card-muted);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-control);
-  padding: var(--space-4);
-}
-
-.oficio-documentos-vehicle-executive__driver {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  justify-content: center;
-  min-width: 0;
-}
-
 /* ── Responsividade — viajantes ────────────────────────────────────── */
 @media (max-width: 720px) {
   .oficio-documentos-travellers-grid {
     grid-template-columns: 1fr;
   }
-
-  .oficio-documentos-traveller-line {
-    flex-basis: 100%;
-  }
-}
-
-@media (min-width: 721px) and (max-width: 800px) {
-  .oficio-documentos-traveller-line {
-    flex-basis: 45%;
-  }
-}
-
-/* ── Responsividade — transporte ───────────────────────────────────── */
-@media (min-width: 820px) {
-  .oficio-documentos-vehicle-executive {
-    align-items: stretch;
-    grid-template-columns: minmax(160px, 220px) 1fr minmax(160px, 220px);
-  }
-}
-
-@media (max-width: 520px) {
-  .oficio-documentos-vehicle-executive__facts {
-    grid-template-columns: 1fr;
-  }
-}
-
-.oficio-documentos-card {
-  background: var(--color-card);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
 }
 
 .oficio-documentos-card__body {
@@ -637,55 +346,6 @@
   word-break: break-word;
 }
 
-/* Resumo de roteiro (etapa documentos) — shell transparente; poço só nos tiles internos */
-.oficio-documentos-route-card {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  box-sizing: border-box;
-  display: grid;
-  gap: var(--space-2);
-  margin: 0;
-  overflow: visible;
-  padding: 0;
-}
-
-.oficio-documentos-route-card__head {
-  border-bottom: 1px solid var(--color-border-soft);
-  margin-bottom: var(--space-3);
-  padding-bottom: var(--space-3);
-}
-
-.oficio-documentos-route-card__eyebrow {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  margin: 0 0 var(--space-2);
-  text-transform: uppercase;
-}
-
-.oficio-documentos-route-card__title-row {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-3);
-  justify-content: space-between;
-}
-
-.oficio-documentos-route-card__title {
-  color: var(--color-heading);
-  flex: 1 1 12rem;
-  font-size: var(--font-size-md);
-  font-weight: 800;
-  letter-spacing: 0;
-  line-height: 1.25;
-  margin: 0;
-  min-width: 0;
-  word-break: break-word;
-}
-
 .oficio-documentos-route-card__status-chip.status-chip--draft,
 .oficio-documentos-route-card__status-chip.chip--warning {
   background: var(--route-status-draft-bg);
@@ -705,299 +365,6 @@
   background: var(--route-status-muted-bg);
   border-color: var(--route-status-muted-border);
   color: var(--route-status-muted-text);
-}
-
-.oficio-documentos-route-card__subtitle {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  line-height: 1.35;
-  margin: var(--space-2) 0 0;
-  max-width: 56ch;
-}
-
-.oficio-documentos-route-card__body {
-  align-items: stretch;
-  display: grid;
-  gap: var(--space-3);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: var(--space-1);
-}
-
-.oficio-documentos-route-card__trechos-col {
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  grid-column: 1;
-  grid-row: 1;
-  min-width: 0;
-}
-
-.oficio-documentos-route-card__diarias-col {
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
-  grid-column: 2;
-  grid-row: 1;
-  height: auto;
-  min-height: 0;
-  min-width: 0;
-}
-
-.oficio-documentos-route-card__diarias-box {
-  background: var(--color-card-muted);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-md);
-  box-sizing: border-box;
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  gap: var(--space-2);
-  height: auto;
-  min-height: 0;
-  padding: var(--space-3) var(--space-4) var(--space-4);
-}
-
-.oficio-documentos-route-card__diarias-box-title {
-  color: var(--color-heading);
-  display: block;
-  font-size: var(--font-size-xs);
-  font-weight: 800;
-  letter-spacing: 0;
-  line-height: 1.2;
-  margin-bottom: var(--space-1);
-  padding: var(--space-1) var(--space-1) 0;
-  text-transform: uppercase;
-}
-
-.oficio-documentos-route-card__diarias-box-panels {
-  align-items: stretch;
-  display: grid;
-  flex: 1 1 auto;
-  gap: var(--space-2);
-  grid-template-columns: 1fr 1fr;
-  min-height: 0;
-  min-width: 0;
-}
-
-.oficio-documentos-route-card__diarias-subblock {
-  align-items: flex-start;
-  background: var(--color-card-muted);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-md);
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  justify-content: flex-start;
-  min-width: 0;
-  padding: var(--space-3) var(--space-4);
-  text-align: left;
-}
-
-.oficio-documentos-route-card__diarias-panel-heading {
-  color: var(--color-muted);
-  display: block;
-  font-size: var(--font-size-xs);
-  font-weight: 800;
-  letter-spacing: 0;
-  margin-bottom: var(--space-1);
-  text-transform: uppercase;
-}
-
-.oficio-documentos-route-card__diarias-panel-line {
-  color: var(--color-heading);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  line-height: 1.35;
-  margin: 0;
-  word-break: break-word;
-}
-
-.oficio-documentos-route-card__diarias-panel-line--moeda {
-  font-size: clamp(1.12rem, 1.5vw, 1.35rem);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0;
-  line-height: 1.25;
-}
-
-.oficio-documentos-route-card__diarias-panel-line--muted {
-  color: var(--color-muted);
-  font-weight: var(--font-weight-medium);
-}
-
-.oficio-documentos-route-card__diarias-panel-line--strong {
-  font-size: clamp(1.15rem, 1.6vw, 1.35rem);
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.oficio-documentos-route-card__diarias-metric-value {
-  align-items: center;
-  display: flex;
-  flex: 1 1 auto;
-  justify-content: flex-start;
-  min-height: 0;
-  width: 100%;
-}
-
-.oficio-documentos-route-card__diarias-metric {
-  background: var(--color-card-muted);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-md);
-  box-sizing: border-box;
-  min-width: 0;
-  padding: var(--space-4);
-}
-
-.oficio-documentos-route-card__diarias-metric {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  min-height: 0;
-}
-
-.oficio-documentos-route-card__diarias-extenso-label {
-  margin-top: 12px;
-}
-
-.oficio-documentos-route-card__diarias-extenso {
-  color: var(--color-heading);
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  line-height: 1.4;
-  margin: 0;
-  overflow-wrap: anywhere;
-}
-
-.oficio-documentos-route-card__trecho {
-  background: var(--color-card-muted);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-md);
-  box-sizing: border-box;
-  flex-shrink: 0;
-  padding: var(--space-2) var(--space-3);
-  width: 100%;
-}
-
-.oficio-documentos-route-card__fallback-facts {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  width: 100%;
-}
-
-.oficio-documentos-route-card__fallback-fact {
-  background: var(--color-card-muted);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
-}
-
-.oficio-documentos-route-card__fallback-label {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 800;
-  text-transform: uppercase;
-}
-
-.oficio-documentos-route-card__fallback-value {
-  color: var(--color-heading);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  line-height: 1.35;
-  word-break: break-word;
-}
-
-.oficio-documentos-route-card--layout-diarias-dashboard .oficio-documentos-route-card__diarias-panel-heading {
-  font-size: var(--font-size-xs);
-}
-
-@media (max-width: 1080px) {
-  .oficio-documentos-route-card__body {
-    grid-template-columns: minmax(0, 1.5fr) minmax(240px, 1fr);
-  }
-}
-
-@media (max-width: 900px) {
-  .oficio-documentos-route-card__body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-  }
-
-  .oficio-documentos-route-card__trechos-col {
-    grid-column: unset;
-    grid-row: unset;
-  }
-
-  .oficio-documentos-route-card__diarias-col {
-    flex: 0 1 auto;
-    grid-column: unset;
-    grid-row: unset;
-    width: 100%;
-  }
-
-  .oficio-documentos-route-card__diarias-box {
-    flex: 0 1 auto;
-  }
-
-  .oficio-documentos-route-card__diarias-box-panels {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .oficio-documentos-route-card__diarias-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(180px, 0.8fr);
-  }
-
-  .oficio-documentos-route-card__metrics {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 520px) {
-  .oficio-documentos-route-card__diarias-box-panels,
-  .oficio-documentos-route-card__diarias-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (min-width: 640px) {
-  .oficio-documentos-justification-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 520px) {
-  .oficio-documentos-summary {
-    flex-direction: column;
-  }
-}
-
-/* ── Sugestões de viatura (step 1 do wizard) ──────────────────────────── */
-.viatura-sugestoes {
-  display: grid;
-  gap: var(--space-2);
-  margin-bottom: var(--space-3);
-}
-
-.viatura-sugestoes__label {
-  color: var(--color-label);
-  font-size: var(--font-size-xs);
-  font-weight: 900;
-  letter-spacing: var(--letter-spacing-label);
-  margin: 0;
-  text-transform: uppercase;
-}
-
-.viatura-sugestoes__chips {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
 }
 
 .viatura-sugestao-chip {
@@ -1027,34 +394,6 @@
   color: var(--color-heading);
   font-weight: 800;
   letter-spacing: 0.03em;
-}
-
-.viatura-sugestao-badge {
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--color-border-soft);
-  font-size: var(--font-size-xs);
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  padding: 1px var(--space-2);
-  text-transform: uppercase;
-}
-
-.viatura-sugestao-badge--motorista {
-  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-}
-
-.viatura-sugestao-badge--unidade {
-  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
-  border-color: var(--color-primary-bright);
-  color: var(--color-primary-bright);
-}
-
-.viatura-sugestao-badge--ativa {
-  background: color-mix(in srgb, var(--color-success) 16%, transparent);
-  border-color: var(--color-success);
-  color: var(--color-success);
 }
 
 /* Quando há sugestões visíveis, esconde a mensagem de "nenhuma viatura" */
@@ -1120,23 +459,8 @@
   margin-top: 8px;
 }
 
-/* forms.css declara --form-control-height só em `.main-form-panel .field`, e o
-   picker de documentos não usa esse wrapper. Sem a variável, a regra
-   `.main-form-panel .search-picker__control` (height/min-height/max-height)
-   fica inválida e o campo colapsa para a altura do texto (~19px) em vez de 44px.
-   Mesmo remédio já usado em .related-route-picker (dark-redesign.css). */
-.evento-doc-source-picker {
-  --form-control-height: var(--control-height-md, 44px);
-  /* gap:0 — o select oculto no meio do grid dobraria qualquer gap. */
-  gap: 0 !important;
-}
-
 .evento-doc-source-picker .search-picker__field {
   gap: 7px;
-}
-
-.evento-doc-summary-panel {
-  margin-top: 0;
 }
 
 .evento-doc-source-picker .search-picker__selected-panel {
@@ -1322,7 +646,6 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .search-picker {
 /* ── Sugestões de viatura: sem corte (JS já limita a 8 chips) ───── */
 /* max-height removido — overflow: hidden cortava chips na segunda linha */
 
-
 /* Regras responsivas exclusivas do wizard, separadas dos cards de listagem. */
 @media (max-width: 720px) {
   .travel-document-wizard__main .form-section-stack--comfortable {
@@ -1335,19 +658,6 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .search-picker {
     overflow-wrap: anywhere;
   }
 }
-
-@media (max-width: 600px) {
-  .oficio-equipe-picker__selected-card {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-@media (max-width: 420px) {
-  .oficio-viajante-card__termo-choice {
-    grid-template-columns: 1fr;
-  }
-}
-
 
 /* --------------------------------------------------------------------------
    FAB — Floating Action Button container (eventos wizard etapas 2-5)
@@ -1364,58 +674,8 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .search-picker {
   z-index: 100;
 }
 
-html[data-theme="dark"] .fab-container > .cv-btn--primary {
-  background: var(--color-accent);
-  background-image: none;
-  border: 0;
-  border-radius: 12px;
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
-  color: var(--color-on-accent, #19232d);
-  font-weight: var(--font-weight-bold);
-  min-height: var(--control-height-md, 44px);
-  padding: 0 18px;
-  text-shadow: none;
-}
-
-html[data-theme="dark"] .fab-container > .cv-btn--primary:hover,
-html[data-theme="dark"] .fab-container > .cv-btn--primary:focus-visible {
-  background: var(--color-accent-hover);
-  background-image: none;
-  border: 0;
-  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
-  color: var(--color-on-accent, #19232d);
-}
-
-html[data-theme="dark"] .fab-container > .cv-btn--primary .cv-btn__icon {
-  color: inherit;
-}
-
 .fab-container .fab {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-}
-
-/* Motorista externo — painel contextual dentro da seção de transporte. */
-.oficio-external-driver {
-  min-width: 0;
-}
-
-.oficio-external-driver__body {
-  display: grid;
-  gap: var(--space-4);
-  padding: 0;
-}
-
-.oficio-external-driver__identity {
-  min-width: 0;
-}
-
-.oficio-external-driver__reference {
-  align-items: end;
-  border-top: 1px solid var(--color-border-soft);
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: minmax(160px, 0.7fr) minmax(0, 2fr);
-  padding-top: var(--space-4);
 }
 
 .oficio-external-driver__identity > .search-picker {
@@ -1431,41 +691,10 @@ html[data-theme="dark"] .fab-container > .cv-btn--primary .cv-btn__icon {
   gap: 0;
 }
 
-.oficio-external-driver__reference-copy {
-  align-self: center;
-  display: grid;
-  gap: 3px;
-}
-
-.oficio-external-driver__reference-copy strong {
-  font-size: var(--font-size-sm);
-}
-
-.oficio-external-driver__reference-copy span {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  line-height: 1.4;
-}
-
-.oficio-external-driver__reference-fields {
-  display: grid;
-  gap: var(--space-3);
-  grid-template-columns: minmax(190px, 0.8fr) minmax(240px, 1.2fr);
-}
-
 @media (max-width: 720px) {
-  .oficio-external-driver__reference {
-    align-items: stretch;
-    grid-template-columns: 1fr;
-  }
-
   .oficio-external-driver .segment-toggle {
     align-self: stretch;
     display: grid;
     grid-template-columns: 1fr 1fr;
-  }
-
-  .oficio-external-driver__reference-fields {
-    grid-template-columns: 1fr;
   }
 }

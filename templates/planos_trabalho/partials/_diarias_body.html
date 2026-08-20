@@ -44,16 +44,16 @@
   procura (`data-pt-resultado-*`) para reescrever o número a cada mudança de
   data, hora ou efetivo.
 {% endcomment %}
-<div class="document-summary fact-list pt-diarias-summary" data-pt-diarias-resultado>
+<div class="fact-list fact-list--band-3" data-pt-diarias-resultado>
   {% if diarias_resultado.ok %}
     {% with valor_total="R$"|add:diarias_resultado.valor_total_display valor_unitario="R$"|add:diarias_resultado.valor_unitario_display efetivo_total=diarias_resultado.quantidade_servidores|stringformat:"s"|add:" servidor(es)" %}
-      <c-v2.form_block aria_label="Valor total do plano" extra_class="pt-diarias-summary__panel">
+      <c-v2.form_block aria_label="Valor total do plano">
         <c-slot name="body"><c-v2.fact label="Valor total do plano" :value="valor_total" :strong="True" value_hook="data-pt-resultado-total" note_label="Valor por extenso" :note="diarias_resultado.valor_total_extenso" note_hook="data-pt-resultado-total-extenso" /></c-slot>
       </c-v2.form_block>
-      <c-v2.form_block aria_label="Valor por servidor" extra_class="pt-diarias-summary__panel">
+      <c-v2.form_block aria_label="Valor por servidor">
         <c-slot name="body"><c-v2.fact label="Valor por servidor" :value="valor_unitario" :strong="True" value_hook="data-pt-resultado-unitario" note_label="Valor por extenso" :note="diarias_resultado.valor_unitario_extenso" note_hook="data-pt-resultado-unitario-extenso" /></c-slot>
       </c-v2.form_block>
-      <c-v2.form_block aria_label="Quantidade de diárias e efetivo total" extra_class="pt-diarias-summary__panel">
+      <c-v2.form_block aria_label="Quantidade de diárias e efetivo total">
         <c-slot name="body"><c-v2.fact label="Quantidade de diárias" :value="diarias_resultado.composicao" value_hook="data-pt-resultado-composicao" note_label="Efetivo total" :note="efetivo_total" note_hook="data-pt-resultado-efetivo" /></c-slot>
       </c-v2.form_block>
     {% endwith %}
@@ -67,13 +67,13 @@
       com a cara de "não informado". Com o traço, o elemento já nasce sendo o
       valor que ele vai virar.
     {% endcomment %}
-    <c-v2.form_block aria_label="Valor total do plano" extra_class="pt-diarias-summary__panel">
+    <c-v2.form_block aria_label="Valor total do plano">
       <c-slot name="body"><c-v2.fact label="Valor total do plano" value="—" :strong="True" value_hook="data-pt-resultado-total" note_label="Valor por extenso" note="—" note_hook="data-pt-resultado-total-extenso" /></c-slot>
     </c-v2.form_block>
-    <c-v2.form_block aria_label="Valor por servidor" extra_class="pt-diarias-summary__panel">
+    <c-v2.form_block aria_label="Valor por servidor">
       <c-slot name="body"><c-v2.fact label="Valor por servidor" value="—" :strong="True" value_hook="data-pt-resultado-unitario" note_label="Valor por extenso" note="—" note_hook="data-pt-resultado-unitario-extenso" /></c-slot>
     </c-v2.form_block>
-    <c-v2.form_block aria_label="Quantidade de diárias e efetivo total" extra_class="pt-diarias-summary__panel">
+    <c-v2.form_block aria_label="Quantidade de diárias e efetivo total">
       <c-slot name="body"><c-v2.fact label="Quantidade de diárias" value="—" value_hook="data-pt-resultado-composicao" note_label="Efetivo total" note="—" note_hook="data-pt-resultado-efetivo" /></c-slot>
     </c-v2.form_block>
   {% endif %}

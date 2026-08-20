@@ -310,6 +310,7 @@ def diario_servidor_motorista(request, ps_pk):
         for o in oficios_para_prefill_de_motorista(prestacao.oficio)
     ]
 
+    viatura_oficio = viatura_resumo_oficio(prestacao.oficio)
     return render(
         request,
         "prestacoes_contas/diario_motorista_form.html",
@@ -326,7 +327,18 @@ def diario_servidor_motorista(request, ps_pk):
             "back_url": reverse("prestacoes_contas:index"),
             "motorista_oficio_nome": oficio_nome or "—",
             "motorista_oficio_cpf": oficio_cpf,
-            "viatura_oficio": viatura_resumo_oficio(prestacao.oficio),
+            # A dica do cartão de escolha é UMA frase, montada aqui.
+            #
+            # O template a compunha com `{% if %}` no meio do texto; o
+            # `c-v2.choice_card` recebe a dica pronta, e em atributo de
+            # componente Cotton não se pode compor — `:hint="a|add:b"` é busca de
+            # variável, não expressão, e chegaria vazio (contrato guardado por
+            # `AtributoDinamicoSemFiltroTests`).
+            "motorista_oficio_sufixo_cpf": f" · CPF {oficio_cpf}" if oficio_cpf else "",
+            "viatura_oficio": viatura_oficio,
+            "viatura_oficio_sufixo_placa": (
+                f" · {viatura_oficio['placa']}" if viatura_oficio.get("placa") else ""
+            ),
             "oficios_prefill": oficios_prefill,
             "diario_url": diario_url,
         },

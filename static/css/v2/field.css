@@ -76,6 +76,55 @@
 }
 
 
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * VINDAS DAS FOLHAS DE TEMA E DO CASCO ANTIGO, em 2026-08-20.
+ *
+ * Descreviam este componente DE FORA dele — em `theme-shared-components.css`,
+ * `theme-dark-components.css`, `layout/page-shell.css`, `fields/forms.css` ou
+ * `lists/list-header.css`. Enquanto ficaram lá, o componente do v2 dependia de
+ * folhas do sistema antigo para ter forma, e toda tela migrada carregava
+ * aquelas folhas por causa dele.
+ *
+ * Vieram com o texto INTACTO — `!important` e escopo de wizard inclusive —, e
+ * ANTES da divisa: elas chegavam pelo bundle do shell, que é anterior ao
+ * `ui.bundle.css`, e por isso perdiam para o delta do v2. Anexá-las no fim
+ * inverteria a disputa sem mudar um valor sequer. Medido antes e depois em 20
+ * telas: nenhuma diferença.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.quick-create-panel .field-grid {
+  flex: 1;
+}
+
+@media (max-width: 600px) {
+.field-grid--cols-2,
+  .field-grid--cols-3,
+  .field-grid--cols-4 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+#quick-add-modelo-motivo .inline-create__fields > .field-grid {
+  margin: 0;
+}
+
+#quick-add-atividade .inline-create__fields > .field-grid {
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * DELTA v2 — daqui para baixo é o redesenho, sob a raiz `html[data-theme]`.
+ *
+ * A divisa é lida por teste — a linha `=== DELTA v2 ===`: as asserções de
+ * aparência do v2 descrevem ESTA metade. Medir o arquivo inteiro faria o teste
+ * ler a regra base que o delta sobrescreve — foi o que aconteceu na fusão de
+ * 2026-08-20, com sete asserções apontando para a declaração antiga da mesma
+ * classe, três telas acima.
+ * ══════════════════════════════════════════════════════════════════════════ */
+/* === DELTA v2 === */
+
 /* Field — rótulo, controle, ajuda e erro. Depende de `v2/tokens.css`.
  *
  * COLISÃO: `.field` já existe no legado (33 usos). Enquanto ele viver, estas
@@ -93,6 +142,12 @@
   color: var(--text-strong);
   font-size: var(--text-size-base);
   font-weight: var(--weight-strong);
+  /* Declarado, e não omitido: `fields/forms.css` dava `0.01em` a todo `label`
+     dentro de `.field`, e era a ÚNICA declaração daquela folha que ainda
+     alcançava uma tela do v2 (medido no editor de roteiro em 2026-08-20).
+     Espaçamento de letra no v2 é coisa de sobrancelha, não de rótulo — 0,14px
+     num texto de 14px não se vê, e a herança atravessava o sistema inteiro. */
+  letter-spacing: normal;
 }
 
 :is(html[data-theme]) .field__help {
@@ -182,4 +237,107 @@
   background: var(--accent);
   border-color: var(--accent);
   color: var(--text-on-accent);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * A GRADE DE CAMPOS — veio de `layout/page-shell.css` em 2026-08-20.
+ *
+ * `field-grid`, `field-grid--cols-N` e `field-size-N` são emitidos por 40
+ * templates do v2 (todo quick-add, todo formulário de catálogo), e as regras
+ * moravam na folha do casco antigo. Enquanto ficaram lá, toda tela do v2
+ * dependia de uma folha do sistema que este refactor existe para apagar — e as
+ * páginas de catálogo, que carregam um perfil enxuto, chegavam a perder os
+ * modificadores de coluna no caminho.
+ *
+ * SEM o prefixo `:is(html[data-theme])` do resto do v2, de propósito: telas não
+ * migradas ajustam a grade com seletores de duas classes
+ * (`.main-form-panel .field-grid`, `.roteiro-trecho-card__route-row.field-grid--cols-2`).
+ * Acrescentar o prefixo subiria a especificidade destas regras acima das
+ * daquelas e mudaria a grade em telas que ninguém pediu para mexer. O prefixo
+ * entra quando o último desses seletores morrer.
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --field-grid-gap: var(--space-4);
+}
+
+.field-grid {
+  align-items:           start;
+  display:               grid;
+  gap:                   var(--field-grid-gap);
+  width:                 100%;
+}
+
+.field-grid > .field,
+.field-grid > .app-form-field,
+.field-grid--cols-3 > .field,
+.field-grid--cols-3 > .app-form-field {
+  min-width: 0;
+  width:     100%;
+}
+
+/* 2 colunas: pares de campos — nome + sigla, data + hora */
+.field-grid--cols-2 {
+  display: grid;
+  gap: var(--field-grid-gap);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+}
+
+/* 3 colunas: trios de campos — nome + CPF + telefone */
+.field-grid--cols-3 {
+  display:               grid;
+  gap:                   var(--field-grid-gap);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width:                 100%;
+}
+
+/* 4 colunas: alias explícito do `.field-grid` padrão */
+.field-grid--cols-4 {
+  display:               grid;
+  gap:                   var(--field-grid-gap);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width:                 100%;
+}
+
+/* Quatro tamanhos, em colunas da grade. O tamanho segue o TIPO do dado:
+   pequeno para UF e CEP, médio para telefone e cargo, linha inteira para
+   textarea. `--3` não tem regra própria: ele é o vão entre `--2` e a linha
+   inteira, e só existe nas consultas de mídia abaixo. */
+.field-size-1 { grid-column: span 1; }
+
+.field-size-2 { grid-column: span 2; }
+
+.field-size-4 { grid-column: 1 / -1; }
+
+/* Tablet: a grade cai para duas colunas, e os tamanhos a acompanham. */
+@media (max-width: 840px) {
+  .field-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .field-grid--cols-2,
+  .field-grid--cols-3,
+  .field-grid--cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .field-size-1 { grid-column: span 1; }
+  .field-size-2 { grid-column: span 2; }
+
+  .field-size-4 { grid-column: 1 / -1; }
+}
+
+/* Celular: uma coluna, e nenhum campo atravessa nada. */
+@media (max-width: 600px) {
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field-size-1,
+  .field-size-2,
+  .field-size-3,
+  .field-size-4 {
+    grid-column: 1;
+  }
 }

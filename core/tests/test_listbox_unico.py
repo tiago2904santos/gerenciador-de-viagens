@@ -27,6 +27,21 @@ ROOT = Path(__file__).resolve().parents[2]
 V2 = ROOT / "static" / "css" / "v2"
 LISTBOX = V2 / "listbox.css"
 
+DIVISA = "/* === DELTA v2 === */"
+
+
+def delta(caminho: Path) -> str:
+    """A metade v2 da folha — o que vem depois da divisa.
+
+    Em 2026-08-20 as regras que descreviam a lista de FORA dela (nas duas folhas
+    de tema do sistema antigo) vieram para cá, e ficaram ANTES da divisa: era lá
+    que elas perdiam para o v2, e mudá-las de lugar não pode mudar quem vence.
+    Elas continuam sendo legado — com `!important`, cor literal e assimetria —,
+    e é o DELTA que estes contratos descrevem.
+    """
+    texto = caminho.read_text(encoding="utf-8")
+    return texto[texto.index(DIVISA) + len(DIVISA) :]
+
 SELECT = "custom-select__menu--v2"
 PICKER = "search-picker__dropdown--v2"
 
@@ -80,7 +95,7 @@ class ListboxEhModeloGlobalTests(SimpleTestCase):
         )
 
     def test_toda_regra_de_aparencia_vale_para_as_duas_listas(self):
-        css = LISTBOX.read_text(encoding="utf-8")
+        css = delta(LISTBOX)
         assimetricas = []
         for seletor in _regras(css):
             if any(marca in seletor for marca in SO_DO_PICKER):
@@ -103,7 +118,7 @@ class ListboxEhModeloGlobalTests(SimpleTestCase):
 
     def test_a_lista_nao_escreve_cor_literal(self):
         """Cor literal aqui é cor que não acompanha o tema."""
-        css = re.sub(r"/\*.*?\*/", "", LISTBOX.read_text(encoding="utf-8"), flags=re.DOTALL)
+        css = re.sub(r"/\*.*?\*/", "", delta(LISTBOX), flags=re.DOTALL)
         literais = re.findall(r"#[0-9a-fA-F]{3,8}\b|\brgba?\([^)]*\)", css)
         self.assertEqual(
             literais, [], "use os tokens de `v2/tokens.css`, não cor literal"
@@ -121,7 +136,7 @@ class VariacaoDeDuasLinhasTests(SimpleTestCase):
 
     def setUp(self):
         self.css = re.sub(
-            r"/\*.*?\*/", "", LISTBOX.read_text(encoding="utf-8"), flags=re.DOTALL
+            r"/\*.*?\*/", "", delta(LISTBOX), flags=re.DOTALL
         )
 
     def _bloco(self, marca: str) -> str:

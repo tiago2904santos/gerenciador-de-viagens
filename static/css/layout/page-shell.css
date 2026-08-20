@@ -72,7 +72,6 @@
   --form-section-inner-gap: var(--space-5);
 
   /* --- Field Grid --- */
-  --field-grid-gap: var(--space-4);
 
   /* --- Field Group --- */
   --field-group-padding: var(--space-4);
@@ -511,89 +510,6 @@ html[data-theme="light"] {
 
 .page-stepper::-webkit-scrollbar { display: none; }
 
-/* Lista horizontal de etapas */
-.page-stepper__list {
-  align-items: flex-start;
-  display:     flex;
-  gap:         var(--space-8);
-  list-style:  none;
-  margin:      0;
-  padding:     0;
-  width:       100%;
-}
-
-/* Item — coluna: trilha no topo, rótulos abaixo */
-.page-stepper__item {
-  align-items:    center;
-  display:        flex;
-  flex:           1 1 0;
-  flex-direction: column;
-  gap:            var(--space-2);
-  min-width:      0;
-  padding:        0;
-}
-
-/* Trilha: linha-esquerda + marcador + linha-direita */
-.page-stepper__track {
-  align-items: center;
-  display:     flex;
-  margin-inline: calc(var(--space-8) / -2);
-  width:       calc(100% + var(--space-8));
-}
-
-/* Linha conectora entre marcadores */
-.page-stepper__connector {
-  background: var(--stepper-connector);
-  flex:       1;
-  height:     var(--stepper-connector-h);
-  min-width:  var(--space-2);
-  transition: background var(--transition-base);
-}
-
-/* Extremidades invisíveis para alinhamento centrado */
-.page-stepper__item:first-child .page-stepper__connector--before { visibility: hidden; }
-.page-stepper__item:last-child  .page-stepper__connector--after  { visibility: hidden; }
-
-/* Marcador circular premium */
-.page-stepper__marker {
-  align-items:     center;
-  background:      var(--stepper-idle-bg);
-  border:          2px solid var(--stepper-idle-border);
-  border-radius:   var(--radius-pill);
-  color:           var(--stepper-idle-color);
-  display:         inline-flex;
-  flex-shrink:     0;
-  font-size:       var(--font-size-sm);
-  font-weight:     var(--font-weight-bold);
-  height:          var(--stepper-marker-size);
-  justify-content: center;
-  line-height:     1;
-  transition:
-    background   var(--transition-base),
-    border-color var(--transition-base),
-    box-shadow   var(--transition-base),
-    color        var(--transition-base);
-  width:           var(--stepper-marker-size);
-}
-
-/* Ícone interno do marcador (✓, ✕, número) */
-.page-stepper__marker-icon {
-  font-size:   var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  line-height: 1;
-  pointer-events: none;
-}
-
-/* Bloco textual centralizado abaixo do marcador */
-.page-stepper__content {
-  align-items:    center;
-  display:        flex;
-  flex-direction: column;
-  gap:            2px;
-  padding:        0 var(--space-1);
-  text-align:     center;
-}
-
 /* Número da etapa (eyebrow) */
 .page-stepper__eyebrow {
   color:          var(--stepper-eyebrow-color);
@@ -601,23 +517,6 @@ html[data-theme="light"] {
   font-weight:    var(--font-weight-bold);
   letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
-}
-
-/* Título da etapa */
-.page-stepper__label {
-  color:       var(--stepper-label-idle);
-  font-size:   var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  line-height: 1.3;
-  transition:  color var(--transition-base);
-}
-
-/* Status da etapa (Concluída, Em andamento…) */
-.page-stepper__status {
-  color:     var(--stepper-label-idle);
-  font-size: 10px;
-  opacity:   0.7;
-  transition: color var(--transition-base), opacity var(--transition-base);
 }
 
 /* ─── Estado: Concluído (.is-complete) ──────────────────── */
@@ -692,32 +591,6 @@ html[data-theme="light"] {
 
 /* ─── Foco acessível ─────────────────────────────────────── */
 
-.page-stepper__item:focus-visible .page-stepper__marker,
-.page-stepper__marker--link:focus-visible {
-  outline:        2px solid var(--border-focus);
-  outline-offset: 3px;
-}
-
-.page-stepper__marker--link {
-  color:           inherit;
-  text-decoration: none;
-}
-
-.page-stepper__content-link {
-  align-items:     center;
-  color:           inherit;
-  display:         flex;
-  flex-direction:  column;
-  gap:             2px;
-  max-width:       100%;
-  text-align:      center;
-  text-decoration: none;
-}
-
-.page-stepper__content-link:hover .page-stepper__label {
-  color: var(--stepper-label-active);
-}
-
 /* Seções internas leves dentro de um card wizard */
 .wizard-inner-section {
   display:        flex;
@@ -732,28 +605,6 @@ html[data-theme="light"] {
 .wizard-inner-section + .wizard-inner-section {
   border-top: 1px solid var(--border-form-section);
   padding-top: var(--space-4);
-}
-
-.wizard-inner-section__header {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--space-1);
-}
-
-.wizard-inner-section__title {
-  color:          var(--theme-text-heading);
-  font-size:      var(--font-size-sm);
-  font-weight:    var(--font-weight-bold);
-  letter-spacing: 0.04em;
-  margin:         0;
-  text-transform: uppercase;
-}
-
-.wizard-inner-section__description {
-  color:       var(--theme-text-muted);
-  font-size:   var(--font-size-sm);
-  line-height: 1.45;
-  margin:      0;
 }
 
 /* Stepper legado como irmão do header — UI Lab / demos.
@@ -885,34 +736,11 @@ html[data-theme="light"] {
   justify-content: space-between;
 }
 
-.section-header__copy {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--space-1);
-  min-width:      0;
-}
-
-.section-header__title {
-  color:          var(--theme-text-heading);
-  font-size:      var(--font-size-md);
-  font-weight:    var(--font-weight-bold);
-  letter-spacing: -0.01em;
-  line-height:    1.3;
-  margin:         0;
-}
-
 .section-header__description {
   color:       var(--theme-text-muted);
   font-size:   var(--font-size-sm);
   line-height: 1.5;
   margin:      0;
-}
-
-.section-header__actions {
-  align-items: center;
-  display:     flex;
-  flex-shrink: 0;
-  gap:         var(--space-2);
 }
 
 /* =========================================================
@@ -944,57 +772,13 @@ html[data-theme="light"] {
   width:          100%;
 }
 
-.form-section-card {
-  background:    var(--form-section-bg);
-  border:        1px solid var(--form-section-border);
-  border-radius: var(--radius-card);
-  box-shadow:    var(--form-section-shadow);
-  overflow:      hidden;
-  width:         100%;
-}
-
 /* =========================================================
    card-footer — rodapé padronizado do último card.
    Fica dentro do form-section-card ou form-section,
    após o corpo de conteúdo, separado por uma linha.
    ========================================================= */
-.card-footer {
-  align-items:     center;
-  border-top:      1px solid var(--form-section-border, var(--border-form-section));
-  display:         flex;
-  gap:             var(--space-3);
-  justify-content: space-between;
-  padding:         var(--space-4) var(--space-6);
-}
-
-.card-footer__secondary,
-.card-footer__primary {
-  align-items: center;
-  display:     flex;
-  gap:         var(--space-3);
-}
-
-.card-footer--end {
-  justify-content: flex-end;
-}
-
-.card-footer-section {
-  display: grid;
-}
-
-.card-footer-section__divider {
-  border-top: 1px solid var(--form-section-border, var(--border-form-section));
-}
-
-.card-footer-section > .card-footer {
-  border-top: 0;
-}
 
 /* Dentro de form-section (páginas de formulário simples) */
-.form-section > .card-footer {
-  margin-inline: calc(-1 * var(--form-section-padding-x, var(--space-6)));
-  padding-inline: var(--form-section-padding-x, var(--space-6));
-}
 
 .cv-form-section-header {
   --_wizard-filete-inset-block: var(--space-4);
@@ -1031,72 +815,7 @@ html[data-theme="light"] {
   width:         var(--_wizard-filete-width);
 }
 
-.cv-form-section-header__copy {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--space-1);
-  min-width:      0;
-}
-
-.cv-form-section-header__actions {
-  align-items: center;
-  display:     flex;
-  flex-shrink: 0;
-  gap:         var(--space-2);
-}
-
-.form-section-title {
-  color:          var(--theme-text-heading);
-  font-size:      var(--font-size-lg);
-  font-weight:    var(--font-weight-extrabold);
-  letter-spacing: 0.06em;
-  line-height:    1.2;
-  margin:         0;
-  text-shadow:    0 1px 6px color-mix(in srgb, var(--color-accent) 20%, transparent);
-  text-transform: uppercase;
-}
-
 /* Botões dentro do cabeçalho: compactos e contidos no min-height do header */
-.cv-form-section-header__actions .btn,
-.cv-form-section-header__actions .app-btn,
-.cv-form-section-header__actions .cv-btn {
-  font-size:  var(--font-size-xs);
-  height:     var(--control-height-sm);
-  min-height: var(--control-height-sm);
-  max-height: var(--control-height-sm);
-  padding:    0 var(--space-3);
-}
-
-.form-section-subtitle {
-  display:     none;
-}
-
-/* Modificadores canônicos para formulários que precisam explicar a tarefa
-   sem transformar cada seção em um cabeçalho pesado. */
-.form-section-card--described .form-section-subtitle {
-  display: block;
-  line-height: 1.45;
-  max-width: 72ch;
-}
-
-.cv-form-section-header--described .form-section-subtitle {
-  display: block;
-  line-height: 1.45;
-  max-width: 72ch;
-}
-
-/* Cabeçalho autônomo para coleções: compartilha a linguagem do card sem
-   envolver cards de lista em outra superfície. */
-.wizard-collection {
-  display: grid;
-  gap: var(--space-4);
-  min-width: 0;
-  width: 100%;
-}
-
-.wizard-collection__body {
-  min-width: 0;
-}
 
 .form-section-card--compact .cv-form-section-header {
   --_wizard-filete-width: 4px;
@@ -1106,18 +825,6 @@ html[data-theme="light"] {
 
 .form-section-card--compact .cv-form-section-header::before {
   width: var(--_wizard-filete-width);
-}
-
-.form-section-card--compact .form-section-title {
-  font-size: var(--font-size-md);
-  letter-spacing: 0.045em;
-}
-
-.form-section-body {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--form-section-inner-gap);
-  padding:        var(--form-section-body-padding);
 }
 
 .form-section-body--sections > .wizard-inner-section:not(:last-child) {
@@ -1134,38 +841,11 @@ html[data-theme="light"] {
    A largura de cada campo é definida pelas classes .field-size-*.
    ========================================================= */
 
-.field-grid {
-  align-items:           start;
-  display:               grid;
-  gap:                   var(--field-grid-gap);
-  width:                 100%;
-}
-
-.field-grid > .field,
-.field-grid > .app-form-field,
-.field-grid--cols-3 > .field,
-.field-grid--cols-3 > .app-form-field {
-  min-width: 0;
-  width:     100%;
-}
-
 /* =========================================================
    13. Field Sizes
    Quatro tamanhos de campo baseados em colunas do grid.
    Escolher o tamanho conforme o tipo de informação inserida.
    ========================================================= */
-
-/* Pequeno: RG, CPF, UF, CEP, matrícula, status, data curta */
-.field-size-1 { grid-column: span 1; }
-
-/* Médio: telefone, e-mail, cargo, município, placa, modelo */
-.field-size-2 { grid-column: span 2; }
-
-/* Grande: nome completo, endereço, lotação, destino principal */
-.field-size-3 { grid-column: span 3; }
-
-/* Linha inteira: justificativa, observações, descrição, textarea */
-.field-size-4 { grid-column: 1 / -1; }
 
 /* =========================================================
    14. Field Group
@@ -1173,34 +853,11 @@ html[data-theme="light"] {
    Usado para blocos condicionais ou campos muito relacionados.
    ========================================================= */
 
-.field-group {
-  background:     var(--surface-field-group);
-  border:         1px solid var(--border-field-group);
-  border-radius:  var(--field-group-radius);
-  box-sizing:     border-box;
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--field-group-gap);
-  padding:        var(--field-group-padding);
-}
-
 /* =========================================================
    15. Footer Actions
    Rodapé de ações do formulário. Sempre ao final do Main Form Panel.
    Ações secundárias à esquerda, primárias à direita.
    ========================================================= */
-
-.footer-actions {
-  align-items:     center;
-  background:      var(--surface-footer-actions);
-  border-top:      1px solid var(--border-footer-actions);
-  box-sizing:      border-box;
-  display:         flex;
-  flex-wrap:       wrap;
-  gap:             var(--footer-actions-gap);
-  justify-content: space-between;
-  padding:         var(--footer-actions-padding-y) var(--footer-actions-padding-x) var(--footer-actions-padding-bottom);
-}
 
 .form-section > .footer-actions {
   padding-inline: 0;
@@ -1250,13 +907,6 @@ html[data-theme="light"] {
   width:          100%;
 }
 
-/* Estado vazio já possui sua própria superfície; não o envolve em outro card. */
-.list-panel--empty {
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-}
-
 /* Filter Bar: controles de busca/filtro à esquerda, ações à direita */
 .filter-bar {
   align-items:     center;
@@ -1268,160 +918,6 @@ html[data-theme="light"] {
   gap:             var(--filter-bar-gap);
   justify-content: space-between;
   padding:         var(--filter-bar-padding-y) var(--filter-bar-padding-x);
-}
-
-/* List Content */
-.list-content {
-  box-sizing:     border-box;
-  display:        flex;
-  flex-direction: column;
-  padding-block:  var(--space-3);
-  width:          100%;
-}
-
-/* Pagination — segmented control em cápsula */
-.pagination-shell {
-  align-items: center;
-  background: var(--surface-pagination);
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  justify-content: space-between;
-  padding: var(--pagination-padding-y) var(--pagination-padding-x);
-}
-
-.pagination-shell--controls-only {
-  display: inline-flex;
-  flex-wrap: nowrap;
-  gap: 0;
-  justify-content: flex-end;
-  padding: 0;
-  width: auto;
-}
-
-.pagination-shell--info-only {
-  display: flex;
-  justify-content: flex-start;
-  margin: 0;
-  padding-block: var(--space-2);
-}
-
-.pagination-shell__info {
-  display: flex;
-  flex: 1 1 auto;
-  justify-content: flex-start;
-  margin: 0;
-  min-width: 0;
-}
-
-.pagination-shell__info-pill {
-  align-items: baseline;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  color: var(--theme-text-muted);
-  display: inline-flex;
-  flex-wrap: wrap;
-  font-size: var(--font-size-xs);
-  gap: 0.4em;
-  justify-content: flex-start;
-  line-height: 1.35;
-  margin-inline: 0;
-  padding: 0;
-  text-align: left;
-}
-
-.pagination-shell__info-pill strong {
-  color: var(--theme-text-heading);
-  font-size: var(--font-size-sm);
-  font-variant-numeric: tabular-nums;
-  font-weight: var(--font-weight-extrabold);
-  letter-spacing: -0.01em;
-  line-height: 1;
-}
-
-.pagination-shell__info-label,
-.pagination-shell__info-separator,
-.pagination-shell__info-unit {
-  color: var(--theme-text-muted);
-  font-size: 0.6875rem;
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.pagination-shell__info-separator {
-  letter-spacing: 0.06em;
-  opacity: 0.72;
-}
-
-/* Cápsula única: setas + páginas */
-.pagination-shell__controls {
-  align-items: center;
-  background: var(--color-surface-soft, var(--surface-filter-button));
-  border: 1px solid var(--color-border-soft, var(--border-filter-button));
-  border-radius: var(--radius-pill);
-  display: flex;
-  flex: 0 0 auto;
-  flex-wrap: nowrap;
-  gap: 2px;
-  justify-content: flex-end;
-  padding: 3px;
-}
-
-.pagination-shell__pages {
-  align-items: center;
-  display: inline-flex;
-  flex-wrap: nowrap;
-  gap: 2px;
-  justify-content: center;
-}
-
-.pagination-shell__nav,
-.pagination-shell__page,
-.pagination-shell__ellipsis {
-  align-items: center;
-  border-radius: 999px;
-  box-sizing: border-box;
-  display: inline-flex;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  justify-content: center;
-  min-height: 36px;
-  min-width: 36px;
-  padding: 0;
-  text-decoration: none;
-  transition:
-    background var(--transition-base),
-    border-color var(--transition-base),
-    color var(--transition-base);
-}
-
-.pagination-shell__nav,
-.pagination-shell__page {
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--theme-text-muted, var(--text-filter-button));
-}
-
-.pagination-shell__page {
-  width: 36px;
-}
-
-.pagination-shell__nav {
-  width: 36px;
-}
-
-.pagination-shell__nav:hover,
-.pagination-shell__nav:focus-visible,
-.pagination-shell__page:hover,
-.pagination-shell__page:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
-  border-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
-  color: var(--color-accent-hover, var(--color-accent));
-  outline: none;
 }
 
 .pagination-shell__page.is-current {
@@ -1438,184 +934,13 @@ html[data-theme="light"] {
   color: var(--color-accent-hover, var(--color-accent));
 }
 
-/* “Próxima” deixa de ser primary azul — só a página atual destaca */
-.pagination-shell__nav--primary {
-  background: transparent;
-  border-color: transparent;
-  color: var(--theme-text-muted, var(--text-filter-button));
-}
-
-.pagination-shell__nav--prev,
-.pagination-shell__nav--next {
-  border-radius: 999px;
-}
-
 .pagination-shell__nav.is-disabled {
   opacity: 0.38;
   pointer-events: none;
 }
 
-.pagination-shell__ellipsis {
-  border: 0;
-  color: var(--theme-text-muted);
-  min-width: 20px;
-  padding-inline: 2px;
-}
-
-.pagination-shell__icon {
-  display: inline-flex;
-  height: 14px;
-  width: 14px;
-}
-
-/* Contrato quebrado: lista declarada como paginada renderizada sem page_obj. */
-.pagination-shell--erro {
-  justify-content: flex-start;
-}
-
-.pagination-shell__erro {
-  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-danger) 46%, transparent);
-  border-radius: var(--radius-md);
-  color: var(--color-danger);
-  display: block;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  padding: 10px 16px;
-  width: 100%;
-}
-
 body.has-delete-modal-open {
   overflow: hidden;
-}
-
-.delete-confirm-modal {
-  align-items: center;
-  display: flex;
-  inset: 0;
-  justify-content: center;
-  padding: var(--space-4);
-  position: fixed;
-  z-index: var(--z-modal, 1000);
-}
-
-.delete-confirm-modal__backdrop {
-  background: rgba(2, 9, 19, 0.72);
-  backdrop-filter: blur(8px);
-  inset: 0;
-  position: absolute;
-}
-
-.delete-confirm-modal__dialog {
-  background: var(--surface-list-panel);
-  border: 1px solid var(--border-list-panel);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
-  box-sizing: border-box;
-  display: grid;
-  gap: var(--space-4);
-  max-width: min(100%, 520px);
-  padding: var(--space-5);
-  position: relative;
-  width: 100%;
-}
-
-.delete-confirm-modal__icon {
-  align-items: center;
-  background: color-mix(in srgb, var(--color-danger) 18%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-danger) 52%, transparent);
-  border-radius: var(--radius-pill);
-  color: var(--color-danger);
-  display: inline-flex;
-  flex: 0 0 42px;
-  height: 42px;
-  justify-content: center;
-  width: 42px;
-}
-
-.delete-confirm-modal__icon .icon {
-  height: 20px;
-  width: 20px;
-}
-
-.delete-confirm-modal__copy {
-  min-width: 0;
-}
-
-.delete-confirm-modal__eyebrow {
-  color: var(--color-danger);
-  display: block;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
-  text-transform: uppercase;
-}
-
-.delete-confirm-modal__title {
-  color: var(--theme-text-heading);
-  font-size: 1.25rem;
-  line-height: 1.2;
-  margin: var(--space-1) 0 0;
-}
-
-.delete-confirm-modal__message {
-  color: var(--theme-text-muted);
-  font-size: var(--font-size-sm);
-  line-height: 1.55;
-  margin: 0;
-}
-
-.delete-confirm-modal__message strong {
-  color: var(--theme-text-heading);
-}
-
-.delete-confirm-modal__actions {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  justify-content: flex-end;
-  margin: 0;
-}
-
-@media (max-width: 520px) {
-  .delete-confirm-modal__actions {
-    align-items: stretch;
-    flex-direction: column-reverse;
-  }
-
-  .delete-confirm-modal__actions .cv-btn {
-    width: 100%;
-  }
-}
-
-.cancel-reason-modal__form {
-  display: grid;
-  gap: var(--space-4);
-}
-
-.cancel-reason-modal__field {
-  margin: 0;
-}
-
-.cancel-reason-modal__textarea,
-.cancel-reason-modal__textarea:hover,
-.cancel-reason-modal__textarea:focus,
-.cancel-reason-modal__textarea:focus-visible,
-.cancel-reason-modal__textarea:active {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  min-height: 96px;
-  outline: none;
-  resize: vertical;
-  width: 100%;
-}
-
-.attach-signed-modal__form {
-  display: grid;
-  gap: var(--space-4);
 }
 
 /* Menu de ações (⋮) — junta Cancelar/Excluir num único botão */
@@ -1671,18 +996,8 @@ body.has-delete-modal-open {
   background: color-mix(in srgb, var(--color-success, #24a25b) 16%, transparent);
 }
 
-.action-menu__form {
-  display: block;
-  width: 100%;
-}
-
 .quick-create-panel.is-open {
   display: flex;
-}
-
-/* Field Grid dentro do Quick Create ocupa o espaço restante */
-.quick-create-panel .field-grid {
-  flex: 1;
 }
 
 /* =========================================================
@@ -1714,60 +1029,10 @@ body.has-delete-modal-open {
     padding-block: var(--space-3);
   }
 
-  .form-section-body {
-    padding: var(--space-4);
-  }
-
-  .footer-actions {
-    align-items:    stretch;
-    flex-direction: column-reverse;
-    gap:            var(--space-2);
-    padding:        var(--space-4) var(--space-4);
-  }
-
-  .footer-actions__secondary,
-  .footer-actions__primary {
-    width: 100%;
-  }
-
-  /* Field Grid: 2 colunas no tablet */
-  .field-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .field-size-1 { grid-column: span 1; }
-  .field-size-2 { grid-column: span 2; }
-  .field-size-3 { grid-column: 1 / -1; }
-  .field-size-4 { grid-column: 1 / -1; }
-
   /* Filter Bar empilha no tablet */
   .filter-bar {
     flex-direction: column;
     align-items:    stretch;
-  }
-
-  .filter-bar__controls,
-  .filter-bar__actions {
-    width: 100%;
-  }
-
-  .filter-bar__controls {
-    flex-wrap: wrap;
-  }
-
-  /* Quick Create: campos e ações empilham no tablet */
-  .quick-create-panel__body {
-    flex-direction: column;
-  }
-
-  .quick-create-panel__row {
-    flex-direction: column;
-    align-items:    stretch;
-  }
-
-  .quick-create-actions {
-    width:          100%;
-    justify-content: flex-end;
   }
 
   /* Header clean: stage com padding reduzido */
@@ -1778,56 +1043,9 @@ body.has-delete-modal-open {
 }
 
 @media (max-width: 600px) {
-  /* Field Grid: 1 coluna no mobile */
-  .field-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .field-size-1,
-  .field-size-2,
-  .field-size-3,
-  .field-size-4 {
-    grid-column: 1;
-  }
-
-  .page-stepper__label {
-    display: none;
-  }
 
   .page-header--clean .page-header__title {
     font-size: 1.5rem;
-  }
-
-  .pagination-shell {
-    align-items: stretch;
-    flex-direction: column;
-    gap: var(--space-2);
-    text-align: center;
-  }
-
-  .pagination-shell--controls-only {
-    align-items: center;
-    flex-direction: row;
-    width: auto;
-  }
-
-  .pagination-shell--info-only {
-    justify-content: center;
-    text-align: center;
-  }
-
-  .pagination-shell__info {
-    justify-content: center;
-  }
-
-  .pagination-shell__info-pill {
-    justify-content: center;
-    text-align: center;
-  }
-
-  .pagination-shell__controls {
-    align-self: center;
-    justify-content: center;
   }
 }
 
@@ -1848,51 +1066,6 @@ body.has-delete-modal-open {
    Ambos os modos são válidos e coexistem.
    ========================================================= */
 
-/* Container vertical das linhas — ocupa 100% da Form Section */
-.field-layout {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--layout-field-grid-gap);
-  width:          100%;
-}
-
-/* Linha base — grade com largura total */
-.field-row {
-  display:   grid;
-  gap:       var(--layout-field-grid-gap);
-  min-width: 0;
-  width:     100%;
-}
-
-/* 2 colunas — pares: datas, telefone + e-mail, valor + tipo */
-.field-row--2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-/* 3 colunas — trios: nome + CPF + telefone, cargo + RG + status */
-.field-row--3 {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-/* Tablet (840px): rows de 3 e 4 colunas reduzem para 2 */
-@media (max-width: 840px) {
-  .field-row--3,
-  .field-row--4 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-/* Mobile (600px): todos os rows viram 1 coluna */
-@media (max-width: 600px) {
-  .field-row,
-  .field-row--1,
-  .field-row--2,
-  .field-row--3,
-  .field-row--4 {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
 /* =========================================================
    21. Page Header Stack
    Nomenclatura canônica para headers do design system.
@@ -1900,92 +1073,11 @@ body.has-delete-modal-open {
    A faixa branca (rail) é obrigatória — nunca mostrar o band sozinho.
    ========================================================= */
 
-.page-header-stack {
-  border-radius: var(--radius-lg);
-  box-shadow:    var(--shadow-lg);
-  overflow:      hidden;
-  width:         100%;
-}
-
 /* =========================================================
    22. Page Header Band — Faixa Escura
    Contexto: eyebrow, título e chip opcional de status.
    Não recebe filtros, stepper nem botões funcionais.
    ========================================================= */
-
-.page-header-band {
-  align-items:    flex-start;
-  background:     var(--app-hero-stage-bg);
-  box-shadow:     inset 0 -1px 0 rgba(255, 255, 255, 0.08);
-  box-sizing:     border-box;
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--space-2);
-  padding:        var(--space-5) var(--space-6);
-}
-
-.page-header-band__eyebrow {
-  color:          var(--app-hero-eyebrow);
-  font-size:      var(--font-size-xs);
-  font-weight:    var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
-  margin:         0;
-  text-transform: uppercase;
-}
-
-.page-header-band__title {
-  align-items:    center;
-  color:          var(--app-hero-title);
-  display:        flex;
-  flex-wrap:      wrap;
-  font-size:      clamp(1.4rem, 2.2vw, 2.2rem);
-  font-weight:    var(--font-weight-extrabold);
-  gap:            var(--space-2);
-  letter-spacing: -0.03em;
-  line-height:    1.12;
-  margin:         0;
-}
-
-/* Conteúdo do Band: texto à esquerda + chip à direita */
-.page-header-band__content {
-  align-items:     center;
-  display:         flex;
-  gap:             var(--header-band-gap);
-  justify-content: space-between;
-  min-width:       0;
-  width:           100%;
-}
-
-/* Bloco textual do Band (eyebrow + título) */
-.page-header-band__text {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--space-1);
-  min-width:      0;
-}
-
-/* Chip de status dentro do Band */
-.page-header-status-chip {
-  border-radius:  var(--radius-pill);
-  font-size:      var(--font-size-xs);
-  font-weight:    var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-chip);
-  padding:        3px var(--space-3);
-  white-space:    nowrap;
-}
-
-/* Alerta inline simples (ex.: aviso de cancelamento) */
-.cv-alert {
-  border-radius: var(--radius-md, 8px);
-  padding:       var(--space-3) var(--space-4);
-  font-size:     var(--font-size-sm);
-}
-
-.cv-alert--danger {
-  background: var(--color-danger-soft);
-  border:     1px solid var(--color-danger-border-soft);
-  color:      var(--color-danger);
-}
 
 /* =========================================================
    23. Page Header Rail — Faixa Clara Obrigatória
@@ -1993,85 +1085,6 @@ body.has-delete-modal-open {
    Variações: simple | back-action | filters |
               filters-quick-add | stepper
    ========================================================= */
-
-.page-header-rail {
-  align-items: center;
-  background:  var(--app-hero-body-bg);
-  box-sizing:  border-box;
-  display:     flex;
-  gap:         var(--space-3);
-  padding:     var(--space-4) var(--space-5);
-  width:       100%;
-}
-
-/* Marcador circular de módulo */
-.page-header-rail__marker {
-  align-items:     center;
-  background:      var(--color-primary-soft);
-  border:          1px solid var(--color-border);
-  border-radius:   var(--radius-pill);
-  color:           var(--color-primary);
-  display:         inline-flex;
-  flex-shrink:     0;
-  font-size:       var(--font-size-sm);
-  font-weight:     var(--font-weight-extrabold);
-  height:          44px;
-  justify-content: center;
-  letter-spacing:  -0.01em;
-  width:           44px;
-}
-
-/* Bloco de texto */
-.page-header-rail__content {
-  display:        flex;
-  flex:           1;
-  flex-direction: column;
-  gap:            var(--space-1);
-  min-width:      0;
-}
-
-.page-header-rail__eyebrow {
-  color:          var(--theme-text-muted);
-  font-size:      var(--font-size-xs);
-  font-weight:    var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
-  text-transform: uppercase;
-}
-
-.page-header-rail__subtitle {
-  color:       var(--theme-text-muted);
-  font-size:   var(--font-size-sm);
-  line-height: 1.5;
-  margin:      0;
-}
-
-/* Ações no Rail — somente botão de retorno */
-.page-header-rail__actions {
-  align-items: center;
-  display:     flex;
-  flex-shrink: 0;
-  gap:         var(--space-2);
-}
-
-/* Stepper embutido no Rail */
-.page-header-rail__stepper {
-  align-items:     center;
-  display:         flex;
-  flex:            1;
-  list-style:      none;
-  margin:          0;
-  min-width:       0;
-  overflow-x:      auto;
-  padding:         0;
-  scrollbar-width: none;
-}
-
-.page-header-rail__stepper::-webkit-scrollbar { display: none; }
-
-.page-header-rail--stepper {
-  flex-wrap: wrap;
-  gap:       var(--space-4);
-}
 
 /* Painel inline dentro do rail quick-add */
 .page-header-rail--filters-inline-create .inline-create__panel {
@@ -2082,25 +1095,8 @@ body.has-delete-modal-open {
   width:       100%;
 }
 
-.page-header-rail--filters-inline-create .inline-create__body {
-  align-items: flex-end;
-  display:     flex;
-  gap:         var(--layout-quick-create-gap);
-  padding:     var(--space-4) 0;
-  width:       100%;
-}
-
-.page-header-rail--filters-inline-create .inline-create__actions {
-  margin-left: auto;
-  width:       auto;
-}
-
 /* Variante compacta (cargo/combustível): apenas o input.
    Sem label, sem botão e com o divisor indo de ponta a ponta do card. */
-
-.header-stack--inline-create-compact .inline-create__body {
-  padding: var(--space-3) 0 0; /* só o gap entre o divisor e o input */
-}
 
 .header-stack--inline-create-compact .page-header-rail--filters-inline-create .inline-create__panel {
   border-radius: 0;
@@ -2306,13 +1302,6 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
    Extensão visual abaixo do filter bar / toolbar.
    ========================================================= */
 
-.inline-create {
-  box-sizing:     border-box;
-  display:        flex;
-  flex-direction: column;
-  width:          100%;
-}
-
 /* Painel: visualmente unido à aba acima */
 .inline-create__panel {
   background:    var(--surface-quick-create);
@@ -2329,290 +1318,29 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
   flex-direction: column;
 }
 
-.inline-create__body {
-  align-items: flex-end;
-  box-sizing:  border-box;
-  display:     flex;
-  gap:         var(--layout-quick-create-gap);
-  padding:     var(--space-4) var(--filter-bar-padding-x);
-  width:       100%;
-}
-
-.inline-create__fields {
-  flex:      1;
-  min-width: 0;
-}
-
-.inline-create__actions {
-  align-items:    flex-end;
-  display:        flex;
-  flex-shrink:    0;
-  gap:            var(--space-2);
-  padding-bottom: var(--inline-create-actions-offset);
-  width:          var(--layout-quick-create-actions-width);
-}
-
-.inline-create__actions .btn {
-  border-radius: var(--radius-md);
-}
-
-.inline-create__actions .btn-primary {
-  border-color: var(--inline-create-primary-border);
-}
-
-/* 3 colunas: trios de campos — nome + CPF + telefone */
-.field-grid--cols-2 {
-  display: grid;
-  gap: var(--field-grid-gap);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  width: 100%;
-}
-
-.field-grid--cols-3 {
-  display:               grid;
-  gap:                   var(--field-grid-gap);
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  width:                 100%;
-}
-
-/* 4 colunas: alias explícito do .field-grid padrão */
-.field-grid--cols-4 {
-  display:               grid;
-  gap:                   var(--field-grid-gap);
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  width:                 100%;
-}
-
-@media (max-width: 840px) {
-  .field-grid--cols-2,
-  .field-grid--cols-3,
-  .field-grid--cols-4 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 600px) {
-  .field-grid--cols-2,
-  .field-grid--cols-3,
-  .field-grid--cols-4 {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
 /* =========================================================
    28. Responsive — Header Stack, Listas e Quick Add Inline
    ========================================================= */
 
-@media (max-width: 840px) {
-  .page-header-band {
-    padding: var(--space-4);
-  }
-
-  .page-header-rail {
-    flex-wrap: wrap;
-    padding:   var(--space-4);
-  }
-
-  .card-list {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  }
-
-  .inline-create__body {
-    align-items:    stretch;
-    flex-direction: column;
-  }
-
-  .inline-create__actions {
-    justify-content: flex-end;
-    width:           100%;
-  }
-
-  /* Filter bar: empilha campos e ações */
-  .header-filter-bar {
-    flex-direction: column;
-    align-items:    stretch;
-  }
-
-  .header-filter-bar__search,
-  .header-filter-bar__fields {
-    min-width: 0;
-    width:     100%;
-  }
-
-  .header-filter-bar--advanced .header-filter-field {
-    flex:      unset;
-    min-width: 0;
-    width:     100%;
-  }
-
-  .header-applied-filters {
-    padding-top: var(--space-2);
-  }
-}
-
 @media (max-width: 600px) {
-  .page-header-band__title {
-    font-size: 1.5rem;
-  }
-
-  .page-header-band__content {
-    align-items: flex-start;
-    flex-wrap:   wrap;
-    gap:         var(--space-2);
-  }
-
-  .card-list {
-    grid-template-columns: 1fr;
-    padding:               var(--space-3);
-  }
-
   /* Stepper: scroll horizontal sem overflow da página */
   .page-stepper {
     padding: var(--stepper-padding-y) var(--space-4);
   }
-
-  .page-stepper__list {
-    min-width: 520px;
-  }
-
-  .page-header-rail--stepper .page-header-rail__stepper {
-    order: 3;
-    width: 100%;
-  }
-}
-
-/* Input de texto / busca */
-.header-filter-input {
-  background:    var(--surface-filter-input);
-  border:        1px solid var(--border-filter-input);
-  border-radius: var(--radius-control);
-  box-sizing:    border-box;
-  color:         var(--text-filter);
-  font-size:     var(--font-size-sm);
-  height:        var(--filter-input-height);
-  outline:       none;
-  padding:       0 var(--space-3);
-  transition:    border-color var(--transition-base);
-  width:         100%;
-}
-
-.header-filter-input::placeholder { color: var(--text-filter-placeholder); }
-
-.header-filter-input:focus,
-.header-filter-input:focus-visible {
-  outline: none;
-}
-
-/* Select de filtro */
-.header-filter-select {
-  appearance:    none;
-  background:    var(--surface-filter-input);
-  border:        1px solid var(--border-filter-input);
-  border-radius: var(--radius-control);
-  box-sizing:    border-box;
-  color:         var(--text-filter);
-  cursor:        pointer;
-  font-size:     var(--font-size-sm);
-  height:        var(--filter-input-height);
-  outline:       none;
-  padding:       0 var(--space-4) 0 var(--space-3);
-  transition:    border-color var(--transition-base);
-  width:         100%;
-}
-
-.header-filter-select:focus,
-.header-filter-select:focus-visible {
-  outline: none;
 }
 
 @media (max-width: 840px) {
-  .page-header-rail--filters {
-    align-items: stretch;
-  }
-
-  .page-header-rail--filters .page-header-rail__marker {
-    height: 40px;
-    width: 40px;
-  }
-
-  .header-filter-bar__row {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .header-filter-bar__fields,
-  .page-header-rail__actions {
-    align-items: stretch;
-    width: 100%;
-  }
-
-  .page-header-rail__actions {
-    flex-wrap: wrap;
-  }
-
-  .page-header-rail__actions .cv-btn {
-    flex: 1 1 12rem;
-    min-width: 0;
-  }
+  
 
   .cv-form-section-header {
     align-items: flex-start;
     flex-wrap: wrap;
     gap: var(--space-3);
   }
-
-  .cv-form-section-header__copy,
-  .cv-form-section-header__actions {
-    min-width: 0;
-  }
-
-  .cv-form-section-header__actions {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-  }
 }
 
 @media (max-width: 600px) {
-  .page-header-stack {
-    border-radius: var(--radius-md);
-  }
-
-  .page-header-band,
-  .page-header-rail {
-    padding: 14px;
-  }
-
-  .page-header-rail--filters .page-header-rail__marker {
-    display: none;
-  }
-
-  .header-filter-bar,
-  .header-filter-bar__row,
-  .header-filter-bar__fields,
-  .page-header-rail__actions {
-    width: 100%;
-  }
-
-  .header-filter-bar {
-    flex-wrap: nowrap;
-  }
-
-  .header-filter-bar__search,
-  .header-filter-bar__row {
-    flex: 0 0 auto;
-  }
-
-  .header-filter-bar--advanced .header-filter-bar__search {
-    flex: 0 0 auto;
-  }
-
-  .header-filter-field {
-    flex: 0 0 100%;
-  }
-
-  .page-header-rail__actions .cv-btn {
-    flex-basis: 100%;
-  }
+  
 
   .page-shell--wizard > .page-stepper,
   .cv-page--flow > .page-stepper {
@@ -2624,27 +1352,9 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
     padding: 12px 10px;
   }
 
-  .page-stepper__list {
-    gap: var(--space-2);
-    min-width: 0;
-  }
-
-  .page-stepper__track {
-    margin-inline: calc(var(--space-2) / -2);
-    width: calc(100% + var(--space-2));
-  }
-
-  .page-stepper__content {
-    padding: 0;
-  }
-
   .page-stepper__eyebrow {
     font-size: 9px;
     letter-spacing: 0.04em;
-  }
-
-  .page-stepper__status {
-    font-size: 9px;
   }
 
   .cv-form-section-header {
@@ -2658,54 +1368,19 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
     padding-block: var(--space-4);
   }
 
-  .cv-form-section-header__actions,
-  .cv-form-section-header__actions .btn,
-  .cv-form-section-header__actions .app-btn,
-  .cv-form-section-header__actions .cv-btn {
+  .cv-form-section-header__actions {
     width: 100%;
   }
 
-  .form-section-body {
-    padding: var(--space-4);
-  }
+  
 
-  .card-footer {
-    align-items: stretch;
-    flex-direction: column;
-    padding: var(--space-4);
-  }
-
-  .card-footer__secondary,
-  .card-footer__primary {
-    align-items: stretch;
-    flex-direction: column;
-    width: 100%;
-  }
+  
 }
 
 @media (max-width: 420px) {
-  .page-stepper__marker {
-    height: 34px;
-    width: 34px;
-  }
-
   .page-stepper__eyebrow {
     font-size: 8px;
   }
-
-  .page-stepper__status {
-    display: none;
-  }
-}
-
-#quick-add-modelo-motivo .inline-create__fields {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-#quick-add-modelo-motivo .inline-create__fields > .field-grid {
-  margin: 0;
 }
 
 #quick-add-modelo-motivo .app-form-field {
@@ -2738,16 +1413,6 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
 #quick-add-modelo-motivo .cv-field__control--textarea:focus,
 #quick-add-modelo-motivo .cv-field__control--textarea:focus-visible {
   outline: none;
-}
-
-#quick-add-atividade .inline-create__fields {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-#quick-add-atividade .inline-create__fields > .field-grid {
-  margin: 0;
 }
 
 #quick-add-atividade .app-form-field {

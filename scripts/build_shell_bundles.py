@@ -28,23 +28,14 @@ SHELL_CSS: tuple[str, ...] = (
     "css/base/utilities.css",
     "css/layout/page-shell.css",
     "css/actions/action-system.css",
-    "css/lists/record-list.css",
     "css/fields/form-panel.css",
-    "css/fields/form-sections.css",
     "css/feedback/notice.css",
-    "css/feedback/metric.css",
-    "css/layout/app-shell.css",
-    "css/lists/content-cards.css",
-    "css/feedback/dialog.css",
-    "css/feedback/document-download-loading.css",
     "css/components/theme-dark-components.css",
     "css/components/theme-shared-components.css",
     "css/lists/list-header.css",
 )
 
-FORM_COMPONENTS_CSS: tuple[str, ...] = (
-    "css/fields/file-picker.css",
-)
+FORM_COMPONENTS_CSS: tuple[str, ...] = ()
 
 # Famílias antes espalhadas em CSS de domínio precisam continuar depois de
 # todo o shell global, como eram quando chegavam pelos blocos extra_css.
@@ -57,15 +48,11 @@ FORM_COMPONENT_IMPORTS: tuple[tuple[str, str], ...] = (
     # v2 correspondentes em 2026-08-20 — não há mais o que importar aqui.
 )
 
-# O bloco de formulário entra ANTES do sistema de ações, que é onde
-# `fields/field.css` o ancorava até a fusão das bases no v2 (2026-08-20).
-# Depois dele, o `action-system` venceria o file picker na cascata.
-_FORM_CSS_INSERT_AT = SHELL_CSS.index("css/base/utilities.css") + 1
+# O pacote de formulário é o shell MAIS o que só ele precisa. Desde a fusão das
+# bases no v2 (2026-08-20) sobrou uma folha só, e ela vai depois de todo o shell
+# — era assim que chegava, pelos blocos `extra_css` das telas.
 SHELL_CSS_WITH_FORM_COMPONENTS: tuple[str, ...] = (
-    SHELL_CSS[:_FORM_CSS_INSERT_AT]
-    + FORM_COMPONENTS_CSS
-    + SHELL_CSS[_FORM_CSS_INSERT_AT:]
-    + FORM_COMPONENTS_CSS_AFTER_SHELL
+    SHELL_CSS + FORM_COMPONENTS_CSS + FORM_COMPONENTS_CSS_AFTER_SHELL
 )
 
 SHELL_JS: tuple[str, ...] = (
@@ -112,6 +99,8 @@ UI_CSS: tuple[str, ...] = (
     # arquivos do NOVO-12 fica preservado.
     "css/v2/tokens.css",
     "css/v2/base.css",
+    "css/v2/shell.css",
+    "css/v2/document-loading.css",
     "css/v2/button.css",
     "css/v2/input.css",
     "css/v2/field.css",
@@ -142,6 +131,7 @@ UI_CSS: tuple[str, ...] = (
     "css/v2/file-picker.css",
     "css/v2/file-list.css",
     "css/v2/fab.css",
+    "css/v2/module-card.css",
     "css/v2/quick-add.css",
     "css/v2/list-page.css",
     "css/v2/form-page.css",
@@ -149,6 +139,10 @@ UI_CSS: tuple[str, ...] = (
     "css/v2/document-number.css",
     "css/v2/suggestions.css",
     "css/v2/fact.css",
+    "css/v2/stat.css",
+    "css/v2/progress.css",
+    "css/v2/folder-browser.css",
+    "css/v2/signature-fonts.css",
     "css/v2/number-stepper.css",
     "css/v2/efetivo-row.css",
     "css/v2/live-list.css",

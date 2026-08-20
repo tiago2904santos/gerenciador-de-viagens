@@ -1,15 +1,19 @@
-<section class="card-footer-section">
-  <div class="card-footer-section__divider" aria-hidden="true"></div>
-  <footer class="card-footer">
-    <div class="card-footer__secondary">
-      <c-v2.button :href="rt_url" label="Voltar ao Relatório Técnico" variant="secondary" icon="arrow-left" only />
-    </div>
-    <div class="card-footer__primary">
-      {% if trechos %}
-        <c-v2.button label="Gerar XLSX" variant="secondary" icon="download" :icon_after="True" type="submit" name="action" value="download_xlsx" only />
-        <c-v2.button label="Gerar PDF" variant="secondary" icon="download" :icon_after="True" type="submit" name="action" value="download_pdf" only />
-      {% endif %}
-      <c-v2.button :href="documentos_url" label="Ir para Documentos" variant="primary" icon="arrow-right" :icon_after="True" only />
-    </div>
-  </footer>
-</section>
+{% comment %}
+  Rodapé do Diário de Bordo: voltar ao RT, gerar os arquivos e seguir.
+
+  Migrado para `c-v2.card_footer` em 2026-08-20, pela mesma razão do rodapé da
+  troca de motorista. Os três botões do lado primário entram pelo slot — é para
+  isso que ele existe.
+{% endcomment %}
+<c-v2.card_footer>
+  <c-slot name="secondary">
+    <c-v2.button :href="rt_url" label="Voltar ao Relatório Técnico" variant="secondary" icon="arrow-left" only />
+  </c-slot>
+  <c-slot name="primary">
+    {% if trechos %}
+      <c-v2.button label="Gerar XLSX" variant="secondary" icon="download" :icon_after="True" type="submit" name="action" value="download_xlsx" only />
+      <c-v2.button label="Gerar PDF" variant="secondary" icon="download" :icon_after="True" type="submit" name="action" value="download_pdf" only />
+    {% endif %}
+    <c-v2.button :href="documentos_url" label="Ir para Documentos" variant="primary" icon="arrow-right" :icon_after="True" only />
+  </c-slot>
+</c-v2.card_footer>

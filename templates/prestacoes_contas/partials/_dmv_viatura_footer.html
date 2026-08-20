@@ -1,11 +1,16 @@
-<section class="card-footer-section">
-  <div class="card-footer-section__divider" aria-hidden="true"></div>
-  <footer class="card-footer">
-    <div class="card-footer__secondary">
-      <c-v2.button :href="diario_url" label="Cancelar" variant="secondary" icon="arrow-left" only />
-    </div>
-    <div class="card-footer__primary">
-      <c-v2.button label="Salvar alterações" variant="primary" icon="check" :icon_after="True" type="submit" only />
-    </div>
-  </footer>
-</section>
+{% comment %}
+  Rodapé da troca de motorista/viatura: cancelar e salvar.
+
+  Migrado para `c-v2.card_footer` em 2026-08-20. Era o rodapé escrito à mão
+  (`card-footer-section`, `card-footer__secondary`, `card-footer__primary`), com
+  uma régua própria acima — vocabulário do casco antigo. O componente já dá os
+  dois lados e a separação vem do vão do painel.
+{% endcomment %}
+<c-v2.card_footer>
+  <c-slot name="secondary">
+    <c-v2.button :href="diario_url" label="Cancelar" variant="secondary" icon="arrow-left" only />
+  </c-slot>
+  <c-slot name="primary">
+    <c-v2.button label="Salvar alterações" variant="primary" icon="check" :icon_after="True" type="submit" only />
+  </c-slot>
+</c-v2.card_footer>

@@ -144,4 +144,41 @@
       </c-slot>
     </c-v2.panel>
 
+    <c-v2.panel title="Contagem" description="Um número do sistema, com o ícone dizendo de que assunto ele é. Diferente do fato, que descreve um registro.">
+      <c-slot name="body">
+        <div class="stat-row">
+          <c-v2.stat icon="cloud" label="Arquivos enviados ao Drive" value="1.284" />
+          <c-v2.stat icon="calendar" label="Eventos cadastrados" value="37" />
+        </div>
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Barra de progresso" description="Trabalho longo que o servidor toca em segundo plano — quem escreve o número é o motor da tela.">
+      <c-slot name="body">
+        <c-v2.progress
+          label="Status da reorganização"
+          state="Em andamento"
+          percent="42%"
+          value="42"
+          hint="132 de 314 documentos organizados."
+        />
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Linha de pasta" description="A única lista do sistema com duas ações de mesmo peso: escolher esta pasta, ou entrar nela.">
+      <c-slot name="body">
+        <div class="folder-list" role="list">
+          <c-v2.folder_row name="Documentos oficiais" folder_id="demo-1" />
+          <c-v2.folder_row name="Eventos 2026" folder_id="demo-2" :selected="True" />
+          <c-v2.folder_row name="Drive da Assessoria" folder_id="demo-3" :shared="True" />
+        </div>
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Fontes de assinatura" description="A tela pública de assinatura: cada opção mostra o próprio nome do signatário desenhado naquela fonte.">
+      <c-slot name="body">
+        <c-v2.signature_fonts :fontes="v2_fontes_de_assinatura" nome="Tiago dos Santos" />
+      </c-slot>
+    </c-v2.panel>
+
     {# ---------------------------------------------------------------- LISTA #}

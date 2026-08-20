@@ -8,15 +8,12 @@
   var buttonNew = document.getElementById("toggle-btn-novo");
   if (!panelSaved || !panelNew) return;
 
+  /* `aria-pressed` é o único estado: `v2/toggle.css` pinta o segmento escolhido
+     por ele. A animação de entrada era `segment-toggle__btn--pop`, do alternador
+     ANTIGO — saiu em 2026-08-20, junto com a folha que a desenhava. */
   function setPressed(button, active) {
     if (!button) return;
-    var wasActive = button.getAttribute("aria-pressed") === "true";
     button.setAttribute("aria-pressed", active ? "true" : "false");
-    if (active && !wasActive) {
-      button.classList.remove("segment-toggle__btn--pop");
-      void button.offsetWidth;
-      button.classList.add("segment-toggle__btn--pop");
-    }
   }
 
   function syncButtons(saved) {

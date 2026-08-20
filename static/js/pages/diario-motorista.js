@@ -27,14 +27,13 @@
       return radios[0] ? radios[0].value : "";
     }
 
+    /* Só mostrar e esconder os grupos. Marcar o cartão escolhido era coisa daqui
+       até 2026-08-20 (`classList.toggle("is-selected")` no `.dmv-option`); agora
+       as opções são `c-v2.choice_card`, e a folha do componente pinta o
+       escolhido por `:has(input:checked)` — sem JS, e igual ao resto do
+       sistema. */
     function aplicar() {
       var modo = modoAtual();
-      radios.forEach(function (radio) {
-        var card = radio.closest(".dmv-option");
-        if (card) {
-          card.classList.toggle("is-selected", radio.checked);
-        }
-      });
       groups.forEach(function (group) {
         group.hidden = group.getAttribute(groupAttr) !== modo;
       });

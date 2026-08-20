@@ -34,17 +34,24 @@
   min-width: 0;
 }
 
-/* O resumo administrativo do ofício é uma faixa única: número, protocolo,
-   criação e custeio têm o mesmo peso e precisam permanecer lado a lado. A
-   exceção é local para não devolver colunas aos fatos dos cartões de lista. */
-:is(html[data-theme]) .fact-list.document-summary--identity {
+/* FAIXA — a exceção à coluna única.
+ *
+ * Um resumo de documento é uma linha de fatos equivalentes: número, protocolo,
+ * criação e custeio têm o mesmo peso e se leem lado a lado. A exceção é um
+ * modificador do PRÓPRIO bloco, e não uma classe de tela: eram
+ * `document-summary--identity` e `document-summary--vehicle`, dois seletores
+ * com o mesmo corpo, modificando um bloco (`document-summary`) que não existia
+ * em folha nenhuma — nome de tela vestido de componente.
+ *
+ * A contagem entra no nome porque é ela que muda: o resumo do ofício tem
+ * quatro fatos, o das diárias tem três painéis. `auto-fit` não serve aqui —
+ * foi ele que encolheu a placa até "Não informa…" e obrigou a coluna única. */
+:is(html[data-theme]) .fact-list--band-4 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-/* O resumo da viatura segue a mesma leitura horizontal: placa, modelo, tipo e
-   combustível formam uma única faixa de quatro fatos equivalentes. */
-:is(html[data-theme]) .fact-list.document-summary--vehicle {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+:is(html[data-theme]) .fact-list--band-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 /* Três linhas EMPILHADAS: rótulo, valor, apoio.

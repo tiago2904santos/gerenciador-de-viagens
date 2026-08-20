@@ -17,11 +17,6 @@
       sourceAttribute: "data-cv-lazy-card-toggle-src",
     },
     {
-      name: "segment-nav",
-      selector: ".segment-toggle--nav",
-      sourceAttribute: "data-cv-lazy-segment-nav-src",
-    },
-    {
       name: "file-picker",
       selector: "[data-file-picker]",
       sourceAttribute: "data-cv-lazy-file-picker-src",

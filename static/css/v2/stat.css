@@ -1,0 +1,56 @@
+/* Contagem com ícone — par de `cotton/v2/stat.html`.
+ *
+ * Uma linha: ícone, assunto, número. O número fica à direita e em destaque,
+ * porque é o que se lê; o assunto explica de que ele é.
+ *
+ * O fundo é o poço de campo, e não um cartão: três contagens seguidas com
+ * borda e sombra viram três caixas competindo com o conteúdo da tela — foi o
+ * que o `metric` fazia no painel antigo.
+ */
+
+:is(html[data-theme]) .stat-row {
+  display: grid;
+  gap: var(--gap-tight);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  min-width: 0;
+}
+
+:is(html[data-theme]) .stat {
+  align-items: center;
+  background: var(--surface-contrast, var(--surface-field));
+  border-radius: var(--radius-field);
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px 12px;
+}
+
+:is(html[data-theme]) .stat__icon {
+  align-items: center;
+  color: var(--accent);
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+:is(html[data-theme]) .stat__icon svg {
+  height: 18px;
+  width: 18px;
+}
+
+/* O assunto cede a largura; o número nunca. */
+:is(html[data-theme]) .stat__label {
+  color: var(--text-muted);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:is(html[data-theme]) .stat__value {
+  color: var(--text-strong);
+  flex: 0 0 auto;
+  font-size: var(--text-size-base);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-strong);
+}

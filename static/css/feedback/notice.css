@@ -1,5 +1,13 @@
 /* ========================================================================
-   notice — aviso inline unificado (Etapa 7, fase 13)
+   notice — aviso inline do sistema antigo, no que sobrou dele.
+
+   Os apelidos de `.alert` saíram em 2026-08-20: o alerta é `c-v2.alert`, com
+   folha própria (`v2/alert.css`), e enquanto os dois desenhavam a mesma classe
+   o componente do v2 dependia daqui para saber que forma tinha. O que fica são
+   `notice*` e `diario-diaria-alert`, emitidos por três telas de prestação de
+   contas que ainda não migraram.
+
+   Histórico original: (Etapa 7, fase 13)
 
    Substitui progressivamente: .alert/.alert-*, .cv-alert/.cv-alert--*,
    .diario-diaria-alert, .pte-events__banner.
@@ -7,17 +15,14 @@
    ======================================================================== */
 
 /* Contêiner de pilha */
-.notice-stack,
-.alerts {
+.notice-stack {
   display: grid;
   gap: var(--space-2);
   margin-bottom: var(--space-5);
 }
 
 /* Base */
-.notice,
-.alert,
-.cv-alert {
+.notice {
   align-items: flex-start;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -30,15 +35,12 @@
   position: relative;
 }
 
-.notice > *,
-.alert > *,
-.cv-alert > * {
+.notice > * {
   grid-column: 2;
   min-width: 0;
 }
 
-.notice::before,
-.alert::before {
+.notice::before {
   border-radius: var(--radius-pill);
   content: "";
   display: inline-block;
@@ -49,8 +51,7 @@
   width: 8px;
 }
 
-.notice__title,
-.alert__title {
+.notice__title {
   color: inherit;
   display: block;
   font-size: var(--font-size-sm);
@@ -58,8 +59,7 @@
   grid-column: 2;
 }
 
-.notice__message,
-.alert__message {
+.notice__message {
   color: inherit;
   display: block;
   font-weight: var(--font-weight-semibold);
@@ -69,17 +69,13 @@
 
 /* Variante info */
 .notice--info,
-.alert-info,
-.alert--info,
 .pte-events__banner {
   background: var(--color-info-bg);
   border-color: var(--color-info-border);
   color: var(--color-info-text);
 }
 
-.notice--info::before,
-.alert-info::before,
-.alert--info::before {
+.notice--info::before {
   background: var(--color-info);
 }
 
@@ -100,32 +96,19 @@
   display: none;
 }
 
-.pte-events__banner-icon,
-.pte-events__banner svg {
-  flex: 0 0 auto;
-  height: 1.15rem;
-  width: 1.15rem;
-}
-
 /* Variante success */
-.notice--success,
-.alert-success,
-.alert--success {
+.notice--success {
   background: var(--color-success-soft);
   border-color: var(--color-success-border-soft, color-mix(in srgb, var(--color-success) 35%, transparent));
   color: var(--color-success);
 }
 
-.notice--success::before,
-.alert-success::before,
-.alert--success::before {
+.notice--success::before {
   background: var(--color-success);
 }
 
 /* Variante warning */
 .notice--warning,
-.alert-warning,
-.alert--warning,
 .diario-diaria-alert {
   background: color-mix(in srgb, var(--color-warning) 7%, transparent);
   border: 0;
@@ -138,8 +121,6 @@
 }
 
 .notice--warning::before,
-.alert-warning::before,
-.alert--warning::before,
 .diario-diaria-alert::before {
   content: none;
   display: none;
@@ -163,50 +144,13 @@
   font-weight: 600;
 }
 
-.notice--danger,
-.alert-error,
-.alert-danger,
-.alert--error,
-.cv-alert--danger {
+.notice--danger {
   background: var(--color-danger-bg);
   border-color: var(--color-danger-border-soft, color-mix(in srgb, var(--color-danger) 32%, transparent));
   color: var(--color-danger-text);
 }
 
-.notice--danger::before,
-.alert-error::before,
-.alert-danger::before,
-.alert--error::before {
+.notice--danger::before {
   background: var(--color-danger);
 }
 
-/* cv-alert simples (sem marcador) */
-.cv-alert {
-  box-shadow: none;
-  display: block;
-  font-size: var(--font-size-sm);
-  grid-template-columns: unset;
-}
-
-.cv-alert::before {
-  content: none;
-  display: none;
-}
-
-/* Layout com ação lateral */
-.notice--action,
-.cv-alert--action {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  grid-template-columns: unset;
-  justify-content: space-between;
-  margin: 0 0 var(--space-4);
-}
-
-.notice--action::before,
-.cv-alert--action::before {
-  content: none;
-  display: none;
-}

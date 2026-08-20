@@ -25,7 +25,7 @@
       action: "data-delete-url",
       label: "[data-delete-confirm-label]",
       labelAttribute: "data-delete-label",
-      title: ".delete-confirm-modal__title",
+      title: "[data-delete-modal-title]",
       titleAttribute: "data-delete-title",
     },
     {

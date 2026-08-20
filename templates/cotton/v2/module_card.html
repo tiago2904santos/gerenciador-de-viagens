@@ -1,20 +1,28 @@
 {% cotton:vars action_label description eyebrow href mark title %}
 {% firstof mark title as card_mark %}
 {% comment %}
-  Atalho de módulo compartilhado pelo Dashboard e pelo hub de Cadastros.
-  A marcação visual existente fica preservada; a ação passa a usar o botão v2.
+  Atalho de módulo — o cartão que leva a uma área do sistema. Aparece no Início
+  e no hub de Cadastros. Par de `static/css/v2/module-card.css`.
+
+  Vocabulário próprio desde 2026-08-20: era `cv-module-card__*` e o cartão
+  carregava QUATRO classes na raiz (`module-card-v2 cv-module-card module-card
+  app-card`) porque cada uma trazia um pedaço do desenho de uma folha
+  diferente. Agora é uma classe e uma folha.
+
+  A marca são as duas primeiras letras do nome, em caixa alta — é o que
+  distingue os atalhos numa fileira, antes de o olho chegar ao título.
 {% endcomment %}
-<article class="module-card-v2 cv-module-card module-card app-card">
-  <header class="cv-module-card__header">
-    <span class="cv-module-card__mark" aria-hidden="true">{{ card_mark|slice:":2"|upper }}</span>
-    <span class="cv-module-card__eyebrow eyebrow">{{ eyebrow|default:"Módulo" }}</span>
+<article class="module-card">
+  <header class="module-card__header">
+    <span class="module-card__mark" aria-hidden="true">{{ card_mark|slice:":2"|upper }}</span>
+    <span class="module-card__eyebrow">{{ eyebrow|default:"Módulo" }}</span>
   </header>
-  <div class="cv-module-card__body">
-    <h3 class="cv-module-card__title">{{ title }}</h3>
-    {% if description %}<p class="cv-module-card__description">{{ description }}</p>{% endif %}
+  <div class="module-card__body">
+    <h3 class="module-card__title">{{ title }}</h3>
+    {% if description %}<p class="module-card__description">{{ description }}</p>{% endif %}
   </div>
   {% if href %}
-    <footer class="cv-module-card__footer">
+    <footer class="module-card__footer">
       {% with rotulo=action_label|default:"Abrir" %}<c-v2.button :href="href" :label="rotulo" variant="secondary" icon="arrow-right" :icon_after="True" />{% endwith %}
     </footer>
   {% endif %}

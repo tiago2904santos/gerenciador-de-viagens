@@ -22,6 +22,7 @@ motivo: com Planos de Trabalho fora da tupla de
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from django.contrib.auth import get_user_model
@@ -264,7 +265,13 @@ class WizardV2Tests(TestCase):
     def test_pickers_de_coordenador_nao_repetem_o_rotulo_nome(self):
         html = self._html("planos_trabalho:wizard_identificacao")
 
-        self.assertEqual(html.count('class="field__label sr-only"'), 2)
+        # A contagem é do rótulo "Nome", e não de todo rótulo escondido: os
+        # blocos de texto da etapa (contextualização, coordenação, considerações)
+        # também escondem o seu, e passaram a somar cinco.
+        escondidos = re.findall(
+            r'<label class="field__label sr-only"[^>]*>([^<]*)</label>', html
+        )
+        self.assertEqual(escondidos.count("Nome"), 2)
         self.assertNotIn('class="field__label">Nome</label>', html)
 
     # ---- etapa 2 ---------------------------------------------------------
@@ -344,8 +351,15 @@ class WizardV2Tests(TestCase):
     def test_o_resumo_das_diarias_usa_tres_paineis_v2(self):
         html = self._html("planos_trabalho:wizard_efetivo_diarias")
 
-        self.assertIn('class="document-summary fact-list pt-diarias-summary"', html)
-        self.assertEqual(html.count("pt-diarias-summary__panel"), 3)
+        # `pt-diarias-summary` e `pt-diarias-summary__panel` não tinham CSS:
+        # os três painéis vinham EMPILHADOS, e não na faixa que o comentário da
+        # tela descrevia. A faixa agora é o modificador do próprio bloco.
+        self.assertIn('class="fact-list fact-list--band-3"', html)
+        self.assertEqual(html.count('aria-label="Valor total do plano"'), 1)
+        self.assertEqual(html.count('aria-label="Valor por servidor"'), 1)
+        self.assertEqual(
+            html.count('aria-label="Quantidade de diárias e efetivo total"'), 1
+        )
         self.assertIn("Quantidade de diárias", html)
         self.assertNotIn("Composição por servidor", html)
 

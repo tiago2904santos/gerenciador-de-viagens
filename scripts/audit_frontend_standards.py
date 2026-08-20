@@ -120,13 +120,12 @@ COBERTURA_ADIADA = {
     "static/css/actions/action-system.css",
     "static/css/feedback/dialog.css",
     "static/css/feedback/document-download-loading.css",
-    "static/css/feedback/metric.css",
-    "static/css/feedback/notice.css",
-    "static/css/fields/file-picker.css",
+        "static/css/feedback/notice.css",
+    "static/css/v2/file-picker.css",
     "static/css/fields/form-panel.css",
     "static/css/fields/form-sections.css",
     "static/css/layout/app-shell.css",
-    "static/css/lists/content-cards.css",
+    "static/css/v2/module-card.css",
     "static/css/lists/list-header.css",
     "static/css/lists/record-list.css",
     "static/css/pages/document-generation-embedded.css",
@@ -139,8 +138,7 @@ GLOBAL_CSS = {
     "static/css/layout/layout.css",
     "static/css/base/base.css",
     "static/css/base/utilities.css",
-    "static/css/layout/stages.css",
-    "static/css/pages/documents.css",
+        "static/css/pages/documents.css",
 }
 
 # Seletores de domínio que não devem estar em CSS global
@@ -161,7 +159,11 @@ CSS_RULES_ERRO: list[tuple] = [
 
 CSS_RULES_AVISO = [
     ("domain_selector_in_global", _DOMAIN_SELECTOR_PAT, "Seletor de domínio em CSS global — mover para css de módulo"),
-    ("route_token_in_global",     _ROUTE_TOKEN_PAT,     "Token --route-* em CSS global — mover para roteiros.css"),
+    # `pages/roteiros.css` foi APAGADA em 2026-08-20 — o editor de roteiro
+    # migrou para o v2 em 2026-08-17 e nenhuma tela a carregava desde então.
+    # Os tokens `--route-*` que sobraram vivem em `base/tokens.css`, com o
+    # resto da paleta; não há mais para onde "mover".
+    ("route_token_in_global",     _ROUTE_TOKEN_PAT,     "Token --route-* em CSS global — usar token do v2"),
     ("legacy_page_header_in_css", _LEGACY_PAGE_HEADER_PAT, "Seletor .page-header legado — encerrar após Prompt 3"),
 ]
 

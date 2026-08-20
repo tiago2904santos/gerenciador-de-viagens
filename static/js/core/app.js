@@ -174,44 +174,34 @@ document.documentElement.dataset.appReady = "true";
     return node;
   }
 
+  /* O diálogo global (`CV.feedback.alert` / `.confirm`) é o MODAL DO V2, montado
+     em JS porque não há template para ele: qualquer script do sistema pode pedir
+     uma confirmação, de qualquer tela.
+
+     Era `cv-dialog` até 2026-08-20 — um `<div hidden>` com fundo próprio, botão
+     "×" no cabeçalho e uma folha só dele (`feedback/dialog.css`, 153 linhas,
+     apagada). A estrutura aqui é a mesma de `cotton/v2/modal.html`, classe por
+     classe, para que os dois caminhos — o diálogo de template e o de script —
+     sejam a mesma peça na tela.
+
+     `<dialog>` nativo traz foco preso, Esc e camada de topo; o `::backdrop` vem
+     de `v2/modal.css`. Some com isso o backdrop de mentira e o "×": fechar é o
+     botão do rodapé ou o Esc, como nos outros diálogos do sistema. */
   function ensureModal() {
     if (modal) return modal;
 
-    modal = element("div", "cv-dialog cv-dialog--warning delete-confirm-modal", {
+    modal = element("dialog", "modal", {
       "data-cv-feedback-modal": "",
-      hidden: "",
-    });
-    modal.hidden = true;
-
-    var backdrop = element("div", "cv-dialog__backdrop delete-confirm-modal__backdrop", {
-      "data-cv-feedback-cancel": "",
-    });
-    var panel = element("section", "cv-dialog__panel cv-dialog__panel--sm delete-confirm-modal__dialog", {
-      role: "dialog",
-      "aria-modal": "true",
       "aria-labelledby": "feedback-title",
       "aria-describedby": "feedback-message",
-      tabindex: "-1",
     });
-    var header = element("header", "cv-dialog__header cv-dialog__header--warning");
-    var heading = element("div", "cv-dialog__heading delete-confirm-modal__copy");
-    var eyebrow = element("span", "cv-dialog__eyebrow delete-confirm-modal__eyebrow");
-    eyebrow.textContent = "Central de Viagens";
-    var title = element("h2", "cv-dialog__title delete-confirm-modal__title", { id: "feedback-title" });
-    /* `icon-button` do v2, e não o `icon-btn` legado: era o último lugar do
-       sistema a emitir aquela classe, e ela sustentava sozinha uma folha de
-       1.141 linhas (`actions/buttons.css`, apagada em 2026-08-20). */
-    var closeButton = element("button", "cv-dialog__close icon-button", {
-      type: "button",
-      "aria-label": "Fechar",
-      "data-cv-feedback-cancel": "",
-    });
-    closeButton.textContent = "×";
-    var body = element("div", "cv-dialog__body delete-confirm-modal__body");
-    var message = element("p", "cv-dialog__message delete-confirm-modal__message", {
-      id: "feedback-message",
-    });
-    var footer = element("div", "cv-dialog__footer delete-confirm-modal__actions");
+
+    var shell = element("div", "modal__shell");
+    var header = element("header", "modal__header");
+    var title = element("h2", "modal__title", { id: "feedback-title" });
+    var body = element("div", "modal__body");
+    var message = element("p", "modal__message", { id: "feedback-message" });
+    var footer = element("footer", "modal__actions");
     var cancelButton = element("button", "button button--secondary", {
       type: "button",
       "data-cv-feedback-cancel": "",
@@ -222,23 +212,29 @@ document.documentElement.dataset.appReady = "true";
       "data-cv-feedback-accept": "",
     });
 
-    heading.appendChild(eyebrow);
-    heading.appendChild(title);
-    header.appendChild(heading);
-    header.appendChild(closeButton);
+    header.appendChild(title);
     body.appendChild(message);
     footer.appendChild(cancelButton);
     footer.appendChild(acceptButton);
-    panel.appendChild(header);
-    panel.appendChild(body);
-    panel.appendChild(footer);
-    modal.appendChild(backdrop);
-    modal.appendChild(panel);
+    shell.appendChild(header);
+    shell.appendChild(body);
+    shell.appendChild(footer);
+    modal.appendChild(shell);
     document.body.appendChild(modal);
 
     modal.addEventListener("click", function (event) {
       if (event.target.closest("[data-cv-feedback-accept]")) finish(true);
       else if (event.target.closest("[data-cv-feedback-cancel]")) finish(false);
+      /* Clique FORA do painel. Num `<dialog>` nativo o fundo é o `::backdrop`, e
+         o clique nele chega com `target` no próprio diálogo — era o que o
+         backdrop de mentira do desenho antigo fazia à mão. */
+      else if (event.target === modal) finish(false);
+    });
+    /* Esc fecha o `<dialog>` sozinho, e o cancelamento precisa resolver a
+       promessa de quem pediu — senão o `await CV.confirm(...)` nunca volta. */
+    modal.addEventListener("cancel", function (event) {
+      event.preventDefault();
+      finish(false);
     });
     return modal;
   }
@@ -260,7 +256,6 @@ document.documentElement.dataset.appReady = "true";
     var message = container.querySelector("#feedback-message");
     var cancelButton = container.querySelector("[data-cv-feedback-cancel].button");
     var acceptButton = container.querySelector("[data-cv-feedback-accept]");
-    var panel = container.querySelector('[role="dialog"]');
 
     title.textContent = active.options.title || (isConfirm ? "Confirmar ação" : "Aviso");
     renderMessage(message, active.message);
@@ -272,7 +267,6 @@ document.documentElement.dataset.appReady = "true";
       initialFocus: isConfirm ? cancelButton : acceptButton,
       onRequestClose: function () { finish(false); },
     });
-    panel.setAttribute("aria-labelledby", title.id);
   }
 
   function finish(accepted) {

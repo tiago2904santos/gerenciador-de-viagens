@@ -23,8 +23,39 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.base_tokens_css = self.base_tokens_path.read_text(encoding="utf-8")
         self.shared_components_css = self.shared_components_path.read_text(encoding="utf-8")
         self.dark_components_css = self.components_path.read_text(encoding="utf-8")
-        self.components_css = (
-            f"{self.dark_components_css}\n{self.shared_components_css}"
+        # As duas folhas de tema encolheram 2.400 linhas em 2026-08-20: o que
+        # descrevia um componente do v2 foi para a folha DELE (a pele do editor
+        # de roteiro, a lista de opções, o picker, o bloco de formulário, o
+        # calendário e a grade de campos).
+        #
+        # O que este arquivo guarda é CONTRATO DE DESENHO — "claro e escuro
+        # mudam de paleta, não de geometria" —, e esse contrato não depende de
+        # em qual arquivo a regra mora. Por isso a camada medida é a soma: as
+        # duas folhas de tema mais as folhas que receberam as regras.
+        v2 = Path(settings.BASE_DIR) / "static" / "css" / "v2"
+        self.route_editor_css = (v2 / "route-editor.css").read_text(encoding="utf-8")
+        # A CAMADA DE TEMA, e só ela: é sobre ela que valem as proibições
+        # ("o tema não escolhe geometria", "o tema não mira o claro").
+        self.components_css = "\n".join(
+            (self.dark_components_css, self.shared_components_css)
+        )
+        # A camada de tema MAIS as folhas que receberam as regras dela. Serve às
+        # asserções que guardam DESENHO — "claro e escuro mudam de paleta, não de
+        # geometria" —, porque esse contrato não depende de em qual arquivo a
+        # regra mora, e em 2026-08-20 seis componentes levaram a sua para casa.
+        self.desenho_css = "\n".join(
+            [self.components_css]
+            + [
+                (v2 / nome).read_text(encoding="utf-8")
+                for nome in (
+                    "route-editor.css",
+                    "listbox.css",
+                    "picker.css",
+                    "form-block.css",
+                    "date-picker.css",
+                    "field.css",
+                )
+            ]
         )
         self.page_shell_css = self.page_shell_path.read_text(encoding="utf-8")
         self.list_header_css = self.list_header_path.read_text(encoding="utf-8")
@@ -50,16 +81,11 @@ class DarkRedesignContractTests(SimpleTestCase):
         ).read_text(encoding="utf-8")
         style_index = bundle.index(">>> css/style.css >>>")
         theme_dark_tokens_index = bundle.index(">>> css/base/03-theme-dark.css >>>")
-        file_picker_index = form_bundle.index(">>> css/fields/file-picker.css >>>")
         form_action_system_index = form_bundle.index(
             ">>> css/actions/action-system.css >>>"
         )
         action_system_index = bundle.index(">>> css/actions/action-system.css >>>")
-        record_list_index = bundle.index(">>> css/lists/record-list.css >>>")
         form_panel_index = bundle.index(">>> css/fields/form-panel.css >>>")
-        app_shell_index = bundle.index(">>> css/layout/app-shell.css >>>")
-        content_cards_index = bundle.index(">>> css/lists/content-cards.css >>>")
-        dialog_index = bundle.index(">>> css/feedback/dialog.css >>>")
         theme_shared_components_index = bundle.index(
             ">>> css/components/theme-shared-components.css >>>"
         )
@@ -73,20 +99,23 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertNotIn("css/dark-redesign.css", self.base)
         self.assertNotIn("css/dark-redesign.css", bundle)
         self.assertLess(shell_bundle_index, extra_css_index)
-        self.assertNotIn(">>> css/fields/file-picker.css >>>", bundle)
-        self.assertLess(file_picker_index, form_action_system_index)
-        self.assertLess(action_system_index, dialog_index)
-        self.assertLess(action_system_index, record_list_index)
+        # `fields/file-picker.css` foi fundida em `v2/file-picker.css` em
+        # 2026-08-20: a folha era a BASE do componente do v2, não legado.
         # `lists/filter-header.css` saiu do bundle em 2026-08-19 — ela mesma se
         # descrevia como "compat residual", e nenhuma tela emitia as classes dela.
-        self.assertLess(record_list_index, form_panel_index)
-        self.assertLess(form_panel_index, app_shell_index)
-        self.assertLess(app_shell_index, content_cards_index)
-        # `pages/document-viewer.css` saiu do bundle em 2026-08-19: o
-        # visualizador virou tela com folha própria (`v2/pdf-viewer.css`),
-        # carregada por ela e não pelo shell de todas as páginas.
-        self.assertLess(content_cards_index, dialog_index)
-        self.assertLess(dialog_index, theme_dark_components_index)
+        # `lists/record-list.css` saiu em 2026-08-20: das nove regras dela só a
+        # pilha continuava viva, e foi para `v2/record.css`.
+        self.assertLess(action_system_index, form_panel_index)
+        # `layout/app-shell.css` saiu do shell em 2026-08-20 junto com a pasta
+        # `layout/`: a casca virou `v2/shell.css` e viaja no pacote do v2.
+        # `lists/content-cards.css` saiu pelo mesmo motivo — o cartão de módulo
+        # virou componente (`v2/module-card.css`) —, e
+        # `pages/document-viewer.css` um dia antes, quando o visualizador virou
+        # tela com folha própria (`v2/pdf-viewer.css`). `feedback/dialog.css`
+        # saiu no mesmo dia: o diálogo global de `core/app.js` passou a montar o
+        # `<dialog class="modal">` do v2, e a folha do `cv-dialog` ficou sem
+        # nenhuma marcação para vestir.
+        self.assertLess(form_panel_index, theme_dark_components_index)
         self.assertLess(theme_dark_components_index, theme_shared_components_index)
         self.assertLess(action_system_index, theme_dark_components_index)
 
@@ -161,28 +190,39 @@ class DarkRedesignContractTests(SimpleTestCase):
                 self.assertIn(token, self.tokens_css)
 
     def test_reduced_motion_and_mobile_shell_are_explicit(self):
-        self.assertIn("@media (prefers-reduced-motion: reduce)", self.components_css)
-        self.assertIn("@media (max-width: 600px)", self.components_css)
-        self.assertIn("height: 100dvh;", self.components_css)
-        self.assertIn("max-height: none;", self.components_css)
+        """A casca do celular e o respeito a "menos movimento" continuam escritos.
+
+        A gaveta da barra lateral saiu das folhas de tema em 2026-08-20 e foi
+        para `v2/sidebar.css`, que é de quem ela é. O contrato não é sobre o
+        arquivo: é que as duas coisas estejam DECLARADAS em algum lugar do
+        sistema, e não deduzidas.
+        """
+        sidebar = (
+            Path(settings.BASE_DIR) / "static" / "css" / "v2" / "sidebar.css"
+        ).read_text(encoding="utf-8")
+        casca = "\n".join((self.desenho_css, sidebar))
+        self.assertIn("@media (prefers-reduced-motion: reduce)", casca)
+        self.assertIn("@media (max-width: 600px)", casca)
+        self.assertIn("height: 100dvh;", casca)
+        self.assertIn("max-height: none;", casca)
 
     def test_event_wizard_geometry_is_shared_by_both_themes(self):
         # NOVO-58/NOVO-100: o claro e o escuro mudam de paleta, não de desenho.
         self.assertIn(
             ':is(html[data-theme])\n  :is([data-travel-document-wizard-step1] .travel-document-block',
-            self.components_css,
+            self.desenho_css,
         )
         self.assertIn(
             ':is(html[data-theme])\n  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block.route-destinos-block--split',
-            self.components_css,
+            self.desenho_css,
         )
         self.assertIn(
             ':is(html[data-theme])\n  .custom-select__trigger--v2 .custom-select__chevron',
-            self.components_css,
+            self.desenho_css,
         )
         self.assertNotIn(
             ':is(html[data-theme="dark"])\n  .custom-select__trigger--v2 .custom-select__chevron',
-            self.components_css,
+            self.desenho_css,
         )
 
     def test_event_stepper_uses_one_shared_ring_and_shared_typography(self):
@@ -212,10 +252,10 @@ class DarkRedesignContractTests(SimpleTestCase):
             with self.subTest(selector=selector):
                 shared = f':is(html[data-theme])\n  {selector}'
                 dark_only = f':is(html[data-theme="dark"])\n  {selector}'
-                self.assertIn(shared, self.components_css)
-                self.assertNotIn(dark_only, self.components_css)
+                self.assertIn(shared, self.desenho_css)
+                self.assertNotIn(dark_only, self.desenho_css)
 
-        self.assertIn("box-shadow: var(--shadow-custom-select-menu);", self.components_css)
+        self.assertIn("box-shadow: var(--shadow-custom-select-menu);", self.desenho_css)
         self.assertIn("--shadow-custom-select-menu:", self.tokens_css)
 
     def test_entity_cards_use_one_structure_for_both_themes(self):
@@ -232,8 +272,8 @@ class DarkRedesignContractTests(SimpleTestCase):
             with self.subTest(selector=selector):
                 shared = f':is(html[data-theme])\n  {selector}'
                 dark_only = f':is(html[data-theme="dark"])\n  {selector}'
-                self.assertIn(shared, self.components_css)
-                self.assertNotIn(dark_only, self.components_css)
+                self.assertIn(shared, self.desenho_css)
+                self.assertNotIn(dark_only, self.desenho_css)
 
         self.assertIn(
             "--entity-card-inner-bg: var(--color-surface-powder);",
@@ -243,7 +283,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             "--entity-card-inner-bg: var(--color-surface-soft);",
             self.tokens_css,
         )
-        self.assertIn("background: var(--entity-card-inner-bg);", self.components_css)
+        self.assertIn("background: var(--entity-card-inner-bg);", self.desenho_css)
 
     def test_light_wizard_uses_blue_gray_sections_with_white_fields(self):
         # NOVO-113: a referencia aprovada inverte a hierarquia que havia
@@ -262,9 +302,9 @@ class DarkRedesignContractTests(SimpleTestCase):
         for contract in dark_contracts:
             self.assertIn(contract, self.tokens_css)
 
-        self.assertIn("--step1-surface: var(--wizard-card-bg);", self.components_css)
-        self.assertIn("--step1-panel: var(--wizard-panel-bg);", self.components_css)
-        self.assertIn("--step1-field: var(--wizard-field-bg);", self.components_css)
+        self.assertIn("--step1-surface: var(--wizard-card-bg);", self.desenho_css)
+        self.assertIn("--step1-panel: var(--wizard-panel-bg);", self.desenho_css)
+        self.assertIn("--step1-field: var(--wizard-field-bg);", self.desenho_css)
 
     def test_templates_do_not_reintroduce_inline_visual_or_event_contracts(self):
         templates = Path(settings.BASE_DIR) / "templates"
@@ -394,10 +434,12 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "file_picker.html"
         ).read_text(encoding="utf-8")
         component_css = (
+            # A folha vive em `v2/` desde 2026-08-20: era a base do componente,
+            # não legado — `fields/` só era onde ela tinha nascido.
             Path(settings.BASE_DIR)
             / "static"
             / "css"
-            / "fields"
+            / "v2"
             / "file-picker.css"
         ).read_text(encoding="utf-8")
 
@@ -561,8 +603,11 @@ class DarkRedesignContractTests(SimpleTestCase):
         sidebar_js = (
             Path(settings.BASE_DIR) / "static" / "js" / "components" / "sidebar.js"
         ).read_text(encoding="utf-8")
+        # A pasta `layout/` foi extinta em 2026-08-20: a casca virou
+        # `v2/shell.css` e o comportamento da gaveta foi para a folha da
+        # própria barra, que é de quem ele é.
         shell_css = (
-            Path(settings.BASE_DIR) / "static" / "css" / "layout" / "app-shell.css"
+            Path(settings.BASE_DIR) / "static" / "css" / "v2" / "sidebar.css"
         ).read_text(encoding="utf-8")
 
         self.assertIn('href="#main-content"', self.base)
@@ -610,7 +655,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "templates"
             / "planos_trabalho"
             / "partials"
-            / "resumo_evento_card.html"
+            / "_resumo_evento_record.html"
         ).read_text(encoding="utf-8")
         plan_summary_body = (
             Path(settings.BASE_DIR)
@@ -623,7 +668,11 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR) / "static" / "css" / "v2" / "fact.css"
         ).read_text(encoding="utf-8")
 
-        self.assertIn("<c-v2.panel", plan_summary)
+        # O casco passou a ser o `c-v2.record` na variante de painel
+        # (`box="panel"`): o resumo é um registro com título, selo e miolo, e
+        # era isso que o `panel` mais os três parciais reconstruíam à mão.
+        self.assertIn("<c-v2.record", plan_summary)
+        self.assertIn('box="panel"', plan_summary)
         # `H-05`: o grid saiu do casco e vive no partial do corpo.
         self.assertIn('class="fact-list"', plan_summary_body)
         self.assertNotIn('class="summary-grid', plan_summary_body)
@@ -756,21 +805,33 @@ class DarkRedesignContractTests(SimpleTestCase):
         # sobrou em `/` e cabecalho de pagina mais cartao de modulo, e nenhuma
         # classe `dashboard-*` pode voltar — era ela que justificava um CSS so
         # dela (`dashboard.css`, apagado) e 4 blocos no tema escuro.
-        self.assertIn("page-shell", dashboard)
+        #
+        # 2026-08-20: `page-shell` saiu das duas telas. Ele era o casco do
+        # sistema antigo, e o do v2 é a `list-page` — a mesma casca que as
+        # listas usam. O cartão perdeu o prefixo `cv-`: passou a ser
+        # `module-card`, com folha própria (`v2/module-card.css`).
+        self.assertIn('class="list-page"', dashboard)
         self.assertIn('<c-v2.header', dashboard)
         self.assertIn('<c-v2.module_card', dashboard)
         self.assertNotIn("dashboard-page", dashboard)
+        self.assertNotIn('class="page-shell', dashboard)
         self.assertNotIn("summary_card.html", dashboard)
-        self.assertIn("cv-module-card", module_card)
+        self.assertIn('class="module-card', module_card)
         self.assertIn('<c-v2.button', module_card)
 
         cadastros = (templates / "cadastros" / "index.html").read_text(encoding="utf-8")
-        # `cadastros-hub` virou `catalog-hub` na reescrita visual da
-        # Administracao; o contrato e o shell padrao mais o hub, nao o nome antigo.
-        self.assertIn("page-shell page-shell--standard catalog-hub", cadastros)
+        # `catalog-hub` / `catalog-grid` / `catalog-section` sairam em
+        # 2026-08-20: as tres classes **nao tinham CSS em lugar nenhum** — os
+        # cartoes da Administracao vinham empilhados numa coluna. A tela e a
+        # mesma casca das listas mais a grade do cartao de modulo.
+        self.assertIn('class="list-page"', cadastros)
+        self.assertIn('class="module-card-grid"', cadastros)
         self.assertIn('<c-v2.header', cadastros)
         self.assertIn('<c-v2.module_card', cadastros)
         self.assertNotIn("app-page-hero", cadastros)
+        # A busca é pela CLASSE, não pelo nome: o comentário da tela cita o
+        # casco antigo para registrar de onde ela veio.
+        self.assertNotIn('class="page-shell', cadastros)
 
     def test_login_is_a_solid_responsive_dark_surface_without_flow_changes(self):
         """A folha mudou de lugar com a reconstrução no v2.

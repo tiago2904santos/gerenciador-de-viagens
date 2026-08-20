@@ -1,0 +1,121 @@
+/* Barra de progresso — par de `cotton/v2/progress.html`.
+ *
+ * Uma linha de cabeçalho (rótulo, estado, porcentagem) e a barra. O estado fica
+ * NO MEIO e cresce: é ele que muda a cada consulta, e a porcentagem à direita
+ * dá o ponto fixo para o olho voltar.
+ *
+ * Veio da reorganização do Drive, que era a única barra do sistema e vivia numa
+ * folha de página (2026-08-20).
+ */
+
+:is(html[data-theme]) .progress {
+  display: grid;
+  gap: var(--gap-tight);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .progress[hidden] {
+  display: none;
+}
+
+:is(html[data-theme]) .progress__head {
+  align-items: baseline;
+  display: flex;
+  gap: var(--gap-tight);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .progress__label {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* O estado empurra a porcentagem para a direita e cede primeiro quando falta
+   largura — o número é curto e não pode virar reticência. */
+:is(html[data-theme]) .progress__state {
+  color: var(--text-strong);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:is(html[data-theme]) .progress__percent {
+  color: var(--text-strong);
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-strong);
+}
+
+/* O trilho é o `<progress>` NATIVO, e vesti-lo custa três blocos: o elemento
+   traz aparência de sistema operacional, e cada motor pinta o preenchimento
+   pelo seu próprio pseudo-elemento. `appearance: none` é o que desliga a
+   aparência nativa; sem ele o Chrome ignora o `background` do trilho.
+
+   O trilho é um poço de campo, como todo fundo de controle do sistema. */
+:is(html[data-theme]) .progress__track {
+  appearance: none;
+  background: var(--surface-contrast, var(--surface-field));
+  border: 0;
+  border-radius: var(--radius-pill);
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Chrome/Safari: o trilho de novo (o `background` acima não alcança) e o
+   preenchimento. A transição existe para o salto de 12% para 40% não parecer um
+   redesenho da tela. */
+:is(html[data-theme]) .progress__track::-webkit-progress-bar {
+  background: var(--surface-contrast, var(--surface-field));
+  border-radius: var(--radius-pill);
+}
+
+:is(html[data-theme]) .progress__track::-webkit-progress-value {
+  background: var(--accent);
+  border-radius: var(--radius-pill);
+  transition: inline-size 240ms ease;
+}
+
+/* Firefox. */
+:is(html[data-theme]) .progress__track::-moz-progress-bar {
+  background: var(--accent);
+  border-radius: var(--radius-pill);
+}
+
+:is(html[data-theme]) .progress.is-done .progress__track::-webkit-progress-value {
+  background: var(--status-done);
+}
+
+:is(html[data-theme]) .progress.is-done .progress__track::-moz-progress-bar {
+  background: var(--status-done);
+}
+
+:is(html[data-theme]) .progress.is-error .progress__track::-webkit-progress-value {
+  background: var(--status-late);
+}
+
+:is(html[data-theme]) .progress.is-error .progress__track::-moz-progress-bar {
+  background: var(--status-late);
+}
+
+:is(html[data-theme]) .progress__hint {
+  color: var(--text-muted);
+  font-size: var(--text-size-micro);
+  margin: 0;
+}
+
+:is(html[data-theme]) .progress__hint[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(html[data-theme]) .progress__track::-webkit-progress-value {
+    transition: none;
+  }
+}
