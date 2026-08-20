@@ -69,8 +69,7 @@ class SuperficiesClarasContratoTests(SimpleTestCase):
         # para lugar nenhum: das 80 regras das duas folhas de tema, 63 foram
         # apagadas por nao pintarem nada, e as 17 herdeiras estao nos arquivos
         # abaixo. A proibicao passa a valer sobre elas.
-        cls.components = "
-".join(
+        cls.components = "\n".join(
             (root / caminho).read_text(encoding="utf-8")
             for caminho in (
                 "static/css/base/base.css",

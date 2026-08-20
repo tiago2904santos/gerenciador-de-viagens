@@ -10434,3 +10434,49 @@ manifesto.
 mover as regras para lá as faria vencer disputas que hoje perdem. É a mesma
 inversão que quebrou o menu do select e o cabeçalho do bloco de formulário na
 migração das folhas de lista, e precisa da mesma medição.
+
+### NOVO-20260820-153027-30e60d6af880 🟢 RESOLVIDO · `NOVO` A camada de tema de componente deixou de existir · FE · risco alto
+
+As 17 regras que sobreviveram à poda das duas folhas de tema mudaram de casa e
+`static/css/components/` foi apagada. Cada uma foi para a folha de quem ela
+veste:
+
+- **`base/base.css`** recebeu as oito de ELEMENTO — corpo da página, seleção de
+  texto, anel de foco, campo nativo (`:is(input, select, textarea)` e as
+  variantes `[readonly]`/`:disabled`) e a trava de `prefers-reduced-motion`.
+  Não descrevem componente nenhum: descrevem a tag. Ficam ao lado do `body` e do
+  `::selection` do tema claro, que já moravam lá.
+- **`v2/module-card.css`** recebeu a sombra do cartão.
+- **`v2/select.css`** recebeu as oito do gatilho do select v2, antes da divisa
+  `=== DELTA v2 ===`.
+
+**A cascata inverteu duas vezes, e a medição pegou as duas.**
+
+1. Anexadas no FIM de `v2/module-card.css`, as regras do cartão passaram a
+   vencer `background` e `border-color` do `.module-card` do v2 — que perdiam
+   quando chegavam pelo pacote do shell, anterior ao `ui.bundle.css`. O cartão
+   do painel ficou BRANCO no tema escuro (`rgb(255,255,255)` em `/`,
+   `rgb(19,34,56)` em `/cadastros/`). No TOPO da folha, a regra do v2 volta a
+   vencer as duas propriedades e sobra só o `box-shadow`, que ela não declara —
+   que é exatamente o que a regra herdada tem de fazer.
+2. As de `base/base.css` foram no sentido contrário: do fim do pacote para o
+   começo. Conferido antes de mover que nenhuma folha entre as duas posições tem
+   seletor de elemento que dispute, e que as três de `fields/forms.css` que
+   chegam perto resolvem por especificidade.
+
+**Como se conferiu:** A/B de estilo computado em 33 telas, 42 propriedades,
+comparando o estado ANTERIOR (folhas podadas, ainda no pacote) com o dissolvido.
+Resultado: **5 diferenças**, todas a deriva sub-pixel de um cartão de
+`/justificativas/` que o CONTROLE NULO — duas capturas do mesmo CSS — reproduz.
+
+**Defeito PRÉ-EXISTENTE encontrado no caminho, e não corrigido aqui:** as telas
+servidas por `profiles/*.css` não recebem o bloco principal de tokens escuros de
+`base/03-theme-dark.css`. Em `/oficios/`, `/roteiros/novo/` e companhia,
+`--color-input-bg` resolve para `#e3eaf2` (o valor CLARO) com
+`data-theme="dark"`. Está assim no commit atual e não foi introduzido por esta
+etapa — conferido com `git show HEAD:static/css/profiles/entity-lists.css`. Não
+aparece na tela porque quem pinta os controles visíveis é o `v2/tokens.css`, que
+viaja no `ui.bundle.css`; quem herda o valor errado é o `<input>`/`<select>`
+NATIVO escondido atrás de cada widget, e o `<option>` dentro dele. Vale abrir
+linha própria: ou o manifesto passa a incluir aquele bloco, ou os tokens legados
+saem de vez.
