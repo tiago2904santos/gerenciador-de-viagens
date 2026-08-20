@@ -19,6 +19,7 @@ from core.catalog import CatalogMessages
 from core.catalog import delete_view
 from core.catalog import edit_view
 from core.catalog import index_view
+from core.catalog import rotulo_de_retorno
 from core.catalog import set_default_view
 
 from .forms import ModeloJustificativaForm
@@ -57,6 +58,8 @@ MODELOS_JUSTIFICATIVA = CatalogConfig(
     ),
     paginar_por=20,
     url_fallback_next="justificativas:index",
+    back_label_com_next="Voltar à justificativa",
+    back_label_sem_next="Voltar às justificativas",
     # O presenter monta o `set_default_url` e precisa do `next_url` para isso.
     presenter_recebe_set_default=False,
     presenter_recebe_next_url=True,
@@ -67,16 +70,16 @@ MODELOS_JUSTIFICATIVA = CatalogConfig(
 
 
 def _contexto_de_retorno(request, next_url: str) -> dict:
-    if next_url.startswith(reverse("oficios:index")):
-        return {
-            "back_to_url": next_url,
-            "back_label": "Voltar para o ofício",
-            "back_aria_label": "Voltar para o cadastro de ofício",
-        }
+    """O rótulo vem do DESTINO (`core.catalog.rotulo_de_retorno`).
+
+    As duas frases fixas que moravam aqui só conheciam duas origens, e este
+    catálogo é aberto de mais telas do que isso.
+    """
+    rotulo = rotulo_de_retorno(next_url)
     return {
         "back_to_url": next_url,
-        "back_label": "Voltar para as justificativas",
-        "back_aria_label": "Voltar para a lista de justificativas",
+        "back_label": rotulo,
+        "back_aria_label": rotulo,
     }
 
 

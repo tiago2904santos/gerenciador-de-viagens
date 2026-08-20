@@ -1,4 +1,3 @@
-{% load chips %}
 {% comment %}
   Card de EVENTO no v2 (2026-08-18). Um painel por evento: título com destino e
   período, selo de situação, e o miolo em três faixas — ofícios vinculados,
@@ -12,15 +11,15 @@
   (`test_todo_gatilho_da_lista_encontra_o_menu_dele_no_fragmento`).
 {% endcomment %}
 {% comment %}
-  Dois `{% with %}` aninhados: filtro dentro de `:attr` do Cotton não roda —
-  ali é BUSCA de variável —, e `chip` só existe para o `with` de dentro.
+  Os selos vêm PRONTOS do presenter (`chips_v2`), com o tom já traduzido: filtro
+  dentro de `:attr` do Cotton não roda, e são dois selos agora — situação do
+  documento e quando a viagem acontece.
 {% endcomment %}
-{% with chip=card.header.chips.0 %}{% with chip_tom=chip.tone|tom_v2 %}
 <c-v2.record
   box="panel"
   :title="card.header.items.0.value"
-  :status="chip.label"
-  :status_tone="chip_tom"
+  :chips="card.chips_v2"
+  :meta="card.meta_display"
   :search_text="card.search_text"
 >
   <c-slot name="actions">
@@ -45,7 +44,7 @@
           {% if card.oficios %}
             <ul class="person-list">
               {% for oficio in card.oficios %}
-                <c-v2.person_row :name="oficio.numero" :meta="oficio.meta_display">
+                <c-v2.person_row icon="document" :name="oficio.numero" :badge="oficio.protocolo" :meta="oficio.meta_display">
                   <c-slot name="actions">
                     <c-v2.icon_button
                       icon="folder"
@@ -70,7 +69,7 @@
           {% if card.documentos %}
             <ul class="person-list">
               {% for documento in card.documentos %}
-                <c-v2.person_row :name="documento.title" :meta="documento.meta_display" :badge="documento.kind">
+                <c-v2.person_row icon="document" :name="documento.title" :meta="documento.meta_display" :badge="documento.kind">
                   <c-slot name="actions">
                     <c-v2.icon_button
                       icon="folder"
@@ -119,4 +118,3 @@
     {% endif %}
   </c-slot>
 </c-v2.record>
-{% endwith %}{% endwith %}

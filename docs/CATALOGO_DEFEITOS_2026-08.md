@@ -9910,3 +9910,161 @@ foi passado ao render, então ela passaria de qualquer jeito. Quem guarda o comp
 `assertEqual(CORPO_DE_MENU.findall(html), [])`, na linha seguinte. Reescrever a asserção é decisão
 de desenho de teste do dono do arquivo, e não cabe num PR cujo objetivo é destravar a catraca.
 
+### NOVO-20260819-233339-8d250ddb67e2 🟢 RESOLVIDO · `NOVO` A lista de eventos abria limitada ao recorte futuro · HT/BE · risco baixo
+
+Ao acessar `/eventos/` sem parâmetros, o backend selecionava implicitamente `futuras`. Isso fazia
+a tela inicial esconder eventos atuais, realizados, finalizados e cancelados, embora o controle de
+situação seja um filtro opcional e multisseleção.
+
+**Correção:** ausência de `aba` agora significa nenhum recorte: a consulta entrega todos os
+eventos visíveis para a área. Quando uma ou mais situações são escolhidas, o mesmo filtro temporal
+compartilhado continua sendo aplicado. O teste focado cobre futuro, atual e cancelado juntos na
+abertura da página e garante que nenhuma opção nasce selecionada.
+
+### NOVO-20260819-234021-0b4f53796d23 🟢 RESOLVIDO · `NOVO` Os filtros de eventos dependiam do botão Buscar · HT/JS · risco baixo
+
+A busca por texto e o multiselect de situação só eram enviados depois de clicar em `Buscar`,
+adicionando uma confirmação desnecessária a cada ajuste do filtro.
+
+**Correção:** o formulário da lista agora agenda automaticamente o GET 1.000 ms após a última
+digitação ou alteração de situação. O atraso reinicia a cada escolha para permitir marcar várias
+situações antes da navegação. O botão redundante foi removido; `Limpar` continua disponível quando
+há filtros ativos. Testes focados cobrem o contrato renderizado e os dois eventos do navegador.
+
+### NOVO-20260819-234918-fda270904660 🟢 RESOLVIDO · `NOVO` A busca automática perdia o foco após filtrar · JS · risco baixo
+
+Depois do atraso da busca, o envio GET recarregava a lista e o campo deixava de ser o elemento ativo. Para
+continuar digitando, era necessário clicar novamente na barra a cada atualização.
+
+**Correção:** envios disparados pela digitação registram temporariamente a intenção de continuar a
+busca. Na página carregada, o campo recupera o foco e o cursor volta ao final do valor pesquisado.
+Alterações feitas apenas no multiselect não roubam o foco para a barra de texto.
+
+### NOVO-20260819-235431-bdc719877078 🟢 RESOLVIDO · `NOVO` Listagens repetiam busca manual e abas de filtro · HT/JS · risco médio
+
+As listagens servidas pelo Django tinham comportamentos diferentes para a mesma tarefa: algumas
+dependiam do botão `Buscar`, outras usavam scripts exclusivos e os recortes de situação, cargo ou
+combustível ainda ocupavam uma segunda linha como toggles de navegação.
+
+**Correção:** as listas agora compartilham um único motor de filtro automático. A busca aguarda
+1.000 ms de pausa, preserva foco e cursor após o GET e os selects comuns, períodos completos e
+filtros de situação disparam a atualização sem confirmação adicional. Os toggles de recorte foram
+substituídos pelo select V2 no subheader; os controles numéricos de paginação permanecem links.
+
+### NOVO-20260820-002113-7c009789fa9e 🟢 RESOLVIDO · `NOVO` Número de ofício não ocupava a coluna disponível · UI · risco baixo
+
+O componente V2 de número de documento limitava o campo editável a `7ch`. Nos formulários de
+ofício, isso concentrava número e ano no começo da coluna e deixava um vazio desproporcional até o
+próximo campo.
+
+**Correção:** o conjunto número/ano agora ocupa toda a largura da coluna; o input cresce no espaço
+disponível e o ano permanece como sufixo fixo na mesma linha. A mudança vale também para o ofício
+de origem do motorista, que usa o mesmo componente global.
+
+### NOVO-20260820-002415-9ae27aac4713 🟢 RESOLVIDO · `NOVO` Ofício de origem empilhava cabeçalho e campos · HT · risco baixo
+
+O bloco de referência do motorista mantinha título e descrição acima dos controles, consumindo uma
+linha inteira e divergindo dos demais grupos curtos do formulário.
+
+**Correção:** o bloco agora usa a variante `split` global do V2, com identificação na coluna lateral
+e os campos de número e protocolo na coluna principal. Os dois fluxos que renderizam essa referência
+compartilham o mesmo arranjo.
+
+### NOVO-20260820-002631-2977a1359614 🟢 RESOLVIDO · `NOVO` Instituição de custeio quebrava a linha de identificação · HT · risco baixo
+
+Ao selecionar `Outra instituição`, o campo condicional era inserido em uma grade de três colunas e
+caía sozinho na linha seguinte, apesar de completar o mesmo conjunto de identificação do ofício.
+
+**Correção:** número do ofício, protocolo, custeio e nome da instituição agora compartilham uma grade
+V2 de quatro colunas iguais no desktop. Os pontos de quebra globais preservam duas colunas em telas
+médias e uma coluna em telas pequenas.
+
+### NOVO-20260820-002836-ceccd19b60f8 🟢 RESOLVIDO · `NOVO` Painel da etapa de roteiro colava no stepper · UI · risco baixo
+
+O intervalo global do wizard era aplicado ao irmão imediatamente posterior ao stepper. Na etapa de
+roteiro do ofício, esse irmão é um script JSON invisível, por isso o painel começava sem nenhum espaço.
+
+**Correção:** o espaçamento passa a pertencer ao próprio rail do stepper, preservando o mesmo ritmo
+visual em todas as etapas mesmo quando scripts de configuração aparecem antes do conteúdo visível.
+
+### NOVO-20260820-003805-1a754fc15d74 🟢 RESOLVIDO · `NOVO` Roteiros equivalentes apareciam duplicados e eram recriados · BE · risco médio
+
+O picker de roteiros salvos exibia mais de uma opção quando registros diferentes possuíam exatamente
+a mesma sede, destinos ordenados, trechos, datas, horários, distâncias e retorno. Além disso, ao
+preencher novamente essa mesma estrutura no modo de roteiro próprio, o ofício criava outra linha em
+vez de reaproveitar silenciosamente a já existente.
+
+**Correção:** a lista agora colapsa opções estruturalmente equivalentes, preservando a opção mais
+prioritária da ordenação existente. No salvamento, a mesma comparação completa usada pelo reuso
+explícito procura um roteiro equivalente na área do ofício e o vincula sem criar cópia; alterações
+reais continuam gerando um rascunho próprio e nunca sobrescrevem um roteiro compartilhado.
+
+### NOVO-20260820-005326-981551050553 🟢 RESOLVIDO · `NOVO` Textarea da justificativa ainda usava o controle legado · HT · risco baixo
+
+O texto da etapa de justificativa era renderizado pelo `form_field` V2, mas o widget Django ainda
+emitia `cv-field__control--textarea` e não passava pelo componente global de input. Por isso sua
+geometria, superfície e foco divergiam dos demais textareas V2.
+
+**Correção:** o widget agora emite `input__control input__control--textarea` e é renderizado pelo
+`c-v2.input`, preservando o `id`, o nome, o valor, os erros e o gancho que preenche o texto ao
+selecionar um modelo.
+
+### NOVO-20260820-005654-abf697afc915 🟢 RESOLVIDO · `NOVO` Textarea do cadastro de modelos de justificativa ainda usava o controle legado · HT · risco baixo
+
+O textarea do quick-add de modelos continuava emitindo `form-control`, embora estivesse dentro da
+estrutura V2. Com isso, sua geometria e seu foco divergiam do textarea global usado nos formulários
+migrados.
+
+**Correção:** o campo agora emite `input__control input__control--textarea` e passa pelo `c-v2.input`,
+sem alterar nome, `id`, valor, ajuda, validação ou contrato de envio do quick-add.
+
+### NOVO-20260820-010347-b732e1256956 🟢 RESOLVIDO · `NOVO` Resumo administrativo do ofício empilhava os quatro fatos · UI · risco baixo
+
+Número do ofício, protocolo, data de criação e custeio eram renderizados pelos componentes V2
+corretos, mas herdavam a grade de uma coluna usada pelos fatos dos cartões de lista. Por isso cada
+item ocupava sozinho uma linha no resumo da etapa de documentos.
+
+**Correção:** o modificador `document-summary--identity` agora mantém os quatro fatos em uma única
+faixa de quatro colunas, sem alterar a grade global de uma coluna dos demais consumidores.
+
+### NOVO-20260820-010922-a44c9e55d494 🟢 RESOLVIDO · `NOVO` Viajantes do resumo do ofício ficavam em uma coluna · UI · risco baixo
+
+A lista de viajantes da etapa de documentos reutilizava as linhas V2, mas não estava dentro da
+grade de um cartão de lista. Por isso os servidores eram empilhados mesmo quando havia largura
+para duas colunas.
+
+**Correção:** a lista usa o modificador V2 `person-list--two-columns`; as linhas são distribuídas
+em duas colunas e, em quantidade ímpar, a última ocupa a largura completa.
+
+### NOVO-20260820-011244-e1a3f851426d 🟢 RESOLVIDO · `NOVO` Resumo da viatura exibia unidade lotada desnecessária · HT · risco baixo
+
+O resumo de transporte da etapa de documentos repetia a unidade de lotação da viatura, dado que
+não faz parte da leitura necessária desse bloco.
+
+**Correção:** removido o fato `Unidade lotada`; permanecem placa, modelo, tipo, combustível e,
+quando aplicável, motorista externo.
+
+### NOVO-20260820-011426-45006c867507 🟢 RESOLVIDO · `NOVO` Resumo da viatura empilhava os quatro fatos principais · UI · risco baixo
+
+Placa, modelo, tipo e combustível herdavam a grade global de uma coluna e ocupavam quatro linhas,
+apesar de formarem um resumo curto e equivalente ao resumo administrativo do ofício.
+
+**Correção:** o modificador `document-summary--vehicle` mantém os quatro fatos em uma única
+linha de quatro colunas iguais, sem alterar os demais usos de `fact-list`.
+
+### NOVO-20260820-011732-6ea908f8fb88 🟢 RESOLVIDO · `NOVO` Descrição do resumo de roteiro ficava alinhada à esquerda · UI · risco baixo
+
+O título do percurso e a descrição curta compartilhavam um contêiner restrito ao conteúdo, então
+`Trechos e cálculo das diárias.` permanecia sob o início do título em vez de ocupar o lado direito
+do cabeçalho.
+
+**Correção:** o bloco de resumo do roteiro ganhou um modificador local que expande a área textual e
+alinha apenas a descrição à direita, preservando o título à esquerda e o selo de status no extremo.
+
+### NOVO-20260820-012350-3a2467636445 🟢 RESOLVIDO · `NOVO` Valor por extenso das diárias era comprimido em uma linha · UI · risco baixo
+
+Na coluna estreita do resumo do roteiro, a regra compacta global obrigava o valor por extenso a
+permanecer em uma linha e o ajuste automático reduzia excessivamente o texto para fazê-lo caber.
+
+**Correção:** somente o fato de valor total desse resumo permite agora até duas linhas para a nota;
+as demais notas V2 continuam compactas em uma linha.

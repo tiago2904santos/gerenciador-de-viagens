@@ -26,13 +26,11 @@
       busca: por isso ele viaja num campo oculto do formulário. Sem ele, buscar
       dentro de uma aba jogava a pessoa de volta para "Todos" sem avisar.
     {% endcomment %}
-    <c-slot name="tabs"><c-v2.toggle :items="abas" aria_label="Filtrar por cargo" /></c-slot>
-
     <c-slot name="controls">
-      <form method="get" action="{{ request.path }}" class="rail__form" role="search">
+      <form method="get" action="{{ request.path }}" class="rail__form" role="search" data-server-filter-form>
         {% if cargo_filter %}<input type="hidden" name="cargo" value="{{ cargo_filter }}">{% endif %}
-        <c-v2.input icon="search" name="q" :value="q" placeholder="Buscar servidores" aria_label="Buscar servidores" />
-        <c-v2.button type="submit" label="Buscar" icon="search" />
+        <c-v2.input icon="search" name="q" :value="q" placeholder="Buscar servidores" aria_label="Buscar servidores" hook="data-server-filter-search" />
+        <c-v2.select :options="abas" placeholder="Filtrar por cargo" aria_label="Filtrar servidores por cargo" hook="data-server-filter-url" />
         {% if q %}<c-v2.button label="Limpar" icon="x" :href="request.path" />{% endif %}
       </form>
     </c-slot>

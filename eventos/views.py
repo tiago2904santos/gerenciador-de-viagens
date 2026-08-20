@@ -30,6 +30,9 @@ from termos.presenters import apresentar_linha_lista_simples_termo
 from .presenters import linhas_de_destino_do_evento
 
 
+from core.retorno import com_next
+from core.retorno import daqui
+
 from .forms import EventoForm
 from .forms import EventoNovoCadastroForm
 from .models import Evento
@@ -69,7 +72,8 @@ def index(request):
     from core import documento_abas as tabs
 
     q = request.GET.get("q", "").strip()
-    abas_selecionadas = tabs.normalizar_abas(request.GET.getlist("aba"))
+    valores_abas = request.GET.getlist("aba")
+    abas_selecionadas = tabs.normalizar_abas(valores_abas) if valores_abas else []
     viagem_de = request.GET.get("viagem_de", "").strip()
     viagem_ate = request.GET.get("viagem_ate", "").strip()
     sort = request.GET.get("sort", "").strip()
@@ -83,13 +87,15 @@ def index(request):
 
     cancelado_q = Q(status=Evento.STATUS_CANCELADO)
     date_field = "data_inicio"
-    lista = eventos.filter(
-        tabs.q_das_abas(
-            abas_selecionadas,
-            date_field=date_field,
-            cancelado_q=cancelado_q,
+    lista = eventos
+    if abas_selecionadas:
+        lista = eventos.filter(
+            tabs.q_das_abas(
+                abas_selecionadas,
+                date_field=date_field,
+                cancelado_q=cancelado_q,
+            )
         )
-    )
     contagem = tabs.contar_por_aba(eventos, date_field=date_field, cancelado_q=cancelado_q)
     abas_escolhidas = set(abas_selecionadas)
     status_filter_options = [
@@ -100,7 +106,7 @@ def index(request):
         }
         for chave, label in tabs.ABA_LABELS
     ]
-    has_filters = any([q, viagem_de, viagem_ate, sort]) or abas_selecionadas != [tabs.ABA_PADRAO]
+    has_filters = any([q, viagem_de, viagem_ate, sort, abas_selecionadas])
     paginacao = contexto_paginacao(lista, request, 20)
     page_obj = paginacao["page_obj"]
     cards = [apresentar_evento_list_card(evento) for evento in page_obj.object_list]
@@ -377,8 +383,13 @@ def detalhe(request, pk, etapa=1):
             "termo_rows": _termo_rows_do_evento(evento),
             "sede_uf": config.uf if config else "",
             "sede_config_label": rotulo_da_sede_configurada(),
-            "modelos_motivo_url": _reverse("oficios:modelos_motivo_index"),
-            "tipos_evento_url": f"{_reverse('eventos:tipos_index')}?{urlencode({'next': request.path})}",
+            # `daqui(request)` e não `request.path`: o retorno tem de trazer a
+            # querystring junto, senão voltar de um catálogo cai na etapa 1 sem
+            # o filtro (ou sem a aba) em que a pessoa estava. Sem o `next`, o
+            # botão do catálogo caía no fallback dele — o de modelos de motivo
+            # levava para "/oficios/novo/", vindo do evento.
+            "modelos_motivo_url": com_next(_reverse("oficios:modelos_motivo_index"), daqui(request)),
+            "tipos_evento_url": com_next(_reverse("eventos:tipos_index"), daqui(request)),
             "solicitacao_anexos": solicitacao_anexos,
             "evento_status_variant": "danger" if evento.status == Evento.STATUS_CANCELADO else "active",
             # Vocabulário do chip do v2: `late` para cancelado, `progress` para

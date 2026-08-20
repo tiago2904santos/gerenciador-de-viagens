@@ -1,4 +1,4 @@
-{% cotton:vars back_label back_url csrf_token delete_entity delete_title empty_message fields form next_value page_obj page_querystring pages panel_id q request rows search_placeholder submit_label tabs title toggle_label %}
+{% cotton:vars back_label back_url csrf_token delete_entity delete_title empty_message fields filter_aria_label filter_options filter_placeholder form next_value page_obj page_querystring pages panel_id q request rows search_placeholder submit_label title toggle_label %}
 {% comment %}
   A página de um CATÁLOGO no v2 — a lista simples com cadastro rápido que os
   quinze cadastros do sistema compartilham (cargos, cidades, combustíveis,
@@ -34,7 +34,7 @@
   action_icon="arrow-left"
 >
   <c-slot name="controls">
-    <form method="get" action="{{ request.path }}" class="rail__form" role="search">
+    <form method="get" action="{{ request.path }}" class="rail__form" role="search" data-server-filter-form>
       {% if next_value %}<input type="hidden" name="next" value="{{ next_value }}">{% endif %}
       <c-v2.input
         icon="search"
@@ -42,8 +42,16 @@
         :value="q"
         :placeholder="search_placeholder"
         :aria_label="search_placeholder"
+        hook="data-server-filter-search"
       />
-      <c-v2.button type="submit" label="Buscar" icon="search" />
+      {% if filter_options %}
+        <c-v2.select
+          :options="filter_options"
+          :placeholder="filter_placeholder"
+          :aria_label="filter_aria_label"
+          hook="data-server-filter-url"
+        />
+      {% endif %}
       {% if q %}<c-v2.button label="Limpar" icon="x" :href="request.path" />{% endif %}
     </form>
   </c-slot>
@@ -60,8 +68,6 @@
       {{ fields }}
     </c-v2.quick_add>
   </c-slot>
-
-  {% if tabs %}<c-slot name="tabs">{{ tabs }}</c-slot>{% endif %}
 
   <c-slot name="rows">
     {% for row in rows %}

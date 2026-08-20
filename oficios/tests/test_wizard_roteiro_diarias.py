@@ -1,6 +1,7 @@
 import json
 from unittest.mock import patch
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -107,6 +108,17 @@ class OficioWizardRoteiroDiariasTests(TestCase):
 
         oficio.refresh_from_db()
         self.assertIsNone(oficio.roteiro_id)
+
+    def test_stepper_global_reserva_intervalo_antes_do_painel(self):
+        """O gap pertence ao rail, inclusive quando um script JSON vem antes do form."""
+        css = (settings.BASE_DIR / "static/css/v2/stepper.css").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            ".wizard-page > .rail {\n  margin-bottom: var(--gap);",
+            css,
+        )
+        self.assertNotIn(".wizard-page > .rail + *", css)
 
     def test_autosave_criar_vincula_rascunho_ao_oficio_imediatamente(self):
         """Sem isso, desmarcar um roteiro salvo e comecar o proprio nao sobrevive a um

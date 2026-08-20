@@ -108,7 +108,14 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, f"/ {oficio.ano}")
         self.assertNotContains(response, "Data criação:")
         self.assertContains(response, "form-block--v2")
-        self.assertContains(response, "field-grid field-grid--cols-3")
+        self.assertContains(response, "field-grid field-grid--cols-4")
+        self.assertRegex(
+            html,
+            re.compile(
+                r'class="form-block--v2 form-block--split"[^>]*>.*?Ofício de origem',
+                re.DOTALL,
+            ),
+        )
         self.assertNotContains(response, "DOCX")
         self.assertContains(response, "Avançar")
         self.assertNotContains(response, "Gerado automaticamente ao salvar.")

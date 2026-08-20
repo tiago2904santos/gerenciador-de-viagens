@@ -36,7 +36,7 @@
     {{ field }}
   {% else %}
     <select
-      name="{{ name }}"
+      {% if name %}name="{{ name }}"{% endif %}
       aria-label="{{ aria_label }}"
       {% if multiple %}multiple{% endif %}
       {% if placeholder %}data-placeholder="{{ placeholder }}"{% endif %}
@@ -46,7 +46,8 @@
       {{ attrs }}
     >
       {% for opt in options %}
-        <option value="{{ opt.value }}"{% if opt.selected or opt.value == value or fallback_first and not value and forloop.first %} selected{% endif %}>{{ opt.label }}</option>
+        {% firstof opt.value opt.url as option_value %}
+        <option value="{{ option_value }}"{% if opt.selected or opt.is_active or option_value == value or fallback_first and not value and forloop.first %} selected{% endif %}>{{ opt.label }}{% if opt.count != None %} ({{ opt.count }}){% endif %}</option>
       {% endfor %}
     </select>
   {% endif %}

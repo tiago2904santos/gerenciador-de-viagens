@@ -17,6 +17,7 @@ from core.catalog import CatalogMessages
 from core.catalog import delete_view
 from core.catalog import edit_view
 from core.catalog import index_view
+from core.catalog import rotulo_de_retorno
 from core.catalog import set_default_view
 
 from .forms import ModeloMotivoOficioForm
@@ -59,6 +60,8 @@ MODELOS_MOTIVO = CatalogConfig(
     ),
     paginar_por=20,
     url_fallback_next="oficios:novo",
+    back_label_com_next="Voltar ao ofício",
+    back_label_sem_next="Voltar ao ofício",
     # O presenter monta o `set_default_url` por dentro e as URLs da linha são
     # nuas — comportamento preservado da view antiga.
     presenter_recebe_set_default=False,
@@ -70,17 +73,18 @@ MODELOS_MOTIVO = CatalogConfig(
 
 
 def _contexto_de_retorno(request, next_url: str) -> dict:
-    """Rótulo de volta conforme a tela de onde o usuário veio."""
-    if next_url.startswith(reverse("ordens_servico:index")):
-        return {
-            "back_to_oficio_url": next_url,
-            "back_label": "Voltar para a Ordem de Serviço",
-            "back_aria_label": "Voltar para o cadastro de Ordem de Serviço",
-        }
+    """Rótulo de volta conforme a tela de onde o usuário veio.
+
+    O rótulo sai de `core.catalog.rotulo_de_retorno`, que o lê do DESTINO. Aqui
+    havia duas frases fixas — ofício e Ordem de Serviço —, e este catálogo é
+    aberto também do evento e do termo: quem vinha de um evento lia "Voltar para
+    o ofício" e ia parar no evento (2026-08-19).
+    """
+    rotulo = rotulo_de_retorno(next_url)
     return {
         "back_to_oficio_url": next_url,
-        "back_label": "Voltar para o ofício",
-        "back_aria_label": "Voltar para o cadastro de ofício",
+        "back_label": rotulo,
+        "back_aria_label": rotulo,
     }
 
 

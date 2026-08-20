@@ -1,3 +1,4 @@
+{% load icones %}
 {% comment %}
 Corpos dos menus de um card de prestação, servidos por `prestacoes_contas:card_menus` (PF-04).
 
@@ -15,7 +16,7 @@ Isso está conferido no navegador, não deduzido.
            hidden>
         <div class="action-menu__heading">
           <span class="action-menu__heading-icon">
-            <c-ui.icons.icon icon="download" only />
+            {% icone_svg "download" %}
           </span>
           <span>
             <strong>Baixar documentos</strong>
@@ -27,7 +28,7 @@ Isso está conferido no navegador, não deduzido.
            download
            role="menuitem">
           <span class="action-menu__item-icon action-menu__item-icon--pdf">
-            <c-ui.icons.icon icon="pdf" only />
+            {% icone_svg "pdf" %}
           </span>
           <span><strong>Relatório técnico</strong><small>Salvar PDF individual</small></span>
         </a>
@@ -37,7 +38,7 @@ Isso está conferido no navegador, não deduzido.
            download
            role="menuitem">
           <span class="action-menu__item-icon action-menu__item-icon--route">
-            <c-ui.icons.icon icon="route" only />
+            {% icone_svg "route" %}
           </span>
           <span><strong>Diário de bordo</strong><small>Salvar PDF do diário</small></span>
         </a>
@@ -46,7 +47,7 @@ Isso está conferido no navegador, não deduzido.
               role="menuitem"
               aria-disabled="true">
           <span class="action-menu__item-icon action-menu__item-icon--route">
-            <c-ui.icons.icon icon="route" only />
+            {% icone_svg "route" %}
           </span>
           <span><strong>Diário de bordo</strong><small>Ainda não foi criado</small></span>
         </span>
@@ -70,7 +71,7 @@ Isso está conferido no navegador, não deduzido.
           data-attach-signed-upload-label="Anexar arquivo"
           data-attach-signed-kinds="{{ card.attach_kinds_json }}" only>
           <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
-            <c-ui.icons.icon icon="sign" only />
+            {% icone_svg "sign" %}
           </span>
           <span>
             <strong>{% if servidor.rt_assinado.assinado or servidor.diario_assinado.assinado or servidor.comprovante_anexo.assinado %}Gerenciar documentos assinados{% else %}Anexar documentos assinados{% endif %}</strong>
@@ -82,7 +83,7 @@ Isso está conferido no navegador, não deduzido.
            download
            role="menuitem">
           <span class="action-menu__item-icon action-menu__item-icon--package">
-            <c-ui.icons.icon icon="folder" only />
+            {% icone_svg "folder" %}
           </span>
           <span><strong>Anexo completo</strong><small>Salvar PDF consolidado</small></span>
         </a>
@@ -90,7 +91,7 @@ Isso está conferido no navegador, não deduzido.
 <div class="action-menu action-menu--whatsapp" id="diaria-wa-menu-{{ servidor.ps_pk }}" role="menu" hidden>
         <div class="action-menu__heading">
           <span class="action-menu__heading-icon action-menu__heading-icon--wa">
-            <c-ui.icons.icon icon="whatsapp-modern" only />
+            {% icone_svg "whatsapp-modern" %}
           </span>
           <span>
             <strong>Aviso de liberação</strong>
@@ -99,19 +100,19 @@ Isso está conferido no navegador, não deduzido.
         </div>
         <c-v2.button type="button" class_name="action-menu__item action-menu__item action-menu__item--wa" role="menuitem" data-diaria-wa-send data-wa-app="normal" only>
           <span class="action-menu__item-icon action-menu__item-icon--wa">
-            <c-ui.icons.icon icon="whatsapp-modern" only />
+            {% icone_svg "whatsapp-modern" %}
           </span>
           <span><strong>WhatsApp</strong><small>Abrir no aplicativo pessoal</small></span>
         </c-v2.button>
         <c-v2.button type="button" class_name="action-menu__item action-menu__item action-menu__item--wa" role="menuitem" data-diaria-wa-send data-wa-app="business" only>
           <span class="action-menu__item-icon action-menu__item-icon--business">
-            <c-ui.icons.icon icon="whatsapp-business" only />
+            {% icone_svg "whatsapp-business" %}
           </span>
           <span><strong>WhatsApp Business</strong><small>Abrir no aplicativo profissional</small></span>
         </c-v2.button>
         <c-v2.button type="button" class_name="action-menu__item action-menu__item" role="menuitem" data-diaria-wa-copy only>
           <span class="action-menu__item-icon action-menu__item-icon--copy">
-            <c-ui.icons.icon icon="copy-modern" only />
+            {% icone_svg "copy-modern" %}
           </span>
           <span><strong>Copiar mensagem</strong><small>Copiar o texto para a área de transferência</small></span>
         </c-v2.button>

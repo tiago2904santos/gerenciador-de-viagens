@@ -272,7 +272,7 @@ class OficioViewsTests(TestCase):
         preview_start = html.index("Documentos para conferência")
         self.assertIn("Resumo do ofício", html[preview_start:])
         self.assertEqual(html.count("document-summary__fact-panel--identity"), 4)
-        self.assertEqual(html.count("document-summary__fact-panel--vehicle"), 5)
+        self.assertEqual(html.count("document-summary__fact-panel--vehicle"), 4)
         self.assertIn("Viajantes", html[preview_start:])
         self.assertIn("Viatura e condução", html[preview_start:])
         footer_start = html.index('<footer class="card-footer">', preview_start)
@@ -289,6 +289,39 @@ class OficioViewsTests(TestCase):
         self.assertNotIn("Plano DOCX", footer)
         self.assertNotIn("Ordem", footer)
 
+    def test_resumo_do_oficio_mantem_quatro_fatos_na_mesma_linha(self):
+        css = Path("static/css/v2/fact.css").read_text(encoding="utf-8")
+
+        self.assertIn(
+            ":is(html[data-theme]) .fact-list.document-summary--identity",
+            css,
+        )
+        self.assertIn(
+            "grid-template-columns: repeat(4, minmax(0, 1fr));",
+            css,
+        )
+        self.assertIn(
+            ":is(html[data-theme]) .fact-list.document-summary--vehicle",
+            css,
+        )
+
+    def test_viajantes_do_resumo_usam_duas_colunas_com_ultimo_impar_inteiro(self):
+        source = Path(
+            "templates/oficios/partials/documentos/_viajantes_body.html",
+        ).read_text(encoding="utf-8")
+        css = Path("static/css/v2/person-row.css").read_text(encoding="utf-8")
+
+        self.assertIn("person-list person-list--two-columns", source)
+        self.assertIn(".person-list.person-list--two-columns", css)
+        self.assertIn(
+            "grid-template-columns: repeat(2, minmax(0, 1fr));",
+            css,
+        )
+        self.assertIn(
+            ".person-row:last-child:nth-child(odd)",
+            css,
+        )
+
     def test_resumo_do_roteiro_distribui_conteudo_em_tres_colunas(self):
         source = Path(
             "templates/oficios/partials/documentos/_route_summary_grid.html",
@@ -299,6 +332,27 @@ class OficioViewsTests(TestCase):
         self.assertIn("route-summary__column--details", source)
         self.assertLess(source.index("route-summary__column--legs"), source.index("route-summary__column--value"))
         self.assertLess(source.index("route-summary__column--value"), source.index("route-summary__column--details"))
+
+    def test_resumo_do_roteiro_alinha_descricao_a_direita(self):
+        source = Path(
+            "templates/oficios/partials/_documentos_wizard_body.html",
+        ).read_text(encoding="utf-8")
+        css = Path("static/css/v2/fact.css").read_text(encoding="utf-8")
+
+        self.assertIn('extra_class="route-summary-block"', source)
+        self.assertIn(".route-summary-block .form-block__description", css)
+        self.assertIn("text-align: right;", css)
+
+    def test_valor_por_extenso_do_roteiro_pode_quebrar_em_duas_linhas(self):
+        source = Path(
+            "templates/oficios/partials/documentos/_route_summary_grid.html",
+        ).read_text(encoding="utf-8")
+        css = Path("static/css/v2/fact.css").read_text(encoding="utf-8")
+
+        self.assertIn('extra_class="fact--two-line-note"', source)
+        self.assertIn(".fact--two-line-note .fact__note", css)
+        self.assertIn("-webkit-line-clamp: 2;", css)
+        self.assertIn("white-space: normal;", css)
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "incomplete", "pendencias": ["Pendencia de teste"]})

@@ -20,9 +20,9 @@
     cliente sobre uma lista paginada esconderia parte do que o servidor mandou,
     sem dizer que escondeu.
 
-    As abas continuam sendo as quatro do `core/documento_abas.py`, agora no
-    `toggle` do sistema — `build_abas` já devolve `url`, `label`, `count` e
-    `is_active`, que é exatamente o que o componente lê.
+    As quatro situações de `core/documento_abas.py` ficam no multiselect v2.
+    Sem seleção, a lista mostra todos os roteiros; as situações marcadas são
+    combinadas pelo servidor.
   {% endcomment %}
   <c-v2.list_page
     :title="page_title"
@@ -37,27 +37,25 @@
     :action_url="create_url"
   >
     <c-slot name="controls">
-      <form method="get" action="{{ request.path }}" class="rail__form" role="search">
-        {% comment %}
-          A aba viaja escondida no formulário: buscar dentro de "Finalizados" tem
-          de continuar em "Finalizados". Sem este campo, toda busca voltava para a
-          aba padrão e parecia que o filtro tinha se perdido.
-        {% endcomment %}
-        <input type="hidden" name="aba" value="{{ aba }}">
+      <form method="get" action="{{ request.path }}" class="rail__form" role="search" data-server-filter-form>
         <c-v2.input
           icon="search"
           name="q"
           :value="q"
           placeholder="Buscar por sede, destino ou observações"
           aria_label="Buscar roteiros"
+          hook="data-server-filter-search"
         />
-        <c-v2.button type="submit" label="Buscar" icon="search" />
-        {% if q %}<c-v2.button label="Limpar" icon="x" :href="search_clear_url" />{% endif %}
+        <c-v2.select
+          name="aba"
+          :options="status_filter_options"
+          :multiple="True"
+          placeholder="Filtrar por situação"
+          aria_label="Filtrar roteiros por situação"
+          hook="data-server-filter-control"
+        />
+        {% if has_filters %}<c-v2.button label="Limpar" icon="x" :href="search_clear_url" />{% endif %}
       </form>
-    </c-slot>
-
-    <c-slot name="tabs">
-      <c-v2.toggle :items="abas" aria_label="Abas de roteiros" />
     </c-slot>
 
     <c-slot name="rows">

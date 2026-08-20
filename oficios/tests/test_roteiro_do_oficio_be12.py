@@ -22,6 +22,7 @@ As datas são relativas a hoje de propósito: a escolha entre `wizard_documentos
 fixa faria o teste mudar de significado com o tempo.
 """
 
+from copy import copy
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
@@ -38,10 +39,13 @@ from cadastros.models import Servidor
 from cadastros.models import Unidade
 from cadastros.models import Viatura
 from core.testing import area_de_teste
+from core.testing import com_request
 from core.testing import vincular_area
 from oficios.models import Oficio
 from roteiros.services import editor_state_builder
 from roteiros.models import Roteiro
+from roteiros.models import RoteiroDestino
+from roteiros.models import RoteiroTrecho
 
 
 def _mensagens(response):
@@ -207,6 +211,60 @@ class RoteiroDoOficioCaracterizacaoTests(TestCase):
         )
         self.assertEqual(
             Roteiro.all_objects.count(), total_antes, "reaproveitar não pode gravar uma cópia"
+        )
+
+    def test_1b_roteiro_proprio_equivalente_reutiliza_existente_sem_o_usuario_escolher(self):
+        salvo = self._roteiro_salvo()
+        oficio = self._oficio_pronto()
+        total_antes = Roteiro.all_objects.count()
+
+        resposta = self._salvar_etapa(oficio, self._dados_roteiro())
+
+        self.assertEqual(resposta.status_code, 302, _mensagens(resposta))
+        oficio.refresh_from_db()
+        self.assertEqual(oficio.roteiro_id, salvo.pk)
+        self.assertEqual(Roteiro.all_objects.count(), total_antes)
+
+    def test_1c_picker_exibe_uma_unica_opcao_para_roteiros_equivalentes(self):
+        salvo = self._roteiro_salvo()
+        duplicado = copy(salvo)
+        duplicado._state = copy(salvo._state)
+        duplicado.pk = None
+        duplicado._state.adding = True
+        duplicado.save(force_insert=True)
+
+        for destino in salvo.destinos.all():
+            RoteiroDestino.objects.create(
+                roteiro=duplicado,
+                estado_id=destino.estado_id,
+                cidade_id=destino.cidade_id,
+                ordem=destino.ordem,
+            )
+        for trecho in salvo.trechos.all():
+            RoteiroTrecho.objects.create(
+                roteiro=duplicado,
+                ordem=trecho.ordem,
+                tipo=trecho.tipo,
+                origem_estado_id=trecho.origem_estado_id,
+                origem_cidade_id=trecho.origem_cidade_id,
+                destino_estado_id=trecho.destino_estado_id,
+                destino_cidade_id=trecho.destino_cidade_id,
+                saida_dt=trecho.saida_dt,
+                chegada_dt=trecho.chegada_dt,
+                distancia_km=trecho.distancia_km,
+                tempo_cru_estimado_min=trecho.tempo_cru_estimado_min,
+                tempo_adicional_min=trecho.tempo_adicional_min,
+                duracao_estimada_min=trecho.duracao_estimada_min,
+                rota_fonte=trecho.rota_fonte,
+            )
+
+        with com_request(salvo.area):
+            opcoes, _ = editor_state_builder._build_roteiro_avulso_route_options()
+        ids_equivalentes = {salvo.pk, duplicado.pk}
+
+        self.assertEqual(
+            len([opcao for opcao in opcoes if opcao["id"] in ids_equivalentes]),
+            1,
         )
 
     def test_2_roteiro_alterado_grava_copia_e_deixa_o_escolhido_intacto(self):

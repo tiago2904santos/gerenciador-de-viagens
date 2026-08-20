@@ -5,9 +5,8 @@
 {% block content %}
   <c-v2.list_page :title="page_title" filter_mode="none">
     <c-slot name="controls">
-      <form method="get" action="{{ request.path }}" class="rail__controls">
-        <c-v2.input name="q" :value="q" placeholder="Buscar modelos de texto" aria_label="Buscar modelos de texto" icon="search" />
-        <c-v2.button type="submit" label="Buscar" icon="search" />
+      <form method="get" action="{{ request.path }}" class="rail__controls" data-server-filter-form>
+        <c-v2.input name="q" :value="q" placeholder="Buscar modelos de texto" aria_label="Buscar modelos de texto" icon="search" hook="data-server-filter-search" />
       </form>
     </c-slot>
     <c-slot name="rows">

@@ -26,6 +26,7 @@
     <c-slot name="body">
       <div class="fact-list">
         <c-v2.fact
+          extra_class="fact--two-line-note"
           label="Valor total"
           value="{% if card.diaria_vazio %}Não calculado{% elif card.diaria_moeda %}{{ card.diaria_moeda }}{% endif %}"
           note_label="Valor por extenso"

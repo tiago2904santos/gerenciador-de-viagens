@@ -10,6 +10,8 @@ from core.pagination import contexto_paginacao
 from core.pagination import KnownCountPaginator
 from core.deletion import DelecaoProtegidaError
 from eventos.services import resolve_evento_from_request
+from core.retorno import com_next
+from core.retorno import daqui
 from .models import PlanoTrabalho
 from .selectors import hidratar_planos_da_pagina
 from .selectors import listar_planos_trabalho
@@ -78,8 +80,8 @@ def index(request):
             **paginacao,
             "create_url": reverse("planos_trabalho:novo"),
             "search_clear_url": f"{reverse('planos_trabalho:index')}?aba={aba}",
-            "programas_url": reverse("planos_trabalho:programas_index"),
-            "horarios_url": reverse("planos_trabalho:horarios_index"),
+            "programas_url": com_next(reverse("planos_trabalho:programas_index"), daqui(request)),
+            "horarios_url": com_next(reverse("planos_trabalho:horarios_index"), daqui(request)),
             "status_options": [{"value": "", "label": "Todos os status"}]
             + [{"value": valor, "label": rotulo} for valor, rotulo in PlanoTrabalho.STATUS_CHOICES],
             "sort_options": [

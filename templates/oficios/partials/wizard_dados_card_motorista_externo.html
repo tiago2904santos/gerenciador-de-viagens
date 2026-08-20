@@ -39,7 +39,7 @@
         dois campos soltos embaixo dos outros.
       {% endcomment %}
       <div data-oficio-motorista-extras {% if not motorista_extras_visivel %}hidden{% endif %}>
-        <c-v2.form_block title="Ofício de origem" description="Identifique o documento que autorizou este motorista.">
+        <c-v2.form_block :split="True" title="Ofício de origem" description="Identifique o documento que autorizou este motorista.">
           <c-slot name="body">
             <div class="field-grid">
               <c-v2.document_number

@@ -95,6 +95,7 @@ SHELL_JS: tuple[str, ...] = (
     "js/components/document-download.js",
     "js/components/fit-text.js",
     "js/components/notice-auto-dismiss.js",
+    "js/components/server-filter.js",
 )
 
 # HT-04: componentes pesados de formulario/documento saem do shell global. A

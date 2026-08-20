@@ -24,6 +24,16 @@
   padding: 0;
 }
 
+/* Algumas equipes são o conteúdo principal do bloco, sem a grade de um
+   `record` ao redor. Nesses casos a própria lista assume as duas colunas; o
+   modificador mantém a semântica da `ul` e reutiliza integralmente a linha V2. */
+:is(html[data-theme]) .person-list.person-list--two-columns {
+  display: grid;
+  gap: var(--gap-tight);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+}
+
 /* Em número ímpar, o último ocupa a linha inteira — sozinho em meia largura ele
    fica ao lado de um vazio, e o vazio se lê como alguém faltando. A conta de
    `nth-child` continua valendo com `display: contents`: ela olha a marcação,
@@ -65,6 +75,21 @@
 
 /* A viatura é a mesma linha com outro tom: o selo já diz o que ela é, e mudar
    a forma faria a faixa parecer duas listas. */
+/* A linha de DOCUMENTO leva ícone no lugar das iniciais, e o avatar vai cheio:
+   é o mesmo escolhido do picker — accent sólido, desenho na cor de cima do
+   accent. Translúcido com um traço fino dentro, que é como o das iniciais
+   funciona, sumia na fileira. */
+:is(html[data-theme]) .person-row__avatar--icon {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-on-accent);
+}
+
+:is(html[data-theme]) .person-row__avatar--icon svg {
+  height: 20px;
+  width: 20px;
+}
+
 :is(html[data-theme]) .person-row--viatura .person-row__avatar {
   background: color-mix(in srgb, var(--status-info) 16%, transparent);
   border-color: color-mix(in srgb, var(--status-info) 32%, transparent);
@@ -170,6 +195,7 @@
    e é a regra do sistema (`v2/surface.css`) que só a primeira camada sobre a
    página tem linha. */
 :is(html[data-theme]) .person-row__actions .icon-button {
-  background: var(--surface-rail);
+  --icon-button-surface: var(--surface-rail);
+
   border: 0;
 }

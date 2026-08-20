@@ -206,9 +206,13 @@
 }
 
 /* Header e stepper formam a navegação do wizard; o conteúdo da etapa começa
-   depois de um intervalo completo, sem colar a primeira lista ao rail. */
-:is(html[data-theme]) .wizard-page > .rail + * {
-  margin-top: var(--gap);
+   depois de um intervalo completo, sem colar a primeira lista ao rail.
+
+   O espaço pertence ao próprio rail: algumas etapas inserem um `<script>` JSON
+   antes do painel e, com um seletor de irmão adjacente, a margem era aplicada ao
+   elemento invisível em vez de separar visualmente o painel. */
+:is(html[data-theme]) .wizard-page > .rail {
+  margin-bottom: var(--gap);
 }
 
 /* A faixa do stepper acompanha a rolagem (2026-08-19, a pedido do dono): fica

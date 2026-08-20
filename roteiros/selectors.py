@@ -187,7 +187,12 @@ def queryset_roteiros_avulsos_para_mapa_rotas(limit=50):
     )
 
 
-def queryset_roteiros_reutilizaveis_para_evento(evento=None, limit=50, excluir_pk=None):
+def queryset_roteiros_reutilizaveis_para_evento(
+    evento=None,
+    limit=50,
+    excluir_pk=None,
+    area=None,
+):
     """Roteiros avulsos (reuso global) + roteiros do evento atual (Etapa 2 ou ja usados por
     algum oficio do evento), priorizando o roteiro do evento no topo da lista. Em ambos os
     casos, so entram roteiros totalmente preenchidos (ver `_anotar_e_filtrar_roteiros_completos`).
@@ -200,7 +205,9 @@ def queryset_roteiros_reutilizaveis_para_evento(evento=None, limit=50, excluir_p
         condicao |= Q(evento=evento) | Q(oficios__evento=evento)
 
     qs = (
-        _anotar_e_filtrar_roteiros_completos(filter_queryset_by_area(Roteiro.objects).filter(condicao))
+        _anotar_e_filtrar_roteiros_completos(
+            filter_queryset_by_area(Roteiro.objects, area=area).filter(condicao)
+        )
         .distinct()
         .select_related("origem_cidade", "origem_estado")
         .prefetch_related(
@@ -226,7 +233,7 @@ def queryset_roteiros_reutilizaveis_para_evento(evento=None, limit=50, excluir_p
         ).order_by("-is_do_evento", "-pk")
     else:
         qs = qs.order_by("-pk")
-    return qs[:limit]
+    return qs if limit is None else qs[:limit]
 
 
 def obter_cidades_origem_destino_estimativa(origem_id, destino_id):

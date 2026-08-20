@@ -31,7 +31,7 @@
 </c-v2.form_block>
 
 {% with titulo_roteiro=documentos_ctx.roteiro_card.title|default:"Roteiro e diárias" %}
-  <c-v2.form_block :title="titulo_roteiro" description="Trechos e cálculo das diárias.">
+  <c-v2.form_block :title="titulo_roteiro" description="Trechos e cálculo das diárias." extra_class="route-summary-block">
     <c-slot name="actions">
       {% include "oficios/partials/documentos/_roteiro_actions.html" with documentos_ctx=documentos_ctx only %}
     </c-slot>

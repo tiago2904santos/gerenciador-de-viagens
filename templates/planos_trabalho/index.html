@@ -28,12 +28,8 @@
     action_label="Novo plano"
     :action_url="create_url"
   >
-    <c-slot name="tabs">
-      <c-v2.toggle aria_label="Abas de planos de trabalho" :items="abas" />
-    </c-slot>
-
     <c-slot name="controls">
-      <form method="get" action="{{ request.path }}" class="rail__form" role="search">
+      <form method="get" action="{{ request.path }}" class="rail__form" role="search" data-server-filter-form>
         <input type="hidden" name="aba" value="{{ aba }}">
         <c-v2.input
           icon="search"
@@ -41,9 +37,11 @@
           :value="q"
           placeholder="Buscar por número, destino ou programa"
           aria_label="Buscar planos de trabalho"
+          hook="data-server-filter-search"
         />
-        <c-v2.select name="status" :value="status" :options="status_options" aria_label="Status do plano" />
-        <c-v2.select name="sort" :value="sort" :options="sort_options" aria_label="Ordenação" />
+        <c-v2.select :options="abas" placeholder="Filtrar por situação" aria_label="Filtrar planos por situação" hook="data-server-filter-url" />
+        <c-v2.select name="status" :value="status" :options="status_options" aria_label="Status do plano" hook="data-server-filter-control" />
+        <c-v2.select name="sort" :value="sort" :options="sort_options" aria_label="Ordenação" hook="data-server-filter-control" />
         {% comment %}
           O intervalo de viagem viaja em dois campos ocultos, sem formulário
           Django por trás: numa lista o filtro é querystring, não POST.
@@ -58,7 +56,6 @@
           :end_hidden_value="viagem_ate"
           aria_label="Período da viagem"
         />
-        <c-v2.button type="submit" label="Buscar" icon="search" />
         {% if has_filters %}<c-v2.button label="Limpar" icon="x" :href="search_clear_url" />{% endif %}
       </form>
     </c-slot>

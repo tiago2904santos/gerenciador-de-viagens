@@ -211,6 +211,20 @@ Sem gancho `data-*`: o módulo acha os avisos pela pilha (`.notice-stack`,
 `.alerts`) e marca os que já armou com `data-auto-dismiss-armado`. Avisos de
 erro e de atenção (`--danger`, `--error`, `--warning`) ficam na tela.
 
+## Filtros automáticos do servidor — `components/server-filter.js`
+
+Raiz: `data-server-filter-form`. A busca espera 1.000 ms e preserva foco e
+cursor depois da navegação GET.
+
+| Atributo | Elemento |
+|---|---|
+| `data-server-filter-search` | input de busca com debounce |
+| `data-server-filter-control` | select que envia o formulário automaticamente |
+| `data-server-filter-url` | select cujas opções contêm URLs prontas |
+
+Os valores ocultos do date picker já usam os hooks globais do calendário e são
+enviados automaticamente quando o intervalo está completo ou é limpo.
+
 ## File picker — `components/file-picker.js`
 
 Raiz: `data-file-picker`, com o `<input type=file>` nativo em `data-file-native`.

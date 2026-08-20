@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from core import entity_cards
 from core.presenters.badges import build_badge
+from core.presenters.badges import tom_de_chip_v2
 from core.presenters.text import join_non_empty
 from oficios.presenters import apresentar_oficio_card
 
@@ -50,7 +51,10 @@ def _oficio_item(oficio):
         "protocolo": protocolo,
         "data_evento_display": data_evento,
         "destino_display": destino,
-        "meta_display": join_non_empty([protocolo, data_evento, destino]),
+        # O protocolo sai da meta e vira selo ao lado do número: é por ele que
+        # o ofício é procurado no sistema de origem, e no meio de três itens
+        # separados por ponto ele não se achava.
+        "meta_display": join_non_empty([data_evento, destino]),
         "status_label": card["status_chip_label"].replace(" (legado)", ""),
         "status_state": card["status_chip_tone"],
         "data": card["data_criacao_display"],
@@ -204,6 +208,53 @@ def _evento_roteiro_saida(evento):
     return saida_date, end_date, origem
 
 
+def _evento_situacao_chip(evento):
+    """Selo da SITUAÇÃO do documento: rascunho, pronto, finalizado, cancelado.
+
+    Finalizado é derivado das prestações, pelas mesmas anotações que as abas da
+    lista usam (`core/documento_abas.anotar_finalizacao`). Sem elas — um evento
+    carregado fora da lista —, o selo simplesmente não fala em finalização, em
+    vez de mentir que não está.
+    """
+    if evento.status == evento.STATUS_CANCELADO:
+        return "Cancelado", "danger"
+    tem_prestacao = getattr(evento, "_tem_prestacao", None)
+    pendente = getattr(evento, "_tem_prestacao_pendente", None)
+    if tem_prestacao and not pendente:
+        return "Finalizado", "success"
+    if _evento_pronto(evento):
+        return "Pronto", "success"
+    return "Rascunho", "warning"
+
+
+def _evento_quando_chip(evento):
+    """Selo do QUANDO: falta tanto, em andamento, realizado.
+
+    Separado da situação porque são duas perguntas diferentes sobre o mesmo
+    evento — "o documento está pronto?" e "a viagem já foi?". Enquanto eram um
+    selo só, o evento em rascunho não dizia quando ia acontecer, e o que já
+    tinha acontecido não se distinguia do que estava acontecendo.
+
+    Evento cancelado não recebe este selo: contar dias de uma viagem que não vai
+    haver é informação que só atrapalha.
+    """
+    if evento.status == evento.STATUS_CANCELADO:
+        return None
+    saida_date, end_date, _origem = _evento_roteiro_saida(evento)
+    if not saida_date:
+        return None
+
+    hoje = timezone.localdate()
+    if hoje < saida_date:
+        dias = (saida_date - hoje).days
+        if dias == 1:
+            return "falta 1 dia", "info"
+        return f"faltam {dias} dias", "info"
+    if saida_date <= hoje <= end_date:
+        return "Em andamento", "progress"
+    return "Realizado", "done"
+
+
 def _evento_temporal_chip(evento):
     """Rótulo/tonalidade do chip de um evento pronto: contagem regressiva até a saída."""
     saida_date, end_date, origem = _evento_roteiro_saida(evento)
@@ -277,12 +328,8 @@ def apresentar_evento_list_card(evento, *, menus_sob_demanda=True):
     documentos.extend(_ordem_item(ordem) for ordem in evento.ordens_servico.all())
     documentos.extend(_solicitacao_item(doc) for doc in evento.documentos_solicitacao.all())
 
-    if evento.status == evento.STATUS_CANCELADO:
-        status_label, status_state = "Cancelado", "danger"
-    elif _evento_pronto(evento):
-        status_label, status_state = _evento_temporal_chip(evento)
-    else:
-        status_label, status_state = "Rascunho", "warning"
+    status_label, status_state = _evento_situacao_chip(evento)
+    quando = _evento_quando_chip(evento)
 
     titulo = _titulo_sem_data(evento)
     destino = _clean_evento_display(evento.destino_display)
@@ -300,7 +347,12 @@ def apresentar_evento_list_card(evento, *, menus_sob_demanda=True):
     for doc in documentos:
         search_parts.extend([doc.get("kind", ""), doc.get("title", ""), doc.get("detail", "")])
 
-    header_value = " · ".join(p for p in [titulo, destino, periodo] if p)
+    # O TÍTULO diz o que é e onde; o PERÍODO desce para a segunda linha
+    # (2026-08-19). Com os três no título, "PCPR na Comunidade · ADRIANÓPOLIS/PR
+    # · 03/06/2026 a 05/06/2026" gastava a linha inteira e o destino — que é o
+    # que se procura ao varrer a lista — ficava no meio dela.
+    header_value = " · ".join(p for p in [titulo, destino] if p)
+    meta_value = periodo
 
     if cancelado:
         acao_situacao = entity_cards.menu_confirm(
@@ -320,6 +372,17 @@ def apresentar_evento_list_card(evento, *, menus_sob_demanda=True):
             [entity_cards.header_item("Evento", header_value, wide=True, wrap=True)],
             [entity_cards.chip(status_state, status_label)],
         ),
+        # Os DOIS selos do cartão, já no vocabulário do v2 — o filtro `tom_v2`
+        # não roda dentro de `:attr` do Cotton.
+        "chips_v2": [
+            {"label": status_label, "tone": tom_de_chip_v2(status_state)},
+            *(
+                [{"label": quando[0], "tone": quando[1]}]
+                if quando
+                else []
+            ),
+        ],
+        "meta_display": meta_value,
         "footer": entity_cards.footer(
             edit_url=reverse("eventos:guiado_etapa", args=[evento.pk, 1]),
             edit_aria="Editar evento",

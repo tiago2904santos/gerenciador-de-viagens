@@ -2286,6 +2286,9 @@
   align-items: center;
   display: inline-flex;
   flex: none;
+  /* Com dois selos (situação + temporal) eles precisam de um vão entre si; com
+     um só, o `gap` não faz nada. */
+  gap: var(--gap-tight);
   margin-left: auto;
 }
 
@@ -2396,7 +2399,7 @@
   /* O teto vive no BLOCO, e não numa linha da grade: `grid-auto-rows` não sabe
      limitar só a faixa dos fatos, e é ela que precisa de altura previsível para
      os cartões da lista não variarem de tamanho conforme o roteiro. */
-  max-height: 170px;
+  max-height: 173px;
   min-height: 0;
   overflow: hidden;
 }
@@ -2529,9 +2532,7 @@
   max-height: calc(3 * var(--control-height) + 4 * var(--gap-tight));
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding-right: var(--gap-tight);
   scrollbar-color: var(--text-muted) transparent;
-  scrollbar-gutter: stable;
   scrollbar-width: thin;
 }
 
@@ -2545,7 +2546,7 @@
 /* Nestes dois blocos a linha já está no degrau rail; repetir rail no botão o
    fazia desaparecer. A ação usa field, como os demais controles sobre rail. */
 :is(html[data-theme]) .evento-card__docs .person-row__actions .icon-button {
-  background: var(--surface-field);
+  --icon-button-surface: var(--surface-field);
 }
 
 /* O formulário de uma ação só não quebra a fila de ações do rodapé. */
@@ -2989,6 +2990,16 @@
   padding: 0;
 }
 
+/* Algumas equipes são o conteúdo principal do bloco, sem a grade de um
+   `record` ao redor. Nesses casos a própria lista assume as duas colunas; o
+   modificador mantém a semântica da `ul` e reutiliza integralmente a linha V2. */
+:is(html[data-theme]) .person-list.person-list--two-columns {
+  display: grid;
+  gap: var(--gap-tight);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+}
+
 /* Em número ímpar, o último ocupa a linha inteira — sozinho em meia largura ele
    fica ao lado de um vazio, e o vazio se lê como alguém faltando. A conta de
    `nth-child` continua valendo com `display: contents`: ela olha a marcação,
@@ -3030,6 +3041,21 @@
 
 /* A viatura é a mesma linha com outro tom: o selo já diz o que ela é, e mudar
    a forma faria a faixa parecer duas listas. */
+/* A linha de DOCUMENTO leva ícone no lugar das iniciais, e o avatar vai cheio:
+   é o mesmo escolhido do picker — accent sólido, desenho na cor de cima do
+   accent. Translúcido com um traço fino dentro, que é como o das iniciais
+   funciona, sumia na fileira. */
+:is(html[data-theme]) .person-row__avatar--icon {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-on-accent);
+}
+
+:is(html[data-theme]) .person-row__avatar--icon svg {
+  height: 20px;
+  width: 20px;
+}
+
 :is(html[data-theme]) .person-row--viatura .person-row__avatar {
   background: color-mix(in srgb, var(--status-info) 16%, transparent);
   border-color: color-mix(in srgb, var(--status-info) 32%, transparent);
@@ -3135,7 +3161,8 @@
    e é a regra do sistema (`v2/surface.css`) que só a primeira camada sobre a
    página tem linha. */
 :is(html[data-theme]) .person-row__actions .icon-button {
-  background: var(--surface-rail);
+  --icon-button-surface: var(--surface-rail);
+
   border: 0;
 }
 /* <<< css/v2/person-row.css <<< */
@@ -3387,7 +3414,13 @@
 
 :is(html[data-theme]) .icon-button {
   align-items: center;
-  background: var(--surface-contrast, var(--surface-field));
+  /* A superfície de repouso vive numa VARIÁVEL, e não no `background` direto:
+     três lugares do sistema precisam de um degrau diferente (a linha de pessoa,
+     o cartão do evento, a linha do file picker), e cada um deles sobrescrevia o
+     `background` com seletor mais específico — que também vencia no `:hover`.
+     Resultado medido: o botão da linha de ofício não reagia ao ponteiro.
+     Trocando a variável, o realce continua saindo da regra de hover. */
+  background: var(--icon-button-surface, var(--surface-contrast, var(--surface-field)));
   border: 0;
   border-radius: var(--radius-pill);
   color: var(--text-muted);
@@ -3410,7 +3443,11 @@
    14% do accent e o conteúdo assume o accent. Os dois são ações de mesma
    ênfase; ter realces diferentes faria a lista piscar em dois padrões. */
 :is(html[data-theme]) .icon-button:hover {
-  background: color-mix(in srgb, var(--accent) 14%, var(--surface-contrast, var(--surface-rail)));
+  background: color-mix(
+    in srgb,
+    var(--accent) 14%,
+    var(--icon-button-surface, var(--surface-contrast, var(--surface-rail)))
+  );
   color: var(--accent);
 }
 
@@ -3793,9 +3830,13 @@
 }
 
 /* Header e stepper formam a navegação do wizard; o conteúdo da etapa começa
-   depois de um intervalo completo, sem colar a primeira lista ao rail. */
-:is(html[data-theme]) .wizard-page > .rail + * {
-  margin-top: var(--gap);
+   depois de um intervalo completo, sem colar a primeira lista ao rail.
+
+   O espaço pertence ao próprio rail: algumas etapas inserem um `<script>` JSON
+   antes do painel e, com um seletor de irmão adjacente, a margem era aplicada ao
+   elemento invisível em vez de separar visualmente o painel. */
+:is(html[data-theme]) .wizard-page > .rail {
+  margin-bottom: var(--gap);
 }
 
 /* A faixa do stepper acompanha a rolagem (2026-08-19, a pedido do dono): fica
@@ -5755,7 +5796,7 @@
    superfície de onde está — medido, saía `#132132` sobre `#132132`, botão invisível.
    Aqui é o degrau seguinte que separa o controle do fundo, como no resto do v2. */
 :is(html[data-theme]) .file-picker__row .icon-button {
-  background: var(--surface-field);
+  --icon-button-surface: var(--surface-field);
 }
 
 :is(html[data-theme]) .file-picker__actions {
@@ -6473,9 +6514,9 @@
  * (`composite-field`) desenhava a própria moldura em volta dos dois, e por isso
  * tinha borda, raio e altura que só coincidiam com o resto por acaso.
  *
- * O número não cresce com o campo: três dígitos ocupam o que ocupam, e um
- * `<input>` de 400px para "12" fazia a barra de rolagem do formulário mentir
- * sobre quanto ainda faltava preencher.
+ * O conjunto ocupa a coluna inteira do formulário. O número cresce até o ano
+ * fixo, mantendo as duas partes na mesma linha e sem deixar um vazio artificial
+ * depois do sufixo.
  */
 
 :is(html[data-theme]) .document-number {
@@ -6483,17 +6524,17 @@
   display: flex;
   gap: var(--gap-tight);
   min-width: 0;
+  width: 100%;
 }
 
 /* Vale para o `<input>` que este componente cria (modo composto) E para o do
-   formulário (modo simples): os dois são o mesmo número de três dígitos. Sem a
-   segunda metade, o campo do Django chegava aqui com a largura cheia que
-   `.form-control` lhe dá, e o "N° do Ofício" ocupava mil pixels para receber
-   "153". */
+   formulário (modo simples). O controle ocupa o espaço restante e o ano fica
+   como sufixo fixo da mesma linha. */
 :is(html[data-theme]) .document-number__input,
 :is(html[data-theme]) .document-number > input {
-  flex: 0 0 auto;
-  width: 7ch;
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
 }
 
 /* O ano não é rótulo nem valor: é a parte fixa do número, e por isso fica na
@@ -6501,6 +6542,7 @@
    leitura com o que se digita. */
 :is(html[data-theme]) .document-number__suffix {
   color: var(--text-muted);
+  flex: 0 0 auto;
   font-size: var(--text-size-base);
   white-space: nowrap;
 }
@@ -6510,14 +6552,14 @@
 /* Sugestões — a faixa de atalhos que o formulário oferece a partir do que já
  * foi preenchido. Depende de `v2/tokens.css`.
  *
- * O chip aqui é BOTÃO, e não o `.chip--v2`: aquele é um selo, que informa; este
- * é uma ação, que preenche o campo ao lado. Compartilham a forma de pílula e
- * nada mais — o selo não tem hover, não tem foco e não tem estado escolhido.
+ * A faixa só resolve o ARRANJO. O chip em si é peça do sistema: cada sugestão é
+ * um `toggle__item` — o botão de "escolha uma entre poucas", que já tem hover,
+ * foco e estado escolhido —, e a razão da sugestão é um `chip--v2`.
  *
- * Os chips são criados pelo script da tela, então as regras casam por CLASSE e
- * não por filho direto: o motor injeta `<button class="viatura-sugestao-chip">`
- * dentro de `.suggestions__chips`, e o nome vem do legado na letra porque
- * trocá-lo deixaria a faixa na tela com chips sem desenho nenhum.
+ * As classes `viatura-sugestao-chip` e `viatura-sugestao-badge` saíram em
+ * 2026-08-19 junto com as 40 linhas que as desenhavam: elas repetiam, com outro
+ * nome, a pílula que o toggle e o selo já davam — inclusive o realce do
+ * escolhido, que aqui era uma classe `--active` e no sistema é `aria-pressed`.
  */
 
 :is(html[data-theme]) .suggestions {
@@ -6540,44 +6582,18 @@
   gap: var(--gap-tight);
 }
 
-:is(html[data-theme]) .viatura-sugestao-chip {
-  align-items: center;
-  background: var(--surface-field);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  color: var(--text-strong);
-  cursor: pointer;
-  display: inline-flex;
-  font-size: var(--text-size-eyebrow);
-  gap: 6px;
-  padding: 4px 10px;
-  transition: background var(--ease), border-color var(--ease);
-}
+/* Os itens NÃO ficam sobre a calha do toggle: aqui eles são atalhos soltos, e
+   não os segmentos de um controle único. Por isso a faixa é um flex simples e
+   não leva a classe `.toggle`. */
 
-:is(html[data-theme]) .viatura-sugestao-chip:hover {
-  border-color: var(--accent);
-}
-
-/* O chip escolhido é o mesmo da linha selecionada em qualquer lista do sistema:
-   a superfície de seleção, e não uma cor própria. */
-:is(html[data-theme]) .viatura-sugestao-chip--active {
-  background: var(--surface-selected);
-  border-color: var(--accent);
-}
-
-/* A razão da sugestão — o nome do motorista ou o da unidade. É dado de apoio:
-   diz POR QUE aquela viatura foi lembrada, e não o que ela é. */
-:is(html[data-theme]) .viatura-sugestao-badge {
-  color: var(--text-muted);
-  font-size: var(--text-size-eyebrow);
-}
-
-:is(html[data-theme]) .viatura-sugestao-badge--motorista {
-  color: var(--status-info);
-}
-
-:is(html[data-theme]) .viatura-sugestao-badge--unidade {
-  color: var(--text-muted);
+/* O selo DENTRO da sugestão escolhida: sobre o accent, a cor de estado do chip
+   fica ilegível — medido, "ADILSON" em `--status-progress` sobre o amarelo
+   praticamente sumia. Aqui ele passa a ser um véu escuro com a cor de cima do
+   accent, que é o mesmo tratamento que o segmento escolhido do `toggle--fill`
+   dá ao marcador dele. */
+:is(html[data-theme]) .suggestions__chips .toggle__item[aria-pressed="true"] .chip--v2 {
+  background: color-mix(in srgb, #000 18%, transparent);
+  color: inherit;
 }
 /* <<< css/v2/suggestions.css <<< */
 
@@ -6616,6 +6632,19 @@
   gap: var(--gap);
   grid-template-columns: minmax(0, 1fr);
   min-width: 0;
+}
+
+/* O resumo administrativo do ofício é uma faixa única: número, protocolo,
+   criação e custeio têm o mesmo peso e precisam permanecer lado a lado. A
+   exceção é local para não devolver colunas aos fatos dos cartões de lista. */
+:is(html[data-theme]) .fact-list.document-summary--identity {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* O resumo da viatura segue a mesma leitura horizontal: placa, modelo, tipo e
+   combustível formam uma única faixa de quatro fatos equivalentes. */
+:is(html[data-theme]) .fact-list.document-summary--vehicle {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 /* Três linhas EMPILHADAS: rótulo, valor, apoio.
@@ -6665,6 +6694,7 @@
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
+  margin-bottom: 8px;
 }
 
 /* O valor é GRANDE. No original a placa e o total ocupam a altura de duas
@@ -6771,6 +6801,16 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* O valor por extenso precisa preservar legibilidade na coluna estreita do
+   resumo do roteiro. Só esse fato pode ocupar uma segunda linha; as demais
+   notas continuam obedecendo ao contrato compacto global. */
+:is(html[data-theme]) .fact--two-line-note .fact__note {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  white-space: normal;
 }
 
 /* ---- trechos --------------------------------------------------------------
@@ -6965,6 +7005,17 @@
 
 :is(html[data-theme]) .route-summary__column {
   min-width: 0;
+}
+
+/* O título identifica o percurso à esquerda; a explicação curta pertence ao
+   lado oposto do mesmo cabeçalho, imediatamente antes do selo de status. */
+:is(html[data-theme]) .route-summary-block > .form-block__header > div:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .route-summary-block .form-block__description {
+  text-align: right;
 }
 
 @media (max-width: 900px) {

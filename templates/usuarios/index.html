@@ -33,8 +33,10 @@
     :page_querystring="page_querystring"
     :csrf_token="csrf_token"
     :request="request"
+    :filter_options="abas"
+    filter_placeholder="Filtrar administração"
+    filter_aria_label="Filtrar administração"
   >
-    <c-slot name="tabs"><c-v2.toggle :items="abas" aria_label="Administração" /></c-slot>
     <c-slot name="fields">{% include "usuarios/partials/_quick_add_usuario_fields.html" with form=quick_add_form only %}</c-slot>
   </c-v2.catalog_page>
 

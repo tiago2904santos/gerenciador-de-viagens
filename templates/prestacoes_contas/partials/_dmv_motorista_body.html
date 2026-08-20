@@ -1,3 +1,4 @@
+{% load icones %}
 <fieldset class="dmv-picker" data-dmv-picker="motorista">
   <legend class="sr-only">Motorista do diário</legend>
   <div class="dmv-picker__grid">
@@ -35,7 +36,7 @@
   {% if oficios_prefill %}
     <div class="dmv-prefill">
       <div class="dmv-prefill__icon" aria-hidden="true">
-        <c-ui.icons.icon icon="download" only />
+        {% icone_svg "download" %}
       </div>
       <div class="dmv-prefill__body">
         <label class="cv-field__label" for="dmv-oficio-prefill">Puxar dados de um ofício existente <span class="dmv-muted">(opcional)</span></label>

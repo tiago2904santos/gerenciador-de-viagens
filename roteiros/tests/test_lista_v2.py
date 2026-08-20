@@ -15,6 +15,7 @@ não markup, então a troca de esqueleto passaria inteira por baixo dele.
 from __future__ import annotations
 
 from datetime import timedelta
+from urllib.parse import urlencode
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -90,25 +91,69 @@ class ListaDeRoteirosV2Tests(TestCase):
         self.assertIn("trechos", meta)
         self.assertIn("·", meta)
 
-    def test_a_busca_e_do_servidor_e_preserva_a_aba(self):
+    def test_a_busca_e_o_multiselect_sao_do_servidor(self):
         """`filter_mode="none"`: filtrar no cliente esconderia as outras páginas."""
-        html = self._html(aba="finalizados")
+        html = self._html(aba=["futuras", "cancelados"])
         self.assertNotIn("data-collection-mode", html)
         self.assertIn('<form method="get"', html)
         self.assertIn('name="q"', html)
-        self.assertIn('name="aba" value="finalizados"', html)
+        self.assertIn('name="aba"', html)
+        self.assertIn("multiple", html)
+        self.assertNotIn('type="hidden" name="aba"', html)
 
     def test_a_busca_do_servidor_filtra_de_verdade(self):
         self.assertIn("ARAPONGAS/PR", self._html(q="arapongas"))
         self.assertNotIn("ARAPONGAS/PR", self._html(q="florianopolis"))
 
-    def test_as_quatro_abas_continuam_na_tela(self):
+    def test_as_quatro_situacoes_continuam_no_select_v2(self):
         html = self._html()
         for label in ("Que vão acontecer", "Em andamento", "Finalizados", "Cancelados"):
             with self.subTest(aba=label):
                 self.assertIn(label, html)
-        # o toggle do sistema, não uma barra de abas própria desta tela
-        self.assertIn("toggle--nav", html)
+        self.assertIn('aria-label="Filtrar roteiros por situação"', html)
+        self.assertIn("data-server-filter-control", html)
+        self.assertNotIn("toggle--nav", html)
+
+    def test_multiselect_combina_situacoes_e_preserva_a_query_na_paginacao(self):
+        atual = self._criar_roteiro(dias=-3)
+        cancelado = self._criar_roteiro(dias=8)
+        cancelado.cancelado = True
+        cancelado.save(update_fields=["cancelado"])
+        query = urlencode(
+            [("aba", "futuras"), ("aba", "cancelados")],
+            doseq=True,
+        )
+
+        resposta = self.client.get(f"{reverse('roteiros:index')}?{query}")
+
+        self.assertEqual(resposta.status_code, 200)
+        ids = {roteiro.pk for roteiro in resposta.context["page_obj"].object_list}
+        self.assertEqual(ids, {self.roteiro.pk, cancelado.pk})
+        self.assertNotIn(atual.pk, ids)
+        self.assertEqual(
+            resposta.context["abas_selecionadas"],
+            ["futuras", "cancelados"],
+        )
+        self.assertEqual(
+            resposta.context["page_querystring"],
+            "aba=futuras&aba=cancelados",
+        )
+
+    def test_sem_situacao_selecionada_mostra_todos_os_roteiros(self):
+        atual = self._criar_roteiro(dias=-3)
+        cancelado = self._criar_roteiro(dias=8)
+        cancelado.cancelado = True
+        cancelado.save(update_fields=["cancelado"])
+
+        resposta = self.client.get(reverse("roteiros:index"))
+
+        self.assertEqual(resposta.status_code, 200)
+        ids = {roteiro.pk for roteiro in resposta.context["page_obj"].object_list}
+        self.assertEqual(ids, {self.roteiro.pk, atual.pk, cancelado.pk})
+        self.assertEqual(resposta.context["abas_selecionadas"], [])
+        self.assertFalse(
+            any(opcao["selected"] for opcao in resposta.context["status_filter_options"])
+        )
 
     def test_excluir_abre_o_dialogo_v2_com_o_nome_do_roteiro(self):
         """Sem `data-delete-url` no gatilho o `overlay.js` não abre nada."""

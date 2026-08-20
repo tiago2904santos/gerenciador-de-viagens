@@ -34,6 +34,19 @@
   min-width: 0;
 }
 
+/* O resumo administrativo do ofício é uma faixa única: número, protocolo,
+   criação e custeio têm o mesmo peso e precisam permanecer lado a lado. A
+   exceção é local para não devolver colunas aos fatos dos cartões de lista. */
+:is(html[data-theme]) .fact-list.document-summary--identity {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* O resumo da viatura segue a mesma leitura horizontal: placa, modelo, tipo e
+   combustível formam uma única faixa de quatro fatos equivalentes. */
+:is(html[data-theme]) .fact-list.document-summary--vehicle {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 /* Três linhas EMPILHADAS: rótulo, valor, apoio.
  *
  * Tentei o apoio ao lado do valor para economizar altura dentro do teto de
@@ -81,6 +94,7 @@
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
+  margin-bottom: 8px;
 }
 
 /* O valor é GRANDE. No original a placa e o total ocupam a altura de duas
@@ -187,6 +201,16 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* O valor por extenso precisa preservar legibilidade na coluna estreita do
+   resumo do roteiro. Só esse fato pode ocupar uma segunda linha; as demais
+   notas continuam obedecendo ao contrato compacto global. */
+:is(html[data-theme]) .fact--two-line-note .fact__note {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  white-space: normal;
 }
 
 /* ---- trechos --------------------------------------------------------------
@@ -381,6 +405,17 @@
 
 :is(html[data-theme]) .route-summary__column {
   min-width: 0;
+}
+
+/* O título identifica o percurso à esquerda; a explicação curta pertence ao
+   lado oposto do mesmo cabeçalho, imediatamente antes do selo de status. */
+:is(html[data-theme]) .route-summary-block > .form-block__header > div:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .route-summary-block .form-block__description {
+  text-align: right;
 }
 
 @media (max-width: 900px) {

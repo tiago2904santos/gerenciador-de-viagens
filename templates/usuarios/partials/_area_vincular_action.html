@@ -1,3 +1,4 @@
+{% load icones %}
 {% comment %}
   Ação do header do bloco "Usuários da área". Escrita à mão, e não por
   `button.html`, porque o gatilho carrega `data-*` próprios — quem abre o
@@ -10,6 +11,6 @@
   data-vinculo-create
   data-vincular-url="{{ vinculo_action_url }}"
   aria_label="Vincular um usuário à área {{ area.sigla }}" only>
-  <span class="button__icon" aria-hidden="true"><c-ui.icons.icon icon="link" only /></span>
+  <span class="button__icon" aria-hidden="true">{% icone_svg "link" %}</span>
   <span>Vincular usuário</span>
 </c-v2.button>

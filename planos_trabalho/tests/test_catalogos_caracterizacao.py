@@ -137,7 +137,10 @@ class AtividadesTests(CatalogoCaracterizacaoMixin, TestCase):
         response = self.client.get(self._index(next=destino))
         self.assertEqual(response.context["back_url"], destino)
         self.assertEqual(response.context["quick_add_next_url"], destino)
-        self.assertEqual(response.context["back_label"], "Voltar pra plano de trabalho")
+        # O rótulo passou a sair do DESTINO do `next`, não do catálogo
+        # (2026-08-19): o mesmo catálogo é aberto de quatro telas, e dizer
+        # "plano de trabalho" para quem veio de um evento era mentira.
+        self.assertEqual(response.context["back_label"], "Voltar ao plano de trabalho")
 
         response = self.client.post(
             f"{reverse(self.url_index)}?next={destino}",

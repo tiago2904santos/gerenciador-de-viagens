@@ -2,7 +2,13 @@
 
 :is(html[data-theme]) .icon-button {
   align-items: center;
-  background: var(--surface-contrast, var(--surface-field));
+  /* A superfície de repouso vive numa VARIÁVEL, e não no `background` direto:
+     três lugares do sistema precisam de um degrau diferente (a linha de pessoa,
+     o cartão do evento, a linha do file picker), e cada um deles sobrescrevia o
+     `background` com seletor mais específico — que também vencia no `:hover`.
+     Resultado medido: o botão da linha de ofício não reagia ao ponteiro.
+     Trocando a variável, o realce continua saindo da regra de hover. */
+  background: var(--icon-button-surface, var(--surface-contrast, var(--surface-field)));
   border: 0;
   border-radius: var(--radius-pill);
   color: var(--text-muted);
@@ -25,7 +31,11 @@
    14% do accent e o conteúdo assume o accent. Os dois são ações de mesma
    ênfase; ter realces diferentes faria a lista piscar em dois padrões. */
 :is(html[data-theme]) .icon-button:hover {
-  background: color-mix(in srgb, var(--accent) 14%, var(--surface-contrast, var(--surface-rail)));
+  background: color-mix(
+    in srgb,
+    var(--accent) 14%,
+    var(--icon-button-surface, var(--surface-contrast, var(--surface-rail)))
+  );
   color: var(--accent);
 }
 

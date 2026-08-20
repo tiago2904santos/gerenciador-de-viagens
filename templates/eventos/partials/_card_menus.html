@@ -1,3 +1,4 @@
+{% load icones %}
 {% comment %}
 Corpos dos menus de um card de Evento, servidos por `eventos:card_menus` (PF-04).
 
@@ -84,7 +85,7 @@ O presenter é o mesmo da lista, chamado com `menus_sob_demanda=False`.
               data-attach-signed-current-view-url="{{ s.termo_assinado_view_url }}"
               data-attach-signed-current-remove-url="{{ s.termo_remover_assinado_url }}" only>
               <span class="menu__icon" data-tone="success" aria-hidden="true">
-                <c-ui.icons.icon icon="sign" only />
+                {% icone_svg "sign" %}
               </span>
               <span class="menu__copy">
                 <strong class="menu__title">{% if s.termo_assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>

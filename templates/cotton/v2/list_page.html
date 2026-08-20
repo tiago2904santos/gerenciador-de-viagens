@@ -127,8 +127,14 @@
   {% endif %}
 
   {% if action_url %}
-    <a class="list-page__action" href="{{ action_url }}">
-      {% icone_svg action_icon|default:"plus" %}<span>{{ action_label }}</span>
+    {% comment %}
+      O `<span>` só existe com rótulo: vazio, ele reservava a largura do texto e
+      a ação virava uma pílula com um ícone perdido no meio. E o `aria-label`
+      garante NOME mesmo sem texto — um link só com ícone não tem nome nenhum
+      para quem usa leitor de tela.
+    {% endcomment %}
+    <a class="list-page__action" href="{{ action_url }}"{% if not action_label %} aria-label="Voltar"{% endif %}>
+      {% icone_svg action_icon|default:"plus" %}{% if action_label %}<span>{{ action_label }}</span>{% endif %}
     </a>
   {% endif %}
 

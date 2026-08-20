@@ -239,7 +239,7 @@ class UsuariosAdminPageTests(TestCase):
 
         response = self.client.get(reverse("usuarios:index"))
         self.assertEqual(response.status_code, 200)
-        # Quick-add e modal: área é search-picker; perfil é select (poucas opções).
+        # Filtro da página, quick-add e modal usam o select global; área é search-picker.
         self.assertContains(response, 'data-entity-picker="true"', count=2)
         self.assertContains(response, 'id="quick-add-usuario"')
         self.assertContains(response, 'id="vincular-usuario-modal"')
@@ -249,7 +249,7 @@ class UsuariosAdminPageTests(TestCase):
         self.assertContains(response, 'id="id_vinculo-papel"')
         self.assertContains(response, "Buscar área...")
         self.assertNotContains(response, "Buscar perfil...")
-        self.assertContains(response, 'data-entity-picker-renderer="select"', count=2)
+        self.assertContains(response, 'data-entity-picker-renderer="select"', count=3)
 
     def test_cria_usuario_vinculado_a_area(self):
         self.client.force_login(self.admin)

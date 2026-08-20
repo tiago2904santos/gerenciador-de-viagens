@@ -32,6 +32,7 @@ class ModelosJustificativaCrudTests(TestCase):
         self.assertContains(r, "Novo modelo")
         self.assertContains(r, 'name="nome"')
         self.assertContains(r, 'name="texto"')
+        self.assertContains(r, 'class="input__control input__control--textarea"')
         self.assertNotContains(r, "Dados do modelo")
         self.assertNotContains(r, "Nome e texto da justificativa")
         self.assertNotContains(r, "quick-add__section-copy")
@@ -42,7 +43,9 @@ class ModelosJustificativaCrudTests(TestCase):
         # volta na tela — continua sendo cobrado, com o rótulo junto.
         self.assertContains(r, "list-page__action")
         self.assertContains(r, self.back_label if hasattr(self, "back_label") else "Voltar")
-        self.assertContains(r, "Voltar para as justificativas")
+        # O rótulo passou a sair do destino do `next` (2026-08-19); sem `next`,
+        # o retorno é a própria lista de justificativas.
+        self.assertContains(r, "Voltar à justificativa")
         self.assertContains(r, reverse("justificativas:index"))
 
     def test_quick_add_cria_modelo_e_redireciona_para_lista(self):

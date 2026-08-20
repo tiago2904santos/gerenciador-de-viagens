@@ -1,4 +1,5 @@
-{% cotton:vars actions badge extra_class initials meta name %}
+{% cotton:vars actions badge extra_class icon initials meta name %}
+{% load icones %}
 {% comment %}
   Linha de pessoa — o item da faixa de um registro: quem viaja, e no que viaja.
   Par de `static/css/v2/person-row.css`.
@@ -9,9 +10,16 @@
 
   As iniciais NÃO são decoração: numa faixa de quatro ou cinco nomes elas são a
   âncora que o olho usa para achar a linha certa sem ler.
+
+  `icon` é para a linha que NÃO é uma pessoa — o ofício e o plano vinculados ao
+  evento. Sem ele a caixa das iniciais ficava vazia: um quadrado colorido de
+  44px sem nada dentro, que é como o cartão do evento aparecia. Com ícone, a
+  caixa passa a dizer o que a linha é, e o avatar vai preenchido (o mesmo
+  escolhido do picker), porque um contorno vazio com um desenho fino dentro
+  desaparece na fileira.
 {% endcomment %}
 <li class="person-row{% if extra_class %} {{ extra_class }}{% endif %}">
-  <span class="person-row__avatar" aria-hidden="true">{{ initials }}</span>
+  <span class="person-row__avatar{% if icon and not initials %} person-row__avatar--icon{% endif %}" aria-hidden="true">{% if initials %}{{ initials }}{% elif icon %}{% icone_svg icon %}{% endif %}</span>
   <div class="person-row__body">
     <div class="person-row__name-row">
       <span class="person-row__name">{{ name }}</span>

@@ -1238,6 +1238,50 @@ def _roteiro_virtual_para_trechos(initial):
     return r
 
 
+def _roteiro_equivalence_key_from_state(state):
+    """Identidade estrutural usada apenas para colapsar opções salvas iguais."""
+
+    def trecho_key(trecho):
+        return (
+            parse_int(trecho.get('origem_estado_id')),
+            parse_int(trecho.get('origem_cidade_id')),
+            parse_int(trecho.get('destino_estado_id')),
+            parse_int(trecho.get('destino_cidade_id')),
+            str(trecho.get('saida_data') or ''),
+            str(trecho.get('saida_hora') or ''),
+            str(trecho.get('chegada_data') or ''),
+            str(trecho.get('chegada_hora') or ''),
+            str(trecho.get('distancia_km') or ''),
+            str(trecho.get('tempo_cru_estimado_min') or ''),
+            str(trecho.get('tempo_adicional_min') or 0),
+            str(trecho.get('duracao_estimada_min') or ''),
+        )
+
+    retorno = state.get('retorno') or {}
+    destinos = tuple(
+        (parse_int(item.get('estado_id')), parse_int(item.get('cidade_id')))
+        for item in (state.get('destinos_atuais') or [])
+        if parse_int(item.get('estado_id')) and parse_int(item.get('cidade_id'))
+    )
+    retorno_key = (
+        str(retorno.get('saida_data') or ''),
+        str(retorno.get('saida_hora') or ''),
+        str(retorno.get('chegada_data') or ''),
+        str(retorno.get('chegada_hora') or ''),
+        str(retorno.get('distancia_km') or ''),
+        str(retorno.get('tempo_cru_estimado_min') or ''),
+        str(retorno.get('tempo_adicional_min') or 0),
+        str(retorno.get('duracao_estimada_min') or ''),
+    )
+    return (
+        parse_int(state.get('sede_estado_id')),
+        parse_int(state.get('sede_cidade_id')),
+        destinos,
+        tuple(trecho_key(trecho) for trecho in (state.get('trechos') or [])),
+        retorno_key,
+    )
+
+
 def _build_roteiro_avulso_route_options(evento=None, excluir_pk=None):
     """
     Build route_options from reusable roteiros: avulsos (globais) + roteiros do evento
@@ -1248,6 +1292,7 @@ def _build_roteiro_avulso_route_options(evento=None, excluir_pk=None):
 
     options = []
     state_map = {}
+    equivalencias_vistas = set()
     roteiros = selectors.queryset_roteiros_reutilizaveis_para_evento(evento=evento, excluir_pk=excluir_pk)
     for roteiro in roteiros:
         destinos = [
@@ -1258,6 +1303,10 @@ def _build_roteiro_avulso_route_options(evento=None, excluir_pk=None):
         if len(destinos) > 3:
             resumo += ' -> ...'
         state = _build_roteiro_state_from_roteiro_evento(roteiro)
+        equivalencia = _roteiro_equivalence_key_from_state(state)
+        if equivalencia in equivalencias_vistas:
+            continue
+        equivalencias_vistas.add(equivalencia)
         state_map[roteiro.pk] = state
         options.append({
             'id': roteiro.pk,
@@ -1342,5 +1391,4 @@ def _build_roteiro_diarias_from_request(post, *, roteiro=None, evento=None):
         validated,
         _calculate_avulso_diarias_from_state(roteiro_state, quantidade_servidores=qs_diarias),
     )
-
 

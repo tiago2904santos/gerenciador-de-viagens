@@ -19,9 +19,6 @@
     <c-v2.form_block aria_label="Combustível" extra_class="document-summary__fact-panel document-summary__fact-panel--vehicle">
       <c-slot name="body"><c-v2.fact label="Combustível" :value="t.combustivel" /></c-slot>
     </c-v2.form_block>
-    <c-v2.form_block aria_label="Unidade lotada" extra_class="document-summary__fact-panel document-summary__fact-panel--vehicle">
-      <c-slot name="body"><c-v2.fact label="Unidade lotada" :value="t.unidade" /></c-slot>
-    </c-v2.form_block>
     {% if t.mostrar_motorista_externo %}
       <c-v2.form_block aria_label="Motorista carona" extra_class="document-summary__fact-panel document-summary__fact-panel--vehicle">
         <c-slot name="body"><c-v2.fact label="Motorista carona" :value="t.motorista" /></c-slot>

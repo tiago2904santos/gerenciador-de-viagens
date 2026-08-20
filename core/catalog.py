@@ -29,6 +29,8 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
 from typing import Callable
+from urllib.parse import urlsplit
+
 from django.contrib import messages
 from django.http import HttpRequest
 from django.http import HttpResponse
@@ -250,13 +252,43 @@ def index_view(
     return view
 
 
+#: De onde a pessoa veio → como chamar o caminho de volta. A chave é o começo do
+#: caminho do `?next=`, que é o que diz a tela de origem.
+_ROTULOS_DE_RETORNO = (
+    ("/eventos/", "Voltar ao evento"),
+    ("/oficios/", "Voltar ao ofício"),
+    ("/roteiros/", "Voltar ao roteiro"),
+    ("/planos-trabalho/", "Voltar ao plano de trabalho"),
+    ("/ordens-servico/", "Voltar à ordem de serviço"),
+    ("/termos/", "Voltar ao termo"),
+    ("/prestacoes-contas/", "Voltar à prestação"),
+    ("/justificativas/", "Voltar à justificativa"),
+    ("/cadastros/", "Voltar ao cadastro"),
+)
+
+
+def rotulo_de_retorno(next_url: str) -> str:
+    """O rótulo do botão de voltar, tirado do DESTINO — não do catálogo.
+
+    Era fixo por catálogo (`back_label_com_next`), e por isso mentia: quem abria
+    "Gerenciar modelos de motivo" a partir de um EVENTO lia "Voltar ao ofício",
+    porque o ofício é o dono daquele catálogo. O mesmo catálogo é aberto de
+    quatro telas diferentes; quem sabe para onde se volta é o `next`.
+    """
+    caminho = urlsplit(next_url).path
+    for prefixo, rotulo in _ROTULOS_DE_RETORNO:
+        if caminho.startswith(prefixo):
+            return rotulo
+    return "Voltar"
+
+
 def _contexto_navegacao(config: CatalogConfig, next_url: str, externo: bool) -> dict:
     if not config.url_fallback_next:
         return {}
     return {
         "back_url": next_url,
         "back_label": (
-            config.back_label_com_next if externo else config.back_label_sem_next
+            rotulo_de_retorno(next_url) if externo else config.back_label_sem_next
         ),
     }
 

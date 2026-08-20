@@ -16,6 +16,9 @@ from oficios.picker import dados_do_option
 from oficios.picker import oficios_ja_escolhidos
 from oficios.selectors import listar_oficios
 
+from core.retorno import com_next
+from core.retorno import daqui
+
 from .catalogs import modelo_definir_padrao  # noqa: F401  (re-export para urls.py)
 from .catalogs import modelo_editar  # noqa: F401
 from .catalogs import modelo_excluir  # noqa: F401
@@ -145,7 +148,9 @@ def index(request):
             "oficios_summary": _oficios_summary_for_quick_add(form),
             "q": q,
             "rows": rows,
-            "modelos_url": reverse("justificativas:modelos_index"),
+            # Com `next`: o catálogo tem de devolver a pessoa à tela de onde ela
+            # saiu, com filtro e aba intactos.
+            "modelos_url": com_next(reverse("justificativas:modelos_index"), daqui(request)),
             **paginacao,
         },
     )

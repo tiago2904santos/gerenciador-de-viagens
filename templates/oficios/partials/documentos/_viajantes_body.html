@@ -12,7 +12,7 @@
   sozinha não informa quem não a distingue (WCAG 1.4.1), e a linha já tem onde
   escrever.
 {% endcomment %}
-<ul class="person-list">
+<ul class="person-list person-list--two-columns">
   {% for viajante in documentos_ctx.viajantes_cards %}
     <c-v2.person_row
       :initials="viajante.iniciais"

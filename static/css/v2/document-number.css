@@ -6,9 +6,9 @@
  * (`composite-field`) desenhava a própria moldura em volta dos dois, e por isso
  * tinha borda, raio e altura que só coincidiam com o resto por acaso.
  *
- * O número não cresce com o campo: três dígitos ocupam o que ocupam, e um
- * `<input>` de 400px para "12" fazia a barra de rolagem do formulário mentir
- * sobre quanto ainda faltava preencher.
+ * O conjunto ocupa a coluna inteira do formulário. O número cresce até o ano
+ * fixo, mantendo as duas partes na mesma linha e sem deixar um vazio artificial
+ * depois do sufixo.
  */
 
 :is(html[data-theme]) .document-number {
@@ -16,17 +16,17 @@
   display: flex;
   gap: var(--gap-tight);
   min-width: 0;
+  width: 100%;
 }
 
 /* Vale para o `<input>` que este componente cria (modo composto) E para o do
-   formulário (modo simples): os dois são o mesmo número de três dígitos. Sem a
-   segunda metade, o campo do Django chegava aqui com a largura cheia que
-   `.form-control` lhe dá, e o "N° do Ofício" ocupava mil pixels para receber
-   "153". */
+   formulário (modo simples). O controle ocupa o espaço restante e o ano fica
+   como sufixo fixo da mesma linha. */
 :is(html[data-theme]) .document-number__input,
 :is(html[data-theme]) .document-number > input {
-  flex: 0 0 auto;
-  width: 7ch;
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
 }
 
 /* O ano não é rótulo nem valor: é a parte fixa do número, e por isso fica na
@@ -34,6 +34,7 @@
    leitura com o que se digita. */
 :is(html[data-theme]) .document-number__suffix {
   color: var(--text-muted);
+  flex: 0 0 auto;
   font-size: var(--text-size-base);
   white-space: nowrap;
 }

@@ -72,6 +72,9 @@
   align-items: center;
   display: inline-flex;
   flex: none;
+  /* Com dois selos (situação + temporal) eles precisam de um vão entre si; com
+     um só, o `gap` não faz nada. */
+  gap: var(--gap-tight);
   margin-left: auto;
 }
 
@@ -182,7 +185,7 @@
   /* O teto vive no BLOCO, e não numa linha da grade: `grid-auto-rows` não sabe
      limitar só a faixa dos fatos, e é ela que precisa de altura previsível para
      os cartões da lista não variarem de tamanho conforme o roteiro. */
-  max-height: 170px;
+  max-height: 173px;
   min-height: 0;
   overflow: hidden;
 }
@@ -315,9 +318,7 @@
   max-height: calc(3 * var(--control-height) + 4 * var(--gap-tight));
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding-right: var(--gap-tight);
   scrollbar-color: var(--text-muted) transparent;
-  scrollbar-gutter: stable;
   scrollbar-width: thin;
 }
 
@@ -331,7 +332,7 @@
 /* Nestes dois blocos a linha já está no degrau rail; repetir rail no botão o
    fazia desaparecer. A ação usa field, como os demais controles sobre rail. */
 :is(html[data-theme]) .evento-card__docs .person-row__actions .icon-button {
-  background: var(--surface-field);
+  --icon-button-surface: var(--surface-field);
 }
 
 /* O formulário de uma ação só não quebra a fila de ações do rodapé. */

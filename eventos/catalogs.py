@@ -47,6 +47,10 @@ TIPOS_EVENTO = CatalogConfig(
     ),
     paginar_por=20,
     url_fallback_next="eventos:index",
+    # Sem rótulo o botão saía com um `<span>` VAZIO: uma pílula amarela com
+    # uma seta e nada escrito, e sem nome nenhum para leitor de tela.
+    back_label_com_next="Voltar ao evento",
+    back_label_sem_next="Voltar aos eventos",
     # As URLs de editar/excluir da linha são nuas, como na view antiga.
     urls_de_linha_com_next=False,
 )

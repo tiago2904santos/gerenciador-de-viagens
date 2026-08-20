@@ -164,7 +164,7 @@
    superfície de onde está — medido, saía `#132132` sobre `#132132`, botão invisível.
    Aqui é o degrau seguinte que separa o controle do fundo, como no resto do v2. */
 :is(html[data-theme]) .file-picker__row .icon-button {
-  background: var(--surface-field);
+  --icon-button-surface: var(--surface-field);
 }
 
 :is(html[data-theme]) .file-picker__actions {

@@ -1,4 +1,4 @@
-{% cotton:vars actions body box extra_class eyebrow heading_level meta search_text status status_tone title %}
+{% cotton:vars actions body box chips extra_class eyebrow heading_level meta search_text status status_tone title %}
 {% comment %}
   Record v2 — o card de um registro na lista. Par de `static/css/v2/record.css`.
 
@@ -58,7 +58,22 @@
       </div>
       {% if meta %}<p class="record__meta">{{ meta }}</p>{% endif %}
     </div>
-    {% if status %}<span class="record__status"><c-v2.chip :label="status" :tone="status_tone" /></span>{% endif %}
+    {% comment %}
+      DOIS eixos podem conviver no mesmo registro: a situação do documento
+      (rascunho, pronto, cancelado) e a temporal (falta tanto, em andamento,
+      realizado). Eram um selo só, e o documento ganhava — um evento "Rascunho"
+      não dizia mais quando ia acontecer.
+
+      `chips` é a lista; `status` continua para quem tem um selo só, que é a
+      maioria das listas.
+    {% endcomment %}
+    {% if chips %}
+      <span class="record__status">
+        {% for chip in chips %}<c-v2.chip :label="chip.label" :tone="chip.tone" />{% endfor %}
+      </span>
+    {% elif status %}
+      <span class="record__status"><c-v2.chip :label="status" :tone="status_tone" /></span>
+    {% endif %}
     {% comment %}
       Cartão SEM miolo: as ações voltam para a linha do título. Num registro de
       uma linha só, mandá-las para o rodapé abria uma faixa vazia embaixo do

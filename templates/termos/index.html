@@ -38,7 +38,7 @@
     :action_url="novo_url"
   >
     <c-slot name="controls">
-      <form method="get" action="{{ request.path }}" class="rail__form" role="search">
+      <form method="get" action="{{ request.path }}" class="rail__form" role="search" data-server-filter-form>
         <input type="hidden" name="aba" value="{{ aba }}">
         <c-v2.input
           icon="search"
@@ -46,14 +46,11 @@
           :value="q"
           placeholder="Buscar por destino, ofício, protocolo, viatura ou servidor"
           aria_label="Buscar termos"
+          hook="data-server-filter-search"
         />
-        <c-v2.button type="submit" label="Buscar" icon="search" />
+        <c-v2.select :options="abas" placeholder="Filtrar por situação" aria_label="Filtrar termos por situação" hook="data-server-filter-url" />
         {% if q %}<c-v2.button label="Limpar" icon="x" :href="termos_url" />{% endif %}
       </form>
-    </c-slot>
-
-    <c-slot name="tabs">
-      <c-v2.toggle :items="abas" aria_label="Abas de termos" />
     </c-slot>
 
     <c-slot name="rows">

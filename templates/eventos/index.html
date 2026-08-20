@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load static %}
 {% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
 
 {% block title %}{{ page_title }}{% endblock %}
@@ -26,13 +25,14 @@
     :action_url="novo_url"
   >
     <c-slot name="controls">
-      <form method="get" action="{{ request.path }}" class="rail__form" role="search">
+      <form method="get" action="{{ request.path }}" class="rail__form" role="search" data-server-filter-form>
         <c-v2.input
           icon="search"
           name="q"
           :value="q"
           placeholder="Buscar por título, destino ou responsável…"
           aria_label="Buscar eventos"
+          hook="data-server-filter-search"
         />
         <c-v2.select
           name="aba"
@@ -40,8 +40,8 @@
           :multiple="True"
           placeholder="Filtrar por situação"
           aria_label="Filtrar eventos por situação"
+          hook="data-server-filter-control"
         />
-        <c-v2.button type="submit" label="Buscar" icon="search" />
         {% if has_filters %}<c-v2.button label="Limpar" icon="x" :href="search_clear_url" />{% endif %}
       </form>
     </c-slot>

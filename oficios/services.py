@@ -169,7 +169,13 @@ def obter_roteiro_escolhido_do_post(post, evento=None, area=None):
 
 
 @transaction.atomic
-def vincular_roteiro_ao_oficio_sem_copia(oficio: Oficio, roteiro_escolhido: Roteiro, rascunho_antigo=None) -> None:
+def vincular_roteiro_ao_oficio_sem_copia(
+    oficio: Oficio,
+    roteiro_escolhido: Roteiro,
+    rascunho_antigo=None,
+    *,
+    descartar_rascunho_equivalente=False,
+) -> None:
     """Vincula oficio diretamente ao roteiro existente (estado equivalente, sem alteracoes)."""
     if oficio.area_id != roteiro_escolhido.area_id:
         raise ValueError("Não é permitido vincular roteiro de outra área ao ofício.")
@@ -180,8 +186,10 @@ def vincular_roteiro_ao_oficio_sem_copia(oficio: Oficio, roteiro_escolhido: Rote
         rascunho_antigo is not None
         and rascunho_antigo.pk != roteiro_escolhido.pk
         and rascunho_antigo.status == Roteiro.STATUS_RASCUNHO
-        and not rascunho_antigo.destinos.exists()
-        and not rascunho_antigo.trechos.exists()
+        and (
+            descartar_rascunho_equivalente
+            or (not rascunho_antigo.destinos.exists() and not rascunho_antigo.trechos.exists())
+        )
         and not Oficio.objects.filter(roteiro=rascunho_antigo).exclude(pk=oficio.pk).exists()
     ):
         try:
@@ -249,8 +257,8 @@ def salvar_roteiro_do_oficio(
 
     Duas travas que a decisão carrega, e que os testes congelam:
 
-    - se o estado submetido equivale ao roteiro escolhido, **vincula sem copiar** — dois
-      ofícios passam a apontar para a mesma linha, que é o desenho;
+    - se o estado submetido equivale a um roteiro reutilizável, escolhido ou não,
+      **vincula sem copiar** — dois ofícios passam a apontar para a mesma linha, que é o desenho;
     - se não equivale, grava num rascunho **próprio**. Um roteiro que não é rascunho
       pertence a outros documentos e nunca é reescrito no lugar.
 
@@ -258,26 +266,45 @@ def salvar_roteiro_do_oficio(
     `RoteiroTrecho` — os services chamados são atômicos cada um, o conjunto não era
     (`BE-14`, item 1 da lista).
     """
+    from roteiros import selectors
     from roteiros.services import atualizar_roteiro
     from roteiros.services import roteiro_state_equivalente_ao_roteiro
 
     roteiro_escolhido = obter_roteiro_escolhido_do_post(
         post, evento=oficio.evento, area=oficio.area
     )
+    roteiro_equivalente = None
     if roteiro_escolhido and roteiro_state_equivalente_ao_roteiro(
         roteiro_escolhido, roteiro_state, validated
     ):
+        roteiro_equivalente = roteiro_escolhido
+    else:
+        excluir_pk = roteiro_vinculado.pk if roteiro_vinculado else None
+        for candidato in selectors.queryset_roteiros_reutilizaveis_para_evento(
+            evento=oficio.evento,
+            excluir_pk=excluir_pk,
+            limit=None,
+            area=oficio.area,
+        ):
+            if roteiro_state_equivalente_ao_roteiro(candidato, roteiro_state, validated):
+                roteiro_equivalente = candidato
+                break
+
+    if roteiro_equivalente:
         rascunho_antigo = (
             roteiro_vinculado
             if (roteiro_vinculado and roteiro_vinculado.status == Roteiro.STATUS_RASCUNHO)
             else None
         )
         vincular_roteiro_ao_oficio_sem_copia(
-            oficio, roteiro_escolhido, rascunho_antigo=rascunho_antigo
+            oficio,
+            roteiro_equivalente,
+            rascunho_antigo=rascunho_antigo,
+            descartar_rascunho_equivalente=True,
         )
         tocar_data_criacao_oficio(oficio)
         return ResultadoRoteiroDoOficio(
-            roteiro=roteiro_escolhido,
+            roteiro=roteiro_equivalente,
             reusou_sem_copia=True,
             criou_rascunho=False,
             parcial=False,

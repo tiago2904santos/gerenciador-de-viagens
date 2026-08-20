@@ -92,11 +92,15 @@
       viaturaSelect.dispatchEvent(new Event("change", { bubbles: true }));
     }
 
-    /* ── Atualiza classe --active nos chips já renderizados ─────── */
+    /* ── Marca a sugestão escolhida ──────────────────────────────
+       `aria-pressed`, e não uma classe `--active`: o segmento do sistema
+       (`toggle__item`) pinta o escolhido a partir do atributo, e o atributo é o
+       que um leitor de tela anuncia. A classe dizia a mesma coisa só para o
+       CSS. */
     function updateActiveChips() {
       var currentId = viaturaSelect.value || "";
-      Array.from(chipsEl.querySelectorAll(".viatura-sugestao-chip")).forEach(function (btn) {
-        btn.classList.toggle("viatura-sugestao-chip--active", btn.dataset.viaturaId === currentId);
+      Array.from(chipsEl.querySelectorAll("[data-viatura-id]")).forEach(function (btn) {
+        btn.setAttribute("aria-pressed", btn.dataset.viaturaId === currentId ? "true" : "false");
       });
     }
 
@@ -105,26 +109,27 @@
       var currentId = viaturaSelect.value || "";
       chipsEl.innerHTML = "";
       sugestoes.forEach(function (s) {
+        /* PEÇAS DO V2, e não classes próprias desta tela: a sugestão é uma
+           escolha entre poucas, que é o que o `toggle__item` do sistema já é —
+           com hover, foco e estado escolhido resolvidos —, e a razão da
+           sugestão é um selo, que é o `chip--v2`. As classes
+           `viatura-sugestao-*` e a folha que as desenhava saíram junto. */
         var btn = document.createElement("button");
-        btn.type           = "button";
+        btn.type = "button";
+        btn.className = "toggle__item";
         btn.dataset.viaturaId = s.id;
-        btn.className      = "viatura-sugestao-chip" +
-          (s.id === currentId ? " viatura-sugestao-chip--active" : "");
+        btn.setAttribute("aria-pressed", s.id === currentId ? "true" : "false");
 
-        /* ── Conteúdo: placa (negrito) + descrição ── */
-        var parts = s.label.split(" · ");
+        var texto = document.createElement("span");
+        texto.textContent = s.label;
+        btn.appendChild(texto);
 
-        var strong = document.createElement("strong");
-        strong.textContent = parts[0] || s.label;
-        btn.appendChild(strong);
-
-        if (parts[1]) {
-          btn.appendChild(document.createTextNode(" · " + parts[1]));
-        }
-
-        /* ── Badge de razão ── */
+        /* O selo diz POR QUE a viatura foi lembrada — o motorista ativo ou a
+           unidade da equipe. Tom `progress` para o motorista, neutro para a
+           unidade: o primeiro é uma ligação direta com quem vai dirigir. */
         var badge = document.createElement("span");
-        badge.className   = "viatura-sugestao-badge viatura-sugestao-badge--" + s.reason;
+        badge.className = "chip--v2";
+        if (s.reason === "motorista") badge.setAttribute("data-tone", "progress");
         badge.textContent = s.badgeText;
         btn.appendChild(badge);
 

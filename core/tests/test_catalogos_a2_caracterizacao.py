@@ -141,13 +141,21 @@ class ModelosMotivoTests(_CatalogoMixin, TestCase):
             "Modelo de motivo excluído com sucesso.", self._mensagens(resposta_post)
         )
 
-    def test_o_rotulo_de_volta_muda_conforme_a_origem(self):
-        """Vindo da Ordem de Serviço, o botão diz outra coisa."""
+    def test_o_rotulo_de_volta_sai_do_destino_do_next(self):
+        """O rótulo nomeia PARA ONDE se volta, não de quem é o catálogo.
+
+        Antes eram duas frases fixas — ofício e Ordem de Serviço — e este
+        catálogo é aberto também do evento: quem vinha de um evento lia "Voltar
+        para o ofício" e ia parar no evento (2026-08-19).
+        """
         response = self.client.get(self._index(next=reverse("ordens_servico:index")))
-        self.assertEqual(response.context["back_label"], "Voltar para a Ordem de Serviço")
+        self.assertEqual(response.context["back_label"], "Voltar à ordem de serviço")
+
+        response = self.client.get(self._index(next="/eventos/9/guiado/etapa-1/"))
+        self.assertEqual(response.context["back_label"], "Voltar ao evento")
 
         response = self.client.get(self._index())
-        self.assertEqual(response.context["back_label"], "Voltar para o ofício")
+        self.assertEqual(response.context["back_label"], "Voltar ao ofício")
 
 
 class TiposEventoTests(_CatalogoMixin, TestCase):
@@ -288,12 +296,15 @@ class ModelosJustificativaTests(_CatalogoMixin, TestCase):
         self.assertTrue(modelo.is_padrao)
         self.assertIn("Modelo definido como padrao.", self._mensagens(response))
 
-    def test_o_rotulo_de_volta_muda_conforme_a_origem(self):
+    def test_o_rotulo_de_volta_sai_do_destino_do_next(self):
         response = self.client.get(self._index(next=reverse("oficios:index")))
-        self.assertEqual(response.context["back_label"], "Voltar para o ofício")
+        self.assertEqual(response.context["back_label"], "Voltar ao ofício")
+
+        response = self.client.get(self._index(next="/eventos/9/guiado/etapa-1/"))
+        self.assertEqual(response.context["back_label"], "Voltar ao evento")
 
         response = self.client.get(self._index())
-        self.assertEqual(response.context["back_label"], "Voltar para as justificativas")
+        self.assertEqual(response.context["back_label"], "Voltar à justificativa")
 
 
 class DefinirPadraoNaoAceitaGetTests(TestCase):

@@ -114,6 +114,11 @@ class WizardJustificativaTests(TestCase):
         self.assertNotContains(response, "Modelo e texto da justificativa")
         self.assertNotRegex(response.content.decode(), r">\s*Conteúdo\s*</h2>")
         self.assertContains(response, "data-modelo-justificativa-select")
+        self.assertContains(
+            response,
+            'class="input__control input__control--textarea"',
+        )
+        self.assertNotContains(response, "cv-field__control--textarea")
         self.assertContains(response, reverse("justificativas:modelos_index"))
         self.assertContains(response, reverse('oficios:index'))
         self.assertContains(response, 'Voltar à lista')

@@ -125,7 +125,8 @@ def index(request):
     from prestacoes_contas.models import PrestacaoServidor
 
     q = request.GET.get("q", "").strip()
-    aba = tabs.normalizar_aba(request.GET.get("aba", ""))
+    valores_abas = request.GET.getlist("aba")
+    abas_selecionadas = tabs.normalizar_abas(valores_abas) if valores_abas else []
     roteiros = listar_roteiros(q=q)
 
     # Finalizado = todas as prestações dos ofícios (não cancelados) vinculados
@@ -138,18 +139,30 @@ def index(request):
     cancelado_q = Q(cancelado=True)
     date_field = "saida_dt__date"
 
-    lista = roteiros.filter(tabs.q_da_aba(aba, date_field=date_field, cancelado_q=cancelado_q))
+    lista = roteiros
+    if abas_selecionadas:
+        lista = roteiros.filter(
+            tabs.q_das_abas(
+                abas_selecionadas,
+                date_field=date_field,
+                cancelado_q=cancelado_q,
+            )
+        )
     contagem = tabs.contar_por_aba(roteiros, date_field=date_field, cancelado_q=cancelado_q)
-    abas = tabs.build_abas(
-        reverse("roteiros:index"), aba, contagem,
-        preserved={"q": q},
-    )
+    abas_escolhidas = set(abas_selecionadas)
+    status_filter_options = [
+        {
+            "value": chave,
+            "label": f"{label} ({contagem.get(chave, 0)})",
+            "selected": chave in abas_escolhidas,
+        }
+        for chave, label in tabs.ABA_LABELS
+    ]
 
     paginacao = contexto_paginacao(
         lista,
         request,
         ROTEIROS_PER_PAGE,
-        query_params={"q": q, "aba": aba},
     )
     page_obj = paginacao["page_obj"]
     next_url = request.get_full_path()
@@ -174,12 +187,13 @@ def index(request):
             "page_title": "Roteiros",
             "page_description": "Sede, destinos, período, trechos e diárias prontos para reutilizar em documentos.",
             "create_url": reverse("roteiros:novo"),
-            "search_clear_url": f"{reverse('roteiros:index')}?aba={aba}",
+            "search_clear_url": reverse("roteiros:index"),
             "empty_message": "Nenhum roteiro cadastrado ainda.",
             "linhas": linhas,
             "q": q,
-            "aba": aba,
-            "abas": abas,
+            "abas_selecionadas": abas_selecionadas,
+            "status_filter_options": status_filter_options,
+            "has_filters": bool(q or abas_selecionadas),
             **paginacao,
         },
     )

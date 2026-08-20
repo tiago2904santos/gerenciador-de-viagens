@@ -43,7 +43,7 @@ class JustificativaOficioForm(forms.ModelForm):
             ),
             "texto": forms.Textarea(
                 attrs={
-                    **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
+                    **widget_attrs(WidgetStyle.INPUT_V2_TEXTAREA),
                     "rows": 6,
                     "placeholder": "",
                     "data-justificativa-textarea": "true",
@@ -142,7 +142,7 @@ class ModeloJustificativaForm(forms.ModelForm):
     texto = forms.CharField(
         label="Texto do modelo",
         help_text="Este texto será copiado para a justificativa do ofício e poderá ser editado antes de salvar.",
-        widget=forms.Textarea(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "rows": 4}),
+        widget=forms.Textarea(attrs={**widget_attrs(WidgetStyle.INPUT_V2_TEXTAREA), "rows": 4}),
     )
     is_padrao = forms.BooleanField(
         label="Modelo padrão",

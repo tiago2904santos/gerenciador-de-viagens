@@ -227,11 +227,9 @@ class ServidorCrudTests(TestCase):
         self.assertEqual([aba["label"] for aba in abas], ["Todos", "DELEGADO", "ESCRIVAO", "MOTORISTA"])
         self.assertEqual(abas[0]["count"], 11)
         self.assertNotIn("RARO", [aba["label"] for aba in abas])
-        # `list-tabs` era a classe do alternador legado. As duas telas
-        # migraram para o v2 em 2026-08-18 e as abas agora são o `toggle` do
-        # sistema, dentro de `list-page__tabs`.
-        self.assertContains(response, "list-page__tabs")
-        self.assertContains(response, "toggle--nav")
+        self.assertContains(response, 'aria-label="Filtrar servidores por cargo"')
+        self.assertContains(response, "data-server-filter-url")
+        self.assertNotContains(response, "toggle--nav")
         self.assertContains(response, f"cargo={cargo_a.pk}")
 
         filtrado = self.client.get(reverse("cadastros:servidores_index"), {"cargo": cargo_a.pk})
@@ -501,11 +499,12 @@ class ViaturaCrudTests(TestCase):
         )
         self.assertEqual(abas[0]["count"], 11)
         self.assertNotIn("GNV", [aba["label"] for aba in abas])
-        # `list-tabs` era a classe do alternador legado. As duas telas
-        # migraram para o v2 em 2026-08-18 e as abas agora são o `toggle` do
-        # sistema, dentro de `list-page__tabs`.
-        self.assertContains(response, "list-page__tabs")
-        self.assertContains(response, "toggle--nav")
+        self.assertContains(
+            response,
+            'aria-label="Filtrar viaturas por unidade ou combustível"',
+        )
+        self.assertContains(response, "data-server-filter-url")
+        self.assertNotContains(response, "toggle--nav")
 
         por_unidade = self.client.get(reverse("cadastros:viaturas_index"), {"unidade": unidade.pk})
         self.assertEqual(len(por_unidade.context["rows"]), 8)
