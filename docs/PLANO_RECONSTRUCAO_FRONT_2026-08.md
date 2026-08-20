@@ -812,6 +812,14 @@ medição final mostrou 12,59%–23,18%, dominada pelo `shell.bundle.css` concat
 não se um template importa CSS de outro domínio. Fracionar o bundle exige orçamento de requests e
 cache próprio; não se declara 35% atingido nem se mistura essa decisão com a fronteira concluída.
 
+> **Correção do empacotamento (`NOVO-20260820-211943-6a686a695549`, 20/08).** Os 15 perfis
+> podavam o bloco `html[data-theme="dark"]`: a captura roda numa passagem só, no tema claro, e
+> regra dentro do bloco escuro nunca casa. As 42 rotas com perfil serviam o vocabulário CLARO com
+> `data-theme="dark"` aplicado — `--color-bg` `#f7fbff` no lugar de `#0d1725`. O podador passou a
+> preservar toda regra que declara token, como já fazia com `@font-face` e `@property`. Cada
+> perfil cresce ~16 KB. **A paridade de recaptura passa a exigir os dois temas** — no tema claro
+> este defeito é invisível por construção.
+
 **Fechamento posterior do empacotamento (`PF-02`, 13/08).** Sem reabrir `UI-04`, a estratégia
 global foi corrigida por 15 perfis CSS determinísticos por família de rota, com o bundle completo
 como fallback. Nas 43 rotas, o uso passou para **37,5118%–60,3148%**; o piso uniforme de 35% agora

@@ -108,6 +108,36 @@ def _selector(rule) -> str:
     return tinycss2.serialize(rule.prelude).strip()
 
 
+def _declares_custom_property(rule) -> bool:
+    """A regra declara pelo menos um token (`--x: valor`).
+
+    A cobertura do CDP mede *casamento de seletor*, numa passagem só, no tema
+    claro. Nenhuma regra dentro de `html[data-theme="dark"]` casa nessa
+    passagem, então o bloco de tokens do tema escuro era podado dos 15 perfis e
+    as 42 rotas com perfil serviam o vocabulário CLARO com `data-theme="dark"`
+    aplicado (`NOVO-20260820-211943-6a686a695549`). Medido: `--color-bg` saía
+    `#f7fbff` no lugar de `#0d1725`.
+
+    Nada disso aparece na paridade perfil/bundle: podar uma DECLARAÇÃO de token
+    não muda pixel algum até alguém lê-la, e no tema claro ninguém lia a versão
+    escura. Só quebra quando o usuário troca o tema.
+
+    Bloco de token entra sempre, pelo mesmo motivo que `@font-face`,
+    `@property` e `@import` já entram em `_render_rules`: a régua da cobertura
+    não sabe medi-los. O critério é "declara token", não "só declara token" — o
+    bloco raiz do tema escuro traz 236 declarações e uma delas é `color-scheme`,
+    que é justamente o que veste barra de rolagem e controle nativo. E regra que
+    declara token junto com pintura tem de entrar inteira: podá-la tiraria o
+    token dos descendentes.
+    """
+    return any(
+        item.type == "declaration" and item.name.startswith("--")
+        for item in tinycss2.parse_blocks_contents(
+            rule.content, skip_comments=True, skip_whitespace=True
+        )
+    )
+
+
 def _qualified_rules(rules):
     for rule in rules:
         if rule.type == "qualified-rule":
@@ -229,7 +259,7 @@ def _render_rules(rules, selected: set[str], used_keyframes: set[str]) -> str:
     chunks: list[str] = []
     for rule in rules:
         if rule.type == "qualified-rule":
-            if _rule_id(rule) in selected:
+            if _rule_id(rule) in selected or _declares_custom_property(rule):
                 chunks.append(_serialized(rule))
             continue
         if rule.type != "at-rule":

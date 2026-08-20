@@ -10733,7 +10733,7 @@ dívida voltar inteira sem CI vermelho:
 Nenhum dos dois números é conquista deste PR: os dois já estavam pagos e sem trava. O que muda é
 que agora regridem em vermelho.
 
-### NOVO-20260820-211943-6a686a695549 🔴 ABERTO · `NOVO` Os perfis de CSS por rota podam o tema escuro inteiro: 42 rotas servem tokens claros com `data-theme="dark"` · PF-02 / UI-02 · **risco alto — atinge produção**
+### NOVO-20260820-211943-6a686a695549 ✅ RESOLVIDO (20/08/2026) · `NOVO` Os perfis de CSS por rota podam o tema escuro inteiro: 42 rotas servem tokens claros com `data-theme="dark"` · PF-02 / UI-02 · **risco alto — atingia produção**
 
 O `PF-02` fechou o empacotamento com 15 perfis determinísticos por família de rota
 (`scripts/build_css_profiles.py`), servidos no lugar do `shell.bundle.css` pelo
@@ -10776,6 +10776,54 @@ lê-la — e no tema claro ninguém lia a versão escura.
    tratamento que `_render_rules` já dá a `@import`, `@font-face` e `@property`: entra sempre,
    porque a cobertura do CDP não sabe medi-lo. Depois, recapturar e reconferir a paridade **nos
    dois temas**, que é o furo do processo de captura.
+
+**Conserto (mesmo dia).** `_render_rules` passou a preservar **toda regra que declara pelo menos
+um token**, do mesmo jeito que já preservava `@import`, `@font-face` e `@property`: a régua da
+cobertura não sabe medir declaração de token, então ela não pode decidir podá-la.
+
+O critério é *declara* token, não *só declara* token. A primeira tentativa exigiu pureza e
+reprovou justamente o bloco do defeito: o `html[data-theme="dark"]` raiz traz **236 declarações e
+uma delas é `color-scheme`**, que é o que veste barra de rolagem e controle nativo. Regra que
+declara token junto com pintura também entra inteira — podá-la tiraria o token dos descendentes.
+
+**Verificado** no navegador, perfis LIGADOS, pelo mecanismo real do app (`localStorage.theme` e o
+`data-theme` que o `theme-init.js` escreve), em `/oficios/` e `/prestacoes-contas/`: `--color-bg`
+`#0d1725`, `--color-text` `#f0f6ff`, `--color-card` `#132238`, `--color-card-muted` `#111e2f`,
+`--color-accent` `#d8a21b` — idênticos à medição com os perfis desligados. Os 15 perfis passaram a
+carregar o bloco, com teste que trava a volta.
+
+**Não era só o tema escuro — e a medição do CI é que mostrou.** Três regras voltaram por perfil:
+o `html[data-theme="dark"]` raiz (11.501 B, 235 dos 236 declarações são token), um **`:root` com
+74 tokens** (3.633 B) e um par de chips (217 B). O `:root` **também estava sendo podado**, e
+**67 dos seus 74 tokens não existiam em mais nada que a rota recebia** — nem no perfil, nem no
+`ui.bundle.css`. São tokens de layout: `--page-shell-*`, `--form-section-*`, `--stepper-*`,
+`--filter-bar-*`, `--list-row-*`, `--text-primary`, `--border-subtle`.
+
+Esse lado passou quase incólume por sorte de fallback: só **um** dos 67 era consumido sem
+fallback pelo que a rota recebia (`--list-panel-radius`, um uso). Os demais consumidores tinham
+fallback ou também haviam sido podados. Por isso não houve sintoma no tema claro — mas era a
+mesma falha, e valia nos dois temas.
+
+**Custo, medido no CI (não estimado).** Cada perfil cresce ~16 KB (686 KB → 932 KB no total dos
+15). A estimativa inicial dizia que o uso do `NOVO-70` cairia 0,27-0,52 pp; **subiu**, porque o
+`:root` restaurado casa na passagem clara: **+3.633 bytes casados em toda rota**, contra 15-17 KB
+a mais entregues. Medido: `dashboard` 9,5431% → 9,8731%, `cargo-editar` 10,7288% → 11,0233%,
+`viatura-editar` 17,4518% → 17,5603%, `oficios-detalhe` 20,1194% → 20,1933%. O gate segue 30-45
+pontos abaixo do piso pelo `NOVO-20260820-171008-7afb74d82d2c`; isto não muda o estado dele.
+
+**O furo de processo, que é o que interessa para a próxima vez.** A paridade perfil/bundle do
+`PF-02` comparou estilo computado no tema claro e não achou diferença — corretamente, porque podar
+uma DECLARAÇÃO de token não muda pixel algum até alguém lê-la. Qualquer recaptura futura precisa
+comparar perfil e bundle **nos dois temas**, ou este defeito volta na próxima família de rota.
+
+**Duas travas, com escopos diferentes, porque nenhuma cobre a outra:**
+
+- `audit_css_variaveis_orfas.py` ganhou `profile_regressions()`: nenhum perfil pode citar variável
+  que a entrega completa declara. Rodando contra os perfis de antes do conserto, acusa 9 a 14
+  órfãs por perfil — teria pego o lado do `:root`. **Não** pega o tema escuro, porque ali o token
+  seguia declarado, só que com o valor claro.
+- `PerfilCssPreservaTokenTests` exige o bloco `html[data-theme="dark"]` e um valor conhecido
+  (`--color-card-muted: #111e2f`) nos 15 perfis. É o que pega o lado do tema.
 
 Encosta no `NOVO-20260820-171008-7afb74d82d2c`: a decisão de estender os perfis ao `ui.bundle.css`
 não deve sair antes deste conserto, ou o mesmo corte de tema atingiria também o v2 — hoje o v2
