@@ -10,7 +10,7 @@
   atrás de um `<details>` — quem lê a lista quer saber o que fazer, não a
   mensagem da API do Google.
 {% endcomment %}
-<div class="perfil-pendencias-list">
+<div class="gdrive-pendencias-list">
   {% for p in drive_pendencias %}
     <c-v2.record
       :title="p.titulo"
@@ -30,9 +30,9 @@
         </div>
 
         {% if p.detalhe %}
-          <details class="perfil-pendencia__detalhe">
+          <details class="gdrive-pendencia__detalhe">
             <summary>Detalhes técnicos</summary>
-            <pre class="perfil-pendencia__erro">{{ p.detalhe }}</pre>
+            <pre class="gdrive-pendencia__erro">{{ p.detalhe }}</pre>
           </details>
         {% endif %}
       </c-slot>
@@ -40,9 +40,11 @@
   {% endfor %}
 </div>
 
-<div class="perfil-block-actions">
-  <form method="post" action="{% url 'google_drive:reprocessar_pendencias' %}">
-    {% csrf_token %}
-    <c-v2.button label="Tentar novamente agora" variant="primary" icon="arrow-right" :icon_after="True" type="submit" />
-  </form>
-</div>
+<c-v2.card_footer>
+  <c-slot name="primary">
+    <form method="post" action="{% url 'google_drive:reprocessar_pendencias' %}">
+      {% csrf_token %}
+      <c-v2.button label="Tentar novamente agora" variant="primary" icon="arrow-right" :icon_after="True" type="submit" />
+    </form>
+  </c-slot>
+</c-v2.card_footer>

@@ -380,7 +380,10 @@ document.documentElement.dataset.appReady = "true";
     var eyebrow = element("span", "cv-dialog__eyebrow delete-confirm-modal__eyebrow");
     eyebrow.textContent = "Central de Viagens";
     var title = element("h2", "cv-dialog__title delete-confirm-modal__title", { id: "feedback-title" });
-    var closeButton = element("button", "cv-dialog__close icon-btn icon-btn--sm", {
+    /* `icon-button` do v2, e não o `icon-btn` legado: era o último lugar do
+       sistema a emitir aquela classe, e ela sustentava sozinha uma folha de
+       1.141 linhas (`actions/buttons.css`, apagada em 2026-08-20). */
+    var closeButton = element("button", "cv-dialog__close icon-button", {
       type: "button",
       "aria-label": "Fechar",
       "data-cv-feedback-cancel": "",

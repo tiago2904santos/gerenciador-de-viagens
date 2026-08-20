@@ -1,9 +1,26 @@
 {% extends "base.html" %}
+{% load static %}
 {% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
 
 {% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
 
 {% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+  {% comment %}
+    A folha de prestações fica, e no casco — não em cada tela.
+
+    Ela saiu junto com as outras quatro na migração de 2026-08-19, e isso foi um
+    erro medido: 18 classes que as quatro etapas AINDA emitem ficaram sem
+    desenho nenhum — as caixas dos wizards (`consolidado-wizard-card`,
+    `diario-wizard-card`, `docs-wizard-card`), o vazio dos trechos, a faixa de
+    removidos e o campo "outro" do custeio.
+
+    Ela sai de vez quando essas 18 classes virarem componente; enquanto isso,
+    carregá-la uma vez no casco é melhor do que repeti-la em cinco telas.
+  {% endcomment %}
+  <link rel="stylesheet" href="{% static 'css/pages/prestacoes_contas.css' %}">
+{% endblock %}
 
 {% block content %}
   {% comment %}

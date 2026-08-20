@@ -10107,3 +10107,12 @@ Cargo, CPF, telefone e RG eram itens independentes de uma grade de quatro coluna
 ### NOVO-20260820-015032-dfaef5c511bf 🟢 RESOLVIDO · `NOVO` Filtro redundante de status na lista de Planos de Trabalho · UI · risco baixo
 
 A barra de filtros de Planos de Trabalho exibia simultaneamente a situação temporal e um segundo seletor de status, tornando a filtragem redundante e ocupando espaço sem necessidade. O seletor “Todos os status” e seu contexto exclusivo foram removidos; busca, situação temporal, ordenação e período permanecem inalterados.
+
+### NOVO-20260820-024316-3c257b7457f4 🟢 RESOLVIDO · `NOVO` Tela de perfil misturava estruturas legadas com componentes V2 · HT/UI · risco médio
+
+A página de perfil ainda dependia de classes próprias de wizard, formulário, lista e rodapé para
+compor dados pessoais, senha, áreas de trabalho, Google Drive e encerramento da sessão.
+
+**Correção:** a tela foi recomposta com cabeçalho, painéis, blocos de formulário, campos, registros
+e rodapés globais V2. Os dois POSTs, nomes das ações, validações, integração do Drive e logout foram
+preservados; a folha de estilo antiga do perfil deixou de ser carregada.

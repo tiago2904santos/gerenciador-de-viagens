@@ -27,6 +27,7 @@ class PerfilUsuarioTests(TestCase):
 
     def test_perfil_renderiza_para_usuario_logado(self):
         self.client.force_login(self.user)
+        vincular_area(self.user)
 
         response = self.client.get(reverse("core:perfil"))
 
@@ -35,13 +36,19 @@ class PerfilUsuarioTests(TestCase):
         self.assertContains(response, "Meu perfil")
         self.assertContains(response, "Conta e segurança")
         self.assertContains(response, "Dados pessoais")
+        self.assertContains(response, "Senha de acesso")
+        self.assertContains(response, "Áreas de trabalho")
+        self.assertContains(response, "Google Drive")
+        self.assertContains(response, "Sessão")
         self.assertContains(response, "Sair do sistema")
-        # O casco virou `form-page` em 2026-08-19: as três classes do sistema
-        # antigo (`document-form-page`, `travel-document-wizard__form` e o
-        # `page-shell` em volta) saíram com o `flow_base`. O que a tela precisa
-        # ter continua sendo o painel e o marcador da própria página.
         self.assertContains(response, "form-page")
-        self.assertContains(response, "perfil-form-page")
+        self.assertContains(response, 'class="record form-block--v2"')
+        self.assertNotContains(response, "perfil-form-page")
+        self.assertNotContains(response, "travel-document-wizard__form")
+        self.assertNotContains(response, "travel-document-block")
+        self.assertNotContains(response, "document-form-block")
+        self.assertNotContains(response, "record-row")
+        self.assertNotContains(response, "simple-list")
         self.assertNotContains(response, "Resumo da conta")
 
     def test_perfil_nao_faz_n_mais_um_nas_pendencias_do_drive(self):

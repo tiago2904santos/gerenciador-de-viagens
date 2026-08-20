@@ -650,27 +650,59 @@
   border-left: 3px solid var(--color-danger-border-soft);
 }
 
+.gdrive-pendencias-list {
+  display: grid;
+  gap: var(--gap);
+  max-height: min(28rem, 50vh);
+  overflow-y: auto;
+}
+
+.gdrive-pendencia__detalhe {
+  margin-top: var(--space-3);
+}
+
+.gdrive-pendencia__erro {
+  max-width: 100%;
+  margin: var(--space-2) 0 0;
+  padding: var(--space-3);
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: var(--font-size-xs);
+  white-space: pre-wrap;
+}
+
 /* ── Barras de rolagem temáticas (o scrollbar claro nativo fica feio no escuro) */
 
 .gdrive-previa-lista,
-.gdrive-folder-list {
+.gdrive-folder-list,
+.gdrive-pendencias-list,
+.gdrive-pendencia__erro {
   scrollbar-width: thin;
   scrollbar-color: var(--color-border-strong) transparent;
 }
 
 .gdrive-previa-lista::-webkit-scrollbar,
-.gdrive-folder-list::-webkit-scrollbar {
+.gdrive-folder-list::-webkit-scrollbar,
+.gdrive-pendencias-list::-webkit-scrollbar,
+.gdrive-pendencia__erro::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
 .gdrive-previa-lista::-webkit-scrollbar-track,
-.gdrive-folder-list::-webkit-scrollbar-track {
+.gdrive-folder-list::-webkit-scrollbar-track,
+.gdrive-pendencias-list::-webkit-scrollbar-track,
+.gdrive-pendencia__erro::-webkit-scrollbar-track {
   background: transparent;
 }
 
 .gdrive-previa-lista::-webkit-scrollbar-thumb,
-.gdrive-folder-list::-webkit-scrollbar-thumb {
+.gdrive-folder-list::-webkit-scrollbar-thumb,
+.gdrive-pendencias-list::-webkit-scrollbar-thumb,
+.gdrive-pendencia__erro::-webkit-scrollbar-thumb {
   border: 2px solid transparent;
   border-radius: var(--radius-pill);
   background-color: var(--color-border-strong);
@@ -678,7 +710,9 @@
 }
 
 .gdrive-previa-lista::-webkit-scrollbar-thumb:hover,
-.gdrive-folder-list::-webkit-scrollbar-thumb:hover {
+.gdrive-folder-list::-webkit-scrollbar-thumb:hover,
+.gdrive-pendencias-list::-webkit-scrollbar-thumb:hover,
+.gdrive-pendencia__erro::-webkit-scrollbar-thumb:hover {
   background-color: var(--color-text-soft);
 }
 

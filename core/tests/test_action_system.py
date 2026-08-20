@@ -71,19 +71,24 @@ class GlobalActionSystemTests(SimpleTestCase):
         self.assertIn('href="/termos/7/pdf/"', html)
         self.assertIn("Destino não informado", html)
 
-    def test_base_loads_action_system_after_the_legacy_button_styles(self):
+    def test_base_carrega_o_bundle_antes_do_css_de_tela(self):
+        """A ordem da cascata mora no bundle; `extra_css` vem depois dele.
+
+        O teste guardava também a ordem entre `actions/buttons.css` e
+        `actions/action-system.css`. A primeira foi APAGADA em 2026-08-20: das
+        54 classes dela, 48 não eram emitidas por ninguém (o botão legado
+        inteiro) e o que restava vivo era o tooltip global, que `v2/tooltip.css`
+        já desenhava — duas folhas para a mesma caixinha.
+        """
         root = Path(settings.BASE_DIR)
         base = (root / "templates" / "base.html").read_text(encoding="utf-8")
-        bundle = (root / "static" / "css" / "shell.bundle.css").read_text(
-            encoding="utf-8"
-        )
-        # NOVO-12: ordem de cascata mora no bundle; extra_css vem depois do shell.
+
         self.assertIn("css/shell.bundle.css", base)
         self.assertLess(
             base.index("css/shell.bundle.css"),
             base.index("{% block extra_css %}"),
         )
-        self.assertLess(
-            bundle.index(">>> css/actions/buttons.css >>>"),
-            bundle.index(">>> css/actions/action-system.css >>>"),
+        self.assertFalse(
+            (root / "static" / "css" / "actions" / "buttons.css").exists(),
+            "a folha de botão legada voltou",
         )
