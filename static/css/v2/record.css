@@ -190,16 +190,33 @@
   overflow: hidden;
 }
 
-/* O bloco financeiro pode crescer para mostrar a composição integral das
-   diárias. O teto compacto dos demais fatos continua valendo; esta exceção é
-   necessária porque truncar "5 x 100% + 1 x 15%" altera a informação. */
-:is(html[data-theme]) .record .form-block--v2.oficio-card__allowance-facts {
-  max-height: none;
-  overflow: visible;
+/* O bloco financeiro OBEDECE ao mesmo teto dos outros dois (2026-08-20).
+ *
+ * Tinha `max-height: none` para caber a composição integral das diárias, e com
+ * isso era o único bloco da faixa que crescia: medido na lista, 187px contra
+ * 173px dos blocos de viatura e de trechos. O cartão ficava com uma coluna mais
+ * alta que as vizinhas e a faixa perdia a linha de base.
+ *
+ * A composição continua inteira — o que mudou não foi o teto, foi o que ocupa a
+ * altura: os fatos deste bloco usam a escala compacta abaixo, e os 163px de
+ * conteúdo passam a caber nos 149px úteis sem cortar nada. É a diferença entre
+ * truncar a informação (o que a regra antiga evitava, com razão) e compor a
+ * mesma informação na altura disponível.
+ */
+:is(html[data-theme]) .record .form-block--v2.oficio-card__allowance-facts > .form-block__body {
+  overflow: hidden;
 }
 
-:is(html[data-theme]) .record .form-block--v2.oficio-card__allowance-facts > .form-block__body {
-  overflow: visible;
+/* O valor por extenso e a quantidade são as duas linhas de APOIO do bloco: o
+   que se lê primeiro é "R$ 420,00". Elas cedem os 14px que faltavam. */
+:is(html[data-theme]) .record .oficio-card__allowance-facts .fact + .fact .fact__label,
+:is(html[data-theme]) .record .oficio-card__allowance-facts .fact__note {
+  line-height: 1.25;
+}
+
+:is(html[data-theme]) .record .oficio-card__allowance-facts .fact + .fact .fact__value {
+  font-size: var(--text-size-lg, 1.125rem);
+  line-height: 1.2;
 }
 
 /* Uma coluna em tela estreita: tudo ocupa a largura inteira. */

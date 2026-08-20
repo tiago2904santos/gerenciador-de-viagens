@@ -417,7 +417,15 @@
   --sidebar-focus-ring: var(--color-accent-border-soft);
 
   /* Fallback antes do JS (equivalente a light) */
-  --app-body-bg: linear-gradient(180deg, #ffffff 0%, #e3eaf2 48%, #e3eaf2 100%);
+  /* Fundo da página no tema CLARO: BRANCO CHAPADO (2026-08-20).
+
+     Era um gradiente que terminava em #e3eaf2 — exatamente o valor de
+     `--surface-rail`. Fundo e painel ficavam da mesma cor, e a página inteira
+     lia como um bloco só: a faixa de filtros não tinha borda visível contra o
+     que estava atrás dela. O branco é o mesmo `--surface-field` dos campos, e é
+     ele que devolve a hierarquia — campo branco, painel acinzentado, fundo
+     branco atrás dos dois. */
+  --app-body-bg: var(--color-white);
   --app-main-bg: transparent;
   --app-featured-bg-fallback: #b9cbe0;
   --app-featured-bg:
@@ -578,7 +586,7 @@ html[data-theme="light"] {
   --color-input-placeholder: #71839a;
   --color-input-border: rgba(31, 76, 125, 0.22);
 
-  --app-body-bg: linear-gradient(180deg, #ffffff 0%, #e3eaf2 48%, #e3eaf2 100%);
+  --app-body-bg: var(--color-white);  /* ver nota no :root */
   --app-featured-bg-fallback: #d4dde9;
   --app-featured-bg:
     radial-gradient(ellipse 110% 75% at 0% 0%, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 52%),

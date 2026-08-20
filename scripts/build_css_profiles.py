@@ -126,6 +126,44 @@ def _qualified_rules(rules):
             )
 
 
+# Seletor de RAIZ: `:root`, `html[data-theme="dark"]`, `html[data-theme]`, e as
+# variações embrulhadas em `:is(...)`. Não entra nada com classe, descendente ou
+# combinador — só o elemento raiz, que é onde vivem os tokens.
+_ROOT_SELECTOR = re.compile(
+    r'^(?::is\()?\s*(?::root|html)(?:\[data-theme(?:="[^"]*")?\])?\s*\)?$'
+)
+
+
+def _is_root_rule(rule) -> bool:
+    """Rule aplicada ao ELEMENTO RAIZ — `:root`, `html`, `html[data-theme=…]`.
+
+    Só o próprio raiz: qualquer descendente, classe ou combinador reprova, e é
+    por isso que `:is(html[data-theme]) .rail` (a forma de quase todo componente
+    daqui) não entra.
+    """
+    partes = [parte.strip() for parte in _selector(rule).split(",") if parte.strip()]
+    return bool(partes) and all(_ROOT_SELECTOR.match(parte) for parte in partes)
+
+
+def _token_rule_ids(rules) -> set[str]:
+    """Blocos de raiz, que NUNCA podem ser podados por cobertura.
+
+    A cobertura do CDP é medida com UM tema aplicado por vez, e um bloco
+    `html[data-theme="dark"]` simplesmente não casa enquanto a medição roda no
+    claro. Podar por cobertura, portanto, apaga a definição do OUTRO tema — foi
+    assim que o bloco escuro inteiro sumiu de todos os perfis, levando junto
+    `--app-body-bg`, e as telas com perfil passaram a mostrar no tema escuro o
+    gradiente claro. O bundle completo, sem perfil, continuava certo, o que
+    escondeu o defeito.
+
+    O critério é o SELETOR e não o conteúdo: o bloco escuro dos tokens declara
+    `color-scheme: dark` no meio das custom properties, e exigir "só custom
+    property" deixava justamente ele de fora. Regra de raiz é definição de tema,
+    mede-se em centenas de bytes, e não tem por que ser podada.
+    """
+    return {_rule_id(rule) for rule in _qualified_rules(rules) if _is_root_rule(rule)}
+
+
 def _with_dom_families(
     rules, selected: set[str], dom_classes: set[str]
 ) -> set[str]:
@@ -268,7 +306,7 @@ def build(manifest: dict) -> dict[Path, str]:
         )
         selected = _with_dom_families(
             rules,
-            set(config["rule_ids"]),
+            set(config["rule_ids"]) | _token_rule_ids(rules),
             set(config.get("dom_classes", [])),
         )
         selected_css = "\n".join(

@@ -6,7 +6,6 @@ from django.views.decorators.http import require_http_methods
 from core.pagination import contexto_paginacao
 from core.pagination import KnownCountPaginator
 from eventos.services import resolve_evento_from_request
-from .models import Oficio
 from .presenters import apresentar_oficio_card
 from .card_rendering import renderizar_oficio_card_cacheado
 from .selectors import get_oficio_by_id
@@ -23,8 +22,12 @@ def index(request):
     from prestacoes_contas.models import PrestacaoServidor
 
     q           = request.GET.get("q",          "").strip()
-    status      = request.GET.get("status",     "").strip()
-    aba         = tabs.normalizar_aba(request.GET.get("aba", ""))
+    # Situação é MULTISSELEÇÃO e nasce VAZIA, como em Eventos: a lista abre
+    # inteira e recortar é escolha de quem lê. A aba padrão (`futuras`) escondia
+    # os outros três recortes sem que ninguém tivesse pedido filtro nenhum, e a
+    # tela abria mentindo o tamanho da lista.
+    valores_abas = request.GET.getlist("aba")
+    abas_selecionadas = tabs.normalizar_abas(valores_abas) if valores_abas else []
     criacao_de  = request.GET.get("criacao_de", "").strip()
     criacao_ate = request.GET.get("criacao_ate","").strip()
     viagem_de   = request.GET.get("viagem_de",  "").strip()
@@ -33,7 +36,6 @@ def index(request):
 
     base = listar_oficios(
         q=q or None,
-        status=status or None,
         criacao_de=criacao_de or None,
         criacao_ate=criacao_ate or None,
         viagem_de=viagem_de or None,
@@ -46,20 +48,34 @@ def index(request):
     cancelado_q = Q(cancelado=True)
     date_field = "roteiro__saida_dt__date"
 
-    oficios = base.filter(tabs.q_da_aba(aba, date_field=date_field, cancelado_q=cancelado_q))
     contagem = tabs.contar_por_aba(base, date_field=date_field, cancelado_q=cancelado_q)
-    abas = tabs.build_abas(
-        reverse("oficios:index"), aba, contagem,
-        preserved={"q": q, "status": status, "sort": sort,
-                   "criacao_de": criacao_de, "criacao_ate": criacao_ate,
-                   "viagem_de": viagem_de, "viagem_ate": viagem_ate},
-    )
+    oficios = base
+    if abas_selecionadas:
+        oficios = base.filter(
+            tabs.q_das_abas(abas_selecionadas, date_field=date_field, cancelado_q=cancelado_q)
+        )
+    escolhidas = set(abas_selecionadas)
+    situacao_options = [
+        {
+            "value": chave,
+            "label": f"{label} ({contagem.get(chave, 0)})",
+            "selected": chave in escolhidas,
+        }
+        for chave, label in tabs.ABA_LABELS
+    ]
+    # As abas são mutuamente exclusivas E exaustivas (garantido por
+    # `test_abas_sao_mutuamente_exclusivas_e_exaustivas`), então somar as
+    # escolhidas — ou todas, quando nenhuma foi escolhida — dá o total exato. É
+    # o que mantém o `KnownCountPaginator` sem pagar um COUNT a mais agora que a
+    # lista abre inteira.
+    chaves_contadas = abas_selecionadas or [chave for chave, _ in tabs.ABA_LABELS]
+    known_count = sum(contagem.get(chave, 0) for chave in chaves_contadas)
     paginacao = contexto_paginacao(
         oficios,
         request,
         OFICIOS_POR_PAGINA,
         paginator_class=KnownCountPaginator,
-        paginator_kwargs={"known_count": contagem[aba]},
+        paginator_kwargs={"known_count": known_count},
     )
     objetos_da_pagina = hidratar_oficios_da_pagina(paginacao["page_obj"].object_list)
     paginacao["page_obj"].object_list = objetos_da_pagina
@@ -69,7 +85,9 @@ def index(request):
     for card in cards:
         card["rendered_html"] = renderizar_oficio_card_cacheado(card)
 
-    has_filters = any([q, status, criacao_de, criacao_ate, viagem_de, viagem_ate, sort])
+    has_filters = any(
+        [q, criacao_de, criacao_ate, viagem_de, viagem_ate, sort, abas_selecionadas]
+    )
 
     return render(
         request,
@@ -77,9 +95,8 @@ def index(request):
         {
             "page_title": "Ofícios",
             "q":           q,
-            "status":      status,
-            "aba":         aba,
-            "abas":        abas,
+            "abas_selecionadas": abas_selecionadas,
+            "situacao_options": situacao_options,
             "criacao_de":  criacao_de,
             "criacao_ate": criacao_ate,
             "viagem_de":   viagem_de,
@@ -88,9 +105,7 @@ def index(request):
             "has_filters": has_filters,
             "cards":       cards,
             "create_url":  reverse("oficios:novo"),
-            "search_clear_url": f"{reverse('oficios:index')}?aba={aba}",
-            "status_options": [{"value": "", "label": "Todos os status"}]
-            + [{"value": valor, "label": rotulo} for valor, rotulo in Oficio.STATUS_CHOICES],
+            "search_clear_url": reverse("oficios:index"),
             "sort_options": [
                 {"value": "numero_desc",  "label": "Número: maior"},
                 {"value": "numero_asc",   "label": "Número: menor"},

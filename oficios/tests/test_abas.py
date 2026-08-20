@@ -5,6 +5,7 @@ Exercita a lógica compartilhada através da lista de Ofícios: recorte temporal
 precedência de Cancelados.
 """
 from datetime import timedelta
+from pathlib import Path
 
 from django.contrib.auth import get_user_model
 from django.db.models import OuterRef, Q
@@ -88,10 +89,64 @@ class DocumentoAbasOficioTests(TestCase):
             )
         self.assertEqual(sum(contagem.values()), Oficio.objects.count())
 
-    def test_index_padrao_mostra_aba_futuras(self):
+    def test_index_sem_parametro_abre_a_lista_inteira(self):
+        """Sem `?aba=`, a lista NÃO recorta nada (2026-08-20).
+
+        A tela abria na aba `futuras` e escondia os outros três recortes sem
+        dizer que havia um filtro ligado — quem chegava via menu lia a lista
+        parcial como se fosse o total. O padrão agora é o de Eventos: nenhuma
+        situação marcada, lista inteira, e filtrar é escolha de quem lê.
+        """
         self._oficio(1, saida_offset=5)
         self._oficio(2, saida_offset=-5)
+        self._oficio(3, saida_offset=9, cancelado=True)
         resp = self.client.get(reverse("oficios:index"))
-        self.assertEqual(resp.context["aba"], tabs.ABA_FUTURAS)
-        # Só o ofício futuro aparece na aba padrão.
+        self.assertEqual(resp.context["abas_selecionadas"], [])
+        self.assertFalse(resp.context["has_filters"])
+        self.assertEqual(len(resp.context["cards"]), 3)
+        self.assertEqual(resp.context["page_obj"].paginator.count, 3)
+
+    def test_index_recorta_pela_situacao_escolhida(self):
+        self._oficio(1, saida_offset=5)
+        self._oficio(2, saida_offset=-5)
+        self._oficio(3, saida_offset=9, cancelado=True)
+        resp = self.client.get(reverse("oficios:index"), {"aba": tabs.ABA_FUTURAS})
+        self.assertEqual(resp.context["abas_selecionadas"], [tabs.ABA_FUTURAS])
+        self.assertTrue(resp.context["has_filters"])
         self.assertEqual(len(resp.context["cards"]), 1)
+        self.assertEqual(resp.context["page_obj"].paginator.count, 1)
+
+    def test_index_soma_as_situacoes_marcadas(self):
+        """Multisseleção: duas situações marcadas somam os dois recortes."""
+        self._oficio(1, saida_offset=5)
+        self._oficio(2, saida_offset=-5)
+        self._oficio(3, saida_offset=9, cancelado=True)
+        resp = self.client.get(
+            reverse("oficios:index"),
+            {"aba": [tabs.ABA_FUTURAS, tabs.ABA_CANCELADOS]},
+        )
+        self.assertEqual(
+            resp.context["abas_selecionadas"], [tabs.ABA_FUTURAS, tabs.ABA_CANCELADOS]
+        )
+        self.assertEqual(len(resp.context["cards"]), 2)
+        self.assertEqual(resp.context["page_obj"].paginator.count, 2)
+
+    def test_situacao_options_trazem_contagem_e_marcacao(self):
+        self._oficio(1, saida_offset=5)
+        self._oficio(2, saida_offset=-5)
+        resp = self.client.get(reverse("oficios:index"), {"aba": tabs.ABA_ATUAIS})
+        por_valor = {item["value"]: item for item in resp.context["situacao_options"]}
+        self.assertEqual(por_valor[tabs.ABA_FUTURAS]["label"], "Que vão acontecer (1)")
+        self.assertFalse(por_valor[tabs.ABA_FUTURAS]["selected"])
+        self.assertTrue(por_valor[tabs.ABA_ATUAIS]["selected"])
+
+    def test_filtro_de_status_do_documento_saiu_da_faixa(self):
+        """Eram dois seletores de "situação" na mesma faixa (2026-08-20).
+
+        Um temporal (as abas) e um de estado do documento; escolher no errado
+        devolvia lista vazia sem explicar por quê. Ficou o temporal.
+        """
+        template = Path("templates/oficios/index.html").read_text(encoding="utf-8")
+        self.assertNotIn('name="status"', template)
+        resp = self.client.get(reverse("oficios:index"))
+        self.assertNotIn("status_options", resp.context)

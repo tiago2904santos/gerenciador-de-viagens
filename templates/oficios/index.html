@@ -28,6 +28,8 @@
     :paginated="True"
     empty_title="Nenhum ofício"
     :empty_message="empty_message"
+    filter_empty_title="Nenhum ofício para este filtro"
+    filter_empty_message="Ajuste a busca ou limpe os filtros."
     action_label="Novo ofício"
     :action_url="create_url"
     action_method="post"
@@ -35,7 +37,6 @@
   >
     <c-slot name="controls">
       <form method="get" action="{{ request.path }}" class="rail__form" role="search" data-server-filter-form>
-        <input type="hidden" name="aba" value="{{ aba }}">
         <c-v2.input
           icon="search"
           name="q"
@@ -44,9 +45,31 @@
           aria_label="Buscar ofícios"
           hook="data-server-filter-search"
         />
-        <c-v2.select :options="abas" placeholder="Filtrar por situação" aria_label="Filtrar ofícios por situação" hook="data-server-filter-url" />
-        <c-v2.select name="status" :value="status" :options="status_options" aria_label="Status do ofício" hook="data-server-filter-control" />
-        <c-v2.select name="sort" :value="sort" :options="sort_options" aria_label="Ordenação" hook="data-server-filter-control" />
+        {% comment %}
+          Situação é MULTISSELEÇÃO, e não a fila de abas de antes: sem escolha
+          nenhuma a lista abre inteira, e marcar duas situações soma os dois
+          recortes. Mesmo componente e mesmo contrato da lista de Eventos.
+
+          O filtro de status do documento saiu (2026-08-20): eram dois seletores
+          de "situação" na mesma faixa, um temporal e um de estado, e escolher no
+          errado devolvia lista vazia sem explicar por quê.
+        {% endcomment %}
+        <c-v2.select
+          name="aba"
+          :options="situacao_options"
+          :multiple="True"
+          placeholder="Filtrar por situação"
+          aria_label="Filtrar ofícios por situação"
+          hook="data-server-filter-control"
+        />
+        <c-v2.select
+          name="sort"
+          :value="sort"
+          :options="sort_options"
+          aria_label="Ordenação"
+          extra_class="select--compact"
+          hook="data-server-filter-control"
+        />
         {% comment %}
           Dois intervalos, e não um: a viagem e a criação respondem a perguntas
           diferentes — "quem viaja neste mês" e "o que foi emitido nesta semana".

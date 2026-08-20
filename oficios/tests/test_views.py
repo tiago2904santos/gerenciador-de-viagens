@@ -367,7 +367,15 @@ class OficioViewsTests(TestCase):
         self.assertIn("text-overflow: clip;", fact_css)
         self.assertIn("white-space: normal;", fact_css)
         self.assertIn(".form-block--v2.oficio-card__allowance-facts", record_css)
-        self.assertIn("max-height: none;", record_css)
+        # O bloco financeiro NÃO tem mais teto próprio (2026-08-20): ele era o
+        # único da faixa que crescia — 187px contra 173px dos vizinhos — e o
+        # cartão ficava com uma coluna mais alta que as outras duas. Continuar
+        # inteiro passou a ser trabalho da escala compacta abaixo, e não de uma
+        # exceção ao teto.
+        self.assertNotIn("max-height: none;", record_css)
+        self.assertIn(
+            ".oficio-card__allowance-facts .fact + .fact .fact__value", record_css
+        )
         self.assertIn('oficios:list-card:v7:', cache_source)
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")

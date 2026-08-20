@@ -10571,6 +10571,79 @@ tolerância adicional: qualquer queda futura abaixo desses valores volta a
 reprovar o pipeline. Nenhum auditor foi desativado e nenhum teto de outra métrica
 foi alterado.
 
+### NOVO-20260820-212014-75a3ea9cb7be 🟢 RESOLVIDO · `NOVO` A lista de Ofícios abria filtrada e com dois seletores de "situação" · UI · risco baixo
+
+`oficios/list_views.py` normalizava a aba ausente para `futuras`
+(`core/documento_abas.py:ABA_PADRAO`), então a tela abria recortada sem nenhum
+sinal de que havia filtro ligado: no banco de demonstração, um ofício visível de
+quatro. Quem chegava pelo menu lia a lista parcial como se fosse o total. Ao
+lado, um segundo seletor filtrava por `Oficio.STATUS_CHOICES` — dois controles
+com o mesmo rótulo mental ("situação"), um temporal e um de estado, e escolher
+no errado devolvia lista vazia sem explicar por quê.
+
+A lista de Eventos já resolvia isso: `aba` como MULTISSELEÇÃO que nasce vazia,
+com a contagem em cada opção. Ofícios passou ao mesmo contrato — sem escolha, a
+lista abre inteira; marcar duas situações soma os dois recortes. O filtro de
+status do documento saiu. O `KnownCountPaginator` continua sem COUNT extra:
+somam-se as contagens das abas escolhidas (ou de todas), que são mutuamente
+exclusivas e exaustivas — invariante que
+`test_abas_sao_mutuamente_exclusivas_e_exaustivas` já cobria.
+
+### NOVO-20260820-212014-d03975b73b9d 🟢 RESOLVIDO · `NOVO` A faixa de filtros quebrava em duas linhas · UI · risco baixo
+
+`.rail__form` era `flex-wrap: wrap` com `flex: 0 1 320px; min-width: 240px` em
+cada select. Com cinco controles (busca, situação, status, ordenação e os dois
+períodos), Ofícios não cabia na linha: medida no navegador a 1440px, a faixa
+abria com 100px de altura em vez de 44px, e a segunda linha ficava com a
+ordenação e os dois períodos soltos sob um vão grande.
+
+A faixa é uma banda de UMA linha por desenho. Passou a `nowrap`, e o que não
+couber encolhe: o piso dos selects caiu para 180px e a ordenação ganhou
+`select--compact` (190px), porque o rótulo dela é curto e ela não precisa da
+largura de um filtro que carrega rótulo mais contagem. Medido depois: 44px, uma
+linha, nas seis listas que usam a faixa.
+
+### NOVO-20260820-212014-104180cf2901 🟢 RESOLVIDO · `NOVO` O fundo da página era claro nos DOIS temas, e o perfil de CSS podava o bloco de token do escuro · UI/PF · risco médio
+
+Duas falhas na mesma superfície.
+
+No tema CLARO, `--app-body-bg` terminava em `#e3eaf2` — exatamente o valor de
+`--surface-rail`. Fundo e painel ficavam da mesma cor e a página lia como um
+bloco só. Passou a branco chapado (`var(--color-white)`), o mesmo
+`--surface-field` dos campos: campo branco, painel acinzentado, fundo branco
+atrás dos dois.
+
+No tema ESCURO o fundo era o gradiente CLARO, e a causa não estava no token: o
+escuro sempre teve o seu, em `base/03-theme-dark.css:321`. Quem o apagava era
+`scripts/build_css_profiles.py`. O perfil guarda só as regras observadas como
+casadas pela cobertura do CDP, e a cobertura é medida com UM tema aplicado por
+vez — um bloco `html[data-theme="dark"]` não casa enquanto a medição roda no
+claro. O bloco de token do escuro foi podado inteiro de todos os perfis,
+levando junto `--app-body-bg`, `--sidebar-*` e o resto da definição do tema. O
+bundle completo, sem perfil, continuava certo, e foi isso que escondeu o
+defeito: só as rotas com perfil quebravam.
+
+O gerador passou a tratar regra de RAIZ (`:root`, `html`, `html[data-theme=…]`)
+como não-podável, por selector e não por conteúdo — o bloco escuro declara
+`color-scheme: dark` no meio das custom properties, e o critério "só custom
+property" deixava justamente ele de fora. São centenas de bytes por perfil e são
+a definição do tema.
+
+### NOVO-20260820-212950-6d6eb02586ad 🟢 RESOLVIDO · `NOVO` O bloco de diárias era o único do cartão que crescia · UI · risco baixo
+
+`record.css` dava `max-height: none` ao `.oficio-card__allowance-facts` para
+caber a composição integral das diárias. Com isso ele era o único dos três
+blocos da faixa sem teto: medido na lista, 187px contra os 173px dos blocos de
+viatura e de trechos. O cartão ficava com uma coluna mais alta que as vizinhas e
+a faixa perdia a linha de base.
+
+O teto voltou a valer para os três. A composição continua inteira — o que mudou
+não foi o teto, foi o que ocupa a altura: o valor por extenso e a quantidade,
+que são as duas linhas de APOIO do bloco, usam escala compacta e os 163px de
+conteúdo passam a caber nos 149px úteis. `fact--never-truncate` segue no lugar,
+então o valor quebra linha em vez de receber reticências. Medido depois:
+173/173/173.
+
 ### NOVO-20260820-171008-7afb74d82d2c 🔴 ABERTO · `NOVO` O v2 entrega 517 KB de CSS em toda página: NOVO-70 e o aceite PF-02 ficam incompatíveis · FE/PERF · risco médio
 
 O `NOVO-70` mede quanto do CSS entregue numa rota é de fato usado, e é catraca:
