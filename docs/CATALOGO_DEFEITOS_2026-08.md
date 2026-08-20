@@ -10792,16 +10792,38 @@ declara token junto com pintura também entra inteira — podá-la tiraria o tok
 `--color-accent` `#d8a21b` — idênticos à medição com os perfis desligados. Os 15 perfis passaram a
 carregar o bloco, com teste que trava a volta.
 
-**Custo, declarado.** Cada perfil cresce ~16 KB (686 KB → 932 KB no total dos 15, +35,8%), e isso
-baixa o uso medido pelo `NOVO-70` entre **0,27 e 0,52 pp** por rota, porque o denominador cresce e
-o bloco escuro não casa na passagem clara da medição. É o preço de o tema escuro existir; o gate
-já estava 30-45 pontos abaixo do piso pelo `NOVO-20260820-171008-7afb74d82d2c`, então não muda o
-estado dele.
+**Não era só o tema escuro — e a medição do CI é que mostrou.** Três regras voltaram por perfil:
+o `html[data-theme="dark"]` raiz (11.501 B, 235 dos 236 declarações são token), um **`:root` com
+74 tokens** (3.633 B) e um par de chips (217 B). O `:root` **também estava sendo podado**, e
+**67 dos seus 74 tokens não existiam em mais nada que a rota recebia** — nem no perfil, nem no
+`ui.bundle.css`. São tokens de layout: `--page-shell-*`, `--form-section-*`, `--stepper-*`,
+`--filter-bar-*`, `--list-row-*`, `--text-primary`, `--border-subtle`.
+
+Esse lado passou quase incólume por sorte de fallback: só **um** dos 67 era consumido sem
+fallback pelo que a rota recebia (`--list-panel-radius`, um uso). Os demais consumidores tinham
+fallback ou também haviam sido podados. Por isso não houve sintoma no tema claro — mas era a
+mesma falha, e valia nos dois temas.
+
+**Custo, medido no CI (não estimado).** Cada perfil cresce ~16 KB (686 KB → 932 KB no total dos
+15). A estimativa inicial dizia que o uso do `NOVO-70` cairia 0,27-0,52 pp; **subiu**, porque o
+`:root` restaurado casa na passagem clara: **+3.633 bytes casados em toda rota**, contra 15-17 KB
+a mais entregues. Medido: `dashboard` 9,5431% → 9,8731%, `cargo-editar` 10,7288% → 11,0233%,
+`viatura-editar` 17,4518% → 17,5603%, `oficios-detalhe` 20,1194% → 20,1933%. O gate segue 30-45
+pontos abaixo do piso pelo `NOVO-20260820-171008-7afb74d82d2c`; isto não muda o estado dele.
 
 **O furo de processo, que é o que interessa para a próxima vez.** A paridade perfil/bundle do
 `PF-02` comparou estilo computado no tema claro e não achou diferença — corretamente, porque podar
 uma DECLARAÇÃO de token não muda pixel algum até alguém lê-la. Qualquer recaptura futura precisa
 comparar perfil e bundle **nos dois temas**, ou este defeito volta na próxima família de rota.
+
+**Duas travas, com escopos diferentes, porque nenhuma cobre a outra:**
+
+- `audit_css_variaveis_orfas.py` ganhou `profile_regressions()`: nenhum perfil pode citar variável
+  que a entrega completa declara. Rodando contra os perfis de antes do conserto, acusa 9 a 14
+  órfãs por perfil — teria pego o lado do `:root`. **Não** pega o tema escuro, porque ali o token
+  seguia declarado, só que com o valor claro.
+- `PerfilCssPreservaTokenTests` exige o bloco `html[data-theme="dark"]` e um valor conhecido
+  (`--color-card-muted: #111e2f`) nos 15 perfis. É o que pega o lado do tema.
 
 Encosta no `NOVO-20260820-171008-7afb74d82d2c`: a decisão de estender os perfis ao `ui.bundle.css`
 não deve sair antes deste conserto, ou o mesmo corte de tema atingiria também o v2 — hoje o v2

@@ -26,6 +26,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 STATIC_CSS = ROOT / "static" / "css"
 ENTRY_POINTS = ("shell.bundle.css", "ui.bundle.css")
+PROFILES_DIR = STATIC_CSS / "profiles"
+GLOBAL_SHEET = "ui.bundle.css"
 
 _IMPORT = re.compile(r'@import\s+url\(["\']?([^"\')]+)["\']?\)\s*;')
 _DECL = re.compile(r"(--[A-Za-z0-9_-]+)\s*:")
@@ -96,6 +98,34 @@ def declared_in_page_sheets(names: set[str]) -> dict[str, list[str]]:
     return found
 
 
+def profile_regressions() -> dict[str, list[str]]:
+    """Órfã que o PERFIL de uma rota tem e o bundle completo não.
+
+    As 42 rotas com perfil não recebem o `shell.bundle.css`: recebem o perfil
+    podado no lugar dele. Medir só os bundles é ponto cego — foi exatamente ali
+    que o `NOVO-20260820-211943-6a686a695549` morava, com um `:root` de 74
+    tokens podado dos 15 perfis.
+
+    O invariante é comparativo de propósito: podar não pode *introduzir* órfã.
+    A dívida que já existe no bundle é assunto do `--max`; aqui o que se proíbe
+    é o podador deixar a rota pior que a entrega completa.
+
+    Isto NÃO cobre token podado que continua declarado com outro valor — o
+    tema escuro caía nesse caso, porque `--color-bg` seguia declarado, só que
+    com o valor claro. Esse lado é travado por
+    `PerfilCssPreservaTokenTests` em `core/tests/test_metricas_front.py`.
+    """
+    baseline = set(orphan_variables(delivered_css()))
+    global_css = expanded(STATIC_CSS / GLOBAL_SHEET)
+    regressions: dict[str, list[str]] = {}
+    for profile in sorted(PROFILES_DIR.glob("*.css")):
+        css = without_comments(expanded(profile) + "\n" + global_css)
+        extra = sorted(set(orphan_variables(css)) - baseline)
+        if extra:
+            regressions[profile.name] = extra
+    return regressions
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -106,6 +136,10 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
+    regressions = profile_regressions()
+    for name, extra in regressions.items():
+        print(f"  perfil {name} introduz órfã: {', '.join(extra)}")
+
     orphans = orphan_variables(delivered_css())
     elsewhere = declared_in_page_sheets(set(orphans))
     for name in sorted(orphans):
@@ -114,6 +148,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  {name} — {orphans[name]} uso(s) sem fallback{sufixo}")
     total = len(orphans)
     print(f"Variáveis CSS órfãs no CSS entregue: {total} (teto {args.max})")
+    if regressions:
+        print(
+            f"ERRO: {len(regressions)} perfil(is) de rota introduzem variável órfã que a "
+            "entrega completa não tem — podar não pode piorar a rota."
+        )
+        return 1
     if total > args.max:
         print(
             "ERRO: regra que cita variável inexistente é descartada pelo navegador "

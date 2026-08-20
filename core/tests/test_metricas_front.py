@@ -591,3 +591,22 @@ class PerfilCssPreservaTokenTests(SimpleTestCase):
                 # Um token de valor conhecido, para provar que é o bloco de
                 # verdade e não uma regra escura qualquer que sobreviveu.
                 self.assertIn("--color-card-muted: #111e2f", texto)
+
+
+class PerfilNaoIntroduzOrfaTests(SimpleTestCase):
+    """Podar não pode deixar a rota pior que a entrega completa.
+
+    As 42 rotas com perfil não recebem o `shell.bundle.css` — recebem o perfil
+    no lugar dele. Medir só os bundles era ponto cego, e foi ali que o
+    `NOVO-20260820-211943-6a686a695549` morava: um `:root` de 74 tokens podado
+    dos 15 perfis, dos quais 67 não existiam em mais nada que a rota recebia.
+    """
+
+    def test_nenhum_perfil_introduz_variavel_orfa(self):
+        regressions = orfas_metric.profile_regressions()
+
+        self.assertEqual(
+            regressions,
+            {},
+            msg="perfil de rota cita variável que a entrega completa declara",
+        )
