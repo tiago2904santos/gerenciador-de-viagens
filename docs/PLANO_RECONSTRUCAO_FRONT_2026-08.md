@@ -792,6 +792,15 @@ folha; a extração deve mover a família compartilhada antes de retirar o prime
 > conteúdo revelado, `hover` e foco deram **24 medições com zero diferenças** em claro/escuro e
 > 1440/500 px. A catraca automatizada impede voltar acima de 82.
 
+> **Resíduo fechado em 20/08 (`NOVO-20260820-205803-34867022900a`).** A conta dos imports não
+> pegava o caso inverso: folha que ninguém importa mais, mas que continua no repositório com a
+> base de uma família viva dentro. `pages/oficios.css` estava assim desde a migração v2 — zero
+> `<link>`, zero bundle, zero `@import` — e levou junto a base de `oficio-documentos-*`, o
+> alternador de documentos do evento e as três regras do "Editar" da viatura. Três folhas ainda
+> carregavam OVERRIDES dessa base e esconderam o buraco. O que vestia marcação viva mudou para o
+> dono (`v2/document-summary.css`, novo, e `v2/picker.css`); o resto saiu com prova de grep.
+> Medido no navegador: alternador `grid-template-columns` `none` → `285.19px × 5`.
+
 **Passo a passo.** Extraia os componentes compartilhados dos arquivos de domínio para
 `fields/`, `actions/`, `lists/` e `feedback/`, domínio por domínio, e derrube o import correspondente. Dimensione com a
 régua da E0: o que não é usado na rota não devia estar sendo entregue nela.

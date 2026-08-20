@@ -90,8 +90,17 @@ jobs:
 
       - name: Block new frontend standards debt
         # Catraca: este número só desce. A Etapa 1 levou 465 → 449; a Etapa 7
-        # levou 449 → 438 na fase 2 e 438 → 417 na fase 1.
-        run: python scripts/audit_frontend_standards.py --max-warnings 245
+        # levou 449 → 438 na fase 2 e 438 → 417 na fase 1. A migração v2 fechou
+        # o grosso e o teto ficou para trás: 245 contra 74 medidos em
+        # 2026-08-20. Apertado para o medido, que é o que a catraca quer dizer.
+        run: python scripts/audit_frontend_standards.py --max-warnings 74
+
+      - name: Block CSS variables without an owner
+        # `NOVO-20260820-205803-34867022900a`. Regra que cita variável
+        # inexistente é descartada inteira pelo navegador, sem erro no console:
+        # foi assim que o anel de seleção do `related_picker` virou no-op quando
+        # `pages/roteiros.css` foi apagada. Catraca: só desce.
+        run: python scripts/audit_css_variaveis_orfas.py --max 33
 
       - name: Block new UI pattern debt (NOVO-76)
         # Catraca inaugurada em 09/08/2026 com 2.622 achados de dívida real;

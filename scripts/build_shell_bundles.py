@@ -134,6 +134,7 @@ UI_CSS: tuple[str, ...] = (
     "css/v2/form-page.css",
     "css/v2/document-inline.css",
     "css/v2/document-number.css",
+    "css/v2/document-summary.css",
     "css/v2/suggestions.css",
     "css/v2/fact.css",
     "css/v2/stat.css",

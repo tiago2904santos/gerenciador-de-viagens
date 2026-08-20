@@ -10,6 +10,7 @@ from django.test import SimpleTestCase, override_settings
 from core.context_processors import shell_css_profile
 from scripts import medir_css_por_rota as css_metric
 from scripts import build_css_profiles as css_profiles
+from scripts import audit_css_variaveis_orfas as orfas_metric
 from scripts import medir_divergencia_tema as theme_metric
 from scripts import sonda_mesmo_tema as same_theme_metric
 from scripts.rotas_do_sistema import ROTAS
@@ -465,3 +466,67 @@ class MesmoTemaMetricTests(SimpleTestCase):
         failures = same_theme_metric.report_failures(report, max_style_differences=0)
 
         self.assertEqual(failures, ["1 diferencas de estilo > teto 0"])
+
+
+class VariaveisCssOrfasTests(SimpleTestCase):
+    """`NOVO-20260820-205803-34867022900a` — a régua das variáveis sem dono.
+
+    Regra que cita variável inexistente é descartada pelo navegador inteira, sem
+    erro no console. Foi assim que `pages/roteiros.css` levou embora
+    `--re-accent-border`/`--re-choice-ring` e deixou `.related-route-item.is-active`
+    sem nenhum efeito visual — medido, não deduzido: `box-shadow` computado
+    `none` no anel de seleção.
+    """
+
+    def test_fallback_explicito_nao_conta_como_orfa(self):
+        css = ".a { color: var(--sem-dono, red); }"
+
+        self.assertEqual(orfas_metric.orphan_variables(css), {})
+
+    def test_uso_sem_fallback_e_sem_declaracao_conta(self):
+        css = ".a { color: var(--sem-dono); }"
+
+        self.assertEqual(orfas_metric.orphan_variables(css), {"--sem-dono": 1})
+
+    def test_variavel_declarada_no_proprio_css_nao_conta(self):
+        css = ":root { --tem-dono: red; } .a { color: var(--tem-dono); }"
+
+        self.assertEqual(orfas_metric.orphan_variables(css), {})
+
+    def test_prosa_em_comentario_nao_vira_variavel(self):
+        """O repositório comenta em CSS, e os comentários citam `var(--color-*)`."""
+        css = "/* todos são var(--color-*) e trocam por tema */ .a { color: red; }"
+
+        self.assertEqual(
+            orfas_metric.orphan_variables(orfas_metric.without_comments(css)), {}
+        )
+
+    def test_import_local_e_expandido_antes_de_medir(self):
+        """Sem expandir, o token de `base/tokens.css` some e a conta dobra.
+
+        O `_concat` de `build_shell_bundles.py` mantém a linha `@import` no
+        bundle: é o navegador que a resolve. Medir o texto cru do bundle
+        acusaria `--space-1` e companhia como órfãs.
+        """
+        with TemporaryDirectory() as tmp:
+            raiz = Path(tmp)
+            (raiz / "tokens.css").write_text(":root { --tem-dono: red; }", encoding="utf-8")
+            folha = raiz / "folha.css"
+            folha.write_text(
+                '@import url("./tokens.css");\n.a { color: var(--tem-dono); }',
+                encoding="utf-8",
+            )
+
+            expandido = orfas_metric.expanded(folha)
+
+        self.assertIn("--tem-dono: red", expandido)
+        self.assertEqual(orfas_metric.orphan_variables(expandido), {})
+
+    def test_catraca_do_css_entregue_so_pode_descer(self):
+        orfas = orfas_metric.orphan_variables(orfas_metric.delivered_css())
+
+        self.assertLessEqual(
+            len(orfas),
+            33,
+            msg=f"variáveis CSS órfãs no CSS entregue: {sorted(orfas)}",
+        )
