@@ -120,7 +120,11 @@ class QuickAddComponentesV2SourceTests(SimpleTestCase):
         self.assertNotIn('surface="rail"', usuario)
         self.assertNotIn('surface="rail"', area)
         self.assertNotIn('surface="rail"', unidade)
-        self.assertIn('class="field-grid field-grid--cols-2"', unidade)
+        # Três colunas, com o nome ocupando duas: o nome da unidade precisa de
+        # mais espaço que a sigla, e `cols-2` dava metade a cada um. As duas
+        # classes têm regra própria em `v2/form-block.css`, media query inclusa.
+        self.assertIn('class="field-grid field-grid--cols-3"', unidade)
+        self.assertIn('extra_class="field-grid__span-2"', unidade)
         self.assertNotIn("form.servidores", unidade)
         self.assertIn(".form-block--v2 .field-grid--cols-2", form_block_css)
 

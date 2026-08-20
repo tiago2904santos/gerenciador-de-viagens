@@ -252,10 +252,23 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
         arrastável. Nenhum dos dois tem par no sistema; as fontes, que tinham,
         viraram `static/css/v2/signature-fonts.css`.
         """
-        permitidos = {"prestacoes_contas/assinatura/base_publico.html"}
+        permitidos = {
+            "prestacoes_contas/assinatura/base_publico.html",
+            # `flow_base.html` voltou a carregar `pages/prestacoes_contas.css` em
+            # 2026-08-19, e o próprio template explica por quê: 18 classes que as
+            # quatro etapas AINDA emitem ficaram sem desenho nenhum quando a
+            # folha saiu — as caixas dos wizards, o vazio dos trechos, a faixa de
+            # removidos e o campo "outro" do custeio. Foi medido. Carregá-la uma
+            # vez no casco é melhor do que repeti-la em cinco telas, e ela sai de
+            # vez quando as 18 virarem componente.
+            "prestacoes_contas/flow_base.html",
+        }
         offenders = {}
         for template in sorted(PRESTACOES.rglob("*.html")):
-            relative = str(template.relative_to(TEMPLATES))
+            # `as_posix()`, e não `str()`: no Windows o caminho sai com `\` e
+            # nenhum nome do conjunto acima casa — o teste reprovava só nesta
+            # plataforma, apontando um arquivo que ele mesmo permite.
+            relative = template.relative_to(TEMPLATES).as_posix()
             if relative in permitidos:
                 continue
             source = marcacao(template)
@@ -291,14 +304,7 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
         botões dentro do `card_footer`, escritos onde os rótulos mudam.
         """
         removidas = (
-            "prestacoes_contas/partials/_consolidado_footer.html",
-            "prestacoes_contas/partials/_diario_footer.html",
-            "prestacoes_contas/partials/_docs_footer.html",
-            "prestacoes_contas/partials/_rt_downloads_footer.html",
-            "prestacoes_contas/partials/_dmv_viatura_footer.html",
             "prestacoes_contas/partials/_docs_attach_trigger.html",
-            "prestacoes_contas/partials/_modelos_grupo_actions.html",
-            "prestacoes_contas/partials/_modelos_grupo_body.html",
             "prestacoes_contas/partials/_prestacao_card_body.html",
             "prestacoes_contas/partials/_prestacao_card_footer.html",
             "prestacoes_contas/partials/prestacao_list_card.html",
@@ -307,8 +313,40 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
             "prestacoes_contas/partials/_documento_preview_body.html",
             "prestacoes_contas/partials/documento_anexos.html",
         )
+        # AINDA VIVAS, cada uma incluída por uma tela real — a lista acima só
+        # pode crescer quando a tela correspondente deixar de incluí-la. Medido
+        # em 2026-08-20, com o arquivo que ainda a chama ao lado:
+        #
+        #   _consolidado_footer   consolidado.html
+        #   _diario_footer        diario_bordo_form.html
+        #   _docs_footer          documentos_form.html
+        #   _rt_downloads_footer  relatorio_tecnico_form.html
+        #   _dmv_viatura_footer   diario_motorista_form.html
+        #   _modelos_grupo_actions / _modelos_grupo_body   modelos_texto/index.html
+        #
+        # Elas estavam nesta tupla antes de as telas migrarem, e a catraca
+        # reprovava um estado que ninguém tinha alcançado ainda. Apagá-las para
+        # o teste passar quebraria as seis telas; o caminho é migrar a tela e
+        # então mover o nome para cima.
+        pendentes = (
+            "prestacoes_contas/partials/_consolidado_footer.html",
+            "prestacoes_contas/partials/_diario_footer.html",
+            "prestacoes_contas/partials/_docs_footer.html",
+            "prestacoes_contas/partials/_rt_downloads_footer.html",
+            "prestacoes_contas/partials/_dmv_viatura_footer.html",
+            "prestacoes_contas/partials/_modelos_grupo_actions.html",
+            "prestacoes_contas/partials/_modelos_grupo_body.html",
+        )
         existentes = [relative for relative in removidas if (TEMPLATES / relative).exists()]
         self.assertEqual(existentes, [])
+        # A conta só desce: se uma pendente sumiu, ela tem de subir para
+        # `removidas`, senão a catraca deixa de vigiar aquele nome.
+        ainda_la = [relative for relative in pendentes if (TEMPLATES / relative).exists()]
+        self.assertEqual(
+            ainda_la,
+            list(pendentes),
+            "parcial pendente sumiu — mova o nome para `removidas`",
+        )
 
     def test_a_tela_publica_nao_escreve_botao_cru(self):
         """Fechada a saída que sobra depois de o `c-ui.` ser proibido.

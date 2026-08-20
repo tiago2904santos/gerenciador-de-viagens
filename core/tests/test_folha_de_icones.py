@@ -157,6 +157,13 @@ class FolhaDeIconesTests(SimpleTestCase):
         O login entrou nesta lista em 2026-08-19: ele sempre desenhou ícone, mas
         a busca anterior olhava só quem alcançava o COMPONENTE `icon.html`, e o
         login já usava a tag.
+
+        A casca pública da assinatura entrou em 2026-08-20, e é a QUARTA: ela
+        não estende `base.html` porque quem a abre é o signatário externo, sem
+        login e sem barra lateral. Ela passou a desenhar ícone quando a tela
+        migrou para os componentes do v2, e declara `<c-v2.sprite />` no topo do
+        `<body>` — conferido antes de entrar aqui, que é o que a mensagem do
+        assert abaixo manda fazer.
         """
         textos = _templates()
         raizes = [
@@ -184,6 +191,7 @@ class FolhaDeIconesTests(SimpleTestCase):
                 "base.html",
                 "core/login.html",
                 "documentos/geracao_aguarde_embedded.html",
+                "prestacoes_contas/assinatura/base_publico.html",
             ],
             "mudou o conjunto de raízes que usam ícone; confira se a nova carrega "
             "a folha antes de atualizar esta lista",
