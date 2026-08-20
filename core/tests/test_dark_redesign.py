@@ -17,7 +17,6 @@ class DarkRedesignContractTests(SimpleTestCase):
         )
         self.components_path = css_root / "components" / "theme-dark-components.css"
         self.page_shell_path = css_root / "layout" / "page-shell.css"
-        self.list_header_path = css_root / "lists" / "list-header.css"
         self.base = self.base_path.read_text(encoding="utf-8")
         self.tokens_css = self.tokens_path.read_text(encoding="utf-8")
         self.base_tokens_css = self.base_tokens_path.read_text(encoding="utf-8")
@@ -58,7 +57,6 @@ class DarkRedesignContractTests(SimpleTestCase):
             ]
         )
         self.page_shell_css = self.page_shell_path.read_text(encoding="utf-8")
-        self.list_header_css = self.list_header_path.read_text(encoding="utf-8")
         # Os asserts abaixo localizam o primeiro bloco textual de alguns
         # seletores. Preserve a ordem histórica do arquivo monolítico para que
         # o teste continue descrevendo o contrato, não a ordem dos novos
@@ -81,10 +79,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         ).read_text(encoding="utf-8")
         style_index = bundle.index(">>> css/style.css >>>")
         theme_dark_tokens_index = bundle.index(">>> css/base/03-theme-dark.css >>>")
-        form_action_system_index = form_bundle.index(
-            ">>> css/actions/action-system.css >>>"
-        )
-        action_system_index = bundle.index(">>> css/actions/action-system.css >>>")
+        page_shell_index = bundle.index(">>> css/layout/page-shell.css >>>")
         theme_shared_components_index = bundle.index(
             ">>> css/components/theme-shared-components.css >>>"
         )
@@ -104,7 +99,13 @@ class DarkRedesignContractTests(SimpleTestCase):
         # descrevia como "compat residual", e nenhuma tela emitia as classes dela.
         # `lists/record-list.css` saiu em 2026-08-20: das nove regras dela só a
         # pilha continuava viva, e foi para `v2/record.css`.
-        self.assertLess(action_system_index, theme_dark_components_index)
+        # `actions/action-system.css` foi APAGADA em 2026-08-20, com o último
+        # menu do sistema antigo (o do card de prestação) virando `c-v2.menu`.
+        # Quem ocupa o lugar dela na ordem — depois dos tokens, antes das duas
+        # camadas de tema — é `layout/page-shell.css`, e é isso que se mede.
+        self.assertLess(page_shell_index, theme_dark_components_index)
+        self.assertNotIn(">>> css/actions/action-system.css >>>", bundle)
+        self.assertNotIn(">>> css/actions/action-system.css >>>", form_bundle)
         # `layout/app-shell.css` saiu do shell em 2026-08-20 junto com a pasta
         # `layout/`: a casca virou `v2/shell.css` e viaja no pacote do v2.
         # `lists/content-cards.css` saiu pelo mesmo motivo — o cartão de módulo
@@ -115,7 +116,6 @@ class DarkRedesignContractTests(SimpleTestCase):
         # `<dialog class="modal">` do v2, e a folha do `cv-dialog` ficou sem
         # nenhuma marcação para vestir.
         self.assertLess(theme_dark_components_index, theme_shared_components_index)
-        self.assertLess(action_system_index, theme_dark_components_index)
 
     def test_theme_layer_does_not_target_official_light_theme(self):
         for layer_css in (self.tokens_css, self.components_css):

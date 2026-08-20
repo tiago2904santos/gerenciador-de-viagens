@@ -10246,3 +10246,55 @@ por CHAVE (tag + classe + ordinal), não por índice: o mapa carrega peças em t
 diferentes e desloca o índice de tudo que vem depois. Resultado: nenhuma
 diferença.
 
+### NOVO-20260820-154952-9fe706e7433e 🟢 RESOLVIDO · `NOVO` Modal global V2 entrou sem cobertura comportamental · JS/QA · risco alto
+
+A migração do diálogo global de confirmação para o `<dialog>` do V2 acrescentou
+os caminhos de aceite, alerta simples, clique no backdrop e cancelamento por Esc,
+mas nenhum teste os exercitava. A suíte funcional continuava verde, porém o gate
+de cobertura de `static/js/core/app.js` bloqueava todo deploy de `main`.
+
+**Correção:** o teste do núcleo agora prova a estrutura V2, as opções de título e
+rótulo, a quebra de linhas, a integração com `CV.overlay` e as quatro formas de
+encerrar o diálogo, sem reduzir nenhum piso de cobertura.
+
+### NOVO-20260820-132553-c8781d82b56f 🟢 RESOLVIDO · `NOVO` O último menu do sistema antigo mantinha `action-system.css` de pé · FE · risco médio
+
+`templates/prestacoes_contas/partials/_card_menus.html` era o único lugar do
+projeto que ainda escrevia `action-menu__item` à mão. Por causa dele,
+`actions/action-system.css` (272 linhas) e mais cinco regras de `.action-menu*`
+em `layout/page-shell.css` seguiam no bundle de TODAS as páginas — quatro delas
+já sem efeito nenhum, porque os menus do v2 (`.menu.action-menu`) vencem por
+especificidade em cada propriedade que as duas folhas disputavam. O que a folha
+ainda vestia, de fato, era um menu só.
+
+**Correção:** os dois menus do card viraram `c-v2.menu` com `c-v2.menu_item`,
+`c-v2.menu_attach_signed` e `c-v2.menu_button`. Três componentes ganharam o que
+faltava para a tela caber sem inventar vocabulário:
+
+- `menu_item` ganhou `disabled` — o "Diário de bordo · ainda não foi criado" sai
+  como `<span role="menuitem" aria-disabled>`, não como `<a>` sem destino.
+- `menu_button` e `menu_attach_signed` ganharam `attrs`. É como o `c-v2.button`
+  já repassa gancho COM valor: `data-wa-app="normal"` não cabe em `hook`, que sai
+  escapado, mas atributo escrito solto na chamada chega verbatim na tag.
+- `menu_attach_signed` ganhou `title`/`description`: nesta tela o item anexa TRÊS
+  documentos, e "Anexar assinado" mentiria sobre o que o diálogo abre.
+
+O cabeçalho do menu ("Baixar documentos / <nome>") não voltou: o menu do v2 não
+tem cabeçalho desde 16/08, e o nome do servidor virou `aria-label` — o menu abre
+a partir da linha daquele servidor, que é de onde vem o contexto na tela.
+
+Junto saíram: o menu de FALHA do `overlay.js`, que montava `action-menu--rich` e
+`action-menu__erro` (agora `menu` + `menu__erro`, com regra própria em
+`v2/menu.css`); a trava de `prefers-reduced-motion` do item, que mudou de casa
+com ele; e `.action-menu__panel` de uma união em `v2/listbox.css`. O CSS legado
+foi de 3.522 para 3.251 linhas.
+
+**Fica um resto, e de propósito:** três definições órfãs de `--action-primary-*`
+em `base/03-theme-dark.css`. Elas moram DENTRO da regra `html[data-theme="dark"]`
+de 236 declarações, que é chave do `css_profiles_manifest.json` — editar o texto
+dela a apagaria de todos os `profiles/*.css` sem erro nenhum. Saem quando o
+manifesto for recalibrado (`build_css_profiles.py --capture`).
+
+**Como conferir:** os dois menus abertos no navegador (tema escuro), o diálogo de
+anexar assinado abrindo com os três tipos e o texto "PDF, PNG ou JPEG", e a
+varredura das folhas carregadas: `.action-menu` aparece em zero regras.

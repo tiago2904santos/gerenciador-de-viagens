@@ -90,4 +90,51 @@ describe("CV registry", () => {
     expect(fn).toHaveBeenCalledOnce();
     vi.useRealTimers();
   });
+
+  it("usa o modal V2 e resolve confirmação, alerta, backdrop e Esc", async () => {
+    window.CV.overlay = {
+      openDialog: vi.fn(),
+      closeDialog: vi.fn(),
+    };
+
+    const opener = document.createElement("button");
+    document.body.appendChild(opener);
+
+    const confirmacao = window.CV.feedback.confirm("Primeira linha\nSegunda linha", {
+      title: "Excluir registro",
+      acceptLabel: "Excluir",
+      opener,
+    });
+    const modal = document.querySelector("[data-cv-feedback-modal]");
+    expect(modal).toBeInstanceOf(HTMLDialogElement);
+    expect(modal.className).toBe("modal");
+    expect(modal.querySelector(".modal__shell")).not.toBeNull();
+    expect(modal.querySelector("#feedback-title").textContent).toBe("Excluir registro");
+    expect(modal.querySelector("#feedback-message").innerHTML).toBe("Primeira linha<br>Segunda linha");
+    expect(modal.querySelector("[data-cv-feedback-accept]").textContent).toBe("Excluir");
+    expect(window.CV.overlay.openDialog).toHaveBeenCalledWith(modal, expect.objectContaining({
+      opener,
+      initialFocus: modal.querySelector("[data-cv-feedback-cancel]"),
+    }));
+
+    modal.querySelector("[data-cv-feedback-accept]").click();
+    await expect(confirmacao).resolves.toBe(true);
+
+    const alerta = window.CV.feedback.alert("Tudo certo");
+    expect(modal.querySelector("[data-cv-feedback-cancel]").hidden).toBe(true);
+    expect(modal.querySelector("[data-cv-feedback-accept]").textContent).toBe("Entendi");
+    modal.querySelector("[data-cv-feedback-accept]").click();
+    await expect(alerta).resolves.toBeUndefined();
+
+    const canceladaNoFundo = window.CV.feedback.confirm("Cancelar no fundo");
+    modal.click();
+    await expect(canceladaNoFundo).resolves.toBe(false);
+
+    const canceladaNoEsc = window.CV.feedback.confirm("Cancelar no Esc");
+    const cancelEvent = new Event("cancel", { cancelable: true });
+    modal.dispatchEvent(cancelEvent);
+    expect(cancelEvent.defaultPrevented).toBe(true);
+    await expect(canceladaNoEsc).resolves.toBe(false);
+    expect(window.CV.overlay.closeDialog).toHaveBeenCalledTimes(4);
+  });
 });

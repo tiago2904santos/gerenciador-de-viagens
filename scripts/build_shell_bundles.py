@@ -27,11 +27,9 @@ SHELL_CSS: tuple[str, ...] = (
     "css/base/03-theme-dark.css",
     "css/base/utilities.css",
     "css/layout/page-shell.css",
-    "css/actions/action-system.css",
     "css/feedback/notice.css",
     "css/components/theme-dark-components.css",
     "css/components/theme-shared-components.css",
-    "css/lists/list-header.css",
 )
 
 FORM_COMPONENTS_CSS: tuple[str, ...] = ()

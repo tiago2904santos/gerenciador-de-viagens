@@ -134,10 +134,9 @@ class ShellBundleGateTests(SimpleTestCase):
                 self.assertNotIn(f">>> {source} >>>", shell)
                 self.assertIn(f">>> {source} >>>", form_shell)
 
-        self.assertLess(
-            form_shell.index(">>> css/lists/list-header.css >>>"),
-            form_shell.index(">>> css/fields/related-route-picker.css >>>"),
-        )
+        # A folha da barra de lista vinha antes desta no pacote; foi apagada em
+        # 2026-08-20 e a de escopo de wizard ficou sozinha, no fim.
+        self.assertNotIn(">>> css/lists/list-header.css >>>", form_shell)
 
         # As bases fundidas não voltaram a ser folha própria.
         for extinta in ("fields/search-picker.css", "fields/date-picker.css",

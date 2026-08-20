@@ -64,7 +64,6 @@ class SuperficiesClarasContratoTests(SimpleTestCase):
         root = Path(settings.BASE_DIR)
         cls.tokens = (root / "static/css/base/tokens.css").read_text(encoding="utf-8")
         cls.components = (root / "static/css/components/theme-dark-components.css").read_text(encoding="utf-8")
-        cls.list_header = (root / "static/css/lists/list-header.css").read_text(encoding="utf-8")
 
     def test_tema_claro_tem_tres_niveis_de_superficie(self):
         self.assertIn("--color-surface: #ffffff;", self.tokens)
@@ -82,7 +81,11 @@ class SuperficiesClarasContratoTests(SimpleTestCase):
             with self.subTest(pattern=pattern):
                 self.assertNotRegex(self.components, pattern)
 
-        self.assertNotRegex(
-            self.list_header,
-            r'data-theme="dark"[^\{]{0,160}\.list-header--wizard-band',
+        # `lists/list-header.css` foi apagada em 2026-08-20 (nenhum template
+        # emitia `.list-header`), e com ela a faixa do wizard que este trecho
+        # vigiava. A proibição continua valendo para as folhas vivas, medidas
+        # acima.
+        self.assertFalse(
+            (Path(settings.BASE_DIR) / "static/css/lists").exists(),
+            "a pasta `lists/` voltou — ela morreu com a barra de lista antiga",
         )

@@ -1,4 +1,4 @@
-{% cotton:vars current_name current_remove_url current_view_url doc_label kinds_json signed url %}
+{% cotton:vars attrs current_name current_remove_url current_view_url description doc_label extra_class kinds_json signed title url %}
 {% comment %}
   Item de menu que abre o diálogo de anexar o documento assinado.
 
@@ -16,24 +16,38 @@
   já decodificado — diferente do `hook`, onde o escape estraga o nome do atributo.
 
   O rótulo muda com o estado: sem assinado é "Anexar", com assinado é
-  "Gerenciar", porque as ações disponíveis passam a ser outras.
+  "Gerenciar", porque as ações disponíveis passam a ser outras. `title` e
+  `description` existem para a prestação, onde o item anexa TRÊS documentos
+  diferentes ("RT, diário ou comprovante") e o rótulo genérico mentiria sobre o
+  que o diálogo abre.
+
+  `attrs` repassa os ajustes de diálogo que só algumas telas fazem — a chave de
+  reabertura, os tipos de arquivo aceitos, os rótulos dos botões. São contrato do
+  mesmo script, mas opcionais: sem eles o diálogo usa os padrões dele. Ficam
+  soltos em vez de virarem seis parâmetros porque quem os lê é `getAttribute`, e
+  declará-los aqui não acrescentaria checagem nenhuma.
+
+  Os cinco atributos do documento ÚNICO só saem com `url`: quem tem `kinds_json`
+  descreve cada documento dentro do payload, e emiti-los vazios punha cinco
+  `data-*` sem conteúdo no HTML de todo card de prestação.
 {% endcomment %}
 {% load icones %}
 <button
   type="button"
-  class="menu__item"
+  class="menu__item{% if extra_class %} {{ extra_class }}{% endif %}"
   role="menuitem"
   data-attach-signed-trigger
-  data-attach-signed-url="{{ url }}"
+  {% if url %}data-attach-signed-url="{{ url }}"
   data-attach-signed-doc-label="{{ doc_label }}"
   data-attach-signed-current-name="{{ current_name }}"
   data-attach-signed-current-view-url="{{ current_view_url }}"
-  data-attach-signed-current-remove-url="{{ current_remove_url }}"
+  data-attach-signed-current-remove-url="{{ current_remove_url }}"{% endif %}
   {% if kinds_json %}data-attach-signed-kinds="{{ kinds_json }}"{% endif %}
+  {{ attrs }}
 >
   <span class="menu__icon" data-tone="success" aria-hidden="true">{% icone_svg "sign" %}</span>
   <span class="menu__copy">
-    <strong class="menu__title">{% if signed %}Gerenciar assinado{% else %}Anexar assinado{% endif %}</strong>
-    <small class="menu__description">{% if signed %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
+    <strong class="menu__title">{% if title %}{{ title }}{% elif signed %}Gerenciar assinado{% else %}Anexar assinado{% endif %}</strong>
+    <small class="menu__description">{% if description %}{{ description }}{% elif signed %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
   </span>
 </button>

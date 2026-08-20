@@ -2587,12 +2587,15 @@ document.documentElement.dataset.appReady = "true";
   /** Menu de erro, para o clique nunca terminar em silêncio. */
   function menuDeFalha(id) {
     var bloco = document.createElement("div");
-    bloco.className = "action-menu action-menu--rich";
+    // `menu` é o desenho (v2) e `action-menu` é o gancho: o mesmo par que os
+    // corpos servidos pelo servidor usam. Sem `menu`, o aviso abria sem caixa,
+    // porque a folha do legado saiu em 2026-08-20.
+    bloco.className = "menu action-menu";
     bloco.id = id;
     bloco.setAttribute("role", "menu");
     bloco.hidden = true;
     var aviso = document.createElement("p");
-    aviso.className = "action-menu__erro";
+    aviso.className = "menu__erro";
     aviso.setAttribute("role", "alert");
     aviso.textContent =
       "Não foi possível carregar as ações. Verifique a conexão e tente de novo.";

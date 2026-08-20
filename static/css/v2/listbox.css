@@ -241,7 +241,7 @@
   }
 }
 
-html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .date-picker__popover, .action-menu__panel) {
+html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .date-picker__popover) {
   background: var(--color-surface-elevated);
   border: 1px solid var(--color-border-strong);
   box-shadow: var(--shadow-elevated);

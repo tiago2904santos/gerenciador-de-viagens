@@ -483,50 +483,6 @@ body.has-delete-modal-open {
   overflow: hidden;
 }
 
-/* Menu de ações (⋮) — junta Cancelar/Excluir num único botão */
-.action-menu {
-  background: var(--surface-list-panel);
-  border: 1px solid var(--border-list-panel);
-  border-radius: var(--radius-md);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-  display: none;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 180px;
-  padding: var(--space-2);
-  z-index: var(--z-modal, 1000);
-}
-
-.action-menu--open {
-  display: flex;
-}
-
-.action-menu__item {
-  align-items: center;
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-sm);
-  color: var(--theme-text-heading);
-  cursor: pointer;
-  display: flex;
-  font-size: var(--font-size-sm);
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  text-align: left;
-  width: 100%;
-}
-
-.action-menu__item:hover,
-.action-menu__item:focus-visible {
-  background: var(--color-surface-muted);
-}
-
-.action-menu__item .icon {
-  flex: 0 0 auto;
-  height: 16px;
-  width: 16px;
-}
-
 /* =========================================================
    18. Responsive
    ========================================================= */

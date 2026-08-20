@@ -39,6 +39,17 @@
   --surface-contrast: var(--surface-field);
 }
 
+/* O menu que não deu certo. O corpo vem do servidor no primeiro clique (PF-04);
+   se a busca falhar, o `overlay.js` monta este aviso no lugar — clicar e não
+   acontecer nada seria falha silenciosa. Largura em `ch` porque o que limita a
+   linha aqui é a frase, não a lista de ações que não veio. */
+:is(html[data-theme]) .menu__erro {
+  color: var(--status-late);
+  margin: 0;
+  max-width: 34ch;
+  padding: 10px 12px;
+}
+
 /* Item que é `<button>`: o navegador lhe dá fundo, borda e fonte próprios, e
    sem zerá-los ele fica visivelmente diferente do item que é link — lado a
    lado, no mesmo menu. */
@@ -105,6 +116,30 @@
 :is(html[data-theme]) .menu__item:focus-visible {
   border-color: var(--line-strong, var(--line));
   outline: none;
+}
+
+/* O item que existe mas não dá para usar ainda: apagado, sem cursor e sem
+   realce no hover. Ele fica na lista para dizer o que caberia ali — "Diário de
+   bordo — ainda não foi criado" —, e some do caminho do teclado por
+   `aria-disabled`. O contorno do hover é desligado explicitamente: sem isso o
+   item se acende ao passar o mouse e promete um clique que não acontece. */
+:is(html[data-theme]) .menu__item[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+:is(html[data-theme]) .menu__item[aria-disabled="true"]:hover {
+  border-color: transparent;
+}
+
+/* O item não pisca para quem pediu menos movimento. Veio de
+   `actions/action-system.css`, apagada em 2026-08-20: era a única linha da
+   folha que ainda tinha efeito sobre o menu, e ela não pertence ao legado —
+   pertence ao componente. */
+@media (prefers-reduced-motion: reduce) {
+  :is(html[data-theme]) .menu__item {
+    transition-duration: 0.01ms;
+  }
 }
 
 /* O ícone tem caixa própria, com contorno — é o que dá ao menu o aspecto de

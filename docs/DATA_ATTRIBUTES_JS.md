@@ -51,6 +51,7 @@ registry chama `destroy(root)` quando o nó sai do DOM (`JS-02`).
 | `data-inline-create-close` | botão no painel | Fecha o painel |
 | `data-quick-edit` | botão da lista | Abre o painel em modo edição (`data-edit-url`, `data-edit-fields`) |
 | `data-confirm-submit` | form | Pede confirmação antes de submeter |
+| `data-cv-feedback-modal` | `<dialog class="modal">` | O diálogo de feedback montado por `core/app.js`; é por ele que o script reencontra o que já criou, em vez de empilhar um diálogo por pergunta |
 | `data-cv-feedback-accept` | botão | Confirma o diálogo de feedback |
 | `data-cv-feedback-cancel` | botão | Cancela o diálogo de feedback |
 

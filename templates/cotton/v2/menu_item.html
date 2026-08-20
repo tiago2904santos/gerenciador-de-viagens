@@ -1,4 +1,4 @@
-{% cotton:vars description download extra_class extra_download_url href icon icon_tone target_blank title tone %}
+{% cotton:vars description disabled download extra_class extra_download_url href icon icon_tone target_blank title tone %}
 {% comment %}
   Item do menu v2. O ícone é opcional; a descrição também.
 
@@ -9,8 +9,28 @@
   `download` e `target_blank` existem porque a diferença entre "baixar" e "abrir
   no navegador" é do LINK, não do rótulo: sem eles um item chamado "Baixar PDF"
   abria o arquivo na mesma aba.
+
+  `disabled` troca o `<a>` por um `<span aria-disabled>`: o item continua na
+  lista, dizendo o que existiria ali e por que ainda não existe ("Diário de
+  bordo — ainda não foi criado"). Esconder o item faria a lista mudar de tamanho
+  conforme o estado do registro, e quem procura o diário não saberia se ele não
+  existe ou se o menu é outro. Um `<a>` sem `href` não é focável nem anunciável
+  como item desabilitado; o `<span>` com `role="menuitem"` é.
 {% endcomment %}
 {% load icones %}
+{% if disabled %}
+<span
+  class="menu__item{% if extra_class %} {{ extra_class }}{% endif %}"
+  role="menuitem"
+  aria-disabled="true"
+>
+  {% if icon %}<span class="menu__icon"{% if icon_tone %} data-tone="{{ icon_tone }}"{% endif %} aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
+  <span class="menu__copy">
+    <strong class="menu__title">{{ title }}</strong>
+    {% if description %}<small class="menu__description">{{ description }}</small>{% endif %}
+  </span>
+</span>
+{% else %}
 <a
   class="menu__item{% if extra_class %} {{ extra_class }}{% endif %}"
   href="{{ href }}"
@@ -26,3 +46,4 @@
     {% if description %}<small class="menu__description">{{ description }}</small>{% endif %}
   </span>
 </a>
+{% endif %}

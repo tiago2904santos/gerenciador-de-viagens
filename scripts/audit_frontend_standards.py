@@ -117,7 +117,6 @@ TEMPLATE_RULES_AVISO = [
 # A cobertura fica adiada para nao misturar as duas coisas. A lacuna esta
 # registrada como `NOVO-67`, com o numero ja medido: 240 -> 354.
 COBERTURA_ADIADA = {
-    "static/css/actions/action-system.css",
     "static/css/feedback/dialog.css",
     "static/css/feedback/document-download-loading.css",
         "static/css/feedback/notice.css",
@@ -126,7 +125,6 @@ COBERTURA_ADIADA = {
     "static/css/fields/form-sections.css",
     "static/css/layout/app-shell.css",
     "static/css/v2/module-card.css",
-    "static/css/lists/list-header.css",
     "static/css/lists/record-list.css",
     "static/css/pages/document-generation-embedded.css",
 }

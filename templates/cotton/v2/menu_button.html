@@ -1,4 +1,4 @@
-{% cotton:vars description hook icon icon_tone title tone %}
+{% cotton:vars attrs description extra_class hook icon icon_tone title tone %}
 {% comment %}
   Item de menu que EXECUTA em vez de navegar — "Visualizar termos", que abre de
   uma vez todos os documentos do grupo.
@@ -13,16 +13,22 @@
 
   `hook` é o `data-*` do motor que executa a ação — `data-open-all-termos`, lido
   por `js/pages/oficios-documentos-inline.js`. É valeless, então atravessa o
-  escape sem estrago; um gancho COM valor não caberia aqui, pelo mesmo motivo
-  que não cabe no `c-v2.button`.
+  escape sem estrago.
+
+  Um gancho COM valor não cabe no `hook` — sai com `&quot;` e o seletor do JS
+  nunca casa. Ele entra pelo `attrs`: atributo escrito solto na chamada, que o
+  Cotton repassa para a tag verbatim. É assim que os três avisos de liberação da
+  prestação carregam `data-wa-app="normal"` e `="business"`, que é o que diz ao
+  `prestacoes-diaria-wa.js` qual aplicativo abrir. Mesmo caminho do `c-v2.button`.
 {% endcomment %}
 {% load icones %}
 <button
   type="button"
-  class="menu__item"
+  class="menu__item{% if extra_class %} {{ extra_class }}{% endif %}"
   role="menuitem"
   {% if tone %}data-tone="{{ tone }}"{% endif %}
   {% if hook %}{{ hook }}{% endif %}
+  {{ attrs }}
 >
   {% if icon %}<span class="menu__icon"{% if icon_tone %} data-tone="{{ icon_tone }}"{% endif %} aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
   <span class="menu__copy">

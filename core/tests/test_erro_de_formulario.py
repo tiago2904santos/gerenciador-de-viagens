@@ -365,16 +365,16 @@ class PainelAbertoNaoCortaTests(SimpleTestCase):
     fechado, ele apaga o excedente sem aviso. `overflow-y: auto` mantém a animação
     e devolve o que passa do teto.
 
-    **Duas folhas, e por quê:** `.list-header .inline-create__panel` declara
-    `overflow: hidden` com a mesma especificidade da regra genérica e vem **depois**
-    no bundle — a correção só em `page-shell.css` não chegava a valer (medido:
-    `overflowY` continuava `hidden`). É o `UI-04`; enquanto ele não sai, as duas
-    precisam concordar, e é isso que este teste trava.
+    **Era em duas folhas:** `.list-header .inline-create__panel` declarava
+    `overflow: hidden` com a mesma especificidade da regra genérica e vinha
+    depois no bundle, então corrigir só `page-shell.css` não bastava. Em
+    2026-08-20 `lists/list-header.css` foi APAGADA inteira — nenhum template
+    emitia `.list-header`, e as 25 regras dela pendiam de um ancestral que não
+    existe. Sobrou uma folha, e é nela que o contrato vale.
     """
 
     REGRAS = [
         ("static/css/layout/page-shell.css", ".inline-create__panel.is-open {"),
-        ("static/css/lists/list-header.css", ".list-header .inline-create__panel.is-open {"),
     ]
 
     def test_o_painel_aberto_rola_em_vez_de_cortar(self):
