@@ -10291,6 +10291,18 @@ a reutilizar as cores canônicas indicadas pelo auditor; referências hexadecima
 meramente históricas foram removidas dos comentários. Os bundles foram
 regenerados e o gate voltou a registrar zero duplicatas perceptuais.
 
+### NOVO-20260820-180017-ed576fb44058 🟢 RESOLVIDO · `NOVO` Caminho de fontes no CSS-fonte bloqueou o `collectstatic` de produção · FE/QA · risco baixo
+
+O `collectstatic` da execução de CI `32400247690` falhou ao processar
+`css/v2/signature-fonts.css`: os caminhos das fontes estavam escritos para a
+posição final de `ui.bundle.css`, mas o WhiteNoise também valida a folha-fonte
+individualmente e não encontrou os arquivos nesse caminho.
+
+**Correção:** a folha-fonte passou a referenciar as fontes a partir do seu
+próprio diretório, e o gerador de bundles agora recalcula URLs relativas ao
+concatenar CSS em outro diretório. Um teste de contrato garante simultaneamente
+o caminho válido na origem e o caminho rebased no bundle.
+
 ### NOVO-20260820-132553-c8781d82b56f 🟢 RESOLVIDO · `NOVO` O último menu do sistema antigo mantinha `action-system.css` de pé · FE · risco médio
 
 `templates/prestacoes_contas/partials/_card_menus.html` era o único lugar do
