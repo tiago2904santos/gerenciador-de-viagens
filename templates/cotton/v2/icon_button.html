@@ -1,4 +1,4 @@
-{% cotton:vars action aria_label autosave_link confirm_message download extra_class formaction formnovalidate hook href icon menu_id menu_src target tone tooltip tooltip_tone type %}
+{% cotton:vars action aria_label autosave_link confirm_message download element_id extra_class formaction formnovalidate hook href icon menu_id menu_src target tone tooltip tooltip_tone type %}
 {% comment %}
   Icon button v2 — ação sem rótulo, em forma circular.
 
@@ -43,6 +43,13 @@
   (`data-confirm-submit` + `data-confirm-message`). Remover um evento do plano
   não tem desfazer, e a ação é um ícone — o alvo mais fácil de acertar sem
   querer.
+  `element_id` é o `id` do botão, pelo mesmo motivo do `c-v2.button`: alguns
+  motores acham a ação por `id`. Os dois botões de página do visualizador de
+  assinatura (`asgn-prev`, `asgn-next`) são isso. Enquanto não estava declarado
+  aqui, o atributo era aceito na chamada e DESCARTADO calado pelo Cotton — o
+  script da tela procurava os dois, achava `null`, e a página inteira morria no
+  primeiro `addEventListener`. Nenhum erro no servidor, nenhum aviso no
+  template: a tela abria e não fazia nada.
 {% endcomment %}
 {% load icones %}
 {% if href %}
@@ -52,6 +59,7 @@
     {% if target or action == "preview" %}target="{{ target|default:'_blank' }}" rel="noopener noreferrer"{% endif %}
     {% if download or action == "pdf" or action == "docx" or action == "download" %}download{% endif %}
     aria-label="{{ aria_label }}"
+    {% if element_id %}id="{{ element_id }}"{% endif %}
     {% if tone %}data-tone="{{ tone }}"{% endif %}
     {% if tooltip %}data-tooltip="{{ tooltip }}"{% endif %}
     {% if tooltip_tone %}data-tooltip-tone="{{ tooltip_tone }}"{% endif %}
@@ -64,6 +72,7 @@
     type="{{ type|default:'button' }}"
     class="icon-button{% if extra_class %} {{ extra_class }}{% endif %}"
     aria-label="{{ aria_label }}"
+    {% if element_id %}id="{{ element_id }}"{% endif %}
     {% if tone %}data-tone="{{ tone }}"{% endif %}
     {% if tooltip %}data-tooltip="{{ tooltip }}"{% endif %}
     {% if tooltip_tone %}data-tooltip-tone="{{ tooltip_tone }}"{% endif %}
