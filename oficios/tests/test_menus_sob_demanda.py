@@ -145,7 +145,7 @@ class ComponenteDeMenuTests(TestCase):
 
         menu = entity_cards.menu(
             "menu-teste", "Título", "Subtítulo",
-            [entity_cards.menu_link("/x/", "Item", "Descrição", "eye", "preview")],
+            [entity_cards.menu_link("/x/", "Item", "Descrição", "eye", "view")],
         )
 
         html = render_to_string("cotton/v2/menu_body.html", {"menu": menu})

@@ -438,14 +438,18 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
             "Desfazer retificação" if oficio.retificado_documento else "Retificar ofício",
             "Atualizar o estado de retificação",
             "sync",
-            "preview",
+            # Retificar e complementar dividem o tom `amend`: são a mesma função
+            # — marcar o documento como derivado de outro —, e o rótulo é que
+            # diz qual das duas. Dar cores diferentes a elas faria o menu
+            # sugerir que fazem coisas de naturezas distintas.
+            "amend",
         ),
         entity_cards.menu_post(
             marcar_complementar_url,
             "Desfazer complementar" if oficio.complementar_documento else "Ofício complementar",
             "Identificar o documento como complementar",
             "plus",
-            "edit",
+            "amend",
         ),
     ]
     if not oficio.cancelado:

@@ -10714,6 +10714,75 @@ tentativa de correção reprovar contra a própria cor que ela estava aposentand
 Por isso as notas deste defeito descrevem as cores aposentadas sem escrever o
 hex delas.
 
+### NOVO-20260820-225313-96b2ac2b43dd 🟢 RESOLVIDO · `NOVO` A cor dos itens de menu não dizia nada: quatro das sete funções saíam douradas · UI · risco médio
+
+Regra do dono: **o botão que faz a mesma coisa tem a mesma cor em toda tela do
+sistema**, e a cor é da FUNÇÃO — não do ícone, não da tela, não do tema. Quem
+varre um menu deve reconhecer "baixar PDF" pela cor antes de ler o rótulo.
+
+O que havia não era uma escolha, era o acúmulo. Medido no navegador, no menu de
+ações do cartão de Ofício:
+
+| item | tom declarado | cor real |
+|---|---|---|
+| Visualizar ofício | `preview` | dourado (accent) |
+| Baixar PDF | `pdf` | vermelho |
+| Baixar DOCX | `docx` | **âmbar** |
+| Retificar ofício | `preview` | dourado (accent) |
+| Ofício complementar | `edit` | dourado (accent) |
+| Cancelar ofício | `warning` | **âmbar** |
+| Excluir ofício | `late` | vermelho |
+
+Quatro das sete douradas, e baixar DOCX exatamente da cor de cancelar. `preview`
+e `edit` não tinham bloco nenhum no CSS — caíam no accent, e ninguém percebeu
+porque nada quebra quando uma cor não chega. A mesma função também mudava de cor
+conforme a tela: "Baixar PDF" aparecia com `icon_tone="late"` em cinco lugares e
+`icon_tone="pdf"` em quatro; "Visualizar" com `info` em seis e `preview` em três.
+
+O vocabulário antigo falava de ESTADO (`late`, `progress`, `success`, `warning`)
+onde queria dizer FUNÇÃO, e era essa confusão que produzia as coincidências: quem
+escrevia `icon_tone="late"` num "Baixar PDF" só queria dizer "vermelho".
+
+**A família `--action-*`**, em `v2/tokens.css`, ao lado da família de estado e
+pelo mesmo motivo — fixa nos dois temas, porque função é significado:
+
+| função | cor | de onde vem |
+|---|---|---|
+| visualizar / abrir | teal | **nova** |
+| baixar PDF | vermelho | `--status-late` |
+| baixar DOCX | azul | `--status-info` |
+| anexar (e reativar) | verde | `--status-done` |
+| cancelar | amarelo | `--status-progress` |
+| retificar / complementar | violeta | **nova** |
+| excluir | vermelho, no rótulo | `--status-late` |
+
+As duas cores novas não foram escolhidas no olho: varredura sob duas restrições
+simultâneas — pelo menos 3,0 de deltaE2000 de QUALQUER cor já existente (o gate
+`audit_paleta --max 0`) e contraste legível sobre as duas superfícies de menu.
+Ficaram em ~3,58 nos dois temas, mais equilibradas que a própria família de
+estado, que oscila entre 5,44 e 2,31 conforme o tema.
+
+**Excluir e baixar PDF dividem o vermelho sem ambiguidade** porque estão em
+canais diferentes: o tom do ITEM tinge o rótulo inteiro e é reservado ao
+destrutivo; o tom do ÍCONE tinge só a caixinha. Os dois nunca disputam o mesmo
+canal.
+
+No CSS, uma regra só desenha a caixa e cada tom apenas escolhe a cor em
+`--tom-acao`. Antes eram cinco blocos repetindo as mesmas três declarações com a
+cor trocada — e foi assim que `preview` e `edit` acabaram sem bloco nenhum.
+
+Migradas 38 chamadas em template e 6 em presenter. Os nomes antigos ficam como
+apelido apontando para a cor certa da função: um esquecido em algum canto passa
+a receber a cor certa em vez de cair no accent em silêncio, que era o defeito.
+
+`core/tests/test_cores_por_funcao.py` fixa as duas metades da regra — o
+vocabulário é fechado (nenhuma chamada nova pode escrever `late` num "Baixar
+PDF") e cada função usa sempre o mesmo tom, em qualquer arquivo.
+
+Duas ficam fora do vocabulário e **seguem o accent**, portanto mudam com o tema:
+`edit` (Editar) e `neutral` (WhatsApp, Copiar mensagem). Estão assim porque ainda
+não foram decididas, não porque a regra abra exceção — aguardam o dono.
+
 ### NOVO-20260820-171008-7afb74d82d2c 🔴 ABERTO · `NOVO` O v2 entrega 517 KB de CSS em toda página: NOVO-70 e o aceite PF-02 ficam incompatíveis · FE/PERF · risco médio
 
 O `NOVO-70` mede quanto do CSS entregue numa rota é de fato usado, e é catraca:

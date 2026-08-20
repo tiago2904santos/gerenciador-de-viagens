@@ -21,9 +21,9 @@ vem o contexto na tela.
 <c-v2.menu id="prestacao-docs-menu-{{ servidor.ps_pk }}" extra_class="action-menu" aria_label="Baixar documentos de {{ servidor.name }}">
   <c-v2.menu_item :href="servidor.rt_download_url" title="Relatório técnico" description="Salvar PDF individual" icon="pdf" icon_tone="pdf" :download="True" />
   {% if servidor.diario_pdf_url %}
-    <c-v2.menu_item :href="servidor.diario_pdf_url" title="Diário de bordo" description="Salvar PDF do diário" icon="route" icon_tone="info" :download="True" />
+    <c-v2.menu_item :href="servidor.diario_pdf_url" title="Diário de bordo" description="Salvar PDF do diário" icon="route" icon_tone="pdf" :download="True" />
   {% else %}
-    <c-v2.menu_item title="Diário de bordo" description="Ainda não foi criado" icon="route" icon_tone="info" :disabled="True" />
+    <c-v2.menu_item title="Diário de bordo" description="Ainda não foi criado" icon="route" icon_tone="pdf" :disabled="True" />
   {% endif %}
   {% comment %}
     Eram 17 atributos ordinais no gatilho abaixo, e o `primary` dele era o
@@ -48,11 +48,11 @@ vem o contexto na tela.
     data-attach-signed-choose-label="Escolher arquivo"
     data-attach-signed-upload-label="Anexar arquivo"
   />
-  <c-v2.menu_item :href="servidor.pacote_url" title="Anexo completo" description="Salvar PDF consolidado" icon="folder" icon_tone="info" :download="True" />
+  <c-v2.menu_item :href="servidor.pacote_url" title="Anexo completo" description="Salvar PDF consolidado" icon="folder" icon_tone="pdf" :download="True" />
 </c-v2.menu>
 <c-v2.menu id="diaria-wa-menu-{{ servidor.ps_pk }}" extra_class="action-menu" aria_label="Aviso de liberação de {{ servidor.name }}">
-  <c-v2.menu_button hook="data-diaria-wa-send" data-wa-app="normal" title="WhatsApp" description="Abrir no aplicativo pessoal" icon="whatsapp-modern" icon_tone="info" />
-  <c-v2.menu_button hook="data-diaria-wa-send" data-wa-app="business" title="WhatsApp Business" description="Abrir no aplicativo profissional" icon="whatsapp-business" icon_tone="info" />
-  <c-v2.menu_button hook="data-diaria-wa-copy" title="Copiar mensagem" description="Copiar o texto para a área de transferência" icon="copy-modern" icon_tone="info" />
+  <c-v2.menu_button hook="data-diaria-wa-send" data-wa-app="normal" title="WhatsApp" description="Abrir no aplicativo pessoal" icon="whatsapp-modern" icon_tone="neutral" />
+  <c-v2.menu_button hook="data-diaria-wa-send" data-wa-app="business" title="WhatsApp Business" description="Abrir no aplicativo profissional" icon="whatsapp-business" icon_tone="neutral" />
+  <c-v2.menu_button hook="data-diaria-wa-copy" title="Copiar mensagem" description="Copiar o texto para a área de transferência" icon="copy-modern" icon_tone="neutral" />
 </c-v2.menu>
 {% endfor %}

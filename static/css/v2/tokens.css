@@ -151,6 +151,43 @@
   --status-late: #c0392b;
   --status-info: #2b6cb0;
 
+  /* ---- cor por FUNÇÃO da ação (2026-08-20) -------------------------------
+   *
+   * Regra do dono: o botão que faz a MESMA COISA tem a MESMA COR em toda tela
+   * do sistema. A cor é do que a ação faz, não do ícone que ela usa nem da tela
+   * em que aparece — quem varre um menu deve reconhecer "baixar PDF" pela cor,
+   * antes de ler o rótulo.
+   *
+   * Como a família de estado logo acima, e pelo mesmo motivo, estas cores NÃO
+   * mudam com o tema: função é significado, não decoração, e trocar de tema não
+   * pode obrigar a reaprender o código de cores.
+   *
+   * O que havia antes não era uma escolha, era o acúmulo: medido no navegador,
+   * QUATRO das sete funções saíam douradas — `preview` e `edit` nem existiam no
+   * CSS e caíam no accent —, e baixar DOCX tinha exatamente a mesma cor de
+   * cancelar. A mesma função também mudava de cor conforme a tela: "Baixar PDF"
+   * aparecia com `icon_tone="late"` em cinco lugares e `icon_tone="pdf"` em
+   * quatro.
+   *
+   * Quatro reaproveitam a família de estado, onde ela já dizia a coisa certa;
+   * duas são novas, escolhidas por varredura sob duas restrições ao mesmo tempo
+   * — pelo menos 3,0 de deltaE2000 de QUALQUER cor já existente (o gate
+   * `audit_paleta --max 0`) e contraste legível sobre as duas superfícies de
+   * menu. As duas novas ficam em ~3,58 nos dois temas, mais equilibradas que a
+   * família de estado, que oscila entre 5,44 e 2,31 conforme o tema. */
+  --action-view:   #1e94a9;                 /* visualizar / abrir no navegador */
+  --action-pdf:    var(--status-late);      /* baixar PDF */
+  --action-docx:   var(--status-info);      /* baixar DOCX */
+  --action-attach: var(--status-done);      /* anexar, e o construtivo: reativar */
+  --action-cancel: var(--status-progress);  /* cancelar */
+  --action-amend:  #9a76cb;                 /* retificar e complementar */
+  --action-delete: var(--status-late);      /* excluir */
+  /* Editar e o que está fora do vocabulário (WhatsApp, copiar mensagem) seguem
+     o accent, como já seguiam. São as duas únicas que mudam com o tema, e estão
+     assim porque ainda não foram decididas — não porque a regra abre exceção. */
+  --action-edit:   var(--accent);
+  --action-neutral: var(--accent);
+
 
   /* ---- forma ----------------------------------------------------------- */
   --radius-field: 8px;

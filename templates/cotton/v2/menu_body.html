@@ -82,7 +82,7 @@
         data-cancel-url="{{ item.url }}"
         data-cancel-label="{{ item.label }}"
       >
-        <span class="menu__icon" data-tone="warning" aria-hidden="true">{% icone_svg "ban" %}</span>
+        <span class="menu__icon" data-tone="cancel" aria-hidden="true">{% icone_svg "ban" %}</span>
         <span class="menu__copy">
           <strong class="menu__title">{{ item.title }}</strong>
           <small class="menu__description">{{ item.description }}</small>
@@ -94,12 +94,12 @@
         type="button"
         class="menu__item"
         role="menuitem"
-        data-tone="late"
+        data-tone="delete"
         data-overlay-trigger data-overlay-kind="dialog" data-overlay-target="delete-confirm-modal"
         data-delete-url="{{ item.url }}"
         data-delete-label="{{ item.label }}"
       >
-        <span class="menu__icon" aria-hidden="true">{% icone_svg "delete" %}</span>
+        <span class="menu__icon" data-tone="delete" aria-hidden="true">{% icone_svg "delete" %}</span>
         <span class="menu__copy">
           <strong class="menu__title">{{ item.title }}</strong>
           <small class="menu__description">{{ item.description }}</small>
@@ -118,7 +118,7 @@
         data-attach-signed-current-view-url="{{ item.current_view_url }}"
         data-attach-signed-current-remove-url="{{ item.current_remove_url }}"
       >
-        <span class="menu__icon" data-tone="success" aria-hidden="true">{% icone_svg "sign" %}</span>
+        <span class="menu__icon" data-tone="attach" aria-hidden="true">{% icone_svg "sign" %}</span>
         <span class="menu__copy">
           <strong class="menu__title">{% if item.assinado %}Gerenciar assinado{% else %}Anexar assinado{% endif %}</strong>
           <small class="menu__description">{% if item.assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>

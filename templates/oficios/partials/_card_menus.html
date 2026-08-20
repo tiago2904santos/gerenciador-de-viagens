@@ -18,20 +18,20 @@ são, por construção, os mesmos que estavam embutidos antes.
   ele o clique busca, recebe a marcação certa e conclui "resposta sem menu".
 {% endcomment %}
 <c-v2.menu id="justificativa-document-menu-{{ card.oficio_pk }}" extra_class="action-menu" aria_label="Documentos da justificativa">
-  <c-v2.menu_item :href="card.justificativa_visualizar_url" title="Visualizar justificativa" description="Abrir o documento no navegador" icon="eye" icon_tone="info" :target_blank="True" />
-  <c-v2.menu_item :href="card.justificativa_pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" icon_tone="late" :download="True" />
-  <c-v2.menu_item :href="card.justificativa_docx_url" title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" icon_tone="progress" :download="True" />
+  <c-v2.menu_item :href="card.justificativa_visualizar_url" title="Visualizar justificativa" description="Abrir o documento no navegador" icon="eye" icon_tone="view" :target_blank="True" />
+  <c-v2.menu_item :href="card.justificativa_pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" icon_tone="pdf" :download="True" />
+  <c-v2.menu_item :href="card.justificativa_docx_url" title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" icon_tone="docx" :download="True" />
 </c-v2.menu>
 {% for s in card.servidores %}{% if s.has_termo %}
 <c-v2.menu id="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}" extra_class="action-menu" aria_label="Termo de {{ s.name }}">
   {% if s.termo_open_url %}
-    <c-v2.menu_item :href="s.termo_open_url" title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" icon_tone="info" :target_blank="True" />
+    <c-v2.menu_item :href="s.termo_open_url" title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" icon_tone="view" :target_blank="True" />
   {% endif %}
   {% if s.termo_pdf_url %}
-    <c-v2.menu_item :href="s.termo_pdf_url" title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" icon_tone="late" :download="True" />
+    <c-v2.menu_item :href="s.termo_pdf_url" title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" icon_tone="pdf" :download="True" />
   {% endif %}
   {% if s.termo_docx_url %}
-    <c-v2.menu_item :href="s.termo_docx_url" title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" icon_tone="progress" :download="True" />
+    <c-v2.menu_item :href="s.termo_docx_url" title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" icon_tone="docx" :download="True" />
   {% endif %}
   {% if s.termo_anexar_assinado_url %}
     {% with rotulo_termo="o termo de "|add:s.name %}

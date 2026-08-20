@@ -463,7 +463,7 @@ def main_preview(request, secao=None):
                     # esconder nada — o menu é o lugar onde as ações do registro
                     # já moram.
                     entity_cards.menu_link(
-                        "#", "Editar", "Abrir o formulário do registro", "edit", "info",
+                        "#", "Editar", "Abrir o formulário do registro", "edit", "edit",
                     ),
                     entity_cards.menu_link(
                         "#", "Baixar PDF", "Todos os servidores do termo",

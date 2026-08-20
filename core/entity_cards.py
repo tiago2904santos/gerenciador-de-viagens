@@ -51,7 +51,7 @@ def menu_cancel(url, label, *, title="Cancelar", description="Interromper o flux
     return {"type": "cancel", "url": url, "label": label, "title": title, "description": description}
 
 
-def menu_confirm(url, label, title, description, *, icon="check", icon_tone="success"):
+def menu_confirm(url, label, title, description, *, icon="check", icon_tone="attach"):
     """Item que abre o diálogo global pelo contrato data-overlay-trigger."""
     return {
         "type": "confirm",
@@ -112,7 +112,7 @@ def documents_menu(menu_id, subtitle, *, title, view_url=None, pdf_url=None, doc
     """Menu padrão Visualizar/PDF/DOCX usado no rodapé dos cards."""
     items = []
     if view_url:
-        items.append(menu_link(view_url, view_title, view_description, "eye", "preview", target_blank=True))
+        items.append(menu_link(view_url, view_title, view_description, "eye", "view", target_blank=True))
     if pdf_url:
         items.append(menu_link(pdf_url, "Baixar PDF", pdf_description, "pdf", "pdf", download=True))
     if docx_url:
