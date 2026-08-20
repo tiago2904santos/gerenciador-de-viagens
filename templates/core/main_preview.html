@@ -44,11 +44,10 @@
 
 
     {% comment %}
-      Uma seção por página. O `include` recebe o contexto inteiro da view: os
-      fragmentos consomem `v2_opcoes`, `v2_registros`, `v2_menu` e companhia, e
-      um `only` aqui os deixaria em branco sem erro nenhum.
+      Uma seção por página. O contrato é explícito para impedir que um novo
+      fragmento passe a depender silenciosamente de todo o contexto da view.
     {% endcomment %}
-    {% include secao_template %}
+    {% include secao_template with v2_abas=v2_abas v2_abas_tres=v2_abas_tres v2_anexos=v2_anexos v2_atividades=v2_atividades v2_campo_exemplo=v2_campo_exemplo v2_campo_numero=v2_campo_numero v2_catalogo_linhas=v2_catalogo_linhas v2_erros=v2_erros v2_erros_de_campo=v2_erros_de_campo v2_etapas=v2_etapas v2_fontes_de_assinatura=v2_fontes_de_assinatura v2_linha_efetivo=v2_linha_efetivo v2_mensagens=v2_mensagens v2_menu=v2_menu v2_metas=v2_metas v2_opcoes=v2_opcoes v2_opcoes_longas=v2_opcoes_longas v2_opcoes_pessoas=v2_opcoes_pessoas v2_opcoes_viaturas=v2_opcoes_viaturas v2_pagina=v2_pagina v2_paginas=v2_paginas v2_pendencias=v2_pendencias v2_prestacao=v2_prestacao v2_recursos=v2_recursos v2_registros=v2_registros v2_status_opcoes=v2_status_opcoes v2_trechos=v2_trechos only %}
   </section>
 {% endblock %}
 

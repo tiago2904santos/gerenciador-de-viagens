@@ -21,8 +21,7 @@
   var MAX_ESPERA_MS = 120000;
 
   function pedir(url) {
-    return fetch(url, {
-      credentials: "same-origin",
+    return window.CV.http.request(url, {
       headers: { "X-Requested-With": "XMLHttpRequest" },
     });
   }
@@ -218,10 +217,7 @@
     var dialogo = raiz.closest("dialog");
     var src = raiz.getAttribute("data-src");
 
-    return fetch(src, {
-      credentials: "same-origin",
-      headers: { "X-Requested-With": "XMLHttpRequest" },
-    }).then(function (response) {
+    return pedir(src).then(function (response) {
       return response.json();
     }).then(function (dados) {
       /* Um documento só: não há o que escolher, e abrir o diálogo seria um

@@ -58,6 +58,6 @@
 
     {{ initial_trechos_data|json_script:"initialTrechosData" }}
 
-    {% include "roteiros/includes/_roteiro_editor_v2.html" %}
+    {% include "roteiros/includes/_roteiro_editor_v2.html" with api_calcular_diarias_url=api_calcular_diarias_url api_calcular_rota_preview_url=api_calcular_rota_preview_url api_calcular_rota_url=api_calcular_rota_url api_cidades_por_estado_url=api_cidades_por_estado_url csrf_token=csrf_token destino_estado_fixo_id=destino_estado_fixo_id destinos_rows=destinos_rows diarias_quantidade_servidores=diarias_quantidade_servidores estados=estados evento=evento form=form has_event_routes=has_event_routes object=object oficio=oficio retorno_state=retorno_state roteiro_diarias_resultado=roteiro_diarias_resultado roteiro_editor_state_json=roteiro_editor_state_json roteiro_editor_wizard=roteiro_editor_wizard roteiro_form_action=roteiro_form_action roteiro_id=roteiro_id roteiro_mapa_inicial=roteiro_mapa_inicial roteiro_modo=roteiro_modo roteiro_routes_json=roteiro_routes_json sede_cidade_id=sede_cidade_id sede_cidades_qs=sede_cidades_qs sede_estado_id=sede_estado_id wizard_back_label=wizard_back_label wizard_back_url=wizard_back_url only %}
   </div>
 {% endblock %}

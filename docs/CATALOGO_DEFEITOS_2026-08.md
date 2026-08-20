@@ -10267,6 +10267,18 @@ três `F401` e bloqueou a suíte antes dos testes Django, impedindo o deploy.
 **Correção:** removidos somente os três imports órfãos, sem alterar lógica,
 contratos ou comportamento das telas.
 
+### NOVO-20260820-172319-8c598b1f0b62 🟢 RESOLVIDO · `NOVO` Contratos frontend bloquearam o gate de produção · QA · risco baixo
+
+O gate `audit_frontend_standards` da execução de CI `32397098789` encontrou
+dois includes sem isolamento de contexto e dois usos diretos de `fetch()` na
+fila de downloads. Os quatro erros impediram a conclusão da suíte e, portanto,
+o disparo do deploy de `main`.
+
+**Correção:** os includes da galeria V2 e do editor de roteiro agora declaram
+explicitamente seus contratos e usam `only`; a fila de downloads passou a usar
+`CV.http.request`, preservando `Response`, credenciais e cabeçalho AJAX. O
+auditor voltou a registrar zero erros sem aumentar o teto de avisos.
+
 ### NOVO-20260820-132553-c8781d82b56f 🟢 RESOLVIDO · `NOVO` O último menu do sistema antigo mantinha `action-system.css` de pé · FE · risco médio
 
 `templates/prestacoes_contas/partials/_card_menus.html` era o único lugar do
