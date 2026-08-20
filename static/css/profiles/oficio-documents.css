@@ -681,6 +681,15 @@ textarea[readonly] {
   color: var(--color-input-disabled-text, var(--color-text-muted, var(--color-muted)));
   opacity: 1;
 }
+html[data-theme="dark"] ::selection {
+  background: var(--color-selection);
+  color: var(--color-heading);
+}
+html[data-theme="dark"] :is(input, select, textarea) {
+  background: var(--color-input-bg);
+  border-color: var(--color-input-border);
+  color: var(--color-input-text);
+}
 .form-control {
   background: var(--color-input-bg);
   border-color: var(--color-input-border);
@@ -1181,15 +1190,6 @@ html[data-theme="light"] {
 .page-stepper {
     padding: 12px 10px;
   }
-}
-html[data-theme="dark"] ::selection {
-  background: var(--color-selection);
-  color: var(--color-heading);
-}
-html[data-theme="dark"] :is(input, select, textarea) {
-  background: var(--color-input-bg);
-  border-color: var(--color-input-border);
-  color: var(--color-input-text);
 }
 :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block) {
   margin: 0;

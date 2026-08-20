@@ -681,6 +681,15 @@ textarea[readonly] {
   color: var(--color-input-disabled-text, var(--color-text-muted, var(--color-muted)));
   opacity: 1;
 }
+html[data-theme="dark"] ::selection {
+  background: var(--color-selection);
+  color: var(--color-heading);
+}
+html[data-theme="dark"] :is(input, select, textarea) {
+  background: var(--color-input-bg);
+  border-color: var(--color-input-border);
+  color: var(--color-input-text);
+}
 html[data-theme="dark"] {
   --color-danger-bg: rgba(180, 35, 24, 0.22);
   --color-danger-text: #ffc8c2;
@@ -1090,13 +1099,4 @@ html[data-theme="light"] {
   --stepper-status-done-color:    var(--color-primary);
   --stepper-status-current-color: var(--color-accent);
   --stepper-status-missing-color: var(--color-danger);
-}
-html[data-theme="dark"] ::selection {
-  background: var(--color-selection);
-  color: var(--color-heading);
-}
-html[data-theme="dark"] :is(input, select, textarea) {
-  background: var(--color-input-bg);
-  border-color: var(--color-input-border);
-  color: var(--color-input-text);
 }

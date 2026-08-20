@@ -691,6 +691,15 @@ textarea[readonly] {
   color: var(--color-input-disabled-text, var(--color-text-muted, var(--color-muted)));
   opacity: 1;
 }
+html[data-theme="dark"] ::selection {
+  background: var(--color-selection);
+  color: var(--color-heading);
+}
+html[data-theme="dark"] :is(input, select, textarea) {
+  background: var(--color-input-bg);
+  border-color: var(--color-input-border);
+  color: var(--color-input-text);
+}
 .field-help {
   color: var(--color-help);
   font-size: var(--font-size-sm);
@@ -1263,13 +1272,4 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-}
-html[data-theme="dark"] ::selection {
-  background: var(--color-selection);
-  color: var(--color-heading);
-}
-html[data-theme="dark"] :is(input, select, textarea) {
-  background: var(--color-input-bg);
-  border-color: var(--color-input-border);
-  color: var(--color-input-text);
 }

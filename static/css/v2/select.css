@@ -427,6 +427,134 @@ html[data-theme="dark"] .custom-select--v2 .custom-select__chevron svg {
 }
 
 
+
+/* ───────────────────────────────────────────────────────────────────────────
+ * VINDAS DE `components/theme-shared-components.css`, em 2026-08-20.
+ *
+ * A folha inteira já era isto: o gatilho do select v2 descrito de fora dele.
+ * Das 30 regras que ela tinha, a medição (33 telas, 23.034 elementos) mostrou
+ * que só estas oito ainda pintavam algo — sem elas o gatilho recuperava a
+ * sombra e o valor deixava de ser `flex`/centro em 32 casos.
+ *
+ * Entram ANTES da divisa `=== DELTA v2 ===` de propósito. Elas chegavam pelo
+ * pacote do shell, que é anterior ao `ui.bundle.css`, e por isso PERDIAM para o
+ * delta do v2; anexadas depois da divisa, inverteriam a disputa sem que uma
+ * linha de valor mudasse. Foi assim que o menu do select voltou ao desenho
+ * antigo na migração das folhas de lista.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+
+/* O gatilho do select v2 — e mais nada.
+ *
+ * A folha era a metade "vale nos dois temas" do redesenho: 30 regras sobre
+ * ficha, rodapé de formulário, cartão de registro, faixa, linha de pessoa,
+ * perna de itinerário e painel de coleção, todas descrevendo componentes DE
+ * FORA deles.
+ *
+ * Em 2026-08-20 mediu-se o que elas ainda ganhavam (33 telas, 23.034 elementos,
+ * com e sem a folha): 22 não mudavam um pixel. As 8 do select v2 mudavam —
+ * o gatilho ganhava sombra de volta e o valor dentro dele deixava de ser
+ * `flex`/centro em 32 casos —, e são as que ficaram.
+ *
+ * O nome do arquivo já não descreve o conteúdo: isto é `v2/select.css` fora de
+ * lugar. A fusão é o passo seguinte, e não é mecânica — esta folha é a ÚLTIMA
+ * do pacote do shell, e `v2/select.css` vem depois dele, no `ui.bundle.css`.
+ * Mover as regras para lá as faria vencer disputas que hoje perdem. É a mesma
+ * armadilha que inverteu o menu do select e o cabeçalho do bloco de formulário
+ * na migração das folhas de lista; ali a saída foi inserir ANTES da divisa
+ * `=== DELTA v2 ===`, e é isso que precisa ser medido aqui também.
+ */
+:is(html[data-theme])
+  .custom-select__trigger--v2 {
+  border-radius: 10px;
+}
+
+:is(html[data-theme])
+  .custom-select__trigger--v2 {
+  align-items: stretch;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  box-shadow: none;
+  color: var(--color-text);
+  gap: 0;
+  min-height: var(--control-height-md);
+  overflow: hidden;
+  padding: 0;
+  transition: border-color 120ms ease;
+}
+
+:is(html[data-theme])
+  .custom-select__trigger--v2:focus,
+:is(html[data-theme])
+  .custom-select__trigger--v2:focus-visible {
+  outline: none;
+}
+
+:is(html[data-theme])
+  .custom-select__trigger--v2 .custom-select__value {
+  align-items: center;
+  display: flex;
+  min-width: 0;
+  padding: 0 14px;
+}
+
+/* Chevron v2: usa o accent da paleta em TODOS os estados. */
+:is(html[data-theme])
+  .custom-select--v2 {
+  --cs-chevron-color: var(--color-accent);
+}
+
+:is(html[data-theme])
+  .custom-select__trigger--v2 .custom-select__chevron,
+:is(html[data-theme])
+  .custom-select__trigger--v2:hover .custom-select__chevron,
+:is(html[data-theme])
+  .custom-select__trigger--v2:focus .custom-select__chevron,
+:is(html[data-theme])
+  .custom-select__trigger--v2:focus-visible .custom-select__chevron,
+:is(html[data-theme])
+  .custom-select__trigger--v2[aria-expanded="true"] .custom-select__chevron,
+:is(html[data-theme])
+  .custom-select--v2.custom-select--open .custom-select__chevron,
+:is(html[data-theme])
+  .custom-select--v2.custom-select--disabled .custom-select__chevron,
+:is(html[data-theme])
+  .list-header__rail .custom-select__trigger--v2 .custom-select__chevron {
+  align-items: center;
+  align-self: stretch;
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface-muted));
+  color: var(--color-accent);
+  display: inline-flex;
+  justify-content: center;
+  transform: none;
+  transition: none;
+  width: 44px;
+}
+
+:is(html[data-theme])
+  .custom-select--v2.custom-select--open .custom-select__chevron svg,
+:is(html[data-theme])
+  .custom-select__trigger--v2[aria-expanded="true"] .custom-select__chevron svg {
+  transform: rotate(180deg);
+}
+
+:is(html[data-theme])
+  .custom-select--v2.custom-select--disabled .custom-select__trigger--v2,
+:is(html[data-theme])
+  .custom-select__trigger--v2:disabled {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border-soft);
+  box-shadow: none;
+  opacity: 0.64;
+}
+
+:is(html[data-theme])
+  .custom-select--v2.custom-select--error .custom-select__trigger--v2 {
+  background: var(--color-input-bg);
+  border-color: var(--color-danger);
+  box-shadow: none;
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
  * DELTA v2 — daqui para baixo é o redesenho, sob a raiz `html[data-theme]`.
  *

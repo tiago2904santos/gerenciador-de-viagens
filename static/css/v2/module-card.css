@@ -1,3 +1,37 @@
+/* ───────────────────────────────────────────────────────────────────────────
+ * VINDA DE `components/theme-dark-components.css`, em 2026-08-20.
+ *
+ * A sombra do cartão no tema escuro — 11 ocorrências medidas no painel. Era a
+ * última regra da folha de tema que ainda vestia um componente.
+ *
+ * ENTRA NO TOPO DA FOLHA, e isso não é estética. A regra vinha do pacote do
+ * shell, anterior ao `ui.bundle.css`, e perdia `background` e `border-color`
+ * para o `.module-card` do v2; anexada no FIM daqui, passou a vencer — e como
+ * ela pinta `var(--color-surface)`, o cartão do painel ficou BRANCO no tema
+ * escuro (medido: `rgb(255,255,255)` em `/`, `rgb(19,34,56)` em `/cadastros/`).
+ * No topo, a regra do v2 vem depois com a mesma especificidade e ganha de novo
+ * as duas propriedades, exatamente como antes.
+ *
+ * O que sobra dela é o `box-shadow`, que esta folha não declara — por isso a
+ * sombra sumia quando a regra saía do pacote, e por isso ela ainda existe.
+ *
+ * `.card`, `.app-card` e `.document-card` continuam no seletor porque ele é uma
+ * UNIÃO: `.document-card` não é emitida por ninguém, mas `.card` e `.app-card`
+ * ainda são, e o texto não pode mudar sem tirar a regra do manifesto.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+:is(html[data-theme="dark"])
+  :is(.card, .app-card, .module-card, .document-card) {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-xs);
+}
+
+:is(html[data-theme="dark"])
+  :is(.card, .app-card, .module-card, .document-card):hover {
+  box-shadow: var(--shadow-sm);
+}
+
 /* Cartão de módulo — o atalho para uma área do sistema. Par de
  * `cotton/v2/module_card.html`.
  *
