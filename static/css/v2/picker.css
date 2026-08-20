@@ -748,6 +748,31 @@
   transform: translateY(0);
 }
 
+/* Viatura selecionada: o "Editar" usa o slot do `__driver-control`, mas fica
+   SEMPRE visível — no multiselect de servidores o botão só aparece no hover, e
+   aqui não há segunda linha que explique o que o card faz.
+   As três regras vinham de `pages/oficios.css`, que desde a migração v2 não era
+   carregada por página nenhuma; sem elas o link herdava o estado fechado
+   (`max-height: 0; opacity: 0`) e só aparecia ao passar o mouse.
+   Emitidas por `js/components/picker-parts.js`. */
+.oficio-viatura-selected-card .oficio-viatura-edit-row {
+  max-height: none;
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+.oficio-viatura-edit-link,
+.oficio-viatura-edit-link:hover,
+.oficio-viatura-edit-link:focus-visible {
+  text-decoration: none;
+}
+
+.oficio-viatura-busca__wrap {
+  position: relative;
+  width: 100%;
+}
+
 /* Estrutura compartilhada do roster: o card seleciona o motorista, enquanto
    termo e remoção continuam como ações independentes acima da área clicável. */
 .search-picker--roster .search-picker__selected-card {
@@ -2716,6 +2741,32 @@ html[data-theme="dark"] :is(.search-picker__selected-panel, .search-picker__sele
 
 :is(html[data-theme]) .evento-doc-panel[hidden] {
   display: none;
+}
+
+/* O alternador dos cinco tipos, com o visual do segmented control de função
+   dos servidores (Condução / Técnico / Apoio) da Ordem de Serviço.
+   Vinha de `pages/oficios.css`, que desde a migração v2 não era carregada por
+   página nenhuma: o toggle renderizava sem `display: grid` e os cinco rótulos
+   caíam empilhados. O `--step1-field` só é declarado em folha de PÁGINA, e a
+   tela de eventos não carrega nenhuma — daí o fallback, na forma que o resto
+   do v2 já usa. */
+:is(html[data-theme]) .evento-doc-toggle.segment-toggle {
+  background: var(--step1-field, var(--color-input-bg));
+  border-color: transparent;
+  border-radius: 10px;
+  box-shadow: none;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2px;
+  padding: 3px;
+  width: 100%;
+}
+
+/* Telas estreitas: quebra o toggle em duas colunas para não espremer os rótulos. */
+@media (max-width: 720px) {
+  :is(html[data-theme]) .evento-doc-toggle.segment-toggle {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* O aviso de evento cancelado e o botão de reativar na mesma faixa: quem lê o

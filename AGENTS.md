@@ -138,9 +138,10 @@ python manage.py test --settings=config.settings.test        # suíte completa
 python manage.py test <app> --settings=config.settings.test  # suíte de um app
 python manage.py check --deploy --settings=config.settings.prod
 python manage.py makemigrations --check --dry-run --settings=config.settings.test
-python scripts/audit_frontend_standards.py --max-warnings 401   # teto atual; confira em tests.yml
+python scripts/audit_frontend_standards.py --max-warnings 74    # teto atual; confira em tests.yml
 python scripts/audit_django_architecture.py
 python scripts/audit_ui_patterns.py
+python scripts/audit_css_variaveis_orfas.py --max 33            # var(--x) sem dono no CSS entregue
 python scripts/build_shell_bundles.py --check                   # bundles do shell em dia
 python manage.py runserver 0.0.0.0:8000
 ```

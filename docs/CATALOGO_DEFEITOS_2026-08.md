@@ -9061,7 +9061,14 @@ configuração da área não resolveu. Sumir com a falha, não — `get_configur
 "não há UF cadastrada". O handler passou a chamar `core.errors.capture(exc, "destinos.uf_da_sede")`
 antes de devolver `""`: mesmo comportamento, falha observável. Catraca de volta a 0.
 
-### NOVO-20260818-221535-0258e76352d5 🔴 ABERTO · `NOVO` CSS morto acumulado atrás do gate quebrado: 20 blocos em 6 arquivos · UI-01 · 0,5 d
+### NOVO-20260818-221535-0258e76352d5 ✅ RESOLVIDO (20/08/2026) · `NOVO` CSS morto acumulado atrás do gate quebrado: 20 blocos em 6 arquivos · UI-01 · 0,5 d
+
+> **Fechado em 20/08.** `audit_css_morto.py --max 0` sai em **zero**. Não houve um PR só: três
+> dos seis arquivos citados deixaram de existir — `pages/eventos-list.css` e
+> `pages/planos-trabalho-eventos.css` na migração v2 das duas telas, e `pages/oficios.css` no
+> `NOVO-20260820-205803-34867022900a` — e os blocos dos outros três saíram na poda da assinatura
+> (`NOVO-20260820-185700-cd31dbf0dde8`), que foi quem restaurou o gate. A linha ficou aberta
+> porque ninguém voltou a ela depois que o gate voltou a rodar.
 
 Com o pipeline andando, `audit_css_morto.py --max 0` acusa **20 blocos / 5,6 KB** cujo seletor só
 cita classe que ninguém usa: `pages/ordens-servico.css` (7 blocos, 2,0 KB), `layout/page-shell.css`
@@ -9138,7 +9145,15 @@ da galeria foram consertadas aqui). Auditor frontend em **4 erros e 303 avisos**
 de base — a catraca não subiu. Bundles em dia. As cinco etapas, a lista e a galeria foram
 conferidas no navegador a 1440px nos dois temas.
 
-### NOVO-20260818-223102-58bda2a28945 🔴 ABERTO · `NOVO` Editor de roteiro legado ficou sem consumidor · HT · 0,5 d
+### NOVO-20260818-223102-58bda2a28945 ✅ RESOLVIDO (20/08/2026) · `NOVO` Editor de roteiro legado ficou sem consumidor · HT · 0,5 d
+
+> **Fechado em 20/08**, junto com a etapa de Roteiros que o enunciado pedia. Conferido hoje:
+> `roteiros/includes/_roteiro_editor.html` e `roteiros/includes/mapa_rota.html` não existem mais;
+> `templates/roteiros/partials/roteiro/` só tem `v2/`; `templates/cotton/travel/` foi removida
+> inteira, com os dois componentes que o enunciado citava
+> (`c-travel.route_segments`, `c-travel.travel_allowance_calculator`). Hoje `templates/cotton/`
+> tem apenas `v2/` — nenhum namespace de componente legado sobrou. As únicas menções a
+> `c-travel.*` que restam no repositório são prosa em comentário, explicando o que saiu.
 
 Com a etapa de roteiro do ofício migrada para `_roteiro_editor_v2.html`
 (`NOVO-20260818-213853-fab772ef1b6e`), o editor anterior perdeu o último `{% include %}`:
@@ -10627,3 +10642,141 @@ comprimido e o arquivo é UM só, cacheado uma vez para o app inteiro, enquanto 
 perfis são um por família de rota. Pela métrica de regra não usada está muito
 pior; pelo custo de rede numa navegação de várias telas, não necessariamente. A
 métrica continua certa em apontar — o desperdício de parse e de bytes existe.
+
+### NOVO-20260820-205803-34867022900a ✅ RESOLVIDO · `NOVO` `pages/oficios.css` não era carregada por página nenhuma, e a família que ela vestia ficou sem base · UI-04 · 0,5 d
+
+`static/css/pages/oficios.css` (12 KB, 389 linhas) não tinha **nenhum** consumidor: zero
+`<link>` em `templates/`, fora das cinco fontes de `SHELL_CSS` e de `UI_CSS` em
+`build_shell_bundles.py`, e sem `@import` de outra folha. Ficou assim quando as telas de
+Ofícios migraram para o v2 — o `<link>` saiu, o arquivo ficou.
+
+O `audit_css_morto.py` não pega este caso, e não é defeito dele: ele procura **bloco cujo
+seletor só cita classe que ninguém usa**. Aqui as classes continuam vivas na marcação; o que
+morreu foi a entrega da folha. São dois defeitos diferentes com o mesmo cheiro.
+
+**O que estava quebrado.** Catorze famílias de classe perderam a última definição. Medido no
+navegador, contra o CSS realmente entregue:
+
+| Superfície | Sintoma medido |
+|---|---|
+| Alternador dos 5 tipos de documento do evento | `grid-template-columns` computado `none` — a grade de 5 colunas não era aplicada e os rótulos empilhavam |
+| Tiles de viajante ("Saíram da equipe", Prestações) | sem fundo e sem borda; `border-color` caía para `currentColor` |
+| Fatos do resumo executivo (`oficio-documentos-fact*`) | sem cartão: a base inteira da família não existia em folha alguma |
+| "Editar" da viatura selecionada | herdava o estado fechado do `__driver-control` (`max-height: 0; opacity: 0`) e só aparecia no hover |
+
+Três folhas ainda carregam **overrides** desta família e esconderam o buraco:
+`pages/prestacoes_contas.css` estreita a grade do tile e pinta
+`.prestacao-removidos__tile { border-style: dashed }` — sem largura nem cor de base, não
+desenhava nada — e `v2/route-editor.css` arredonda o canto na etapa de Documentos. Override sem
+base não levanta erro.
+
+**Conserto.** O que vestia marcação viva mudou para o dono, verbatim, sem renomear classe (o
+`AGENTS.md` §3.2 pede o pacote completo para renomear, e isso é outra etapa):
+
+- família `oficio-documentos-*` (tiles de viajante + fatos do resumo) → **novo**
+  `static/css/v2/document-summary.css`, registrado em `UI_CSS`;
+- alternador de documentos do evento e as três regras do picker de viatura → `v2/picker.css`,
+  que já era dono de `.evento-doc-picker`/`.evento-doc-panel` e do `search-picker`.
+
+O `--step1-field` do alternador só é declarado em folha de PÁGINA, e a tela de eventos não
+carrega nenhuma: entrou com o fallback na forma que o v2 já usa
+(`var(--step1-field, var(--color-input-bg))`).
+
+**O que foi apagado por estar morto de verdade**, com a prova de grep do §3.6: `.oficio-card` e
+`.oficio-justificativa-card` (o card virou `c-v2.record` em 18/08 e as classes só aparecem em
+comentário), `.oficio-documentos-admin-facts`, `.viatura-sugestao-chip*`, `.fab-container`, o
+`@keyframes cv-segment-fade-out` (declarado reservado, `from`/`to` idênticos) e as quatro regras
+de `#evento-card-documentos-d`, cujo id deixou de existir quando o painel virou
+`.evento-doc-picker`.
+
+**Verificação.** Estilo computado antes/depois no CSS entregue, mesmo elemento: alternador
+`none` → `285.19px × 5`; tile `rgba(0,0,0,0)`/`currentColor` → `--color-card-muted` com borda
+`rgb(227,234,242)`. Suíte completa verde, `build_shell_bundles.py --check` OK,
+`audit_css_morto.py --max 0` segue em zero.
+
+### NOVO-20260820-211109-01292b76affb 🔴 ABERTO · `NOVO` 33 variáveis CSS são usadas sem declaração e sem fallback no CSS entregue · UI · a dimensionar
+
+Régua nova: `scripts/audit_css_variaveis_orfas.py`, catraca em **33**, no CI depois do
+`audit_frontend_standards`. Ela expande os `@import` dos dois bundles do `base.html` — o
+`_concat` mantém a linha `@import` e é o navegador que a resolve, então medir o texto cru do
+bundle acusaria `--space-1` e todo o vocabulário de `base/tokens.css` como órfão (79 falsos
+contra 33 reais).
+
+`var(--x)` sem declaração e sem fallback torna a declaração inválida no tempo de valor
+computado: o navegador **descarta a linha inteira**, sem erro no console e sem teste vermelho.
+É o modo de falha silencioso que o `NOVO-20260820-205803-34867022900a` acabou de mostrar.
+
+Um caso já está medido e é visível ao usuário: `--re-accent-border` e `--re-choice-ring` morreram
+com `pages/roteiros.css` (apagada em 20/08) e deixaram `.related-route-item.is-active`
+(`v2/picker.css:2820`) sem efeito — `box-shadow` computado **`none`** no anel de seleção, e a
+borda caindo para `currentColor` em vez do acento. Quem escolhe um documento vinculado no evento
+não recebe o sinal visual que o desenho previa.
+
+Os 33 se separam em três consertos diferentes, e por isso a linha não foi fechada junto:
+`--state-*` (16, em `utilities.css`) e `--btn-secondary-*` (6, em `date-picker.css`) parecem
+vocabulário que nunca chegou a existir — decidir entre declarar o token ou apagar a regra órfã;
+`--step1-*` (4) é token de folha de página usado por folha global, e o conserto é promovê-lo ao
+vocabulário global; `--re-*` (2) precisa de um valor de desenho, que não se inventa aqui.
+
+### NOVO-20260820-211110-661c6a3b4f7f ✅ RESOLVIDO · `NOVO` Duas catracas de front ficaram muito acima do medido depois da migração v2 · QA · 0,1 d
+
+Catraca que não acompanha o medido para de ser catraca. Duas estavam abertas o bastante para a
+dívida voltar inteira sem CI vermelho:
+
+- `audit_frontend_standards.py`: teto **245** no `tests.yml` contra **74** medidos — 171 avisos
+  de folga. Apertado para 74. (O `AGENTS.md` §7 ainda citava 401, número de dois tetos atrás;
+  corrigido no mesmo passo.)
+- `test_total_de_imports_css_em_templates_so_pode_cair`: teto **82**, da E10, contra **15**
+  medidos — a migração v2 levou o desenho para os componentes e os `<link>` de folha de página
+  quase acabaram. Apertado para 15.
+
+Nenhum dos dois números é conquista deste PR: os dois já estavam pagos e sem trava. O que muda é
+que agora regridem em vermelho.
+
+### NOVO-20260820-211943-6a686a695549 🔴 ABERTO · `NOVO` Os perfis de CSS por rota podam o tema escuro inteiro: 42 rotas servem tokens claros com `data-theme="dark"` · PF-02 / UI-02 · **risco alto — atinge produção**
+
+O `PF-02` fechou o empacotamento com 15 perfis determinísticos por família de rota
+(`scripts/build_css_profiles.py`), servidos no lugar do `shell.bundle.css` pelo
+`shell_css_profile` (`core/context_processors.py`). `CSS_ROUTE_PROFILES_ENABLED` tem padrão
+**`true`** em `config/settings/base.py:25` e não aparece no `.env.example` — está ligado em
+produção.
+
+O manifesto guarda o hash das regras que **casaram** na captura, e a captura roda em UMA
+passagem, no tema claro. Nenhuma regra dentro de `html[data-theme="dark"]` casa nessa passagem,
+então o bloco de tokens do tema escuro é podado dos **15** perfis. A expansão do
+`_with_dom_families` não cobre o caso: ela só devolve estado interativo
+(`hover`/`focus`/`checked`), não variante de tema.
+
+**Medido no navegador**, mesma rota (`/oficios/`), mesmo tema (`localStorage.theme = "dark"`,
+com o `data-theme="dark"` que o `theme-init.js` escreve), só trocando
+`CSS_ROUTE_PROFILES_ENABLED`:
+
+| token | perfis ligados | perfis desligados (correto) |
+|---|---|---|
+| `--color-bg` | `#f7fbff` | `#0d1725` |
+| `--color-text` | `#132238` | `#f0f6ff` |
+| `--color-card` | `#ffffff` | `#132238` |
+| `--color-card-muted` | `#e3eaf2` | `#111e2f` |
+| `--color-accent` | `#155b9a` | `#d8a21b` |
+
+Ou seja: **o tema escuro não existe nas 42 rotas com perfil.** A rota sem perfil (`login`) e a
+casca pública, que carregam o bundle inteiro, continuam certas — o que explica o defeito ter
+passado: quem conferiu o tema escuro numa tela pública viu tudo certo.
+
+Por que a paridade perfil/bundle do `PF-02` não pegou: ela comparou estilo computado dos
+elementos presentes, e naquele momento nenhuma regra entregue consumia os tokens podados de um
+jeito que mudasse pixel na captura clara. Podar uma DECLARAÇÃO de token não muda nada até alguém
+lê-la — e no tema claro ninguém lia a versão escura.
+
+**Duas saídas, e elas não são equivalentes:**
+
+1. **Mitigação imediata** — `CSS_ROUTE_PROFILES_ENABLED=false` no `.env` de produção. Devolve o
+   tema escuro no próximo request, sem deploy de código, e custa os bytes que o `PF-02` economizou.
+2. **Conserto** — o podador nunca deve descartar bloco que só declara custom property. É o mesmo
+   tratamento que `_render_rules` já dá a `@import`, `@font-face` e `@property`: entra sempre,
+   porque a cobertura do CDP não sabe medi-lo. Depois, recapturar e reconferir a paridade **nos
+   dois temas**, que é o furo do processo de captura.
+
+Encosta no `NOVO-20260820-171008-7afb74d82d2c`: a decisão de estender os perfis ao `ui.bundle.css`
+não deve sair antes deste conserto, ou o mesmo corte de tema atingiria também o v2 — hoje o v2
+escapa só porque `ui.bundle.css` não passa pelo podador.
