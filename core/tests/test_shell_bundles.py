@@ -245,6 +245,16 @@ class ShellBundleGateTests(SimpleTestCase):
         self.assertIn(">>> js/core/http.js >>>", js)
         self.assertNotIn(">>> js/core/theme-init.js >>>", js)
 
+    def test_ui_bundle_rebases_relative_font_urls(self):
+        source = (ROOT / "static" / "css" / "v2" / "signature-fonts.css").read_text(
+            encoding="utf-8"
+        )
+        bundle = (ROOT / "static" / "css" / "ui.bundle.css").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('url("../../vendor/fonts/GreatVibes-Regular.ttf")', source)
+        self.assertIn('url("../vendor/fonts/GreatVibes-Regular.ttf")', bundle)
+
     def test_js08_components_are_lazy_and_have_static_urls(self):
         base = BASE_HTML.read_text(encoding="utf-8")
         bundle = (ROOT / "static" / "js" / "shell.bundle.js").read_text(

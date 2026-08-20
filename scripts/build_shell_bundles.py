@@ -13,6 +13,8 @@ Uso:
 from __future__ import annotations
 
 import argparse
+import posixpath
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -162,6 +164,10 @@ BANNER = (
     "Edit the source files listed below and re-run the script. */\n"
 )
 
+CSS_URL_RE = re.compile(
+    r"url\((?P<quote>['\"])(?P<path>(?!data:|https?:|/|#)[^'\"]+)(?P=quote)\)"
+)
+
 
 def _read(rel: str) -> str:
     path = STATIC / rel
@@ -186,19 +192,36 @@ def _style_with_form_components() -> str:
     return style
 
 
+def _rebase_css_urls(text: str, source_rel: str, bundle_rel: str) -> str:
+    """Preserva URLs relativas quando uma folha muda de diretório no bundle."""
+    source_dir = posixpath.dirname(source_rel)
+    bundle_dir = posixpath.dirname(bundle_rel)
+    if source_dir == bundle_dir:
+        return text
+
+    def replace(match: re.Match[str]) -> str:
+        asset = posixpath.normpath(posixpath.join(source_dir, match.group("path")))
+        rebased = posixpath.relpath(asset, bundle_dir)
+        quote = match.group("quote")
+        return f"url({quote}{rebased}{quote})"
+
+    return CSS_URL_RE.sub(replace, text)
+
+
 def _concat(
     sources: tuple[str, ...],
     kind: str,
     *,
     overrides: dict[str, str] | None = None,
+    output_rel: str | None = None,
 ) -> str:
     parts: list[str] = [BANNER, f"/* shell {kind} sources ({len(sources)}): */\n"]
     for rel in sources:
         parts.append(f"\n/* >>> {rel} >>> */\n")
-        if overrides is not None and rel in overrides:
-            parts.append(overrides[rel])
-        else:
-            parts.append(_read(rel))
+        source = overrides[rel] if overrides is not None and rel in overrides else _read(rel)
+        if output_rel is not None and rel.endswith(".css"):
+            source = _rebase_css_urls(source, rel, output_rel)
+        parts.append(source)
         if not parts[-1].endswith("\n"):
             parts.append("\n")
         parts.append(f"/* <<< {rel} <<< */\n")
@@ -206,18 +229,23 @@ def _concat(
 
 
 def build() -> tuple[str, str, str, str]:
-    css = _concat(SHELL_CSS, "css")
+    css = _concat(SHELL_CSS, "css", output_rel="css/shell.bundle.css")
     form_css = _concat(
         SHELL_CSS_WITH_FORM_COMPONENTS,
         "css with form components",
         overrides={"css/style.css": _style_with_form_components()},
+        output_rel="css/shell.form-components.bundle.css",
     )
     js = _concat(SHELL_JS, "js")
     form_components = _concat(FORM_COMPONENTS_JS, "form components js")
     CSS_BUNDLE.parent.mkdir(parents=True, exist_ok=True)
     JS_BUNDLE.parent.mkdir(parents=True, exist_ok=True)
     CSS_BUNDLE.write_text(css, encoding="utf-8", newline="\n")
-    UI_CSS_BUNDLE.write_text(_concat(UI_CSS, "css"), encoding="utf-8", newline="\n")
+    UI_CSS_BUNDLE.write_text(
+        _concat(UI_CSS, "css", output_rel="css/ui.bundle.css"),
+        encoding="utf-8",
+        newline="\n",
+    )
     FORM_CSS_BUNDLE.write_text(form_css, encoding="utf-8", newline="\n")
     JS_BUNDLE.write_text(js, encoding="utf-8", newline="\n")
     FORM_COMPONENTS_BUNDLE.write_text(
@@ -228,15 +256,16 @@ def build() -> tuple[str, str, str, str]:
 
 
 def check() -> int:
-    expected_css = _concat(SHELL_CSS, "css")
+    expected_css = _concat(SHELL_CSS, "css", output_rel="css/shell.bundle.css")
     expected_form_css = _concat(
         SHELL_CSS_WITH_FORM_COMPONENTS,
         "css with form components",
         overrides={"css/style.css": _style_with_form_components()},
+        output_rel="css/shell.form-components.bundle.css",
     )
     expected_js = _concat(SHELL_JS, "js")
     errors: list[str] = []
-    expected_ui = _concat(UI_CSS, "css")
+    expected_ui = _concat(UI_CSS, "css", output_rel="css/ui.bundle.css")
     if not UI_CSS_BUNDLE.is_file():
         errors.append(f"ausente: {UI_CSS_BUNDLE.relative_to(ROOT).as_posix()}")
     elif UI_CSS_BUNDLE.read_text(encoding="utf-8") != expected_ui:
