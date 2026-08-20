@@ -530,3 +530,64 @@ class VariaveisCssOrfasTests(SimpleTestCase):
             33,
             msg=f"variáveis CSS órfãs no CSS entregue: {sorted(orfas)}",
         )
+
+
+class PerfilCssPreservaTokenTests(SimpleTestCase):
+    """`NOVO-20260820-211943-6a686a695549` — o perfil não pode podar token.
+
+    A cobertura do CDP roda numa passagem só, no tema claro. Regra dentro de
+    `html[data-theme="dark"]` nunca casa nessa passagem, e o bloco inteiro de
+    tokens do tema escuro sumia dos 15 perfis: as 42 rotas com perfil serviam o
+    vocabulário claro com `data-theme="dark"` aplicado.
+    """
+
+    def test_regra_que_declara_token_e_reconhecida(self):
+        rules = css_profiles.tinycss2.parse_stylesheet(
+            'html[data-theme="dark"] { --color-bg: #0d1725; color-scheme: dark; }',
+            skip_comments=True,
+            skip_whitespace=True,
+        )
+
+        self.assertTrue(css_profiles._declares_custom_property(rules[0]))
+
+    def test_regra_que_so_pinta_nao_e_reconhecida(self):
+        rules = css_profiles.tinycss2.parse_stylesheet(
+            ".card { color: red; background: blue; }",
+            skip_comments=True,
+            skip_whitespace=True,
+        )
+
+        self.assertFalse(css_profiles._declares_custom_property(rules[0]))
+
+    def test_bloco_de_token_entra_no_perfil_sem_ter_casado(self):
+        """O critério é "declara token", não "só declara token".
+
+        O bloco raiz do tema escuro traz 236 declarações e uma delas é
+        `color-scheme` — exigir pureza reprovava justamente o bloco que o
+        defeito era sobre.
+        """
+        fonte = (
+            'html[data-theme="dark"] { --color-bg: #0d1725; color-scheme: dark; }\n'
+            ".nao-casou { color: red; }\n"
+        )
+        rules = css_profiles.tinycss2.parse_stylesheet(
+            fonte, skip_comments=True, skip_whitespace=True
+        )
+
+        rendered = css_profiles._render_rules(rules, set(), set())
+
+        self.assertIn("--color-bg", rendered)
+        self.assertIn("color-scheme", rendered)
+        self.assertNotIn(".nao-casou", rendered)
+
+    def test_os_quinze_perfis_entregam_o_vocabulario_do_tema_escuro(self):
+        perfis = sorted(css_profiles.OUTPUT_DIR.glob("*.css"))
+
+        self.assertEqual(len(perfis), 15)
+        for perfil in perfis:
+            with self.subTest(perfil=perfil.name):
+                texto = perfil.read_text(encoding="utf-8")
+                self.assertIn('html[data-theme="dark"]', texto)
+                # Um token de valor conhecido, para provar que é o bloco de
+                # verdade e não uma regra escura qualquer que sobreviveu.
+                self.assertIn("--color-card-muted: #111e2f", texto)
