@@ -144,11 +144,6 @@
   .form-block__actions {
     width: 100%;
   }
-
-  .resource-picker__actions,
-  .resource-picker__actions .cv-btn {
-    width: 100%;
-  }
 }
 
 

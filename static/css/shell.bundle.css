@@ -2008,11 +2008,6 @@ html[data-theme="dark"] *::after {
   display: none;
 }
 
-/* Voltar: fundo --step1-panel (#223348 / --color-surface-soft)
-   (escopo: só footer do form-card — não altera .cv-btn--secondary global). */
-
-/* Avançar: primary dourado (accent) — hierarquia acima do Voltar soft. */
-
 @media (max-width: 640px) {
 
   :is(html[data-theme])

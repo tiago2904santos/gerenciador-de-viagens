@@ -1036,9 +1036,6 @@
   box-shadow: none;
 }
 
-/* Stepper −/+: mesmo secondary filled soft do "Preencher datas"
-   (.form-block__actions .cv-btn--secondary). */
-
 /* Toggle bate-volta (ofício): pill compacta — controle real, não texto dourado. */
 :is(html[data-theme])
   [data-travel-document-wizard-roteiro]

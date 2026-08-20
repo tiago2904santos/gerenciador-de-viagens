@@ -46,12 +46,17 @@ class GlobalActionSystemTests(SimpleTestCase):
         ícone é `c-v2.icon_button` e o menu é `c-v2.menu` — cada um com folha
         própria.
 
-        A varredura do MENU é sobre todo o CSS de origem, porque o risco não é a
-        folha voltar com o mesmo nome: é o vocabulário reaparecer em outra. A dos
-        botões ainda não pode ser: cinco folhas citam `.cv-btn` em `:not()` e em
-        regra morta (`v2/date-picker.css`, `v2/form-block.css` e três em
-        comentário). São restos de guarda contra um botão que não existe mais, e
-        saem na varredura seguinte — o que este teste trava por ora é a pasta.
+        A varredura é sobre todo o CSS de origem, porque o risco não é a folha
+        voltar com o mesmo nome: é o vocabulário reaparecer em outra. E é sobre
+        SELETOR, não sobre texto — as folhas do v2 citam as classes antigas em
+        comentário para registrar de onde veio cada desenho, e essa nota é
+        justamente o que não pode virar falha.
+
+        Os últimos restos de `.cv-btn` saíram em 2026-08-20: três regras em
+        `v2/date-picker.css` que se excluíam por `:not(.cv-btn)` — guarda que já
+        não guardava nada, porque a classe morreu com
+        `actions/action-system.css` — e uma de `.resource-picker__actions` em
+        `v2/form-block.css`, cujo componente inteiro não existe mais.
         """
         css_root = self.root / "static" / "css"
         self.assertFalse(
@@ -65,8 +70,9 @@ class GlobalActionSystemTests(SimpleTestCase):
         ]
         for arquivo in fontes:
             texto = _sem_comentario(arquivo.read_text(encoding="utf-8"))
-            with self.subTest(arquivo=arquivo.name):
-                self.assertNotIn(".action-menu", texto)
+            for morta in (".cv-btn", ".btn,", ".app-btn", ".icon-btn", ".action-menu"):
+                with self.subTest(arquivo=arquivo.name, classe=morta):
+                    self.assertNotIn(morta, texto)
 
     def test_o_dialogo_do_sistema_antigo_nao_voltou(self):
         """O diálogo é `<dialog class="modal">` — de template ou montado em JS.

@@ -10299,8 +10299,34 @@ Junto saíram: o menu de FALHA do `overlay.js`, que montava `action-menu--rich` 
 com ele; e `.action-menu__panel` de uma união em `v2/listbox.css`. O CSS legado
 foi de 3.522 para 3.251 linhas.
 
+**A catraca cobrou um resto a mais.** Ao ligar a varredura de vocabulário morto,
+apareceram quatro regras que ainda citavam `.cv-btn` — três em `v2/date-picker.css`
+e uma em `v2/form-block.css`. As três do calendário se excluíam por
+`:not(.cv-btn)`: guarda contra o botão do sistema antigo que, com a classe morta,
+deixou de excluir qualquer coisa — o gatilho `action-button` passou a receber
+chrome de CAMPO em vez do visual de botão que o comentário prometia. As três
+saíram (a variante não é pedida por tela nenhuma: `control_variant` não chega de
+chamador algum, só do teste do componente), e com elas o `button button--secondary`
+que a variante emite passa a valer por si. A de `form-block.css` vestia
+`.resource-picker__actions`, componente que não existe mais em template nem em JS.
+Depois disso, `.cv-btn`, `.btn`, `.app-btn` e `.icon-btn` não aparecem em seletor
+nenhum do projeto, e o teste varre as quatro além de `.action-menu`.
+
+Saíram junto quatro comentários que apontavam para regras que já não existiam —
+dois deles órfãos, descrevendo o "Voltar"/"Avançar" do rodapé em
+`theme-shared-components.css` sem nenhuma regra embaixo — e a regra
+`.file-widget__action` de `v2/file-picker.css`, cujo corpo eram só
+`--icon-btn-size` e `--icon-btn-icon-size`: dois tokens definidos e lidos por
+ninguém. Os perfis saíram byte a byte idênticos das duas podas, o que confirma
+que comentário ENTRE regras é nó próprio para o `tinycss2` e não entra no hash.
+
+`action-menu` continua vivo em template e em JS, e deve continuar: virou GANCHO,
+não desenho. O `overlay.js` colhe por ele os menus que chegam do servidor e o
+`prestacoes-diaria-wa.js` sobe por ele do botão até o menu. O que morreu foi o
+CSS; por isso a varredura do teste ignora comentário e olha só seletor.
+
 **Fica um resto, e de propósito:** três definições órfãs de `--action-primary-*`
-em `base/03-theme-dark.css`. Elas moram DENTRO da regra `html[data-theme="dark"]`
+e três de `--icon-btn-tooltip-*` em `base/03-theme-dark.css`. Elas moram DENTRO da regra `html[data-theme="dark"]`
 de 236 declarações, que é chave do `css_profiles_manifest.json` — editar o texto
 dela a apagaria de todos os `profiles/*.css` sem erro nenhum. Saem quando o
 manifesto for recalibrado (`build_css_profiles.py --capture`).

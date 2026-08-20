@@ -300,12 +300,6 @@
   gap: var(--space-2);
 }
 
-.file-widget__action,
-.prestacao-file-widget__action {
-  --icon-btn-size: 42px;
-  --icon-btn-icon-size: 18px;
-}
-
 @media (max-width: 640px) {
   .file-picker,
   .prestacao-file-picker {

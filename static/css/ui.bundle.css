@@ -1489,11 +1489,6 @@
   .form-block__actions {
     width: 100%;
   }
-
-  .resource-picker__actions,
-  .resource-picker__actions .cv-btn {
-    width: 100%;
-  }
 }
 
 
@@ -5402,9 +5397,6 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   border: 0;
   box-shadow: none;
 }
-
-/* Stepper −/+: mesmo secondary filled soft do "Preencher datas"
-   (.form-block__actions .cv-btn--secondary). */
 
 /* Toggle bate-volta (ofício): pill compacta — controle real, não texto dourado. */
 :is(html[data-theme])
@@ -10014,43 +10006,15 @@ html[data-theme="light"] {
   position: relative;
 }
 
-/* Campo de input: chrome de field. Gatilhos action-button (.cv-btn) e
-   ícone embutido (--icon) ficam de fora — cada um tem visual próprio. */
-.date-picker__trigger:not(.cv-btn):not(.date-picker__trigger--icon) {
-  align-items: center;
-  appearance: none;
-  background:
-    linear-gradient(var(--theme-surface-card), var(--theme-surface-card)) padding-box,
-    linear-gradient(var(--color-input-border, var(--color-border-strong)), var(--color-input-border, var(--color-border-strong))) border-box;
-  border: 1px solid transparent;
-  border-radius: var(--radius-control);
-  box-shadow: var(--shadow-xs);
-  color: var(--theme-text-body);
-  cursor: pointer;
-  display: inline-flex;
-  flex: 0 0 auto;
-  font: inherit;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  justify-content: center;
-  min-height: var(--control-height-md);
-  padding: 0 var(--space-4);
-  transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast),
-    color var(--transition-fast);
-}
-
-.date-picker__trigger:not(.cv-btn):not(.date-picker__trigger--icon):focus,
-.date-picker__trigger:not(.cv-btn):not(.date-picker__trigger--icon):focus-visible {
-  outline: none;
-}
-
-/* Action-button: alinha ao cv-btn sem perder o gancho do date-picker. */
-.date-picker__trigger.cv-btn {
-  flex: 0 0 auto;
-}
+/* O CHROME DE FIELD do gatilho saiu em 2026-08-20, com as três regras que o
+   desenhavam. Elas valiam para `.date-picker__trigger` que não fosse `--icon`, e
+   isso é só a variante `action-button` — que nenhuma tela pede: `control_variant`
+   não é passado por chamador nenhum, e o único a exercitá-la é o teste do
+   componente. As três se excluíam por `:not(.cv-btn)`, classe do botão do
+   sistema antigo, que morreu com `actions/action-system.css` no mesmo dia; a
+   guarda já não guardava nada, e o gatilho recebia chrome de CAMPO em vez do
+   visual de botão que o comentário original prometia. Sem elas, o `button
+   button--secondary` que a variante emite vale por si — que era a intenção. */
 
 .date-picker__trigger--icon {
   align-items: center;
@@ -11710,12 +11674,6 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   display: flex;
   flex: 0 0 auto;
   gap: var(--space-2);
-}
-
-.file-widget__action,
-.prestacao-file-widget__action {
-  --icon-btn-size: 42px;
-  --icon-btn-icon-size: 18px;
 }
 
 @media (max-width: 640px) {
