@@ -51,7 +51,11 @@ class EntityCardStylesTests(SimpleTestCase):
         pattern = re.compile(r"<link[^>]+static 'css/")
         for template in (ROOT / "templates").rglob("*.html"):
             imports += len(pattern.findall(template.read_text(encoding="utf-8")))
-        self.assertLessEqual(imports, 82)
+        # 82 era o número da E10, quando as folhas de página ainda vestiam as
+        # telas. A migração v2 levou o desenho para os componentes e o teto
+        # ficou frouxo: 15 medidos em 2026-08-20, contra um teto de 82 que
+        # deixaria 67 imports voltarem sem ninguém notar.
+        self.assertLessEqual(imports, 15)
 
     def test_folhas_de_lista_legadas_continuam_apagadas(self):
         """As duas folhas de lista do sistema antigo, e nenhum `<link>` para elas.

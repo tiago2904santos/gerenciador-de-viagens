@@ -196,8 +196,13 @@ class ShellBundleGateTests(SimpleTestCase):
         ).read_text(encoding="utf-8")
         self.assertIn(".oficio-reveal-panel {", justificativas)
 
-        oficios = (ROOT / "static/css/pages/oficios.css").read_text(encoding="utf-8")
-        self.assertNotIn("\n.oficio-reveal-panel {", oficios)
+        # `pages/oficios.css` foi APAGADA em 2026-08-20: nenhuma página a
+        # carregava — sem `<link>`, sem bundle e sem `@import` — desde que as
+        # telas de Ofícios migraram para o v2. O que ela ainda vestia de vivo
+        # mudou para o dono: a família `oficio-documentos-*` para
+        # `v2/document-summary.css`, o alternador de documentos do evento e as
+        # três regras do picker de viatura para `v2/picker.css`.
+        self.assertFalse((ROOT / "static/css/pages/oficios.css").exists())
 
         # `pages/termos.css` foi APAGADA em 2026-08-20: sobraram duas regras de
         # um cartão de lista que virou `c-v2.record`, e nenhuma tela a carregava.
