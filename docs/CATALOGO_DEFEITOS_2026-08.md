@@ -10552,3 +10552,57 @@ o `check --deploy` aborta no `core.E001` ANTES do `migrate` enquanto houver linh
 órfã, e o trap reverte o checkout. Havendo aborto, o procedimento é
 `scripts/validar_not_null_db02.py` e depois `backfill_legacy_areas --area SIGLA
 --commit`.
+
+### NOVO-20260820-200232-58928deabdaf 🟢 RESOLVIDO · `NOVO` Os pisos de uso de CSS por rota ainda descreviam a arquitetura anterior à consolidação V2 · PF · risco médio
+
+O run `32410146425` deixou verde toda a suíte, os auditores, a geração real de
+documentos e as demais réguas de desempenho, mas reprovou as 43 rotas em
+`medir_css_por_rota.py`. A causa era a mudança deliberada de arquitetura: os
+componentes V2 passaram a ser entregues pelo `ui.bundle.css` global, enquanto os
+pisos de `scripts/tetos_front.json` ainda haviam sido medidos quando uma parcela
+maior do CSS estava distribuída nas folhas específicas de cada família de rota.
+Assim, o denominador entregue aumentou sem que a régua tivesse sido recalibrada.
+
+Os pisos foram atualizados uma única vez com o artefato canônico
+`front-metrics-32410146425`, produzido em Chromium pela própria CI: mínimo de
+3,4123% (`login`) e máximo de 20,3301% (`oficios-detalhe`, edição e dados de
+viajantes), cobrindo as 43 rotas. A comparação continua sendo crescente e sem
+tolerância adicional: qualquer queda futura abaixo desses valores volta a
+reprovar o pipeline. Nenhum auditor foi desativado e nenhum teto de outra métrica
+foi alterado.
+
+### NOVO-20260820-171008-7afb74d82d2c 🟡 ACEITO COM DÍVIDA · `NOVO` O v2 entrega 517 KB de CSS em toda página, e o piso do NOVO-70 caiu de 49% para 13% · FE/PERF · risco médio
+
+O `NOVO-70` mede quanto do CSS entregue numa rota é de fato usado, e é catraca:
+o uso só pode subir. Nas 43 rotas ele caiu de **48,9% em média para 12,9%** — o
+pior é o `login`, com **3,41%**.
+
+**Não foi regressão de uma mudança.** É a consequência estrutural da migração
+v2, acumulada ao longo dela. Os pisos foram capturados no commit `9aab2343`
+("entrega perfis por família de rota", PF-02), quando `ui.bundle.css` **não
+existia**: a rota recebia só o perfil podado — pequeno e bem casado, daí os
+43-60%. Hoje `base.html` carrega, em toda página, um bundle global de
+**517 KB / 1.621 regras**, e o perfil da rota é ~46 KB. Medido no runner
+canônico: `cargo-editar` entrega 590.469 bytes e casa 64.013.
+
+Só apareceu agora porque o `NOVO-70` é o **último passo** do workflow e a `main`
+estava vermelha há 25 execuções — ele não rodava.
+
+**Decisão do dono (2026-08-20): rebaselinar e lançar.** Os 43 pisos foram
+regravados com a medição real do runner (`floor = valor medido`, que é o corpo
+de `updated_floors(allow_weaker=True)`). Feito à mão porque o `workflow_dispatch`
+expõe `--atualizar-tetos` mas **não** `--permitir-subir-teto`, e sem ele o script
+faz `floor = max(anterior, atual)` — mede certo e regrava o piso antigo.
+
+**A dívida fica registrada, e o conserto é conhecido:** aplicar ao v2 o mesmo
+PF-02 que o shell já tem — perfis por família de rota gerados pelo
+`build_css_profiles.py`, que hoje exclui `static/css/v2/` de propósito ("NÃO
+passa pelo podador... e o orçamento de dois arquivos do NOVO-12 fica
+preservado"). Isso devolveria o uso para a casa dos 40-60%. Enquanto não for
+feito, a catraca protege o número novo, não o antigo.
+
+**Nuance que pesou na decisão:** 517 KB é o tamanho cru. O WhiteNoise entrega
+comprimido e o arquivo é UM só, cacheado uma vez para o app inteiro, enquanto os
+perfis são um por família de rota. Pela métrica de regra não usada está muito
+pior; pelo custo de rede numa navegação de várias telas, não necessariamente. A
+métrica continua certa em apontar — o desperdício de parse e de bytes existe.
