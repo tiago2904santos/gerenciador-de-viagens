@@ -55,10 +55,6 @@ CSS_EXCEPTIONS: dict[str, dict] = {
         "reason": "Arquivo de tokens do namespace v2 — cores hex sao a definicao original.",
         "rules": {"hex_color_outside_tokens"},
     },
-    "static/css/components/theme-dark-components.css": {
-        "reason": "Transitional dark-theme component overrides; literals allowed until dissolved into components.",
-        "rules": {"hex_color_outside_tokens"},
-    },
     "static/css/shell.bundle.css": {
         "reason": "Bundle gerado (NOVO-12) — literais e seletores vêm das fontes; auditar as fontes.",
         "rules": {

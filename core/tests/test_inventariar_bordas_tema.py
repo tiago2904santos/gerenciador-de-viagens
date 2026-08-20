@@ -63,7 +63,21 @@ class SuperficiesClarasContratoTests(SimpleTestCase):
         super().setUpClass()
         root = Path(settings.BASE_DIR)
         cls.tokens = (root / "static/css/base/tokens.css").read_text(encoding="utf-8")
-        cls.components = (root / "static/css/components/theme-dark-components.css").read_text(encoding="utf-8")
+        # A folha vigiada aqui foi DISSOLVIDA em 2026-08-20. As cinco regras que
+        # este teste proibia (`search-picker--vehicle`, `form-card__footer`,
+        # `date-picker__footer-action`, `roteiro-trecho-card__leg`) nao voltaram
+        # para lugar nenhum: das 80 regras das duas folhas de tema, 63 foram
+        # apagadas por nao pintarem nada, e as 17 herdeiras estao nos arquivos
+        # abaixo. A proibicao passa a valer sobre elas.
+        cls.components = "
+".join(
+            (root / caminho).read_text(encoding="utf-8")
+            for caminho in (
+                "static/css/base/base.css",
+                "static/css/v2/module-card.css",
+                "static/css/v2/select.css",
+            )
+        )
 
     def test_tema_claro_tem_tres_niveis_de_superficie(self):
         self.assertIn("--color-surface: #ffffff;", self.tokens)

@@ -12,16 +12,19 @@ class DarkRedesignContractTests(SimpleTestCase):
         css_root = Path(settings.BASE_DIR) / "static" / "css"
         self.tokens_path = css_root / "base" / "03-theme-dark.css"
         self.base_tokens_path = css_root / "base" / "tokens.css"
-        self.shared_components_path = (
-            css_root / "components" / "theme-shared-components.css"
-        )
-        self.components_path = css_root / "components" / "theme-dark-components.css"
         self.page_shell_path = css_root / "layout" / "page-shell.css"
         self.base = self.base_path.read_text(encoding="utf-8")
         self.tokens_css = self.tokens_path.read_text(encoding="utf-8")
         self.base_tokens_css = self.base_tokens_path.read_text(encoding="utf-8")
-        self.shared_components_css = self.shared_components_path.read_text(encoding="utf-8")
-        self.dark_components_css = self.components_path.read_text(encoding="utf-8")
+        # `components/theme-dark-components.css` e `theme-shared-components.css`
+        # foram DISSOLVIDAS em 2026-08-20. Das 80 regras que tinham, a medicao
+        # (33 telas, 23.034 elementos) mostrou que 63 nao pintavam nada — o v2 ja
+        # vencia cada propriedade — e as 17 restantes foram para a folha de quem
+        # elas vestem: o elemento (`base/base.css`), o cartao de modulo e o
+        # select. Estas sao as herdeiras, e e nelas que os contratos valem.
+        self.base_css = (css_root / "base" / "base.css").read_text(encoding="utf-8")
+        self.module_card_css = (css_root / "v2" / "module-card.css").read_text(encoding="utf-8")
+        self.select_css = (css_root / "v2" / "select.css").read_text(encoding="utf-8")
         # As duas folhas de tema encolheram 2.400 linhas em 2026-08-20: o que
         # descrevia um componente do v2 foi para a folha DELE (a pele do editor
         # de roteiro, a lista de opções, o picker, o bloco de formulário, o
@@ -36,7 +39,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         # A CAMADA DE TEMA, e só ela: é sobre ela que valem as proibições
         # ("o tema não escolhe geometria", "o tema não mira o claro").
         self.components_css = "\n".join(
-            (self.dark_components_css, self.shared_components_css)
+            (self.base_css, self.module_card_css, self.select_css)
         )
         # A camada de tema MAIS as folhas que receberam as regras dela. Serve às
         # asserções que guardam DESENHO — "claro e escuro mudam de paleta, não de
@@ -63,13 +66,17 @@ class DarkRedesignContractTests(SimpleTestCase):
         # seletores. Preserve a ordem histórica do arquivo monolítico para que
         # o teste continue descrevendo o contrato, não a ordem dos novos
         # arquivos no bundle.
-        self.css = (
-            f"{self.tokens_css}\n{self.shared_components_css}\n"
-            f"{self.dark_components_css}"
-        )
+        self.css = "\n".join((self.tokens_css, self.components_css))
 
     def test_dark_redesign_is_the_final_global_css_layer(self):
-        # NOVO-12: ordem canônica está no shell.bundle.css; base só linka o bundle.
+        """A ordem da cascata mora no bundle; `base.html` so linka o bundle.
+
+        O teste guardava a posicao das duas folhas de tema entre os tokens e o
+        resto do pacote. Elas foram DISSOLVIDAS em 2026-08-20 e nao ha mais o
+        que ordenar ali: a ultima camada global do pacote passou a ser
+        `feedback/notice.css`, e o que era tema de componente virou regra da
+        folha do componente, no `ui.bundle.css`, que vem depois de tudo.
+        """
         bundle = (
             Path(settings.BASE_DIR) / "static" / "css" / "shell.bundle.css"
         ).read_text(encoding="utf-8")
@@ -82,50 +89,56 @@ class DarkRedesignContractTests(SimpleTestCase):
         style_index = bundle.index(">>> css/style.css >>>")
         theme_dark_tokens_index = bundle.index(">>> css/base/03-theme-dark.css >>>")
         page_shell_index = bundle.index(">>> css/layout/page-shell.css >>>")
-        theme_shared_components_index = bundle.index(
-            ">>> css/components/theme-shared-components.css >>>"
-        )
-        theme_dark_components_index = bundle.index(
-            ">>> css/components/theme-dark-components.css >>>"
-        )
         extra_css_index = self.base.index("{% block extra_css %}")
         shell_bundle_index = self.base.index("css/shell.bundle.css")
 
         self.assertLess(style_index, theme_dark_tokens_index)
+        self.assertLess(theme_dark_tokens_index, page_shell_index)
         self.assertNotIn("css/dark-redesign.css", self.base)
         self.assertNotIn("css/dark-redesign.css", bundle)
         self.assertLess(shell_bundle_index, extra_css_index)
-        # `fields/file-picker.css` foi fundida em `v2/file-picker.css` em
-        # 2026-08-20: a folha era a BASE do componente do v2, não legado.
-        # `lists/filter-header.css` saiu do bundle em 2026-08-19 — ela mesma se
-        # descrevia como "compat residual", e nenhuma tela emitia as classes dela.
-        # `lists/record-list.css` saiu em 2026-08-20: das nove regras dela só a
-        # pilha continuava viva, e foi para `v2/record.css`.
-        # `actions/action-system.css` foi APAGADA em 2026-08-20, com o último
-        # menu do sistema antigo (o do card de prestação) virando `c-v2.menu`.
-        # Quem ocupa o lugar dela na ordem — depois dos tokens, antes das duas
-        # camadas de tema — é `layout/page-shell.css`, e é isso que se mede.
-        self.assertLess(page_shell_index, theme_dark_components_index)
-        self.assertNotIn(">>> css/actions/action-system.css >>>", bundle)
-        self.assertNotIn(">>> css/actions/action-system.css >>>", form_bundle)
-        # `layout/app-shell.css` saiu do shell em 2026-08-20 junto com a pasta
-        # `layout/`: a casca virou `v2/shell.css` e viaja no pacote do v2.
-        # `lists/content-cards.css` saiu pelo mesmo motivo — o cartão de módulo
-        # virou componente (`v2/module-card.css`) —, e
-        # `pages/document-viewer.css` um dia antes, quando o visualizador virou
-        # tela com folha própria (`v2/pdf-viewer.css`). `feedback/dialog.css`
-        # saiu no mesmo dia: o diálogo global de `core/app.js` passou a montar o
-        # `<dialog class="modal">` do v2, e a folha do `cv-dialog` ficou sem
-        # nenhuma marcação para vestir.
-        self.assertLess(theme_dark_components_index, theme_shared_components_index)
+
+        for morta in (
+            ">>> css/components/theme-dark-components.css >>>",
+            ">>> css/components/theme-shared-components.css >>>",
+            ">>> css/actions/action-system.css >>>",
+        ):
+            with self.subTest(folha=morta):
+                self.assertNotIn(morta, bundle)
+                self.assertNotIn(morta, form_bundle)
+
+        self.assertFalse(
+            (Path(settings.BASE_DIR) / "static" / "css" / "components").exists(),
+            "a pasta `components/` voltou — ela morreu com a camada de tema",
+        )
 
     def test_theme_layer_does_not_target_official_light_theme(self):
-        for layer_css in (self.tokens_css, self.components_css):
+        # A camada de tema e uma so desde a dissolucao das folhas de componente:
+        # `base/03-theme-dark.css`. As herdeiras (`base/base.css`,
+        # `v2/module-card.css`, `v2/select.css`) NAO entram aqui — `base.css` e a
+        # camada base e declara o tema claro de propósito.
+        for layer_css in (self.tokens_css,):
             self.assertNotIn('html[data-theme="light"]', layer_css)
             self.assertNotIn('html[data-theme="light-light"]', layer_css)
             self.assertNotIn('html[data-theme="dark-light"]', layer_css)
 
     def test_geometry_no_longer_lives_in_dark_theme_file(self):
+        """Nao ha mais arquivo de tema de componente — e esse e o contrato.
+
+        O teste media duas coisas na camada de tema: toda regra da folha ESCURA
+        tem `dark` no seletor, e nenhuma regra da folha COMPARTILHADA tem. Em
+        2026-08-20 as duas foram dissolvidas, e o que sobrou mudou de casa:
+
+          - as regras de ELEMENTO (corpo da pagina, selecao de texto, anel de
+            foco, campo nativo) foram para `base/base.css`, e todas continuam
+            predicadas em `dark` — sao excecao de tema por natureza;
+          - a sombra do cartao foi para `v2/module-card.css`, tambem predicada;
+          - o gatilho do select foi para `v2/select.css`, e nenhuma das oito
+            regras dele fala de tema — sao iguais nos dois.
+
+        E isso que se mede agora: nas herdeiras, tema so aparece onde a decisao
+        e mesmo de tema.
+        """
         def selectors_from(css):
             rules = tinycss2.parse_stylesheet(
                 css,
@@ -148,15 +161,26 @@ class DarkRedesignContractTests(SimpleTestCase):
                     )
             return selectors
 
-        selectors = selectors_from(self.dark_components_css)
-        self.assertGreater(len(selectors), 0)
-        self.assertTrue(all("dark" in selector for selector in selectors))
+        vindas = [
+            s for s in selectors_from(self.base_css) if "data-theme" in s
+        ] + [
+            s for s in selectors_from(self.module_card_css) if "data-theme=" in s
+        ]
+        self.assertGreater(len(vindas), 0, "as regras herdadas sumiram de base/ e v2/")
         self.assertTrue(
-            all(
-                "dark" not in selector
-                for selector in selectors_from(self.shared_components_css)
-            )
+            all("dark" in s for s in vindas),
+            f"regra de tema sem predicado de escuro: {[s for s in vindas if 'dark' not in s][:3]}",
         )
+        # No select a medida e sobre o BLOCO herdado, nao sobre o arquivo: a
+        # folha do componente ja tinha regras de escuro proprias, e elas nao
+        # sao objeto deste contrato. O bloco vai do cabecalho que anuncia a
+        # origem ate a divisa do delta.
+        i = self.select_css.index("VINDAS DE `components/theme-shared-components.css`")
+        # A divisa de verdade, nao a mencao a ela dentro do proprio cabecalho.
+        j = self.select_css.index("/* === DELTA v2 === */", i)
+        herdado = self.select_css[i:j]
+        self.assertIn(".custom-select__trigger--v2", herdado)
+        self.assertNotIn("dark", herdado)
 
     def test_semantic_dark_contract_covers_core_component_needs(self):
         required_tokens = (
