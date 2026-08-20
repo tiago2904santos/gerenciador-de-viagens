@@ -15,7 +15,7 @@
   {% block extra_css_after_theme %}{% endblock %}
 </head>
 <body>
-  <c-ui.icons._sprite />
+  <c-v2.sprite />
   <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
   <div class="app-shell {% block shell_class %}{% endblock %}" data-app-shell>
     <header class="app-mobile-bar">
@@ -27,7 +27,7 @@
         <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
       </c-v2.button>
     </header>
-    <c-layout.sidebar  :navigation_items="navigation_items" :request="request" />
+    <c-v2.sidebar  :navigation_items="navigation_items" :request="request" />
     <c-v2.button class_name="sidebar-scrim" type="button" aria_label="Fechar menu principal" tabindex="-1" data-sidebar-drawer-close only></c-v2.button>
     <main class="app-main" id="main-content" tabindex="-1">
       <section class="content-wrap">

@@ -22,7 +22,10 @@ FORM_COMPONENT_TEMPLATES = (
     "templates/oficios/wizard_base.html",
     "templates/ordens_servico/form.html",
     "templates/planos_trabalho/wizard_base.html",
-    "templates/prestacoes_contas/diario_motorista_form.html",
+    # O CASCO, e não a etapa: as cinco telas de prestação passaram a estender
+    # `prestacoes_contas/flow_base.html` em 2026-08-19, e é ele quem declara os
+    # dois blocos — como já fazem os cascos de ofício e de plano de trabalho.
+    "templates/prestacoes_contas/flow_base.html",
     "templates/roteiros/roteiro_form_page.html",
     "templates/termos/form.html",
 )

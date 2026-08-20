@@ -29,9 +29,12 @@ from core.templatetags.icones import ICONES
 from core.templatetags.icones import nome_de_icone
 
 RAIZ = Path(settings.BASE_DIR) / "templates"
-FOLHA = RAIZ / "cotton/ui/icons/_sprite.html"
-ICONE = "cotton/ui/icons/icon.html"
-FOLHA_REL = "cotton/ui/icons/_sprite.html"
+FOLHA = RAIZ / "cotton/v2/sprite.html"
+#: O ícone é uma TAG desde 2026-08-19 — o componente Cotton que fazia o mesmo
+#: trabalho foi apagado com o resto do legado. O que se procura num template
+#: para saber se ele desenha ícone é a chamada da tag.
+ICONE_TAG = "{% icone_svg"
+FOLHA_REL = "cotton/v2/sprite.html"
 
 SIMBOLO = re.compile(r'<symbol id="cv-icon-([^"]+)"')
 REFERENCIA = re.compile(r'{%\s*(?:include|extends)\s+"([^"]+)"')
@@ -45,6 +48,16 @@ def _templates() -> dict[str, str]:
         str(p.relative_to(RAIZ)).replace("\\", "/"): p.read_text(encoding="utf-8-sig")
         for p in RAIZ.rglob("*.html")
     }
+
+
+def _sem_comentarios(texto: str) -> str:
+    """O texto sem o corpo dos `{% comment %}`.
+
+    A galeria de tipografia EXPLICA que o provador reescreve `--font-sans` no
+    `<html>`, e a palavra dentro do comentário fazia o fragmento passar por raiz
+    de documento (2026-08-19). Raiz é quem TEM a tag, não quem a menciona.
+    """
+    return re.sub(r"{%\s*comment\s*%}.*?{%\s*endcomment\s*%}", "", texto, flags=re.S)
 
 
 def _alcance(raiz: str, textos: dict[str, str]) -> set[str]:
@@ -101,19 +114,25 @@ class FolhaDeIconesTests(SimpleTestCase):
             with self.subTest(entrada=entrada):
                 self.assertEqual(nome_de_icone(entrada), DESCONHECIDO)
 
-    def test_o_template_do_icone_passa_pelo_filtro(self):
-        saida = engines["django"].get_template(ICONE).render({"icon": "nao-existe"})
+    def test_a_tag_passa_pelo_filtro(self):
+        saida = engines["django"].from_string(
+            '{% load icones %}{% icone_svg "nao-existe" %}'
+        ).render()
 
         self.assertIn(f'href="#cv-icon-{DESCONHECIDO}"', saida)
         self.assertNotIn("cv-icon-nao-existe", saida)
 
-    def test_tag_leve_preserva_o_html_do_componente(self):
-        componente = engines["django"].get_template(ICONE).render({"icon": "delete"})
-        tag = engines["django"].from_string(
+    def test_a_tag_emite_o_invólucro_do_sistema(self):
+        """O `<svg class="icon">` com `use` — a forma que as folhas dimensionam."""
+        saida = engines["django"].from_string(
             '{% load icones %}{% icone_svg "delete" %}'
         ).render()
 
-        self.assertHTMLEqual(tag, componente)
+        self.assertHTMLEqual(
+            saida,
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" '
+            'focusable="false"><use href="#cv-icon-trash"></use></svg>',
+        )
 
     def test_todo_nome_literal_usado_em_template_tem_simbolo(self):
         orfaos = []
@@ -130,16 +149,21 @@ class FolhaDeIconesTests(SimpleTestCase):
     def test_toda_raiz_de_documento_que_usa_icone_carrega_a_folha(self):
         """A rede que importa: faltar a folha não levanta erro, só apaga o ícone.
 
-        Existem 9 raízes de documento no projeto (`<html>` próprio, sem `extends`).
-        Duas alcançam `icon.html`: `base.html` e a página de espera da geração
-        documental, que é servida dentro de um iframe e por isso não passa pela
-        base. Uma terceira raiz nasce muda se alguém esquecer o include.
+        Três raízes desenham ícone: `base.html`, o login — que tem casca própria,
+        sem sidebar — e a página de espera da geração documental, servida dentro
+        de um iframe e por isso fora da base. As três incluem a folha; a quarta
+        que aparecer nasce muda se alguém esquecer o include.
+
+        O login entrou nesta lista em 2026-08-19: ele sempre desenhou ícone, mas
+        a busca anterior olhava só quem alcançava o COMPONENTE `icon.html`, e o
+        login já usava a tag.
         """
         textos = _templates()
         raizes = [
             nome
             for nome, texto in textos.items()
-            if "<html" in texto.lower() and not re.search(r"{%\s*extends", texto)
+            if "<html" in _sem_comentarios(texto).lower()
+            and not re.search(r"{%\s*extends", texto)
         ]
         self.assertTrue(raizes, "nenhuma raiz de documento encontrada")
 
@@ -147,7 +171,7 @@ class FolhaDeIconesTests(SimpleTestCase):
         com_icone = []
         for raiz in raizes:
             alcance = _alcance(raiz, textos)
-            if ICONE not in alcance:
+            if not any(ICONE_TAG in textos.get(nome, "") for nome in alcance):
                 continue
             com_icone.append(raiz)
             if FOLHA_REL not in alcance:
@@ -156,7 +180,11 @@ class FolhaDeIconesTests(SimpleTestCase):
         self.assertEqual(sem_folha, [], "raiz de documento com ícone e sem a folha")
         self.assertEqual(
             sorted(com_icone),
-            ["base.html", "documentos/geracao_aguarde_embedded.html"],
+            [
+                "base.html",
+                "core/login.html",
+                "documentos/geracao_aguarde_embedded.html",
+            ],
             "mudou o conjunto de raízes que usam ícone; confira se a nova carrega "
             "a folha antes de atualizar esta lista",
         )

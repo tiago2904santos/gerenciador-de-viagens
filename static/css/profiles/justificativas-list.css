@@ -3364,9 +3364,6 @@ html[data-theme="dark"] .action-menu {
     white-space: normal;
   }
 }
-.filter-header {
-  overflow: visible;
-}
 .form-block {
   align-items: start;
   display: grid;

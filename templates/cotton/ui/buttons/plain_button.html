@@ -1,8 +1,0 @@
-{% cotton:vars attrs class_name disabled hidden slot type %}
-{# Botão sem estilo ou dependência de ícone para documentos públicos/autônomos. #}
-<button class="{{ class_name }}"
-        type="{{ type|default:'button' }}"
-        {% if disabled %}disabled{% endif %}
-        {% if hidden %}hidden{% endif %}
-        {{ attrs }}
->{{ slot }}</button>

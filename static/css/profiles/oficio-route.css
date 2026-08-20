@@ -3401,30 +3401,6 @@ html[data-theme="dark"] {
     width: 100%;
   }
 }
-.summary-item {
-  background: var(--route-card-inner-bg);
-  border: 1px solid var(--route-card-inner-border);
-  border-radius: var(--radius-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  min-height: 76px;
-  padding: var(--space-3);
-}
-.summary-label {
-  color: var(--theme-text-muted);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.summary-value {
-  color: var(--theme-stat-value);
-  font-size: 1.05rem;
-  font-weight: 800;
-  line-height: 1.25;
-  word-break: break-word;
-}
 .notice,
 .alert,
 .cv-alert {
@@ -4090,14 +4066,6 @@ html[data-theme="dark"] :is(.alert-danger, .alert-error, .alert--error) {
 :is(html[data-theme="dark"])
   .form-section-subtitle {
   color: var(--color-muted);
-}
-:is(html[data-theme="dark"])
-  .search-picker__dropdown {
-  background: var(--color-surface-strong);
-  border: 1px solid var(--color-border-strong);
-  border-radius: 14px;
-  box-shadow: 0 18px 40px rgba(2, 9, 16, 0.48);
-  padding: 6px;
 }
 :is(html[data-theme="dark"])
   .search-picker__list {

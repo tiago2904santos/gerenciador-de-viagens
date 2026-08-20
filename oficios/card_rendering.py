@@ -28,7 +28,9 @@ def renderizar_oficio_card_cacheado(card):
     # v5 (2026-08-18): título curto (número · destino) e o resto na meta.
     # v6 (2026-08-18): título número+protocolo, meta período+destino, e o
     # selo passou a ser o temporal.
-    key = f"oficios:list-card:v6:{digest}"
+    # v7 (2026-08-20): a composição da quantidade de diárias pode quebrar e o
+    # bloco cresce, sem corte nem reticências.
+    key = f"oficios:list-card:v7:{digest}"
     html = cache.get(key)
     if html is None:
         html = render_to_string("oficios/partials/oficio_list_card.html", {"card": card})

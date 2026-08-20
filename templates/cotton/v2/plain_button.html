@@ -1,0 +1,27 @@
+{% cotton:vars attrs class_name disabled hidden slot type %}
+{% comment %}
+  Botão SEM estilo do sistema — o das telas públicas de assinatura.
+
+  Aquelas páginas têm desenho próprio: casca própria (`assinatura/base_publico.html`),
+  folha própria (`pages/prestacoes-assinatura.css`) e classes `asgn-*`. Elas não
+  carregam o pacote do v2, e é de propósito: quem abre o link de assinatura no
+  celular recebe uma página de 3 arquivos, sem sidebar, sem tema e sem menu.
+
+  Por isso ele não é uma variante do `c-v2.button`: usar aquele aqui traria as
+  classes `.button button--primary` sem a folha que as desenha — marcação que
+  mente sobre o que a página é.
+
+  Então por que existe um componente, e não um `<button>` no template? Porque
+  `test_templates_de_aplicacao_nao_reimplementam_button` proíbe botão cru em
+  template de aplicação, e a regra é boa: é ela que impede um botão do sistema
+  reescrito à mão. Dentro de `templates/cotton/` o botão cru é o caminho previsto.
+
+  Veio de `cotton/ui/buttons/plain_button.html` em 2026-08-19, quando o
+  diretório legado foi esvaziado. Mudou de endereço, não de função.
+{% endcomment %}
+<button class="{{ class_name }}"
+        type="{{ type|default:'button' }}"
+        {% if disabled %}disabled{% endif %}
+        {% if hidden %}hidden{% endif %}
+        {{ attrs }}
+>{{ slot }}</button>

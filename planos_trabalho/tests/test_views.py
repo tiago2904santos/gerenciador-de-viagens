@@ -38,6 +38,8 @@ class PlanoWizardViewsTests(TestCase):
         response = self.client.get(reverse("planos_trabalho:index") + "?aba=atuais")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "20/2026/ASCOM")
+        self.assertNotContains(response, "Todos os status")
+        self.assertNotContains(response, 'aria-label="Status do plano"')
 
     def test_index_pagina_e_mantem_orcamento_de_queries(self):
         PlanoTrabalho.objects.bulk_create(
@@ -68,8 +70,9 @@ class PlanoWizardViewsTests(TestCase):
         )
 
     def test_get_novo_nao_cria_rascunho(self):
+        """GET devolve a lista; criar (e reservar número) é só por POST."""
         response = self.client.get(reverse("planos_trabalho:novo"))
-        self.assertEqual(response.status_code, 200)
+        self.assertRedirects(response, reverse("planos_trabalho:index"))
         self.assertFalse(PlanoTrabalho.objects.exists())
 
     def test_post_novo_cria_rascunho_numerado_e_redireciona_para_etapa_1(self):

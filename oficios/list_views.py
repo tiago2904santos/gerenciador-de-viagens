@@ -107,17 +107,18 @@ def index(request):
 
 @require_http_methods(["GET", "POST"])
 def novo(request):
+    """A criação é POST, e não tem tela de confirmação (2026-08-19).
+
+    A tela "confirme para criar" existia por uma razão técnica — transformar o
+    clique num link (GET) em POST, porque criar RESERVA número. Com o botão da
+    lista submetendo um formulário, ela virava um passo a mais para dizer sim ao
+    que a pessoa acabou de pedir.
+
+    O GET responde com a lista: quem chega neste endereço pela barra do
+    navegador não deve criar nada por isso.
+    """
     if request.method == "GET":
-        return render(
-            request,
-            "cotton/create_draft.html",
-            {
-                "page_title": "Novo ofício",
-                "page_description": "Confirme para reservar a numeração e iniciar o cadastro.",
-                "confirm_label": "Criar ofício",
-                "back_url": reverse("oficios:index"),
-            },
-        )
+        return redirect("oficios:index")
     evento = resolve_evento_from_request(request)
     oficio = criar_oficio_rascunho(evento=evento)
     return redirect("oficios:dados_viajantes", pk=oficio.pk)

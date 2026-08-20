@@ -118,7 +118,7 @@
     {% endif %}
 
     {% if card.valor_diarias_display %}
-      <c-v2.form_block>
+      <c-v2.form_block extra_class="oficio-card__allowance-facts">
         <c-slot name="body">
           <div class="fact-list">
             <c-v2.fact
@@ -134,7 +134,11 @@
               galeria (Valor total + Diárias).
             {% endcomment %}
             {% if card.quantidade_diarias_display %}
-              <c-v2.fact label="Quantidade de diárias" :value="card.quantidade_diarias_display" />
+              <c-v2.fact
+                label="Quantidade de diárias"
+                :value="card.quantidade_diarias_display"
+                extra_class="fact--never-truncate"
+              />
             {% endif %}
           </div>
         </c-slot>

@@ -10068,3 +10068,42 @@ permanecer em uma linha e o ajuste automático reduzia excessivamente o texto pa
 
 **Correção:** somente o fato de valor total desse resumo permite agora até duas linhas para a nota;
 as demais notas V2 continuam compactas em uma linha.
+
+### NOVO-20260820-012629-323cd54a538c 🟢 RESOLVIDO · `NOVO` Quantidade de diárias era cortada no cartão do ofício · UI · risco baixo
+
+A composição percentual das diárias podia ultrapassar a altura fixa do bloco financeiro e era
+ocultada pelo teto e pelo `overflow` do cartão, removendo parte de uma informação contábil.
+
+**Correção:** a quantidade de diárias ganhou uma exceção local que permite quebra de linha e faz
+o bloco financeiro crescer; o valor não recebe reticências nem corte, sem alterar os demais fatos.
+
+### NOVO-20260820-013507-50e3403f29d5 🟢 RESOLVIDO · `NOVO` Painéis da etapa de planejamento ficavam colados · UI · risco baixo
+
+Os painéis de documentos de solicitação e de planejamento/autorização eram irmãos diretos da
+página e não recebiam o espaçamento vertical usado entre as demais seções V2.
+
+**Correção:** os dois painéis foram associados ao mesmo grupo local e agora repetem entre si o
+`--gap` global, sem modificar o conteúdo ou o espaçamento dos outros painéis do wizard.
+
+### NOVO-20260820-013816-b75113f0105b 🟢 RESOLVIDO · `NOVO` Identificação do servidor não usava a composição split · HT · risco baixo
+
+O bloco de identificação funcional exibia título, descrição e campos na mesma coluna, divergindo
+da composição V2 solicitada para separar a apresentação dos dados do formulário.
+
+**Correção:** o bloco agora usa o modo `split` global, com título e descrição na coluna esquerda e
+os campos na direita; a grade interna de quatro colunas e todos os contratos dos campos foram
+preservados.
+
+### NOVO-20260820-014147-9eb9305d9394 🟢 RESOLVIDO · `NOVO` Nome do servidor dividia a primeira linha com outros campos · UI · risco baixo
+
+O campo Nome compartilhava a primeira linha da grade de identificação com Cargo, CPF e Telefone,
+deixando pouco espaço para o dado principal do cadastro.
+
+**Correção:** o campo Nome agora ocupa toda a primeira linha da grade V2; os demais campos seguem
+na linha posterior, sem alterar nomes, valores ou validações do formulário.
+### NOVO-20260820-014652-aa213ae66b9d 🟢 RESOLVIDO · `NOVO` Segunda linha da identificação do servidor não respeitava três colunas · UI · risco baixo
+
+Cargo, CPF, telefone e RG eram itens independentes de uma grade de quatro colunas, fazendo o RG quebrar sozinho para outra linha. O nome permanece ocupando toda a primeira linha; a segunda linha agora se divide em três colunas iguais para cargo, documentos pessoais (CPF e RG) e telefone, preservando o gancho JavaScript do RG.
+### NOVO-20260820-015032-dfaef5c511bf 🟢 RESOLVIDO · `NOVO` Filtro redundante de status na lista de Planos de Trabalho · UI · risco baixo
+
+A barra de filtros de Planos de Trabalho exibia simultaneamente a situação temporal e um segundo seletor de status, tornando a filtragem redundante e ocupando espaço sem necessidade. O seletor “Todos os status” e seu contexto exclusivo foram removidos; busca, situação temporal, ordenação e período permanecem inalterados.

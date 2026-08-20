@@ -98,10 +98,18 @@ class GaleriaV2ContractTests(SimpleTestCase):
         entre_componentes = "".join(
             c.read_text(encoding="utf-8") for c in sorted(V2.glob("*.html"))
         )
+        # As duas peças de CASCA não cabem numa vitrine: a barra lateral É a
+        # página (mostrá-la dentro de um painel seria desenhá-la duas vezes na
+        # mesma tela), e o sprite não desenha nada sozinho — ele é a folha de
+        # símbolos que todo ícone referencia. As duas são renderizadas pelo
+        # `base.html`, inclusive nesta galeria; o que falta é a moldura, não o
+        # consumidor (2026-08-19).
+        CASCA = {"sidebar.html", "sprite.html"}
         ausentes = [
             componente.name
             for componente in sorted(V2.glob("*.html"))
-            if f"<c-v2.{componente.stem}" not in self.source
+            if componente.name not in CASCA
+            and f"<c-v2.{componente.stem}" not in self.source
             and f"<c-v2.{componente.stem}" not in entre_componentes
         ]
         self.assertEqual(ausentes, [], "componente v2 sem consumidor")

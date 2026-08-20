@@ -136,24 +136,10 @@ APAGADOS_NA_ERRADICACAO_V2 = (
 # renderização de PDF, primitiva sem decoração, sprite de ícones e a integração
 # específica com o Google Drive. A igualdade exata impede que um novo namespace
 # paralelo volte a crescer silenciosamente.
-SEM_EQUIVALENTE_V2 = frozenset(
-    {
-        "create_draft.html",
-        "documents/pdf_viewer.html",
-        "layout/sidebar.html",
-        "page/flow_base.html",
-        "partials/_create_draft_body.html",
-        "perfil/partials/_gdrive_card_body.html",
-        "perfil/partials/_gdrive_conta_actions.html",
-        "perfil/partials/_gdrive_conta_body.html",
-        "perfil/partials/_gdrive_diretorio_body.html",
-        "perfil/partials/_gdrive_pendencias_body.html",
-        "perfil/partials/_gdrive_pendencias_meta.html",
-        "ui/buttons/plain_button.html",
-        "ui/icons/_sprite.html",
-        "ui/icons/icon.html",
-    }
-)
+#: VAZIO desde 2026-08-19: `templates/cotton/` tem um namespace só, o `v2`.
+#: A barra lateral e a folha de símbolos foram as últimas a mudar de endereço —
+#: eram v2 por dentro havia semanas e ficavam fora por convenção.
+SEM_EQUIVALENTE_V2 = frozenset()
 
 
 def _sources() -> list[Path]:
@@ -374,9 +360,24 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # `v2/alert_list.html` que Ofícios trouxe no mesmo dia. Nasceram em
         # paralelo com o mesmo contrato, e sobrou o que já estava no `main`.
         # 90 = 160 - 70 implementações antigas substituídas por componentes v2.
-        # As 14 folhas restantes fora de v2 não possuem equivalente: shell de
-        # fluxo, sidebar, PDF, ícones/sprite, assinatura e integração Drive.
-        self.assertEqual(len(self.components()), 90)
+        # 2026-08-19: -1 `ui/icons/icon.html`, apagado — o ícone é a tag
+        # `{% icone_svg %}`, e o componente era o mesmo SVG por outro caminho.
+        # +1 `v2/signature_fonts.html`, que chegou com a assinatura pública.
+        # -2 `create_draft.html` e o corpo dele: a tela de "confirme para criar"
+        # foi APAGADA — o botão da lista cria por POST e leva direto ao cadastro.
+        # `ui/buttons/plain_button.html` mudou de endereço para `v2/`, sem baixa.
+        # -7 o visualizador de PDF (virou tela) e os seis do cartão do Drive
+        # (viraram `include` em `core/partials/`): nenhum deles tinha mais de
+        # um consumidor, e o que faziam era repassar variável de nível a nível.
+        # +1 `v2/gdrive_root_toggle.html`: a origem das pastas do Drive era um
+        # `tablist` com botões crus e classe própria; virou o toggle do sistema.
+        # -1 `page/flow_base.html`: as 8 telas que o estendiam passaram ao
+        # `form-page` (perfil e usuários) e ao casco de Prestações.
+        # 2026-08-19, fim da linha: `layout/sidebar.html` e `ui/icons/_sprite.html`
+        # mudaram de endereço para `v2/`. O total não muda — elas não sumiram,
+        # o diretório legado é que ficou vazio.
+        # NENHUMA folha fora de `v2/`: o namespace é um só.
+        self.assertEqual(len(self.components()), 81)
 
     def test_fora_do_v2_so_restam_pecas_sem_equivalente(self):
         fora_do_v2 = {

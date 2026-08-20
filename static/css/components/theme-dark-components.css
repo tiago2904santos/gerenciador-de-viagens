@@ -875,7 +875,6 @@ html[data-theme="dark"] :is(input, select, textarea):disabled {
   overflow: hidden;
 }
 
-
 :is(html[data-theme="dark"])
   .composite-field__control .form-control {
   background: transparent;
@@ -1536,22 +1535,16 @@ html[data-theme="dark"] .empty-state__title {
 }
 
 :is(html[data-theme="dark"])
-  :is(.doc-pdf-toolbar, .doc-pdf-sidebar, .doc-pdf-stage, .document-inline-viewer, .asgn-viewer) {
+  .document-inline-viewer,
+  .asgn-viewer) {
   background: var(--color-surface-muted);
   border-color: var(--color-border);
   color: var(--color-text);
 }
 
 :is(html[data-theme="dark"])
-  .doc-pdf-thumb {
-  background: var(--color-surface);
-  border-color: transparent;
-}
 
 :is(html[data-theme="dark"])
-  .doc-pdf-thumb--active {
-  border-color: var(--color-accent);
-}
 
 :is(html[data-theme="dark"])
   .search-picker__dropdown {
@@ -1890,72 +1883,28 @@ html[data-theme="dark"] *::after {
 
 /* Canonical PDF viewer: solid controls around a neutral document canvas. */
 :is(html[data-theme="dark"])
-  :is(.document-viewer__toolbar, .document-viewer__sidebar, .document-viewer__stage) {
-  border: 1px solid var(--color-border);
-  border-radius: 13px;
-  box-shadow: none;
-}
 
 :is(html[data-theme="dark"])
-  .document-viewer__toolbar {
-  background: var(--color-surface-strong);
-}
 
 :is(html[data-theme="dark"])
-  .document-viewer__sidebar {
-  background: var(--color-surface-muted);
-}
 
 :is(html[data-theme="dark"])
-  .document-viewer__stage {
-  background: var(--color-bg-strong);
-}
 
 :is(html[data-theme="dark"])
-  .doc-pdf-thumb {
-  background: var(--color-surface);
-  border: 2px solid transparent;
-  border-radius: 9px;
-  color: var(--color-muted-strong);
-}
 
 :is(html[data-theme="dark"])
-  .doc-pdf-thumb:hover {
-  border-color: var(--color-border-strong);
-}
 
 :is(html[data-theme="dark"])
-  .doc-pdf-thumb--active {
-  border-color: var(--color-primary-bright);
-}
 
 :is(html[data-theme="dark"])
-  .document-viewer__thumb-paper {
-  background: var(--color-surface-soft);
-}
 
 :is(html[data-theme="dark"])
-  .document-viewer__paper {
-  background: #f7f4ed;
-  border: 1px solid #d5cec0;
-  box-shadow: 0 20px 55px rgb(0 0 0 / 34%);
-}
 
 :is(html[data-theme="dark"])
-  .document-viewer__paper-mark {
-  background: var(--color-accent);
-  color: #19232d;
-}
 
 :is(html[data-theme="dark"])
-  .document-viewer__paper-line {
-  background: #c8c2b6;
-}
 
 :is(html[data-theme="dark"])
-  .document-viewer__paper-line--title {
-  background: #334c63;
-}
 
 /* Signature card shares the same solid document hierarchy. */
 :is(html[data-theme="dark"])

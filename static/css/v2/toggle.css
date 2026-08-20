@@ -74,8 +74,14 @@
   white-space: nowrap;
 }
 
+/* Três formas de dizer "este é o escolhido", porque três tipos de elemento
+   vivem aqui: link de navegação (`aria-current`), botão de estado
+   (`aria-pressed`), rádio dentro de label (`:checked`) — e a ABA de um
+   `tablist`, que por especificação usa `aria-selected` (a origem das pastas do
+   Drive). */
 :is(html[data-theme]) .toggle__item[aria-current="page"],
 :is(html[data-theme]) .toggle__item[aria-pressed="true"],
+:is(html[data-theme]) .toggle__item[aria-selected="true"],
 :is(html[data-theme]) .toggle__item:has(input:checked) {
   background: var(--accent);
   color: var(--text-on-accent);

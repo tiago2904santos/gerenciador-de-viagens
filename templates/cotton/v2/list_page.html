@@ -1,4 +1,4 @@
-{% cotton:vars action_icon action_label action_url aside cards controls empty_message empty_title extra_class filter_empty_message filter_empty_title filter_mode page_obj page_querystring pages paginated quick_add rows tabs title %}
+{% cotton:vars action_icon action_label action_method action_url aside cards controls csrf_token empty_message empty_title extra_class filter_empty_message filter_empty_title filter_mode page_obj page_querystring pages paginated quick_add rows tabs title %}
 {% load icones %}
 {% comment %}
   List page v2 — o esqueleto de uma tela de lista: identidade, controles, o
@@ -132,10 +132,26 @@
       a ação virava uma pílula com um ícone perdido no meio. E o `aria-label`
       garante NOME mesmo sem texto — um link só com ícone não tem nome nenhum
       para quem usa leitor de tela.
+
+      `action_method="post"` para a ação que CRIA: evento, ofício e plano
+      reservam número ao nascer, e criar por link significaria criar quando o
+      navegador resolvesse buscar o endereço sozinho — o que ele faz ao passar o
+      ponteiro por cima. O POST também é o que permitiu apagar a tela de
+      "confirme para criar": a confirmação existia só para transformar aquele
+      GET num POST (2026-08-19).
     {% endcomment %}
-    <a class="list-page__action" href="{{ action_url }}"{% if not action_label %} aria-label="Voltar"{% endif %}>
-      {% icone_svg action_icon|default:"plus" %}{% if action_label %}<span>{{ action_label }}</span>{% endif %}
-    </a>
+    {% if action_method == "post" %}
+      <form method="post" action="{{ action_url }}" class="list-page__action-form">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <button type="submit" class="list-page__action"{% if not action_label %} aria-label="Criar"{% endif %}>
+          {% icone_svg action_icon|default:"plus" %}{% if action_label %}<span>{{ action_label }}</span>{% endif %}
+        </button>
+      </form>
+    {% else %}
+      <a class="list-page__action" href="{{ action_url }}"{% if not action_label %} aria-label="Voltar"{% endif %}>
+        {% icone_svg action_icon|default:"plus" %}{% if action_label %}<span>{{ action_label }}</span>{% endif %}
+      </a>
+    {% endif %}
   {% endif %}
 
 </div>

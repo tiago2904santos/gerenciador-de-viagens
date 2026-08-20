@@ -1,4 +1,3 @@
-{% cotton:vars csrf_token drive_autorizado drive_job_reorg drive_modo_ativo drive_pasta_raiz_id drive_pasta_raiz_nome drive_pode_reorganizar drive_total_arquivos drive_total_eventos %}
 {% load icones %}
 {% if not drive_autorizado %}
   <p class="gdrive-hint gdrive-disabled-hint">
@@ -43,24 +42,9 @@
     {% endif %}
 
     <div class="gdrive-browser-toolbar">
-      <div class="gdrive-root-tabs" role="tablist" aria-label="Origem das pastas">
-        <button type="button" class="gdrive-root-tab"
-                id="gdrive-btn-meu-drive" role="tab" aria-selected="false">
-          Meu Drive
-        </button>
-        <button type="button" class="gdrive-root-tab"
-                id="gdrive-btn-compartilhados-comigo" role="tab" aria-selected="false">
-          Compartilhados comigo
-        </button>
-        <button type="button" class="gdrive-root-tab"
-                id="gdrive-btn-drives-compartilhados" role="tab" aria-selected="false">
-          Drives compartilhados
-        </button>
-      </div>
+      <c-v2.gdrive_root_toggle />
       <div class="gdrive-navrow">
-        <button type="button" class="button button--secondary" id="gdrive-btn-voltar" hidden>
-          ← Voltar
-        </button>
+        <c-v2.button label="Voltar" variant="secondary" icon="arrow-left" id="gdrive-btn-voltar" :hidden="True" />
         <span class="gdrive-breadcrumb" id="gdrive-breadcrumb"></span>
       </div>
     </div>
@@ -82,9 +66,7 @@
                placeholder="Nome da nova pasta"
                maxlength="255"
                aria-label="Nome da nova pasta">
-        <button type="button" class="button button--secondary" id="gdrive-btn-criar">
-          Criar pasta
-        </button>
+        <c-v2.button label="Criar pasta" variant="secondary" id="gdrive-btn-criar" />
       </div>
       <p class="gdrive-hint">A pasta será criada no diretório atual.</p>
     </div>
@@ -96,12 +78,8 @@
     </form>
 
     <div class="gdrive-browser-actions" id="gdrive-browser-actions" hidden>
-      <button type="button" class="button button--secondary" id="gdrive-btn-toggle-criar">
-        + Criar nova pasta aqui
-      </button>
-      <button type="button" class="button button--primary" id="gdrive-btn-selecionar" disabled>
-        Usar esta pasta como destino
-      </button>
+      <c-v2.button label="Criar nova pasta aqui" variant="secondary" icon="plus" id="gdrive-btn-toggle-criar" />
+      <c-v2.button label="Usar esta pasta como destino" variant="primary" id="gdrive-btn-selecionar" :disabled="True" />
     </div>
   </div>
 
@@ -117,13 +95,11 @@
           </p>
         </div>
         <div class="gdrive-actions gdrive-actions--massa">
-          <button type="button" class="button button--secondary" id="gdrive-btn-previa">
-            Ver prévia
-          </button>
+          <c-v2.button label="Ver prévia" variant="secondary" icon="eye" id="gdrive-btn-previa" />
           <form method="post" action="{% url 'google_drive:reorganizar_tudo' %}"
                 data-confirm-submit data-confirm-message="Reorganizar TODOS os eventos e ofícios avulsos no Drive? Isso move/renomeia arquivos já enviados e sobe os que faltam.">
             {% csrf_token %}
-            <button type="submit" class="button button--primary">Reorganizar tudo no Drive</button>
+            <c-v2.button label="Reorganizar tudo no Drive" variant="primary" icon="sync" type="submit" />
           </form>
         </div>
       </div>

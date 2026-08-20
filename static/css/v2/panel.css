@@ -90,6 +90,13 @@
   gap: var(--gap-tight);
 }
 
+/* Na etapa de planejamento do evento, os dois painéis são irmãos diretos da
+   página. O segundo repete o ritmo global entre seções sem alterar os demais
+   painéis do wizard. */
+:is(html[data-theme]) .evento-planning-panel + .evento-planning-panel {
+  margin-top: var(--gap);
+}
+
 /* A faixa do vazio de FILTRO, quando a lista não tem painel envolvente: é um
    painel sem miolo, e nasce oculta. O par `[hidden]` é obrigatório porque o
    `display: grid` do `.panel` vence a regra de agente do usuário — sem ele a

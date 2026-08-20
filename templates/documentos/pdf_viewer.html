@@ -3,8 +3,82 @@
 
 {% block title %}{{ page_title }}{% endblock %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/v2/pdf-viewer.css' %}">
+{% endblock %}
+
 {% block content %}
-  <c-documents.pdf_viewer :pdf_url="pdf_conteudo_url" :worker_src="pdf_js_worker_src" :filename="pdf_filename" :share_url="share_temporario_url" only />
+  {% comment %}
+    Visualizador de PDF — barra de ferramentas, miniaturas e o palco.
+
+    Era o componente `cotton/documents/pdf_viewer.html`, com um ramo `is_demo`
+    inteiro que nenhuma tela chamava (2026-08-19). Voltou a ser TELA porque tem
+    um consumidor só: o que ele tinha de componente era o invólucro, e o
+    invólucro é esta página.
+
+    Os onze `id` são contrato de `js/pages/documentos-pdf-viewer.js`, que acha
+    cada controle por `getElementById`. Renomear qualquer um deixa o botão na
+    tela e desliga a função em silêncio.
+
+    Os quatro `data-*` da raiz são a entrada: de onde vem o PDF, onde está o
+    worker do pdf.js, como o arquivo se chama e o link temporário de partilha.
+  {% endcomment %}
+  <div
+    id="documentos-pdf-viewer"
+    class="pdf-viewer"
+    data-pdf-url="{{ pdf_conteudo_url }}"
+    data-worker-src="{{ pdf_js_worker_src }}"
+    data-filename="{{ pdf_filename }}"
+    data-share-url="{{ share_temporario_url }}"
+  >
+    <header class="pdf-viewer__toolbar" role="toolbar" aria-label="Ferramentas do visualizador">
+      <div class="pdf-viewer__group">
+        <c-v2.button label="Voltar" variant="secondary" size="sm" icon="arrow-left" id="doc-pdf-back" aria_label="Voltar" />
+        <span class="pdf-viewer__filename" title="{{ pdf_filename }}">{{ pdf_filename }}</span>
+      </div>
+
+      <div class="pdf-viewer__group pdf-viewer__group--center">
+        <c-v2.button label="Anterior" variant="secondary" size="sm" id="doc-pdf-prev" aria_label="Página anterior" />
+        <span class="pdf-viewer__page" id="doc-pdf-page-label" aria-live="polite">—</span>
+        <c-v2.button label="Seguinte" variant="secondary" size="sm" id="doc-pdf-next" aria_label="Página seguinte" />
+
+        {% comment %}
+          O zoom é um `range` nativo: não há controle de faixa no v2, e o
+          nativo já entrega teclado, passo e leitura por leitor de tela.
+        {% endcomment %}
+        <label class="pdf-viewer__zoom">
+          <span class="pdf-viewer__zoom-label">Zoom</span>
+          <input type="range" id="doc-pdf-zoom" min="50" max="200" value="100"
+                 aria-valuemin="50" aria-valuemax="200" aria-valuenow="100">
+        </label>
+      </div>
+
+      <div class="pdf-viewer__group">
+        <c-v2.button label="Abrir PDF" variant="secondary" size="sm" icon="eye" :href="pdf_conteudo_url" link_target="_blank" link_rel="noopener" />
+        <c-v2.button label="Baixar" variant="primary" size="sm" icon="download" :href="pdf_conteudo_url" download="{{ pdf_filename }}" />
+        <c-v2.button label="Imprimir" variant="secondary" size="sm" id="doc-pdf-print" />
+        {% if share_temporario_url %}
+          <c-v2.button label="Copiar link temporário" variant="secondary" size="sm" icon="link" id="doc-pdf-copy-share" data-share-url="{{ share_temporario_url }}" />
+        {% endif %}
+      </div>
+    </header>
+
+    <div class="pdf-viewer__body">
+      <aside class="pdf-viewer__sidebar" aria-label="Miniaturas">
+        <div id="doc-pdf-thumbs" class="pdf-viewer__thumbs"></div>
+      </aside>
+
+      <div class="pdf-viewer__stage">
+        <div id="doc-pdf-canvas-wrap" class="pdf-viewer__canvas" tabindex="0"></div>
+        {% comment %}
+          O iframe é a rede de segurança: se o pdf.js falhar, o navegador abre o
+          arquivo com o visualizador dele em vez de deixar a página vazia.
+        {% endcomment %}
+        <iframe id="doc-pdf-iframe-fallback" class="pdf-viewer__fallback" title="Visualização PDF (navegador)" hidden></iframe>
+        <p id="doc-pdf-error" class="alert" data-tone="error" role="alert" hidden></p>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block extra_js %}

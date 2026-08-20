@@ -1,31 +1,43 @@
-{% extends "cotton/page/flow_base.html" %}
+{% extends "base.html" %}
 {% load static %}
 
-{% comment %}
-  Meu perfil — casco de formulário com UM card mestre e blocos internos
-  (mesmo gesto do gerenciador de área). Conta e senha são POSTs separados
-  dentro do corpo do card, sem aninhar `<form>` em `<form>`.
-{% endcomment %}
+{% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
+  {% comment %}
+    Duas folhas de página ficam: o navegador de pastas do Drive e a lista de
+    áreas ainda são desenho próprio desta tela.
+  {% endcomment %}
   <link rel="stylesheet" href="{% static 'css/pages/gdrive-config.css' %}">
   <link rel="stylesheet" href="{% static 'css/pages/perfil.css' %}">
 {% endblock %}
 
-{% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
-{% block flow_shell_extra %} document-form-page perfil-form-page{% endblock %}
+{% block content %}
+  {% comment %}
+    Meu perfil — um painel mestre com blocos dentro: dados pessoais, senha,
+    áreas de trabalho e a integração com o Drive.
 
-{% block flow_header %}
-  <header class="list-header list-header--wizard-band" data-wizard-sticky-band>
+    Conta e senha são POSTs SEPARADOS dentro do corpo do painel, e não um
+    formulário em volta dele: aninhar `<form>` em `<form>` é inválido, e o
+    logout no rodapé é um terceiro.
+
+    Estendia `cotton/page/flow_base.html` até 2026-08-19. O casco antigo era
+    `page-shell cv-page travel-document-wizard` mais uma faixa própria para o
+    cabeçalho — quatro classes de tela do sistema anterior para fazer o que
+    `form-page` + `c-v2.header` fazem.
+  {% endcomment %}
+  <div class="form-page perfil-form-page">
     <c-v2.header :title="page_title">
-      {% if flow_status_label %}<c-slot name="aside"><c-v2.chip :label="flow_status_label" :tone="flow_status_variant" /></c-slot>{% endif %}
+      {% if flow_status_label %}
+        <c-slot name="aside"><c-v2.chip :label="flow_status_label" :tone="flow_status_variant" /></c-slot>
+      {% endif %}
     </c-v2.header>
-  </header>
-{% endblock %}
 
-{% block flow_body %}
-  <div class="form-section-stack form-section-stack--comfortable" data-travel-document-wizard-step1>
-    <c-v2.panel title="Conta e segurança" :description="page_description" title_id="perfil-conta-title" :heading_level="2" extra_class="travel-document-card" body_extra_class="travel-document-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :meta_extra_class="meta_extra_class"><c-slot name="meta">{% include "core/partials/_perfil_areas_header_meta.html" with vinculos_area=vinculos_area only %}</c-slot><c-slot name="body">{% include "core/partials/_perfil_card_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id csrf_token=csrf_token data_hook=data_hook drive_autorizado=drive_autorizado drive_creds=drive_creds drive_escopo_faltante=drive_escopo_faltante drive_job_reorg=drive_job_reorg drive_modo_ativo=drive_modo_ativo drive_pasta_raiz_id=drive_pasta_raiz_id drive_pasta_raiz_nome=drive_pasta_raiz_nome drive_pendencias=drive_pendencias drive_pode_reorganizar=drive_pode_reorganizar drive_total_arquivos=drive_total_arquivos drive_total_eventos=drive_total_eventos drive_total_pendencias=drive_total_pendencias shell=shell variant=variant perfil_form=perfil_form senha_form=senha_form vinculos_area=vinculos_area only %}</c-slot><c-slot name="footer">{% include "core/partials/_perfil_logout_footer.html" only %}</c-slot></c-v2.panel>
+    <c-v2.panel title="Conta e segurança" :description="page_description">
+      <c-slot name="meta">{% include "core/partials/_perfil_areas_header_meta.html" with vinculos_area=vinculos_area only %}</c-slot>
+      <c-slot name="body">{% include "core/partials/_perfil_card_body.html" with csrf_token=csrf_token drive_autorizado=drive_autorizado drive_creds=drive_creds drive_escopo_faltante=drive_escopo_faltante drive_job_reorg=drive_job_reorg drive_modo_ativo=drive_modo_ativo drive_pasta_raiz_id=drive_pasta_raiz_id drive_pasta_raiz_nome=drive_pasta_raiz_nome drive_pendencias=drive_pendencias drive_pode_reorganizar=drive_pode_reorganizar drive_total_arquivos=drive_total_arquivos drive_total_eventos=drive_total_eventos drive_total_pendencias=drive_total_pendencias perfil_form=perfil_form senha_form=senha_form vinculos_area=vinculos_area only %}</c-slot>
+      <c-slot name="footer">{% include "core/partials/_perfil_logout_footer.html" only %}</c-slot>
+    </c-v2.panel>
   </div>
 {% endblock %}
 

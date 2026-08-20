@@ -1,0 +1,23 @@
+{% cotton:vars %}
+{% comment %}
+  Origem das pastas do Drive — Meu Drive, Compartilhados comigo, Drives
+  compartilhados.
+
+  É o `toggle` do sistema ocupando a linha (`--fill`): três vistas de UMA
+  escolha. Era um grupo `role="tablist"` com botões crus e classe própria
+  (`gdrive-root-tab`), que reimplementava o segmento do sistema.
+
+  Os botões continuam CRUS aqui dentro porque cada um carrega `id` — contrato de
+  `js/pages/gdrive-config.js`, que os acha por `getElementById` e escreve
+  `aria-selected` neles. `id` não cabe no `hook` do `c-v2.button`, e dentro de
+  `templates/cotton/` o botão cru é o caminho previsto.
+
+  O estado continua em `aria-selected`, e não em `aria-pressed`: é o que o
+  motor escreve, e é o correto para uma aba dentro de um `tablist`. O CSS do
+  toggle casa os dois (`v2/toggle.css`).
+{% endcomment %}
+<c-v2.toggle variant="state" aria_label="Origem das pastas" extra_class="toggle--fill toggle--sm gdrive-root-tabs">
+  <button type="button" class="toggle__item" id="gdrive-btn-meu-drive" role="tab" aria-selected="false"><span>Meu Drive</span></button>
+  <button type="button" class="toggle__item" id="gdrive-btn-compartilhados-comigo" role="tab" aria-selected="false"><span>Compartilhados comigo</span></button>
+  <button type="button" class="toggle__item" id="gdrive-btn-drives-compartilhados" role="tab" aria-selected="false"><span>Drives compartilhados</span></button>
+</c-v2.toggle>

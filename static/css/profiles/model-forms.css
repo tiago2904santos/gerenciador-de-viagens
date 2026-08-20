@@ -2987,9 +2987,6 @@ html[data-theme="dark"] {
     white-space: normal;
   }
 }
-.filter-header {
-  overflow: visible;
-}
 .skip-link {
   left: 16px;
   padding: 10px 14px;

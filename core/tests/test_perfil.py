@@ -36,8 +36,11 @@ class PerfilUsuarioTests(TestCase):
         self.assertContains(response, "Conta e segurança")
         self.assertContains(response, "Dados pessoais")
         self.assertContains(response, "Sair do sistema")
-        self.assertContains(response, "document-form-page")
-        self.assertContains(response, "travel-document-wizard__form")
+        # O casco virou `form-page` em 2026-08-19: as três classes do sistema
+        # antigo (`document-form-page`, `travel-document-wizard__form` e o
+        # `page-shell` em volta) saíram com o `flow_base`. O que a tela precisa
+        # ter continua sendo o painel e o marcador da própria página.
+        self.assertContains(response, "form-page")
         self.assertContains(response, "perfil-form-page")
         self.assertNotContains(response, "Resumo da conta")
 

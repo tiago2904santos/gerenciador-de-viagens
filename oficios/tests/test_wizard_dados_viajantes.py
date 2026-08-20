@@ -70,11 +70,11 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertEqual(response.status_code, 302)
         return response.url
 
-    def test_get_novo_solicita_confirmacao_sem_criar_rascunho(self):
+    def test_get_novo_volta_para_a_lista_sem_criar_rascunho(self):
+        """Sem tela de confirmação desde 2026-08-19; o GET não cria nada."""
         response = self.client.get(reverse("oficios:novo"))
 
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Criar ofício")
+        self.assertRedirects(response, reverse("oficios:index"))
         self.assertFalse(Oficio.objects.exists())
 
     def test_post_novo_renderiza_wizard(self):

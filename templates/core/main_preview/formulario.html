@@ -226,6 +226,12 @@
           tamanhos.
         {% endcomment %}
         <c-v2.driver_mode_toggle mode="SERVIDOR" />
+        {% comment %}
+          E o da ORIGEM das pastas do Drive, que é a mesma peça com um estado
+          diferente: `aria-selected`, porque ali os segmentos são abas de um
+          `tablist` de verdade — a lista de pastas troca embaixo deles.
+        {% endcomment %}
+        <c-v2.gdrive_root_toggle />
       </c-slot>
     </c-v2.panel>
 

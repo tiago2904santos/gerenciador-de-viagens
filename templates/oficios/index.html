@@ -30,6 +30,8 @@
     :empty_message="empty_message"
     action_label="Novo ofício"
     :action_url="create_url"
+    action_method="post"
+    :csrf_token="csrf_token"
   >
     <c-slot name="controls">
       <form method="get" action="{{ request.path }}" class="rail__form" role="search" data-server-filter-form>

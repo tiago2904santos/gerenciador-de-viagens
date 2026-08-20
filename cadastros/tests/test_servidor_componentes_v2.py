@@ -17,19 +17,24 @@ TEMPLATES = Path(settings.BASE_DIR) / "templates"
 
 
 class ServidorComponentesV2SourceTests(TestCase):
-    def test_identificacao_usa_bloco_regular_e_quatro_campos_na_mesma_linha(self):
+    def test_identificacao_usa_split_nome_na_primeira_linha_e_tres_colunas_na_segunda(self):
         pagina = (TEMPLATES / "cadastros/servidores/form.html").read_text(encoding="utf-8")
         identificacao = (
             TEMPLATES / "cadastros/servidores/partials/_form_fields.html"
         ).read_text(encoding="utf-8")
 
-        self.assertNotIn(
+        self.assertIn(
             '<c-v2.form_block :split="True" title="Identificação funcional"',
             pagina,
         )
-        self.assertIn('class="field-grid field-grid--cols-4"', identificacao)
-        self.assertIn('<c-v2.form_field :field="form.nome" />', identificacao)
-        self.assertNotIn('extra_class="field--wide"', identificacao)
+        self.assertIn('class="field-grid field-grid--cols-3"', identificacao)
+        self.assertIn(
+            '<c-v2.form_field :field="form.nome" extra_class="field-grid__span-all" />',
+            identificacao,
+        )
+        self.assertIn('class="field-grid field-grid--cols-2"', identificacao)
+        self.assertIn('data-rg-field-wrap', identificacao)
+        self.assertNotIn('class="field-grid field-grid--cols-4"', identificacao)
 
     def test_campos_relacionais_usam_componentes_especializados_v2(self):
         identificacao = (

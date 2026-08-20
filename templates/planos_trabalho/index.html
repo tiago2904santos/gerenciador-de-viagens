@@ -27,6 +27,8 @@
     :empty_message="empty_message"
     action_label="Novo plano"
     :action_url="create_url"
+    action_method="post"
+    :csrf_token="csrf_token"
   >
     <c-slot name="controls">
       <form method="get" action="{{ request.path }}" class="rail__form" role="search" data-server-filter-form>
@@ -40,7 +42,6 @@
           hook="data-server-filter-search"
         />
         <c-v2.select :options="abas" placeholder="Filtrar por situação" aria_label="Filtrar planos por situação" hook="data-server-filter-url" />
-        <c-v2.select name="status" :value="status" :options="status_options" aria_label="Status do plano" hook="data-server-filter-control" />
         <c-v2.select name="sort" :value="sort" :options="sort_options" aria_label="Ordenação" hook="data-server-filter-control" />
         {% comment %}
           O intervalo de viagem viaja em dois campos ocultos, sem formulário

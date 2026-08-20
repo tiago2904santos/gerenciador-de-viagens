@@ -1,9 +1,0 @@
-/* Compat residual — layout de filtros agora vive em list-header.css. */
-
-.filter-header {
-  overflow: visible;
-}
-
-.filter-bar__select {
-  min-width: 9.5rem;
-}

@@ -213,6 +213,16 @@
   white-space: normal;
 }
 
+/* A composição das diárias é uma expressão contábil, não uma legenda. Ela
+   precisa permanecer completa mesmo quando a coluna do cartão estreita: pode
+   quebrar linha, mas nunca recebe reticências nem perde conteúdo. */
+:is(html[data-theme]) .fact--never-truncate .fact__value {
+  overflow: visible;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  white-space: normal;
+}
+
 /* ---- trechos --------------------------------------------------------------
    Cada trecho é rota em cima e horário embaixo. Em duas colunas quando cabe:
    uma ida e volta ocupa duas linhas, e lado a lado elas se leem como o par que

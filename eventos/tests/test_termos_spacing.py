@@ -12,3 +12,10 @@ class TermosSpacingTests(SimpleTestCase):
         ).read_text(encoding="utf-8")
 
         self.assertIn('body_extra_class="list-page__panel-rows"', template)
+
+    def test_paineis_de_planejamento_usam_o_ritmo_global_entre_secoes(self):
+        template = (
+            Path(settings.BASE_DIR) / "templates" / "eventos" / "detalhe.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertEqual(template.count('extra_class="evento-planning-panel"'), 2)

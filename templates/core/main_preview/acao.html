@@ -26,6 +26,21 @@
 </c-v2.panel>
 
 {% comment %}
+  O botão SEM estilo é o das telas públicas de assinatura, que têm desenho
+  próprio e não carregam o pacote do v2. Aqui ele aparece com as classes daquela
+  tela, e por isso sai sem cor nenhuma: é exatamente o que ele faz — nada, além
+  de ser um botão. Está no catálogo para não sumir do inventário; o lugar dele é
+  fora deste sistema.
+{% endcomment %}
+<c-v2.panel title="Botão · sem estilo" description="O das páginas públicas de assinatura: casca própria, folha própria, sem o pacote do v2.">
+  <c-slot name="body">
+    <div class="v2-lab__row">
+      <c-v2.plain_button class_name="asgn-btn asgn-btn--primary">Continuar para assinar</c-v2.plain_button>
+    </div>
+  </c-slot>
+</c-v2.panel>
+
+{% comment %}
   A matriz: cada variante em cada estado. É lendo as colunas que se vê se o
   desabilitado continua distinguível do normal, e as linhas que dizem se as três
   variantes se comportam igual.

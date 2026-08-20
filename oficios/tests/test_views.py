@@ -57,8 +57,15 @@ class OficioViewsTests(TestCase):
         self.assertNotContains(response, f'href="{excluir_url}"')
 
     def test_get_novo_nao_cria_rascunho(self):
+        """GET neste endereço devolve a LISTA — criar é só por POST.
+
+        A tela de "confirme para criar" foi apagada em 2026-08-19: o botão da
+        lista submete um formulário e leva direto ao cadastro. O que este teste
+        continua guardando é o essencial: chegar aqui pela barra do navegador
+        (ou por um prefetch dele) não reserva número nenhum.
+        """
         response = self.client.get(reverse("oficios:novo"))
-        self.assertEqual(response.status_code, 200)
+        self.assertRedirects(response, reverse("oficios:index"))
         self.assertFalse(Oficio.objects.exists())
 
     def test_post_novo_cria_rascunho_e_redireciona(self):
@@ -353,6 +360,23 @@ class OficioViewsTests(TestCase):
         self.assertIn(".fact--two-line-note .fact__note", css)
         self.assertIn("-webkit-line-clamp: 2;", css)
         self.assertIn("white-space: normal;", css)
+
+    def test_quantidade_de_diarias_do_card_nunca_e_truncada(self):
+        source = Path(
+            "templates/oficios/partials/oficio_list_card.html",
+        ).read_text(encoding="utf-8")
+        fact_css = Path("static/css/v2/fact.css").read_text(encoding="utf-8")
+        record_css = Path("static/css/v2/record.css").read_text(encoding="utf-8")
+        cache_source = Path("oficios/card_rendering.py").read_text(encoding="utf-8")
+
+        self.assertIn('extra_class="oficio-card__allowance-facts"', source)
+        self.assertIn('extra_class="fact--never-truncate"', source)
+        self.assertIn(".fact--never-truncate .fact__value", fact_css)
+        self.assertIn("text-overflow: clip;", fact_css)
+        self.assertIn("white-space: normal;", fact_css)
+        self.assertIn(".form-block--v2.oficio-card__allowance-facts", record_css)
+        self.assertIn("max-height: none;", record_css)
+        self.assertIn('oficios:list-card:v7:', cache_source)
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "incomplete", "pendencias": ["Pendencia de teste"]})

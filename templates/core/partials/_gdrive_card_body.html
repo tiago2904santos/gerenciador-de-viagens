@@ -1,0 +1,44 @@
+{% comment %}
+  Integração com o Google Drive, dentro do cartão do perfil: a conta conectada,
+  a pasta de destino e as pendências de envio.
+
+  Eram seis componentes em `cotton/perfil/partials/` (2026-08-19). Não eram
+  componentes: nada além desta tela os renderizava, e o que eles faziam era
+  repassar dezoito variáveis de um nível ao outro. Como `include`, cada pedaço
+  recebe só o que usa.
+
+  As pendências só aparecem quando existem: um bloco "Pendências (0)" ocupa a
+  altura de um título para dizer que não há nada a fazer.
+{% endcomment %}
+<c-v2.form_block
+  element_id="gdrive-conta"
+  title="Conta Google"
+  description="Tokens armazenados e renovados automaticamente, ou conecte uma conta para começar."
+  :heading_level="3"
+  extra_class="gdrive-block"
+>
+  <c-slot name="actions">{% include "core/partials/_gdrive_conta_actions.html" with drive_autorizado=drive_autorizado drive_creds=drive_creds only %}</c-slot>
+  <c-slot name="body">{% include "core/partials/_gdrive_conta_body.html" with drive_autorizado=drive_autorizado drive_creds=drive_creds drive_escopo_faltante=drive_escopo_faltante only %}</c-slot>
+</c-v2.form_block>
+
+<c-v2.form_block
+  element_id="gdrive-diretorio"
+  title="Diretório de destino"
+  description="Pasta raiz onde os documentos desta área são organizados"
+  :heading_level="3"
+  extra_class="gdrive-block"
+>
+  <c-slot name="body">{% include "core/partials/_gdrive_diretorio_body.html" with csrf_token=csrf_token drive_autorizado=drive_autorizado drive_job_reorg=drive_job_reorg drive_modo_ativo=drive_modo_ativo drive_pasta_raiz_id=drive_pasta_raiz_id drive_pasta_raiz_nome=drive_pasta_raiz_nome drive_pode_reorganizar=drive_pode_reorganizar drive_total_arquivos=drive_total_arquivos drive_total_eventos=drive_total_eventos only %}</c-slot>
+</c-v2.form_block>
+
+{% if drive_total_pendencias %}
+  <c-v2.form_block
+    element_id="gdrive-pendencias"
+    title="Pendências"
+    description="Documentos que não chegaram ao Drive; o sistema tenta reenviar em segundo plano"
+    :heading_level="3"
+  >
+    <c-slot name="actions">{% include "core/partials/_gdrive_pendencias_meta.html" with drive_total_pendencias=drive_total_pendencias only %}</c-slot>
+    <c-slot name="body">{% include "core/partials/_gdrive_pendencias_body.html" with drive_pendencias=drive_pendencias only %}</c-slot>
+  </c-v2.form_block>
+{% endif %}

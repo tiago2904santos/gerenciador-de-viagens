@@ -3457,14 +3457,6 @@ html[data-theme="dark"] :is(.chip, .status-chip) {
   color: var(--color-muted);
 }
 :is(html[data-theme="dark"])
-  .search-picker__dropdown {
-  background: var(--color-surface-strong);
-  border: 1px solid var(--color-border-strong);
-  border-radius: 14px;
-  box-shadow: 0 18px 40px rgba(2, 9, 16, 0.48);
-  padding: 6px;
-}
-:is(html[data-theme="dark"])
   .search-picker__list {
   display: grid;
   gap: 4px;

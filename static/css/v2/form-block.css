@@ -80,6 +80,11 @@
   min-width: 0;
 }
 
+:is(html[data-theme]) .form-block--v2 .field-grid__span-all {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
 /* Corpo com TODOS os filhos ocultos não reserva trilha na grade. O bloco é
    `display: grid` com `gap` e `padding` do mesmo tamanho: com o corpo vazio, os
    dois se somavam e o bloco fechava com o dobro do respiro embaixo do cabeçalho

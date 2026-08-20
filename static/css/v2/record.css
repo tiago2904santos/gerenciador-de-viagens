@@ -190,6 +190,18 @@
   overflow: hidden;
 }
 
+/* O bloco financeiro pode crescer para mostrar a composição integral das
+   diárias. O teto compacto dos demais fatos continua valendo; esta exceção é
+   necessária porque truncar "5 x 100% + 1 x 15%" altera a informação. */
+:is(html[data-theme]) .record .form-block--v2.oficio-card__allowance-facts {
+  max-height: none;
+  overflow: visible;
+}
+
+:is(html[data-theme]) .record .form-block--v2.oficio-card__allowance-facts > .form-block__body {
+  overflow: visible;
+}
+
 /* Uma coluna em tela estreita: tudo ocupa a largura inteira. */
 @media (max-width: 720px) {
   :is(html[data-theme]) .record .person-row,

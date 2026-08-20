@@ -56,13 +56,9 @@ class DarkRedesignContractTests(SimpleTestCase):
         )
         action_system_index = bundle.index(">>> css/actions/action-system.css >>>")
         record_list_index = bundle.index(">>> css/lists/record-list.css >>>")
-        filter_header_index = bundle.index(">>> css/lists/filter-header.css >>>")
         form_panel_index = bundle.index(">>> css/fields/form-panel.css >>>")
         app_shell_index = bundle.index(">>> css/layout/app-shell.css >>>")
         content_cards_index = bundle.index(">>> css/lists/content-cards.css >>>")
-        document_viewer_index = bundle.index(
-            ">>> css/pages/document-viewer.css >>>"
-        )
         dialog_index = bundle.index(">>> css/feedback/dialog.css >>>")
         theme_shared_components_index = bundle.index(
             ">>> css/components/theme-shared-components.css >>>"
@@ -81,12 +77,14 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertLess(file_picker_index, form_action_system_index)
         self.assertLess(action_system_index, dialog_index)
         self.assertLess(action_system_index, record_list_index)
-        self.assertLess(record_list_index, filter_header_index)
-        self.assertLess(filter_header_index, form_panel_index)
+        # `lists/filter-header.css` saiu do bundle em 2026-08-19 — ela mesma se
+        # descrevia como "compat residual", e nenhuma tela emitia as classes dela.
+        self.assertLess(record_list_index, form_panel_index)
         self.assertLess(form_panel_index, app_shell_index)
         self.assertLess(app_shell_index, content_cards_index)
-        self.assertLess(content_cards_index, document_viewer_index)
-        self.assertLess(document_viewer_index, dialog_index)
+        # `pages/document-viewer.css` saiu do bundle em 2026-08-19: o
+        # visualizador virou tela com folha própria (`v2/pdf-viewer.css`),
+        # carregada por ela e não pelo shell de todas as páginas.
         self.assertLess(content_cards_index, dialog_index)
         self.assertLess(dialog_index, theme_dark_components_index)
         self.assertLess(theme_dark_components_index, theme_shared_components_index)
@@ -558,7 +556,7 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_global_shell_has_accessible_mobile_navigation_contract(self):
         sidebar_template = (
-            Path(settings.BASE_DIR) / "templates" / "cotton" / "layout" / "sidebar.html"
+            Path(settings.BASE_DIR) / "templates" / "cotton" / "v2" / "sidebar.html"
         ).read_text(encoding="utf-8")
         sidebar_js = (
             Path(settings.BASE_DIR) / "static" / "js" / "components" / "sidebar.js"
@@ -701,16 +699,24 @@ class DarkRedesignContractTests(SimpleTestCase):
         # `entity-card` continua afirmado logo acima, sobre o componente canônico.
 
     def test_document_viewer_and_signature_use_canonical_components(self):
+        """O visualizador é TELA desde 2026-08-19.
+
+        Era um componente com um consumidor só e um ramo `is_demo` que nenhuma
+        tela chamava. O que se guarda aqui continua sendo o mesmo: os botões da
+        barra são os do sistema, e os `id` que o `documentos-pdf-viewer.js`
+        procura seguem existindo.
+        """
         templates = Path(settings.BASE_DIR) / "templates"
-        viewer = (templates / "cotton" / "documents" / "pdf_viewer.html").read_text(encoding="utf-8")
         viewer_page = (templates / "documentos" / "pdf_viewer.html").read_text(encoding="utf-8")
         signature_js = (
             Path(settings.BASE_DIR) / "static" / "js" / "components" / "signature-actions.js"
         ).read_text(encoding="utf-8")
 
-        self.assertIn("document-viewer", viewer)
-        self.assertIn("doc-pdf-canvas-wrap", viewer)
-        self.assertIn('<c-documents.pdf_viewer', viewer_page)
+        self.assertFalse((templates / "cotton" / "documents" / "pdf_viewer.html").exists())
+        self.assertIn("<c-v2.button", viewer_page)
+        self.assertNotIn("cv-btn", viewer_page)
+        for gancho in ("doc-pdf-canvas-wrap", "doc-pdf-thumbs", "doc-pdf-zoom", "doc-pdf-page-label"):
+            self.assertIn(gancho, viewer_page)
         self.assertIn("[data-cv-signature-copy]", signature_js)
         self.assertFalse((templates / "cotton" / "documents" / "signature_card.html").exists())
         self.assertFalse((templates / "prestacoes_contas" / "partials" / "assinatura_card.html").exists())

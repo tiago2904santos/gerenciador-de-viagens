@@ -3682,30 +3682,6 @@ html[data-theme="dark"] #attach-signed-modal .icon-btn.icon-btn--delete,
     width: 100%;
   }
 }
-.summary-item {
-  background: var(--route-card-inner-bg);
-  border: 1px solid var(--route-card-inner-border);
-  border-radius: var(--radius-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  min-height: 76px;
-  padding: var(--space-3);
-}
-.summary-label {
-  color: var(--theme-text-muted);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.summary-value {
-  color: var(--theme-stat-value);
-  font-size: 1.05rem;
-  font-weight: 800;
-  line-height: 1.25;
-  word-break: break-word;
-}
 .notice,
 .alert,
 .cv-alert {
@@ -4327,12 +4303,6 @@ html[data-theme="dark"] :is(.chip, .status-chip) {
   background: transparent;
   border: 0;
   border-color: transparent;
-}
-:is(html[data-theme="dark"])
-  :is(.doc-pdf-toolbar, .doc-pdf-sidebar, .doc-pdf-stage, .document-inline-viewer, .asgn-viewer) {
-  background: var(--color-surface-muted);
-  border-color: var(--color-border);
-  color: var(--color-text);
 }
 :is(html[data-theme="dark"])
   .cv-dialog__icon--document {

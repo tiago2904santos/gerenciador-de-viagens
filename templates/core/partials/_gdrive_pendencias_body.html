@@ -1,0 +1,48 @@
+{% comment %}
+  Pendências do Drive — os documentos que não chegaram lá.
+
+  Cada uma é um `c-v2.record` (2026-08-19). Antes era `record-row` escrito à
+  mão, com a grade de fatos do sistema antigo; a lista aqui é a mesma coisa que
+  qualquer lista simples do sistema: um título, um selo e duas linhas de apoio.
+
+  O que a linha responde, nesta ordem: qual documento, de que tipo, por que
+  falhou, quantas vezes já se tentou e quando foi a última. O erro cru fica
+  atrás de um `<details>` — quem lê a lista quer saber o que fazer, não a
+  mensagem da API do Google.
+{% endcomment %}
+<div class="perfil-pendencias-list">
+  {% for p in drive_pendencias %}
+    <c-v2.record
+      :title="p.titulo"
+      :status="p.tipo_label"
+      heading_level="3"
+    >
+      <c-slot name="meta">{{ p.motivo }}{% if p.acao %} — {{ p.acao }}{% endif %}</c-slot>
+
+      <c-slot name="body">
+        {% if p.contexto %}<p class="record__empty-hint">{{ p.contexto }}</p>{% endif %}
+
+        <div class="fact-list">
+          <c-v2.fact label="Tentativas" :value="p.tentativas" />
+          {% with atualizado=p.atualizado_em|date:"d/m H:i" %}
+            <c-v2.fact label="Atualizado" :value="atualizado" />
+          {% endwith %}
+        </div>
+
+        {% if p.detalhe %}
+          <details class="perfil-pendencia__detalhe">
+            <summary>Detalhes técnicos</summary>
+            <pre class="perfil-pendencia__erro">{{ p.detalhe }}</pre>
+          </details>
+        {% endif %}
+      </c-slot>
+    </c-v2.record>
+  {% endfor %}
+</div>
+
+<div class="perfil-block-actions">
+  <form method="post" action="{% url 'google_drive:reprocessar_pendencias' %}">
+    {% csrf_token %}
+    <c-v2.button label="Tentar novamente agora" variant="primary" icon="arrow-right" :icon_after="True" type="submit" />
+  </form>
+</div>

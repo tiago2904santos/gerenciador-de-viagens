@@ -97,6 +97,22 @@
   width: 18px;
 }
 
+/* Como BOTÃO (a ação que cria, num `<form>` POST) ele precisa das declarações
+   que o navegador dá de graça ao link e não ao botão: fonte própria, borda e
+   fundo do agente. Sem elas, a mesma classe saía com a cara do botão do
+   sistema operacional. */
+:is(html[data-theme]) button.list-page__action {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+/* O formulário é só o portador do POST: não pode ocupar espaço nem criar uma
+   segunda caixa fixa em volta do botão. */
+:is(html[data-theme]) .list-page__action-form {
+  display: contents;
+}
+
 /* O botão paira sobre o fim da lista. Sem esta folga ele cobre a paginação
    exatamente quando a pessoa chega nela. */
 :is(html[data-theme]) .list-page:has(.list-page__action) {

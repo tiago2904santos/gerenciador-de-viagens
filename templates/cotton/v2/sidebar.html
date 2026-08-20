@@ -4,11 +4,14 @@
   Barra de navegação do shell, reconstruída sobre o sistema v2
   (`NOVO-20260819-220313-6c7bd5d89165`).
 
-  Continua FORA de `cotton/v2/` de propósito, e o inventário de
-  `test_componentes_sem_orfao` diz por quê: aqui mora a infraestrutura do shell,
-  não um componente de vitrine. A galeria do UI Lab é o consumidor de produção
-  de tudo que está em `v2/`; um componente de casca não teria como aparecer lá
-  sem que a vitrine renderizasse a barra inteira dentro de si.
+  Mora em `v2/` desde 2026-08-19, junto com o resto: o diretório legado foi
+  esvaziado, e manter dois endereços para "componente do sistema" era a última
+  linha do sistema antigo viva por convenção, não por necessidade.
+
+  Ela e a folha de símbolos são as duas peças de CASCA do v2 — as únicas que a
+  galeria do UI Lab não mostra, porque não cabem numa vitrine: a barra É a
+  página, e o sprite não desenha nada sozinho. `test_main_preview` conhece as
+  duas pelo nome.
 
   O que mudou: o markup passa a compor `c-v2.button` e `c-v2.icon_button` em vez
   de escrever `<a>`/`<button>` cru com classe de mão, os ícones vêm da folha de

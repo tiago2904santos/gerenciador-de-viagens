@@ -46,7 +46,7 @@
       cv.scrollIntoView({ behavior: "smooth", block: "start" });
     }
     thumbEls.forEach(function (el, i) {
-      el.classList.toggle("doc-pdf-thumb--active", i === idx);
+      el.classList.toggle("pdf-viewer__thumb--active", i === idx);
     });
     currentPage = num;
     if (pageLabel && pdfDoc) {
@@ -65,7 +65,7 @@
         pdfDoc.getPage(i).then(function (page) {
           const wrap = document.createElement("button");
           wrap.type = "button";
-          wrap.className = "doc-pdf-thumb";
+          wrap.className = "pdf-viewer__thumb";
           wrap.setAttribute("aria-label", "Página " + i);
           const canvas = document.createElement("canvas");
           const vp = page.getViewport({ scale: 0.2 });

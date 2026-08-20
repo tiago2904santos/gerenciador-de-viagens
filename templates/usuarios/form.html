@@ -1,20 +1,33 @@
-{% extends "cotton/page/flow_base.html" %}
+{% extends "base.html" %}
 
-{% comment %}
-  Página de criação da administração, compartilhada pelos três formulários
-  (usuário, área e vínculo). A view escolhe `body_template`, `card_title` e
-  `submit_label`; o casco é o mesmo do `cadastros/*/form.html`.
-{% endcomment %}
+{% block title %}{{ page_title }}{% endblock %}
 
-{% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
-{% block flow_shell_extra %} document-form-page{% endblock %}
+{% block content %}
+  {% comment %}
+    Página de criação da administração, compartilhada pelos três formulários
+    (usuário, área e vínculo). A view escolhe `body_template`, `card_title` e
+    `submit_label`; o casco é o mesmo das outras telas de formulário.
 
-{% block flow_body %}
-  <form method="post" class="document-form travel-document-wizard__form" novalidate>
-    {% csrf_token %}
-    <c-v2.form_errors :form="form" only />
-    <div class="form-section-stack form-section-stack--comfortable" data-travel-document-wizard-step1>
-      <c-v2.panel :title="card_title" :description="page_description" title_id="usuarios-form-card-title" extra_class="travel-document-card" body_extra_class="travel-document-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include body_template with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook form=form heading_level=heading_level shell=shell variant=variant only %}</c-slot><c-slot name="footer">{% include "usuarios/partials/_form_card_footer.html" with flow_back_url=flow_back_url submit_label=submit_label only %}</c-slot></c-v2.panel>
-    </div>
-  </form>
+    Estendia `cotton/page/flow_base.html` (2026-08-19). O casco antigo trazia
+    quatro classes de tela do sistema anterior — `page-shell`, `cv-page`,
+    `travel-document-wizard`, `form-section-stack` — para desenhar o que
+    `form-page` desenha com uma.
+  {% endcomment %}
+  <div class="form-page">
+    <c-v2.header :title="page_title">
+      <c-slot name="aside">
+        <c-v2.button :href="flow_back_url" :label="flow_back_label" icon="arrow-left" />
+      </c-slot>
+    </c-v2.header>
+
+    <form method="post" class="form-page__form" novalidate>
+      {% csrf_token %}
+      <c-v2.form_errors :form="form" />
+
+      <c-v2.panel :title="card_title" :description="page_description">
+        <c-slot name="body">{% include body_template with form=form only %}</c-slot>
+        <c-slot name="footer">{% include "usuarios/partials/_form_card_footer.html" with flow_back_url=flow_back_url submit_label=submit_label only %}</c-slot>
+      </c-v2.panel>
+    </form>
+  </div>
 {% endblock %}

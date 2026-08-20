@@ -1,0 +1,182 @@
+/* Visualizador de PDF — par de `templates/documentos/pdf_viewer.html`.
+ *
+ * Veio de `pages/document-viewer.css` em 2026-08-19, com três mudanças e nenhum
+ * arranjo novo: o vocabulário passou a ser um só (`pdf-viewer__*`, no lugar da
+ * mistura `document-viewer__*` + `doc-pdf-*`), as medidas passaram a sair dos
+ * tokens do v2 em vez de `var(--space-N, 1rem)` com fallback, e o desenho da
+ * PRÉVIA ilustrativa saiu junto com o ramo `is_demo`, que nenhuma tela chamava.
+ *
+ * As superfícies são declaradas aqui, e não herdadas: esta tela não é uma lista
+ * nem um formulário — é uma moldura escura em volta de um documento branco, e o
+ * papel precisa se destacar do que está atrás dele.
+ */
+
+:is(html[data-theme]) .pdf-viewer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  /* A janela inteira menos o cabeçalho: um visualizador que não ocupa a tela
+     obriga a rolar a página E o documento, duas rolagens concorrentes. */
+  min-height: calc(100vh - 120px);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .pdf-viewer__toolbar {
+  align-items: center;
+  background: var(--surface-rail);
+  border-radius: var(--radius-panel, var(--radius-field));
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-tight);
+  justify-content: space-between;
+  padding: var(--gap-tight) var(--gap);
+}
+
+:is(html[data-theme]) .pdf-viewer__group {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-tight);
+}
+
+:is(html[data-theme]) .pdf-viewer__filename {
+  color: var(--text-strong);
+  font-weight: var(--weight-strong);
+  /* 28 caracteres: nome de arquivo é longo e o resto da barra tem função. */
+  max-width: 28ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* `tabular-nums` para o contador não dançar a cada página virada — a largura do
+   "1" e a do "8" são diferentes em fonte proporcional. */
+:is(html[data-theme]) .pdf-viewer__page {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 6ch;
+  text-align: center;
+}
+
+:is(html[data-theme]) .pdf-viewer__zoom {
+  align-items: center;
+  color: var(--text-muted);
+  display: flex;
+  font-size: var(--text-size-eyebrow);
+  gap: 6px;
+}
+
+:is(html[data-theme]) .pdf-viewer__zoom-label {
+  white-space: nowrap;
+}
+
+:is(html[data-theme]) .pdf-viewer__body {
+  display: grid;
+  flex: 1;
+  gap: var(--gap);
+  grid-template-columns: minmax(120px, 160px) minmax(0, 1fr);
+  min-height: 0;
+}
+
+:is(html[data-theme]) .pdf-viewer__sidebar {
+  background: var(--surface-rail);
+  border-radius: var(--radius-field);
+  overflow: auto;
+  padding: var(--gap-tight);
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-width: thin;
+}
+
+:is(html[data-theme]) .pdf-viewer__thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-tight);
+}
+
+/* A miniatura é BOTÃO: o navegador lhe dá fundo e borda próprios, e sem zerar
+   os dois a página aparece dentro de uma caixa cinza do sistema. */
+:is(html[data-theme]) .pdf-viewer__thumb {
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 3px;
+}
+
+:is(html[data-theme]) .pdf-viewer__thumb canvas {
+  border-radius: 4px;
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+/* A página aberta ganha o contorno de accent — o mesmo marcador de escolha que
+   o resto do sistema usa. Antes era uma regra de tema, longe daqui. */
+:is(html[data-theme]) .pdf-viewer__thumb--active {
+  border-color: var(--accent);
+}
+
+:is(html[data-theme]) .pdf-viewer__stage {
+  background: var(--surface-rail);
+  border-radius: var(--radius-field);
+  min-height: 480px;
+  overflow: auto;
+  position: relative;
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-width: thin;
+}
+
+:is(html[data-theme]) .pdf-viewer__canvas {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding: var(--gap);
+}
+
+:is(html[data-theme]) .pdf-viewer__canvas canvas {
+  height: auto;
+  max-width: 100%;
+}
+
+:is(html[data-theme]) .pdf-viewer__fallback {
+  border: 0;
+  min-height: 70vh;
+  width: 100%;
+}
+
+/* Em tela estreita as miniaturas viram uma fita horizontal: a coluna de 160px
+   comeria metade da largura útil do documento. */
+@media (max-width: 900px) {
+  :is(html[data-theme]) .pdf-viewer__body {
+    grid-template-columns: 1fr;
+  }
+
+  :is(html[data-theme]) .pdf-viewer__sidebar {
+    display: flex;
+    max-height: 150px;
+  }
+
+  :is(html[data-theme]) .pdf-viewer__thumbs {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  :is(html[data-theme]) .pdf-viewer__thumb {
+    flex: 0 0 86px;
+  }
+}
+
+@media (max-width: 720px) {
+  :is(html[data-theme]) .pdf-viewer__toolbar {
+    align-items: stretch;
+  }
+
+  :is(html[data-theme]) .pdf-viewer__group {
+    width: 100%;
+  }
+
+  :is(html[data-theme]) .pdf-viewer__zoom {
+    margin-left: auto;
+  }
+}
