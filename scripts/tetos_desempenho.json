@@ -4,11 +4,11 @@
     "core:dashboard": {
       "200": {
         "consultas": 2,
-        "kb_html": 36.4
+        "kb_html": 38.7
       },
       "20000": {
         "consultas": 2,
-        "kb_html": 36.4
+        "kb_html": 38.7
       }
     },
     "eventos:index": {

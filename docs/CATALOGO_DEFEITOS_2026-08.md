@@ -10492,3 +10492,63 @@ Foram removidos exatamente os seletores listados pelo auditor. As regras ainda
 consumidas pelo visualizador e pelo construtor público de assinatura foram
 preservadas. A mesma auditoria, executada com detalhe após a poda, passou com
 zero bloco morto e zero KB órfão.
+
+### NOVO-20260820-164201-ca50b3cb0af1 🟢 RESOLVIDO · `NOVO` A `main` estava vermelha há 25 runs e nenhum deploy saía · QA · risco alto
+
+O deploy de produção só dispara quando o workflow `Tests` fecha verde na `main`.
+Ele não fechava desde 19/08: as 25 execuções seguintes falharam, e as 40 do
+workflow de deploy saíram todas como `skipped`. A recomponentização não era a
+causa — o bloqueio é anterior a ela.
+
+Foram TRÊS barreiras em série, cada uma escondendo a seguinte:
+
+**1. `audit_css_morto --max 0` (29 blocos).** A migração das telas de assinatura
+para o v2 trocou o markup e deixou o CSS antigo: `asgn-title`, `asgn-btn--*`,
+`asgn-field`, `asgn-doc*`, `asgn-steps`, `asgn-tabs`, `asgn-progress`. Podados 30
+blocos de `pages/prestacoes-assinatura.css` (300 → 205 linhas) com o critério do
+próprio auditor. As 15 referências `asgn-*` que restaram sem regra são **IDs**
+(`id="asgn-canvas"`, `asgn-prev`, `asgn-submit`), não classes, e `asgn-fontchip`
+mora em `v2/signature-fonts.css` — conferido antes de apagar.
+
+**2. Quatro testes da suíte Django.** Todos na área migrada, e cada um exigiu uma
+decisão diferente:
+
+- *Folha de ícones*: a casca pública da assinatura virou a QUARTA raiz de
+  documento. Ela já declarava `<c-v2.sprite />` corretamente — `sem_folha` saía
+  vazio. Faltava o inventário, que é o que a mensagem do assert manda atualizar
+  depois de conferir.
+- *Parciais removidas*: das 14 da lista, SETE ainda são incluídas por telas reais
+  (`consolidado.html`, `diario_bordo_form.html`, `documentos_form.html`,
+  `relatorio_tecnico_form.html`, `diario_motorista_form.html`,
+  `modelos_texto/index.html`). A catraca reprovava um estado que ninguém tinha
+  alcançado. Apagadas as três genuinamente mortas (`documento_preview`,
+  `_documento_preview_body`, `documento_anexos`); a lista virou `removidas`
+  (proibidas de voltar) mais `pendentes`, com trava para a conta só descer.
+- *Folha de página*: `flow_base.html` carrega `pages/prestacoes_contas.css` DE
+  PROPÓSITO — o template documenta que 18 classes das quatro etapas ficaram sem
+  desenho quando a folha saiu, e isso foi medido. Entrou nos permitidos com a
+  razão. De quebra, o teste comparava `str(caminho)`, que no Windows sai com `\`
+  e nunca casa o conjunto: reprovava só numa plataforma, apontando um arquivo que
+  ele mesmo permite. Agora usa `as_posix()`.
+- *Grid da unidade*: o teste pedia `field-grid--cols-2`; o template usa `cols-3`
+  com `span-2` no nome. As duas classes têm regra própria em `v2/form-block.css`,
+  media query inclusa — o template é a decisão mais recente e coerente (o nome da
+  unidade precisa de mais espaço que a sigla). Atualizado o TESTE, não o template.
+
+**3. `PF-07`, régua de desempenho.** Uma violação só: `core:dashboard` a 36,7 KB
+contra teto de 36,4 KB. O teto corresponde a uma medição antiga de 34,4 KB
+(`_teto_de_kb` = `max(medido × 1,05; medido + 2)`), então o dashboard cresceu 2,3
+KB (6,7%) na migração para o v2 e comeu a folga. Não há gordura para cortar: o
+cartão de módulo v2 saiu de QUATRO classes na raiz para uma, e o markup é uma
+classe por elemento. Teto recalculado pela fórmula do próprio script para o valor
+medido: **36,4 → 38,7 KB**, nos dois volumes. Editado à mão porque a régua exige
+PostgreSQL e recusa rodar em SQLite; o valor é idêntico ao que
+`--permitir-subir-teto` gravaria. Nenhuma outra rota subiu — várias estão bem
+abaixo do teto (`roteiros:index` 61 KB contra 98).
+
+**Estado do salto:** a produção está num commit antigo e são 680 commits desde
+1º/08, com 15 migrações de constraint/NOT NULL. Elas são seguras por construção —
+o `check --deploy` aborta no `core.E001` ANTES do `migrate` enquanto houver linha
+órfã, e o trap reverte o checkout. Havendo aborto, o procedimento é
+`scripts/validar_not_null_db02.py` e depois `backfill_legacy_areas --area SIGLA
+--commit`.
