@@ -681,6 +681,10 @@ textarea[readonly] {
   color: var(--color-input-disabled-text, var(--color-text-muted, var(--color-muted)));
   opacity: 1;
 }
+html[data-theme="dark"] body {
+  background-attachment: fixed;
+  
+}
 html[data-theme="dark"] ::selection {
   background: var(--color-selection);
   color: var(--color-heading);

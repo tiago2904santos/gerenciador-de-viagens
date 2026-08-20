@@ -4,91 +4,130 @@
 {% block title %}Assinar {{ doc_label }}{% endblock %}
 
 {% block content %}
-<section class="asgn-card asgn-card--wide" id="asgn-app"
-         data-pdf-url="{{ pdf_url }}"
-         data-worker-src="{{ worker_src }}"
-         data-nome="{{ nome|escape }}">
-  <header class="asgn-sign-head">
-    <h1 class="asgn-title">Assinar {{ doc_label }}</h1>
-    <span class="asgn-progress">{{ indice }} de {{ total }}</span>
-  </header>
+  {% comment %}
+    Assinar — a única tela do sistema com um visualizador de PDF em canvas e uma
+    assinatura arrastável. Esse miolo continua sendo dela: `asgn-viewer`,
+    `asgn-stage`, `asgn-drag` e a folha de criação (`asgn-sheet`) não têm par no
+    v2 porque não há segunda tela que faça isso.
 
-  {% if erro %}<div class="asgn-alert" role="alert">{{ erro }}</div>{% endif %}
+    O que MUDOU na migração: a caixa, os avisos, os campos e todos os botões
+    passaram a ser os do sistema. Onde havia `asgn-btn`, `asgn-alert`,
+    `asgn-input` e `asgn-card`, agora há `button`, `alert`, `input` e `panel`.
 
-  <ol class="asgn-steps">
-    <li>Crie sua assinatura</li>
-    <li>Arraste para a posição no documento</li>
-    <li>Envie</li>
-  </ol>
+    Os `id` são contrato de `js/pages/prestacoes-assinatura.js`, que acha cada
+    botão por eles — por isso o `c-v2.button` ganhou `element_id`. Renomear um
+    deixa o botão na tela e desliga a ação.
+  {% endcomment %}
+  <section id="asgn-app"
+           data-pdf-url="{{ pdf_url }}"
+           data-worker-src="{{ worker_src }}"
+           data-nome="{{ nome|escape }}">
+    {% comment %}
+      O `stringformat` de cada número vem ANTES do `add`: somar `str` com
+      `int` faz o filtro cair no `except` e devolver STRING VAZIA, calado. O
+      selo de progresso saía em branco no cabeçalho.
+    {% endcomment %}
+    {% with atual=indice|stringformat:"s" quantos=total|stringformat:"s" %}
+    {% with progresso=atual|add:" de "|add:quantos %}
+      <c-v2.panel title="Assinar {{ doc_label }}" description="Crie sua assinatura, arraste para a posição no documento e envie.">
+        <c-slot name="actions"><c-v2.chip :label="progresso" tone="progress" /></c-slot>
 
-  <div class="asgn-toolbar">
-    <c-v2.plain_button type="button" class_name="asgn-btn asgn-btn--ghost" id="asgn-open-builder" only>✍ Criar assinatura</c-v2.plain_button>
-    <div class="asgn-pager">
-      <c-v2.plain_button type="button" id="asgn-prev" class_name="asgn-iconbtn" aria-label="Página anterior" only>‹</c-v2.plain_button>
-      <span id="asgn-page-label" class="asgn-pager__label">1 / 1</span>
-      <c-v2.plain_button type="button" id="asgn-next" class_name="asgn-iconbtn" aria-label="Próxima página" only>›</c-v2.plain_button>
+        <c-slot name="body">
+          {% if erro %}<c-v2.alert tone="error" :message="erro" />{% endif %}
+
+          <div class="asgn-toolbar">
+            <c-v2.button label="Criar assinatura" icon="edit" element_id="asgn-open-builder" />
+            <div class="asgn-pager">
+              <c-v2.icon_button icon="arrow-left" element_id="asgn-prev" aria_label="Página anterior" tooltip="Página anterior" />
+              <span id="asgn-page-label" class="asgn-pager__label">1 / 1</span>
+              <c-v2.icon_button icon="arrow-right" element_id="asgn-next" aria_label="Próxima página" tooltip="Próxima página" />
+            </div>
+          </div>
+
+          {% comment %}
+            O visualizador e a área de arraste: marcação própria desta tela, com
+            os `id` que o motor de PDF procura.
+          {% endcomment %}
+          <div class="asgn-viewer" id="asgn-viewer">
+            <div class="asgn-stage" id="asgn-stage">
+              <canvas id="asgn-canvas"></canvas>
+              <div class="asgn-drag" id="asgn-drag" hidden>
+                <img id="asgn-drag-img" alt="Sua assinatura" draggable="false">
+                <span class="asgn-drag__handle" id="asgn-resize" aria-hidden="true"></span>
+              </div>
+            </div>
+          </div>
+          <p class="field__help" id="asgn-hint">Crie sua assinatura para posicioná-la no documento.</p>
+
+          <form method="post" id="asgn-form" action="{{ post_url }}">
+            {% csrf_token %}
+            <input type="hidden" name="assinatura_png" id="f-png">
+            <input type="hidden" name="modo" id="f-modo">
+            <input type="hidden" name="fonte" id="f-fonte">
+            <input type="hidden" name="pagina" id="f-pagina" value="0">
+            <input type="hidden" name="pos_x" id="f-x">
+            <input type="hidden" name="pos_y" id="f-y">
+            <input type="hidden" name="largura" id="f-w">
+            <input type="hidden" name="altura" id="f-h">
+
+            <c-v2.card_footer>
+              <c-slot name="primary">
+                <c-v2.button label="Enviar assinatura" variant="primary" icon="check" type="submit" element_id="asgn-submit" :disabled="True" />
+              </c-slot>
+            </c-v2.card_footer>
+          </form>
+        </c-slot>
+      </c-v2.panel>
+    {% endwith %}{% endwith %}
+  </section>
+
+  {% comment %}
+    A folha de criação da assinatura. Continua com marcação própria — é um
+    diálogo que sobe de baixo no celular, com duas abas e um canvas de desenho, e
+    o `c-v2.modal` do sistema é outro objeto (centralizado, com `<dialog>`).
+    O que entrou aqui foram os botões, os campos e o toggle.
+  {% endcomment %}
+  <div class="asgn-sheet" id="asgn-sheet" hidden>
+    <div class="asgn-sheet__backdrop" id="asgn-sheet-backdrop"></div>
+    <div class="asgn-sheet__panel" role="dialog" aria-label="Criar assinatura">
+      <c-v2.toggle variant="state" aria_label="Como criar a assinatura" extra_class="toggle--fill">
+        {% comment %}
+          As abas são os segmentos de um toggle de estado, e é `data-tab` que o
+          script usa para achá-las — a classe `asgn-tab` saiu junto com a folha
+          de página que a pintava.
+
+          Quem marca a escolhida é `aria-pressed`, que é o que a folha do toggle
+          lê. Com o `is-active` de antes, o script trocava uma classe que nenhuma
+          regra do v2 conhece: as duas abas ficavam com a mesma cara o tempo
+          todo.
+        {% endcomment %}
+        <c-v2.button label="Escolher fonte" extra_class="toggle__item" hook_attr="data-tab" hook_value="fonte" pressed="true" />
+        <c-v2.button label="Desenhar à mão" extra_class="toggle__item" hook_attr="data-tab" hook_value="desenho" pressed="false" />
+      </c-v2.toggle>
+
+      <div class="asgn-tabpane" data-pane="fonte">
+        <c-v2.field label="Nome que aparecerá na assinatura" label_for="asgn-name-input">
+          <c-slot name="control">
+            <c-v2.input input_id="asgn-name-input" :value="nome" aria_label="Nome que aparecerá na assinatura" maxlength="60" />
+          </c-slot>
+        </c-v2.field>
+
+        <c-v2.signature_fonts :fontes="fontes" :nome="nome" />
+      </div>
+
+      <div class="asgn-tabpane" data-pane="desenho" hidden>
+        <div class="asgn-drawwrap">
+          <canvas id="asgn-draw" class="asgn-draw"></canvas>
+        </div>
+        <c-v2.button label="Limpar" icon="x" size="sm" element_id="asgn-draw-clear" />
+      </div>
+
+      <c-v2.card_footer>
+        <c-slot name="secondary"><c-v2.button label="Cancelar" element_id="asgn-sheet-cancel" /></c-slot>
+        <c-slot name="primary"><c-v2.button label="Usar assinatura" variant="primary" icon="check" element_id="asgn-sheet-apply" :disabled="True" /></c-slot>
+      </c-v2.card_footer>
     </div>
   </div>
-
-  <div class="asgn-viewer" id="asgn-viewer">
-    <div class="asgn-stage" id="asgn-stage">
-      <canvas id="asgn-canvas"></canvas>
-      <div class="asgn-drag" id="asgn-drag" hidden>
-        <img id="asgn-drag-img" alt="Sua assinatura" draggable="false">
-        <span class="asgn-drag__handle" id="asgn-resize" aria-hidden="true"></span>
-      </div>
-    </div>
-  </div>
-  <p class="asgn-hint" id="asgn-hint">Crie sua assinatura para posicioná-la no documento.</p>
-
-  <form method="post" id="asgn-form" action="{{ post_url }}">
-    {% csrf_token %}
-    <input type="hidden" name="assinatura_png" id="f-png">
-    <input type="hidden" name="modo" id="f-modo">
-    <input type="hidden" name="fonte" id="f-fonte">
-    <input type="hidden" name="pagina" id="f-pagina" value="0">
-    <input type="hidden" name="pos_x" id="f-x">
-    <input type="hidden" name="pos_y" id="f-y">
-    <input type="hidden" name="largura" id="f-w">
-    <input type="hidden" name="altura" id="f-h">
-    <c-v2.plain_button type="submit" class_name="asgn-btn asgn-btn--primary asgn-btn--block" id="asgn-submit" disabled only>
-      Enviar assinatura
-    </c-v2.plain_button>
-  </form>
-</section>
-
-<div class="asgn-sheet" id="asgn-sheet" hidden>
-  <div class="asgn-sheet__backdrop" id="asgn-sheet-backdrop"></div>
-  <div class="asgn-sheet__panel" role="dialog" aria-label="Criar assinatura">
-    <div class="asgn-tabs">
-      <c-v2.plain_button type="button" class_name="asgn-tab is-active" data-tab="fonte" only>Escolher fonte</c-v2.plain_button>
-      <c-v2.plain_button type="button" class_name="asgn-tab" data-tab="desenho" only>Desenhar à mão</c-v2.plain_button>
-    </div>
-
-    <div class="asgn-tabpane" data-pane="fonte">
-      <label class="asgn-field__label" for="asgn-name-input">Nome que aparecerá na assinatura</label>
-      <input class="asgn-input" id="asgn-name-input" maxlength="60" value="{{ nome }}">
-      <div class="asgn-fontlist" id="asgn-fontlist">
-        {% for f in fontes %}
-        <c-v2.plain_button type="button" class_name="asgn-fontchip asgn-fontchip--{{ f.key }}" data-key="{{ f.key }}"
-                data-family="{{ f.family }}" only>{{ nome }}</c-v2.plain_button>
-        {% endfor %}
-      </div>
-    </div>
-
-    <div class="asgn-tabpane" data-pane="desenho" hidden>
-      <div class="asgn-drawwrap">
-        <canvas id="asgn-draw" class="asgn-draw"></canvas>
-      </div>
-      <c-v2.plain_button type="button" class_name="asgn-btn asgn-btn--ghost asgn-btn--sm" id="asgn-draw-clear" only>Limpar</c-v2.plain_button>
-    </div>
-
-    <div class="asgn-sheet__actions">
-      <c-v2.plain_button type="button" class_name="asgn-btn asgn-btn--ghost" id="asgn-sheet-cancel" only>Cancelar</c-v2.plain_button>
-      <c-v2.plain_button type="button" class_name="asgn-btn asgn-btn--primary" id="asgn-sheet-apply" disabled only>Usar assinatura</c-v2.plain_button>
-    </div>
-  </div>
-</div>
 {% endblock %}
 
 {% block body_js %}

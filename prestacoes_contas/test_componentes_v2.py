@@ -192,16 +192,15 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
             "<c-documents.",
             "<c-page.",
         )
-        # A ÚNICA exceção, e ela não é visual: `<c-ui.icons._sprite />` é a folha
-        # de `<symbol>` dos ícones do sistema. Os ícones são `<use href="#cv-icon-…">`,
-        # então sem os símbolos na página cada `<use>` aponta para o nada. O
-        # `base.html` a inclui para todo o resto do sistema; a casca pública, que
-        # é a única tela que não estende o `base.html`, precisa declará-la. Não
-        # há par no v2 porque não é peça do v2 — é a fonte dos desenhos.
-        sprite = "<c-ui.icons._sprite"
+        # A folha de `<symbol>` dos ícones era a ÚNICA exceção desta varredura:
+        # enquanto morava em `<c-ui.icons._sprite />`, casava com o namespace
+        # legado sem ser peça visual, e precisava ser descontada antes da
+        # contagem. Ela passou a ser `<c-v2.sprite />` (PF-01), que não casa com
+        # nenhum prefixo da lista acima — a exceção deixou de existir e a
+        # varredura voltou a ser direta.
         offenders = {}
         for template in sorted(PRESTACOES.rglob("*.html")):
-            source = marcacao(template).replace(sprite, "")
+            source = marcacao(template)
             encontrados = [tag for tag in namespaces_legados if tag in source]
             if encontrados:
                 offenders[str(template.relative_to(TEMPLATES))] = encontrados
@@ -217,7 +216,7 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
         dentro. O `base.html` inclui a folha; esta casca não o estende.
         """
         source = marcacao(PRESTACOES / "assinatura" / "base_publico.html")
-        self.assertIn("<c-ui.icons._sprite", source)
+        self.assertIn("<c-v2.sprite", source)
 
     def test_as_quatro_etapas_do_fluxo_partem_da_mesma_casca(self):
         """Uma casca só, e ela é o `c-v2.wizard_page`.

@@ -3,41 +3,69 @@
 {% block title %}Confirmar identidade{% endblock %}
 
 {% block content %}
-<section class="asgn-card">
-  <h1 class="asgn-title">Confirme sua identidade</h1>
-  <p class="asgn-lead">Documento a assinar: <strong>{{ doc_label }}</strong></p>
+  {% with descricao_doc="Documento a assinar: "|add:doc_label %}
+    <c-v2.panel title="Confirme sua identidade" :description="descricao_doc">
+      <c-slot name="body">
+        {% if erro %}<c-v2.alert tone="error" :message="erro" />{% endif %}
 
-  {% if erro %}<div class="asgn-alert" role="alert">{{ erro }}</div>{% endif %}
+        {% if bloqueado %}
+          <c-v2.alert tone="warning" message="Muitas tentativas incorretas. Aguarde alguns minutos e abra o link novamente." />
+        {% else %}
+          <form method="post" novalidate autocomplete="off">
+            {% csrf_token %}
 
-  {% if bloqueado %}
-    <p class="asgn-lead">Muitas tentativas incorretas. Aguarde alguns minutos e abra o link novamente.</p>
-  {% else %}
-  <form method="post" class="asgn-form" novalidate autocomplete="off">
-    {% csrf_token %}
+            {% comment %}
+              O nome é FATO, e não campo: ele vem do documento e não se digita.
+              A confirmação é o que se faz com ele, e por isso é um cartão de
+              escolha — a caixa clicável inteira, que num celular é a diferença
+              entre acertar e errar o alvo.
+            {% endcomment %}
+            <div class="fact-list">
+              <c-v2.fact label="Seu nome completo" :value="nome" />
+            </div>
 
-    <div class="asgn-field">
-      <span class="asgn-field__label">Seu nome completo</span>
-      <div class="asgn-name">{{ nome }}</div>
-    </div>
+            {% with confirmacao="Confirmo que sou "|add:nome|add:" e que o nome está correto." %}
+              <c-v2.choice_grid aria_label="Confirmação de identidade">
+                <c-slot name="body">
+                  <c-v2.choice_card input_type="checkbox" input_name="confirma_nome" value="1">{{ confirmacao }}</c-v2.choice_card>
+                </c-slot>
+              </c-v2.choice_grid>
+            {% endwith %}
 
-    <label class="asgn-check">
-      <input type="checkbox" name="confirma_nome">
-      <span>Confirmo que sou <strong>{{ nome }}</strong> e que o nome está correto.</span>
-    </label>
+            <c-v2.field label="Seu CPF" label_for="cpf">
+              <c-slot name="control">
+                {% comment %}
+                  `inputmode`, `maxlength`, `required` e `autocomplete` caem no
+                  `attrs` do componente — o coletor de atributos não declarados
+                  do Cotton. É o caminho certo para o que é do `<input>` e não do
+                  desenho: declará-los um a um no componente faria dele um
+                  espelho do HTML.
+                {% endcomment %}
+                <c-v2.input
+                  input_id="cpf"
+                  name="cpf"
+                  placeholder="000.000.000-00"
+                  aria_label="Seu CPF"
+                  inputmode="numeric"
+                  maxlength="14"
+                  autocomplete="off"
+                  required
+                />
+              </c-slot>
+            </c-v2.field>
 
-    <div class="asgn-field">
-      <label class="asgn-field__label" for="cpf">Seu CPF</label>
-      <input class="asgn-input asgn-input--cpf" id="cpf" name="cpf"
-             inputmode="numeric" maxlength="14"
-             autocomplete="off" placeholder="000.000.000-00" required>
-    </div>
+            <c-v2.card_footer>
+              <c-slot name="primary">
+                <c-v2.button label="Continuar para assinar" variant="primary" icon="arrow-right" :icon_after="True" type="submit" />
+              </c-slot>
+            </c-v2.card_footer>
+          </form>
+        {% endif %}
 
-    <c-v2.plain_button class_name="asgn-btn asgn-btn--primary" type="submit" only>Continuar para assinar</c-v2.plain_button>
-  </form>
-  {% endif %}
-
-  <p class="asgn-help">O nome está incorreto? Entre em contato com quem enviou o link.</p>
-</section>
+        <p class="field__help">O nome está incorreto? Entre em contato com quem enviou o link.</p>
+      </c-slot>
+    </c-v2.panel>
+  {% endwith %}
 {% endblock %}
 
 {% block body_js %}

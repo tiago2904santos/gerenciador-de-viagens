@@ -201,11 +201,21 @@ textarea[readonly] {
    rolado. Se for medir de novo, meça as quatro de fundo, não só cor e imagem.
 
    `font-family` saiu daqui: virou `--font-sans` em `tokens.css`, valendo nos
-   dois temas (`NOVO-62`). `-webkit-font-smoothing` saiu no `NOVO-58` (E8) e
-   virou regra base em `base/base.css` — era 48,2% da divergência não-cor do
-   sistema. Se voltarem a ser declarados aqui, a divergência volta com eles. */
+   dois temas (`NOVO-62`).
+
+   O CORPO DA REGRA ABAIXO É INTOCÁVEL, o comentário de dentro incluído. O
+   `css_profiles_manifest.json` indexa regra pelo sha256 do texto SERIALIZADO, e
+   comentário entre as chaves entra nesse texto. Tirar aquele parágrafo de lá
+   muda o hash, e a regra some dos quinze `profiles/*.css` sem levantar erro
+   nenhum — o fundo volta a ser preto ao rolar, nas telas servidas por perfil.
+   Aconteceu duas vezes nesta migração. */
 html[data-theme="dark"] body {
   background-attachment: fixed;
+  /* NOVO-58 (E8): `-webkit-font-smoothing` saiu daqui e virou regra base em
+     `base/base.css`, junto de `font-family` e `line-height`. Era 48,2% da
+     divergência não-cor do sistema — a maior fatia isolada, e maior que as
+     quatro famílias catalogadas da E8 somadas. Se voltar a ser declarado aqui,
+     a divergência volta com ele. */
 }
 
 html[data-theme="dark"] ::selection {
