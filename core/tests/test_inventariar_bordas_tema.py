@@ -80,7 +80,13 @@ class SuperficiesClarasContratoTests(SimpleTestCase):
 
     def test_tema_claro_tem_tres_niveis_de_superficie(self):
         self.assertIn("--color-surface: #ffffff;", self.tokens)
-        self.assertIn("--color-surface-muted: #f7fbff;", self.tokens)
+        # #f7fbff foi APOSENTADO em 2026-08-20
+        # (NOVO-20260820-220939-23c3de47a4cc): ele ocupava o meio da faixa entre
+        # o degrau tingido e o branco, e era o que impedia o cartão de clarear
+        # sem reprovar em `audit_paleta --max 0`. As superfícies que o usavam
+        # passaram a #f0f4f9 — 1,5 de deltaE2000, abaixo do limiar perceptível,
+        # então nenhuma delas mudou de cara. Os três níveis continuam três.
+        self.assertIn("--color-surface-muted: #f0f4f9;", self.tokens)
         self.assertIn("--color-surface-soft: #e3eaf2;", self.tokens)
 
     def test_componentes_redesenhados_nao_ficam_predicados_no_escuro(self):

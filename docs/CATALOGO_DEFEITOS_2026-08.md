@@ -10644,6 +10644,76 @@ conteúdo passam a caber nos 149px úteis. `fact--never-truncate` segue no lugar
 então o valor quebra linha em vez de receber reticências. Medido depois:
 173/173/173.
 
+### NOVO-20260820-221339-ba96e97ceae3 🟢 RESOLVIDO · `NOVO` O atalho `font: inherit` apagava o peso da ação flutuante · UI · risco baixo
+
+`static/css/v2/list-page.css:75` dá `font-weight: var(--weight-strong)` (900) ao
+`.list-page__action`. Logo abaixo, a regra que veste a variante `<button>` fazia
+`font: inherit` — e o atalho `font` reescreve TODAS as longhands que não estão
+nele, então herdava o peso do corpo e derrubava os 900 para 500.
+
+O efeito só aparecia onde a ação é `<button>`. Ofícios cria por POST (a criação
+RESERVA número, decisão de `list_views.novo`), e o rótulo saía leve; as telas
+cujo botão é `<a>` mostravam os 900. Dois pesos para a mesma ação, sem nenhuma
+regra dizendo isso.
+
+A fonte passou a ser declarada propriedade a propriedade — `font-family:
+inherit` para escapar da fonte do sistema operacional, que era o motivo do
+atalho, mais `font-size`, `font-weight` e `line-height` explícitos.
+
+### NOVO-20260820-221339-76aa8b15ecbc 🟢 RESOLVIDO · `NOVO` A quantidade de diárias saía cortada no cartão da lista · UI · risco baixo
+
+Sequela do NOVO-20260820-212950-6d6eb02586ad, que devolveu o teto de 173px ao
+bloco financeiro. Com o teto valendo, o `row-gap: 12px` do `fact-list` não cabia
+mais: medidos no navegador, 155px de conteúdo em 149px úteis, e o "1,5" saía
+cortado 6px embaixo.
+
+O vão passou a ser VARIÁVEL, com `margin-top: auto` numa coluna flex — a sobra
+da caixa vira o vão quando há folga (15px, mais respiro do que os 12px fixos de
+antes) e fecha sozinha quando o conteúdo cresce. Um vão fixo é a primeira coisa
+que deveria ceder quando falta altura: ele não carrega informação. Medido
+depois: 0px de corte nos quatro cartões da lista, os três blocos em 163px.
+
+Nota de rastreio: o commit que aplicou estas duas correções (`9ef5d81`) cita os
+IDs como `NOVO-20260820-214210-a1` e `-a2`. São placeholders — foram escritos à
+mão em vez de virem do `scripts/novo_id.py`, e não existem em lugar nenhum. Os
+IDs válidos são os dois desta seção, nesta ordem.
+
+### NOVO-20260820-220939-23c3de47a4cc 🟢 RESOLVIDO · `NOVO` A faixa clara da paleta estava lotada e travava qualquer clareamento de superfície · UI · risco médio
+
+Pedido do dono: clarear um pouco o fundo do cartão no tema claro, que com o
+fundo da página agora branco era a única faixa tingida entre dois brancos.
+
+Não havia valor possível. `audit_paleta --max 0` reprova qualquer cor a menos de
+2,5 de deltaE2000 de outra já presente, e entre o degrau tingido do v2 e o
+branco há só 6,27 de deltaE — com DUAS cores quase-brancas ocupando o meio dessa
+faixa. Varrida a faixa inteira por força bruta, os 149 valores legais tinham
+todos a luminância do tingido e mudavam apenas o matiz: nenhum deles clareia
+coisa nenhuma. Duas tentativas caíram no gate antes disso, a 1,03 e a 1,5.
+
+As duas quase-brancas foram aposentadas, cada uma pelo PAPEL que exercia:
+
+- **texto e ícone quase-branco sobre fundo escuro** (11 usos: título de seção,
+  rótulo forte, marca da barra lateral, texto do tema escuro) → `var(--color-white)`.
+  Diferença medida de 1,5 a 1,9 de deltaE2000, abaixo do limiar do olho, e o
+  branco chapado ainda melhora um pouco o contraste contra o fundo escuro;
+- **superfície clara** (10 usos: `--color-bg`, `--color-surface-muted` e seus 36
+  consumidores, a barra de filtros do shell antigo, o botão mudo, uma parada de
+  gradiente) → o mesmo valor que o degrau `rail` passou a usar, a 1,5 de onde
+  estavam.
+
+Nenhuma superfície mudou de cara; o que mudou foi haver UMA cor onde havia três
+quase iguais. Com a vaga aberta, `--surface-rail` clareou: fica a 2,73 do valor
+antigo e a 4,07 do branco. rail→field cai de 1.213 para 1.104 (o mesmo patamar
+que a nota do degrau já registrava como aceito no claro) e page→rail sobe de
+1.130 para 1.241.
+
+Achado de método, que vale para o próximo: **o auditor de paleta lê o arquivo
+inteiro, comentário incluído.** Um hex citado em prosa numa nota de CSS volta a
+ocupar vaga na faixa como se estivesse em uso — foi o que fez a primeira
+tentativa de correção reprovar contra a própria cor que ela estava aposentando.
+Por isso as notas deste defeito descrevem as cores aposentadas sem escrever o
+hex delas.
+
 ### NOVO-20260820-171008-7afb74d82d2c 🔴 ABERTO · `NOVO` O v2 entrega 517 KB de CSS em toda página: NOVO-70 e o aceite PF-02 ficam incompatíveis · FE/PERF · risco médio
 
 O `NOVO-70` mede quanto do CSS entregue numa rota é de fato usado, e é catraca:

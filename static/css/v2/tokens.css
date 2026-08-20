@@ -35,7 +35,27 @@
      mas puxava o azul para o cinza. Em troca, rail→field fica em 1.106 no
      claro contra 1.27 no escuro — o campo se separa menos da caixa aqui. */
   --surface-page: #d4dde9;
-  --surface-rail: #e3eaf2;
+  /* Clareado de #e3eaf2 para #f0f4f9 em 2026-08-20, a pedido do dono
+     (NOVO-20260820-220939-23c3de47a4cc): com o fundo da página agora branco, o
+     degrau `rail` era a única faixa tingida entre dois brancos, e o cartão da
+     lista lia como pesado demais.
+
+     O valor não foi escolhido no olho. `audit_paleta --max 0` reprova qualquer
+     cor a menos de 2,5 de deltaE2000 de outra, e a faixa entre o tingido antigo
+     e o branco tem 6,27 no total. Ela estava LOTADA: duas cores quase-brancas
+     (as antigas f7fbff e f0f6ff) ocupavam o meio dela, e nenhum valor mais
+     claro que o tingido passava no gate — varri a faixa inteira e os 149
+     valores legais tinham todos a luminância do tingido, mudando só o matiz.
+     Aposentar as duas (ver a nota em `base/tokens.css`) foi o que abriu o
+     espaço para este valor: 2,73 do tingido antigo e 4,07 do branco.
+
+     Os hex das cores aposentadas NÃO aparecem escritos aqui de propósito: o
+     auditor lê o arquivo inteiro, comentário incluído, e uma cor citada em
+     prosa volta a ocupar vaga na faixa como se estivesse em uso.
+
+     Custa separação para dentro e ganha para fora: rail→field cai de 1.213 para
+     1.104 e page→rail sobe de 1.130 para 1.241. */
+  --surface-rail: #f0f4f9;
   --surface-field: #ffffff;
   --surface-brand: #155b9a;
   /* Fundo da linha escolhida numa lista de opções. É a cor que o desenho antigo
