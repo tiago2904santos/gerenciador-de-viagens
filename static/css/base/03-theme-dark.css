@@ -25,7 +25,7 @@ html[data-theme="dark"] {
   --theme-shadow-stat: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 8px 22px rgba(0, 0, 0, 0.32);
   --theme-quick-icon-bg: linear-gradient(165deg, #4a3a1e, #5a4622);
   --theme-quick-icon-border: #d8a21b;
-  --theme-quick-icon-fg: #f0f6ff;
+  --theme-quick-icon-fg: var(--color-white);
   --theme-badge-accent-bg: #4a3a1e;
   --theme-badge-accent-border: #d8a21b;
   --theme-badge-accent-text: #ffe7ac;
@@ -41,7 +41,7 @@ html[data-theme="dark"] {
   --route-reference-top-bg: linear-gradient(180deg, #17476f 0%, #0b3a66 100%);
   --route-field-bg: var(--color-card);
   --route-field-border: #425a72;
-  --route-field-text: #f7fbff;
+  --route-field-text: var(--color-white);
   --route-field-placeholder: #9eb7d2;
   --route-card-text: #e3eaf2;
   --route-field-disabled-bg: var(--route-card-bg);
@@ -51,7 +51,7 @@ html[data-theme="dark"] {
   --route-button-primary-hover-border: #2f88c7;
   --route-button-secondary-bg: #111e2f;
   --route-button-secondary-border: #53708c;
-  --route-button-secondary-text: #f0f6ff;
+  --route-button-secondary-text: var(--color-white);
   --route-button-secondary-hover-bg: #2b3f52;
   --route-button-secondary-hover-border: #7690af;
   --route-button-danger-bg: linear-gradient(180deg, #c93636 0%, #962222 100%);
@@ -93,10 +93,10 @@ html[data-theme="dark"] {
   --color-panel-strong: #111e2f;
 
   /* Original bluish text hierarchy — cool whites over deep navy. */
-  --color-text: #f0f6ff;
-  --color-heading: #f7fbff;
+  --color-text: var(--color-white);
+  --color-heading: var(--color-white);
   --color-heading-soft: #deebfb;
-  --color-section-title: #f7fbff;
+  --color-section-title: var(--color-white);
   --color-card-title: #e3eaf2;
   --color-muted: #afc0d3;
   --color-muted-strong: #d4dde9;
@@ -104,12 +104,12 @@ html[data-theme="dark"] {
   --color-text-muted: #afc0d3;
   --color-text-soft: #8598af;
   --color-label: #d4dde9;
-  --color-label-strong: #f0f6ff;
+  --color-label-strong: var(--color-white);
   --color-help: #9fb1c8;
   --color-description: #afc0d3;
   --color-icon: #cddcf0;
   --color-icon-muted: #9fb1c8;
-  --color-icon-strong: #f7fbff;
+  --color-icon-strong: var(--color-white);
 
   /* Original vivid-blue actions and gold accent, with a visible gold glow. */
   --color-border: rgba(191, 211, 234, 0.28);
@@ -224,7 +224,7 @@ html[data-theme="dark"] {
   --theme-list-border: var(--color-border);
   --theme-btn-secondary-bg: #243541;
   --theme-btn-secondary-border: rgba(155, 174, 188, 0.28);
-  --theme-btn-secondary-text: #f7fbff;
+  --theme-btn-secondary-text: var(--color-white);
   --theme-btn-secondary-hover-bg: #334654;
   --theme-btn-secondary-hover-border: rgba(181, 198, 210, 0.42);
   --theme-btn-muted-bg: #243541;

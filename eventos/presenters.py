@@ -357,7 +357,7 @@ def apresentar_evento_list_card(evento, *, menus_sob_demanda=True):
     if cancelado:
         acao_situacao = entity_cards.menu_confirm(
             reativar_url, titulo, "Reativar evento", "Retornar o evento ao fluxo de trabalho",
-            icon="unarchive", icon_tone="success",
+            icon="unarchive", icon_tone="attach",
         )
     else:
         acao_situacao = entity_cards.menu_cancel(

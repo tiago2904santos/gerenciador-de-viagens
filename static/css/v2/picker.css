@@ -1970,7 +1970,7 @@ html[data-theme="dark"] :is(.search-picker__selected-panel, .search-picker__sele
   color: var(--text-strong);
   display: flex;
   /* 14px como todo campo do sistema. O legado deixava o texto do picker em
-     16px e numa cor própria (`#f0f6ff`), e o campo de busca era o único
+     16px e numa cor própria quase-branca, e o campo de busca era o único
      controle com letra maior que os vizinhos — lado a lado com um `input`, a
      diferença aparecia sem que nada a explicasse. */
   font-size: var(--text-size-base);

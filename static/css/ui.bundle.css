@@ -39,7 +39,27 @@
      mas puxava o azul para o cinza. Em troca, rail→field fica em 1.106 no
      claro contra 1.27 no escuro — o campo se separa menos da caixa aqui. */
   --surface-page: #d4dde9;
-  --surface-rail: #e3eaf2;
+  /* Clareado de #e3eaf2 para #f0f4f9 em 2026-08-20, a pedido do dono
+     (NOVO-20260820-220939-23c3de47a4cc): com o fundo da página agora branco, o
+     degrau `rail` era a única faixa tingida entre dois brancos, e o cartão da
+     lista lia como pesado demais.
+
+     O valor não foi escolhido no olho. `audit_paleta --max 0` reprova qualquer
+     cor a menos de 2,5 de deltaE2000 de outra, e a faixa entre o tingido antigo
+     e o branco tem 6,27 no total. Ela estava LOTADA: duas cores quase-brancas
+     (as antigas f7fbff e f0f6ff) ocupavam o meio dela, e nenhum valor mais
+     claro que o tingido passava no gate — varri a faixa inteira e os 149
+     valores legais tinham todos a luminância do tingido, mudando só o matiz.
+     Aposentar as duas (ver a nota em `base/tokens.css`) foi o que abriu o
+     espaço para este valor: 2,73 do tingido antigo e 4,07 do branco.
+
+     Os hex das cores aposentadas NÃO aparecem escritos aqui de propósito: o
+     auditor lê o arquivo inteiro, comentário incluído, e uma cor citada em
+     prosa volta a ocupar vaga na faixa como se estivesse em uso.
+
+     Custa separação para dentro e ganha para fora: rail→field cai de 1.213 para
+     1.104 e page→rail sobe de 1.130 para 1.241. */
+  --surface-rail: #f0f4f9;
   --surface-field: #ffffff;
   --surface-brand: #155b9a;
   /* Fundo da linha escolhida numa lista de opções. É a cor que o desenho antigo
@@ -134,6 +154,43 @@
   --status-progress: #d8a21b;
   --status-late: #c0392b;
   --status-info: #2b6cb0;
+
+  /* ---- cor por FUNÇÃO da ação (2026-08-20) -------------------------------
+   *
+   * Regra do dono: o botão que faz a MESMA COISA tem a MESMA COR em toda tela
+   * do sistema. A cor é do que a ação faz, não do ícone que ela usa nem da tela
+   * em que aparece — quem varre um menu deve reconhecer "baixar PDF" pela cor,
+   * antes de ler o rótulo.
+   *
+   * Como a família de estado logo acima, e pelo mesmo motivo, estas cores NÃO
+   * mudam com o tema: função é significado, não decoração, e trocar de tema não
+   * pode obrigar a reaprender o código de cores.
+   *
+   * O que havia antes não era uma escolha, era o acúmulo: medido no navegador,
+   * QUATRO das sete funções saíam douradas — `preview` e `edit` nem existiam no
+   * CSS e caíam no accent —, e baixar DOCX tinha exatamente a mesma cor de
+   * cancelar. A mesma função também mudava de cor conforme a tela: "Baixar PDF"
+   * aparecia com `icon_tone="late"` em cinco lugares e `icon_tone="pdf"` em
+   * quatro.
+   *
+   * Quatro reaproveitam a família de estado, onde ela já dizia a coisa certa;
+   * duas são novas, escolhidas por varredura sob duas restrições ao mesmo tempo
+   * — pelo menos 3,0 de deltaE2000 de QUALQUER cor já existente (o gate
+   * `audit_paleta --max 0`) e contraste legível sobre as duas superfícies de
+   * menu. As duas novas ficam em ~3,58 nos dois temas, mais equilibradas que a
+   * família de estado, que oscila entre 5,44 e 2,31 conforme o tema. */
+  --action-view:   #1e94a9;                 /* visualizar / abrir no navegador */
+  --action-pdf:    var(--status-late);      /* baixar PDF */
+  --action-docx:   var(--status-info);      /* baixar DOCX */
+  --action-attach: var(--status-done);      /* anexar, e o construtivo: reativar */
+  --action-cancel: var(--status-progress);  /* cancelar */
+  --action-amend:  #9a76cb;                 /* retificar e complementar */
+  --action-delete: var(--status-late);      /* excluir */
+  /* Editar e o que está fora do vocabulário (WhatsApp, copiar mensagem) seguem
+     o accent, como já seguiam. São as duas únicas que mudam com o tema, e estão
+     assim porque ainda não foram decididas — não porque a regra abre exceção. */
+  --action-edit:   var(--accent);
+  --action-neutral: var(--accent);
 
 
   /* ---- forma ----------------------------------------------------------- */
@@ -1908,7 +1965,13 @@
   align-items: center;
   display: flex;
   flex: 1 1 320px;
-  flex-wrap: wrap;
+  /* UMA LINHA, sempre (2026-08-20). Era `wrap`, e com cinco controles a faixa
+     de Ofícios abria em duas linhas: a segunda ficava com a ordenação e os dois
+     períodos soltos sob um vão grande, e a faixa dobrava de altura empurrando a
+     lista para baixo. A faixa é uma banda de uma linha por desenho — o que não
+     couber ENCOLHE, e é para isso que cada controle abaixo tem `min-width`
+     próprio em vez do vão fixo de antes. */
+  flex-wrap: nowrap;
   gap: var(--gap);
   min-width: 0;
 }
@@ -1918,11 +1981,22 @@
   min-width: 0;
 }
 
-/* Filtros select no rail conservam largura suficiente para o rótulo, mas
-   cedem espaço à busca e quebram para outra linha em telas estreitas. */
+/* Filtros select no rail conservam largura suficiente para o rótulo, mas cedem
+   espaço à busca. O piso caiu de 240px para 180px junto com o `nowrap`: com o
+   piso antigo, dois selects mais os dois períodos não cabiam na linha e o
+   `nowrap` viraria transbordo em vez de encolhimento. */
 :is(html[data-theme]) .rail__form > .select {
-  flex: 0 1 320px;
-  min-width: 240px;
+  flex: 0 1 260px;
+  min-width: 180px;
+}
+
+/* Ordenação é o controle mais estreito da faixa: o rótulo dela é curto
+   ("Número: maior") e ela não precisa da largura de um filtro de situação, que
+   carrega rótulo mais a contagem. Vem DEPOIS da regra acima de propósito — os
+   dois seletores empatam em especificidade e quem decide é a ordem. */
+:is(html[data-theme]) .rail__form > .select--compact {
+  flex: 0 1 190px;
+  min-width: 150px;
 }
 
 /* O rail é o contêiner que segura as seções da página (os `form-block`), então
@@ -4063,46 +4137,71 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   line-height: 1.3;
 }
 
+/* ---- COR POR FUNÇÃO ------------------------------------------------------
+ *
+ * Um item de menu diz o que faz por duas vias: o `data-tone` do ITEM, que tinge
+ * o rótulo inteiro, e o `data-tone` do ÍCONE, que tinge só a caixinha. A
+ * primeira é reservada ao destrutivo — um rótulo vermelho é um aviso, e barato
+ * demais para gastar em "baixar". A segunda é a que dá a cor da função, e é a
+ * que deixa o menu legível de relance, antes de ler os rótulos.
+ *
+ * É por isso que excluir e baixar PDF podem dividir o vermelho sem ambiguidade:
+ * um pinta o rótulo, o outro pinta só o ícone, e os dois nunca aparecem no mesmo
+ * canal.
+ *
+ * Uma regra só desenha a caixa, e cada tom apenas ESCOLHE a cor em `--tom-acao`.
+ * Antes eram cinco blocos repetindo as mesmas três declarações com a cor trocada,
+ * e foi assim que `preview` e `edit` acabaram sem bloco nenhum — os dois caíam no
+ * accent, e ninguém percebeu porque nada quebra quando uma cor não chega.
+ *
+ * `color-mix` com `transparent`, e não com a superfície: misturar com a
+ * superfície transforma dourado sobre azul-marinho em oliva.
+ */
+:is(html[data-theme]) .menu__icon[data-tone] {
+  background: color-mix(in srgb, var(--tom-acao, currentColor) 14%, transparent);
+  border-color: color-mix(in srgb, var(--tom-acao, currentColor) 30%, transparent);
+  color: var(--tom-acao, currentColor);
+}
+
+/* O vocabulário canônico: um tom por FUNÇÃO. */
+:is(html[data-theme]) .menu__icon[data-tone="view"]    { --tom-acao: var(--action-view); }
+:is(html[data-theme]) .menu__icon[data-tone="pdf"]     { --tom-acao: var(--action-pdf); }
+:is(html[data-theme]) .menu__icon[data-tone="docx"]    { --tom-acao: var(--action-docx); }
+:is(html[data-theme]) .menu__icon[data-tone="attach"]  { --tom-acao: var(--action-attach); }
+:is(html[data-theme]) .menu__icon[data-tone="cancel"]  { --tom-acao: var(--action-cancel); }
+:is(html[data-theme]) .menu__icon[data-tone="amend"]   { --tom-acao: var(--action-amend); }
+:is(html[data-theme]) .menu__icon[data-tone="delete"]  { --tom-acao: var(--action-delete); }
+:is(html[data-theme]) .menu__icon[data-tone="edit"]    { --tom-acao: var(--action-edit); }
+:is(html[data-theme]) .menu__icon[data-tone="neutral"] { --tom-acao: var(--action-neutral); }
+
+/* Apelidos do vocabulário ANTIGO, que falava de estado ("late", "progress") onde
+   queria dizer função. As chamadas foram migradas para os nomes acima; estes
+   apelidos ficam porque o `icon_tone` chega de presenter e de template, e um
+   apelido esquecido em algum canto deve continuar recebendo a cor CERTA da
+   função em vez de cair no accent em silêncio — que é exatamente o defeito que
+   este bloco corrige. */
+:is(html[data-theme]) .menu__icon[data-tone="preview"]  { --tom-acao: var(--action-view); }
+:is(html[data-theme]) .menu__icon[data-tone="late"]     { --tom-acao: var(--action-pdf); }
+:is(html[data-theme]) .menu__icon[data-tone="progress"] { --tom-acao: var(--action-docx); }
+:is(html[data-theme]) .menu__icon[data-tone="success"]  { --tom-acao: var(--action-attach); }
+:is(html[data-theme]) .menu__icon[data-tone="warning"]  { --tom-acao: var(--action-cancel); }
+:is(html[data-theme]) .menu__icon[data-tone="danger"]   { --tom-acao: var(--action-delete); }
+:is(html[data-theme]) .menu__icon[data-tone="info"]     { --tom-acao: var(--action-neutral); }
+
 /* Ação destrutiva: o tom tinge rótulo, ícone e a caixa dele — sem isso o ícone
    fica no accent ao lado de um rótulo vermelho, e o sinal se contradiz. */
-:is(html[data-theme]) .menu__item[data-tone="late"] .menu__title {
-  color: var(--status-late);
+:is(html[data-theme]) :is(.menu__item[data-tone="delete"], .menu__item[data-tone="late"]) .menu__title {
+  color: var(--action-delete);
 }
 
-:is(html[data-theme]) .menu__item[data-tone="late"] .menu__icon {
-  background: color-mix(in srgb, var(--status-late) 14%, transparent);
-  border-color: color-mix(in srgb, var(--status-late) 30%, transparent);
-  color: var(--status-late);
-}
-
-/* Tom do ÍCONE — os presenters já classificam cada item (pdf, docx, assinado,
-   cancelar), e a cor da caixinha é o que deixa o menu legível de relance, sem
-   ler os rótulos. `color-mix` com `transparent` é seguro em qualquer tema;
-   misturar com a superfície transforma dourado sobre azul-marinho em oliva. */
-:is(html[data-theme]) .menu__icon[data-tone="pdf"],
-:is(html[data-theme]) .menu__icon[data-tone="danger"] {
-  background: color-mix(in srgb, var(--status-late) 14%, transparent);
-  border-color: color-mix(in srgb, var(--status-late) 30%, transparent);
-  color: var(--status-late);
-}
-
-:is(html[data-theme]) .menu__icon[data-tone="docx"],
-:is(html[data-theme]) .menu__icon[data-tone="info"] {
-  background: color-mix(in srgb, var(--status-progress) 14%, transparent);
-  border-color: color-mix(in srgb, var(--status-progress) 30%, transparent);
-  color: var(--status-progress);
-}
-
-:is(html[data-theme]) .menu__icon[data-tone="success"] {
-  background: color-mix(in srgb, var(--status-done) 14%, transparent);
-  border-color: color-mix(in srgb, var(--status-done) 30%, transparent);
-  color: var(--status-done);
-}
-
-:is(html[data-theme]) .menu__icon[data-tone="warning"] {
-  background: color-mix(in srgb, var(--status-progress) 14%, transparent);
-  border-color: color-mix(in srgb, var(--status-progress) 30%, transparent);
-  color: var(--status-progress);
+:is(html[data-theme]) :is(.menu__item[data-tone="delete"], .menu__item[data-tone="late"]) .menu__icon {
+  /* Pinta por conta própria, e não só declarando `--tom-acao`: o ícone do
+     excluir chega SEM `data-tone` em quem ainda não foi migrado, e a regra base
+     acima exige o atributo para casar. Foi assim que o excluir saiu no accent na
+     primeira medição desta mudança — vermelho no rótulo e dourado no ícone. */
+  background: color-mix(in srgb, var(--action-delete) 14%, transparent);
+  border-color: color-mix(in srgb, var(--action-delete) 30%, transparent);
+  color: var(--action-delete);
 }
 
 /* O cabeçalho de grupo do menu foi APAGADO em 2026-08-16, com o componente
@@ -4304,16 +4403,59 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   overflow: hidden;
 }
 
-/* O bloco financeiro pode crescer para mostrar a composição integral das
-   diárias. O teto compacto dos demais fatos continua valendo; esta exceção é
-   necessária porque truncar "5 x 100% + 1 x 15%" altera a informação. */
-:is(html[data-theme]) .record .form-block--v2.oficio-card__allowance-facts {
-  max-height: none;
-  overflow: visible;
+/* O bloco financeiro OBEDECE ao mesmo teto dos outros dois (2026-08-20).
+ *
+ * Tinha `max-height: none` para caber a composição integral das diárias, e com
+ * isso era o único bloco da faixa que crescia: medido na lista, 187px contra
+ * 173px dos blocos de viatura e de trechos. O cartão ficava com uma coluna mais
+ * alta que as vizinhas e a faixa perdia a linha de base.
+ *
+ * A composição continua inteira — o que mudou não foi o teto, foi o que ocupa a
+ * altura: os fatos deste bloco usam a escala compacta abaixo, e os 163px de
+ * conteúdo passam a caber nos 149px úteis sem cortar nada. É a diferença entre
+ * truncar a informação (o que a regra antiga evitava, com razão) e compor a
+ * mesma informação na altura disponível.
+ */
+:is(html[data-theme]) .record .form-block--v2.oficio-card__allowance-facts > .form-block__body {
+  /* `stretch` e não `start`: é o que dá ao `fact-list` a altura útil inteira do
+     bloco, e sem altura definida não há folga para o vão variável distribuir. */
+  align-content: stretch;
+  overflow: hidden;
 }
 
-:is(html[data-theme]) .record .form-block--v2.oficio-card__allowance-facts > .form-block__body {
-  overflow: visible;
+/* O vão entre "Valor total" e "Quantidade de diárias" é VARIÁVEL (2026-08-20).
+ *
+ * Era `row-gap: 12px` fixo, e 12px fixos não cabiam: medido na lista, 155px de
+ * conteúdo em 149px úteis — o "1,5" saía cortado 6px embaixo. Um vão fixo é a
+ * primeira coisa a ceder quando falta altura, e a última que se deveria
+ * defender: ele não carrega informação nenhuma.
+ *
+ * `margin-top: auto` numa coluna flex distribui a SOBRA: quando há folga, ela
+ * vira o vão (aqui, 15px — mais respiro do que os 12px de antes); quando o
+ * conteúdo cresce, a sobra é zero e o vão fecha sozinho, sem cortar nada. É o
+ * comportamento que um `gap` fixo não tem em nenhuma unidade.
+ */
+:is(html[data-theme]) .record .oficio-card__allowance-facts .fact-list {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0;
+}
+
+:is(html[data-theme]) .record .oficio-card__allowance-facts .fact + .fact {
+  margin-top: auto;
+}
+
+/* A quantidade é linha de APOIO do bloco — o que se lê primeiro é "R$ 420,00".
+   Com o vão variável isto sozinho já não seria preciso, mas os dois juntos são
+   o que garante folga em vez de encaixe exato: sem a escala compacta o conteúdo
+   fecha em 151px contra os 149px úteis, e volta a faltar. */
+:is(html[data-theme]) .record .oficio-card__allowance-facts .fact + .fact .fact__label {
+  line-height: 1.25;
+}
+
+:is(html[data-theme]) .record .oficio-card__allowance-facts .fact + .fact .fact__value {
+  font-size: var(--text-size-lg, 1.125rem);
+  line-height: 1.2;
 }
 
 /* Uma coluna em tela estreita: tudo ocupa a largura inteira. */
@@ -9164,7 +9306,7 @@ html[data-theme="dark"] :is(.search-picker__selected-panel, .search-picker__sele
   color: var(--text-strong);
   display: flex;
   /* 14px como todo campo do sistema. O legado deixava o texto do picker em
-     16px e numa cor própria (`#f0f6ff`), e o campo de busca era o único
+     16px e numa cor própria quase-branca, e o campo de busca era o único
      controle com letra maior que os vizinhos — lado a lado com um `input`, a
      diferença aparecia sem que nada a explicasse. */
   font-size: var(--text-size-base);
@@ -12695,11 +12837,22 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
 /* Como BOTÃO (a ação que cria, num `<form>` POST) ele precisa das declarações
    que o navegador dá de graça ao link e não ao botão: fonte própria, borda e
    fundo do agente. Sem elas, a mesma classe saía com a cara do botão do
-   sistema operacional. */
+   sistema operacional.
+
+   A fonte é declarada PROPRIEDADE A PROPRIEDADE, e não pelo atalho `font`
+   (2026-08-20). O atalho reescreve TODAS as longhands que não estão nele — e
+   `font: inherit` herdava `font-weight` do corpo, apagando o
+   `var(--weight-strong)` da regra base logo acima. O efeito era só na variante
+   `<button>`: a lista de Ofícios cria por POST e recebia o rótulo em peso 500,
+   enquanto as telas cujo botão é `<a>` mostravam os 900 corretos. Dois pesos
+   para a mesma ação, e nenhuma regra dizendo isso. */
 :is(html[data-theme]) button.list-page__action {
   border: 0;
   cursor: pointer;
-  font: inherit;
+  font-family: inherit;
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  line-height: 1;
 }
 
 /* O formulário é só o portador do POST: não pode ocupar espaço nem criar uma

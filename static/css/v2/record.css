@@ -190,16 +190,59 @@
   overflow: hidden;
 }
 
-/* O bloco financeiro pode crescer para mostrar a composição integral das
-   diárias. O teto compacto dos demais fatos continua valendo; esta exceção é
-   necessária porque truncar "5 x 100% + 1 x 15%" altera a informação. */
-:is(html[data-theme]) .record .form-block--v2.oficio-card__allowance-facts {
-  max-height: none;
-  overflow: visible;
+/* O bloco financeiro OBEDECE ao mesmo teto dos outros dois (2026-08-20).
+ *
+ * Tinha `max-height: none` para caber a composição integral das diárias, e com
+ * isso era o único bloco da faixa que crescia: medido na lista, 187px contra
+ * 173px dos blocos de viatura e de trechos. O cartão ficava com uma coluna mais
+ * alta que as vizinhas e a faixa perdia a linha de base.
+ *
+ * A composição continua inteira — o que mudou não foi o teto, foi o que ocupa a
+ * altura: os fatos deste bloco usam a escala compacta abaixo, e os 163px de
+ * conteúdo passam a caber nos 149px úteis sem cortar nada. É a diferença entre
+ * truncar a informação (o que a regra antiga evitava, com razão) e compor a
+ * mesma informação na altura disponível.
+ */
+:is(html[data-theme]) .record .form-block--v2.oficio-card__allowance-facts > .form-block__body {
+  /* `stretch` e não `start`: é o que dá ao `fact-list` a altura útil inteira do
+     bloco, e sem altura definida não há folga para o vão variável distribuir. */
+  align-content: stretch;
+  overflow: hidden;
 }
 
-:is(html[data-theme]) .record .form-block--v2.oficio-card__allowance-facts > .form-block__body {
-  overflow: visible;
+/* O vão entre "Valor total" e "Quantidade de diárias" é VARIÁVEL (2026-08-20).
+ *
+ * Era `row-gap: 12px` fixo, e 12px fixos não cabiam: medido na lista, 155px de
+ * conteúdo em 149px úteis — o "1,5" saía cortado 6px embaixo. Um vão fixo é a
+ * primeira coisa a ceder quando falta altura, e a última que se deveria
+ * defender: ele não carrega informação nenhuma.
+ *
+ * `margin-top: auto` numa coluna flex distribui a SOBRA: quando há folga, ela
+ * vira o vão (aqui, 15px — mais respiro do que os 12px de antes); quando o
+ * conteúdo cresce, a sobra é zero e o vão fecha sozinho, sem cortar nada. É o
+ * comportamento que um `gap` fixo não tem em nenhuma unidade.
+ */
+:is(html[data-theme]) .record .oficio-card__allowance-facts .fact-list {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0;
+}
+
+:is(html[data-theme]) .record .oficio-card__allowance-facts .fact + .fact {
+  margin-top: auto;
+}
+
+/* A quantidade é linha de APOIO do bloco — o que se lê primeiro é "R$ 420,00".
+   Com o vão variável isto sozinho já não seria preciso, mas os dois juntos são
+   o que garante folga em vez de encaixe exato: sem a escala compacta o conteúdo
+   fecha em 151px contra os 149px úteis, e volta a faltar. */
+:is(html[data-theme]) .record .oficio-card__allowance-facts .fact + .fact .fact__label {
+  line-height: 1.25;
+}
+
+:is(html[data-theme]) .record .oficio-card__allowance-facts .fact + .fact .fact__value {
+  font-size: var(--text-size-lg, 1.125rem);
+  line-height: 1.2;
 }
 
 /* Uma coluna em tela estreita: tudo ocupa a largura inteira. */

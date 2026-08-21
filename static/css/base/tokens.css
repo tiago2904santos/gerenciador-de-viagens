@@ -2,13 +2,35 @@
   /* --------------------------------------------------------------------------
      Cores base
      -------------------------------------------------------------------------- */
-  --color-bg: #f7fbff;
+  /* Duas cores quase-brancas foram APOSENTADAS em 2026-08-20
+     (NOVO-20260820-220939-23c3de47a4cc). Elas ocupavam o meio da faixa entre o
+     degrau tingido do v2 e o branco, e eram o que impedia o cartão da lista de
+     clarear: `audit_paleta --max 0` reprova cor a menos de 2,5 de deltaE2000 de
+     outra, e com as duas ali dentro nenhum valor mais claro que o tingido
+     passava — varrida a faixa, os 149 valores legais tinham todos a luminância
+     do tingido e mudavam só o matiz, que não é clarear.
+
+     O que cada uma virou depende do PAPEL que exercia, e não da distância:
+
+     - como TEXTO ou ícone quase-branco sobre fundo escuro (título de seção,
+       rótulo forte, marca da barra lateral, texto do tema escuro), viraram
+       `var(--color-white)`. São 11 usos; a diferença medida é de 1,5 a 1,9 de
+       deltaE2000, abaixo do limiar do olho, e o branco chapado ainda aumenta um
+       pouco o contraste contra o fundo escuro.
+     - como SUPERFÍCIE clara (as declarações abaixo, a barra de filtros do
+       shell antigo e o botão mudo), viraram #f0f4f9 — a mesma cor que o degrau
+       `rail` do v2 passou a usar. São 10 usos, todos a 1,5 de onde estavam.
+
+     Nenhuma superfície mudou de cara, portanto; o que mudou foi haver UMA cor
+     onde havia três quase iguais. Os hex aposentados não são citados aqui de
+     propósito: o auditor lê comentário também. */
+  --color-bg: #f0f4f9;
   --color-bg-strong: #e3eaf2;
   --color-bg-dark: #062847;
   --color-bg-subtle: #e3eaf2;
-  --color-bg-glow: #f7fbff;
+  --color-bg-glow: #f0f4f9;
   --color-surface: #ffffff;
-  --color-surface-muted: #f7fbff;
+  --color-surface-muted: #f0f4f9;
   --color-surface-soft: #e3eaf2;
   --color-surface-glass: #ffffff;
   --color-border: #d4dde9;
@@ -395,10 +417,10 @@
   --sidebar-surface: linear-gradient(180deg, #062847 0%, #031c33 100%);
   --sidebar-fg: #d4dde9;
   --sidebar-fg-soft: #cddcf0;
-  --sidebar-fg-heading: #f7fbff;
+  --sidebar-fg-heading: var(--color-white);
   --sidebar-border: rgba(175, 192, 211, 0.24);
   --sidebar-shadow: inset -1px 0 0 rgba(175, 192, 211, 0.2), 12px 0 28px rgba(2, 8, 23, 0.34);
-  --sidebar-brand-fg: #f7fbff;
+  --sidebar-brand-fg: var(--color-white);
   --sidebar-badge-bg: linear-gradient(140deg, var(--color-primary-bright), var(--color-accent-hover));
   --sidebar-link-surface: rgba(255, 255, 255, 0.06);
   --sidebar-link-border: rgba(175, 192, 211, 0.22);
@@ -417,7 +439,15 @@
   --sidebar-focus-ring: var(--color-accent-border-soft);
 
   /* Fallback antes do JS (equivalente a light) */
-  --app-body-bg: linear-gradient(180deg, #ffffff 0%, #e3eaf2 48%, #e3eaf2 100%);
+  /* Fundo da página no tema CLARO: BRANCO CHAPADO (2026-08-20).
+
+     Era um gradiente que terminava em #e3eaf2 — exatamente o valor de
+     `--surface-rail`. Fundo e painel ficavam da mesma cor, e a página inteira
+     lia como um bloco só: a faixa de filtros não tinha borda visível contra o
+     que estava atrás dela. O branco é o mesmo `--surface-field` dos campos, e é
+     ele que devolve a hierarquia — campo branco, painel acinzentado, fundo
+     branco atrás dos dois. */
+  --app-body-bg: var(--color-white);
   --app-main-bg: transparent;
   --app-featured-bg-fallback: #b9cbe0;
   --app-featured-bg:
@@ -471,7 +501,7 @@
   --theme-btn-secondary-text: var(--color-primary);
   --theme-btn-secondary-hover-bg: var(--color-secondary-soft);
   --theme-btn-secondary-hover-border: var(--color-secondary);
-  --theme-btn-muted-bg: #f0f6ff;
+  --theme-btn-muted-bg: #f0f4f9;
   --theme-btn-muted-border: #9eb7d2;
   --theme-btn-muted-text: var(--color-primary);
   --theme-btn-muted-hover-bg: #deebfb;
@@ -515,7 +545,7 @@
   --route-button-primary-text: #ffffff;
   --route-button-primary-hover-bg: linear-gradient(180deg, #12507f 0%, #082f55 100%);
   --route-button-primary-hover-border: #082f55;
-  --route-button-secondary-bg: #f7fbff;
+  --route-button-secondary-bg: #f0f4f9;
   --route-button-secondary-border: #b9cbe0;
   --route-button-secondary-text: #0b3a66;
   --route-button-secondary-hover-bg: #e3eaf2;
@@ -559,7 +589,7 @@
 
 /* ========== 3 tema claro oficial (inclui alias legado claro) ========== */
 html[data-theme="light"] {
-  --color-bg: #f7fbff;
+  --color-bg: #f0f4f9;
   --color-surface: var(--color-white);
   --color-surface-strong: #ffffff;
   --color-surface-soft: #ffffff;
@@ -578,13 +608,13 @@ html[data-theme="light"] {
   --color-input-placeholder: #71839a;
   --color-input-border: rgba(31, 76, 125, 0.22);
 
-  --app-body-bg: linear-gradient(180deg, #ffffff 0%, #e3eaf2 48%, #e3eaf2 100%);
+  --app-body-bg: var(--color-white);  /* ver nota no :root */
   --app-featured-bg-fallback: #d4dde9;
   --app-featured-bg:
     radial-gradient(ellipse 110% 75% at 0% 0%, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 52%),
     radial-gradient(ellipse 80% 60% at 100% 8%, rgba(21, 91, 154, 0.11), transparent 50%),
     radial-gradient(ellipse 70% 48% at 50% 105%, rgba(11, 58, 102, 0.08), transparent 58%),
-    linear-gradient(168deg, #f7fbff 0%, #e3eaf2 34%, #e3eaf2 68%, #cddcf0 100%);
+    linear-gradient(168deg, #f0f4f9 0%, #e3eaf2 34%, #e3eaf2 68%, #cddcf0 100%);
 
   --app-hero-eyebrow: rgba(255, 248, 230, 0.98);
   --app-hero-title: var(--color-white);
@@ -626,7 +656,7 @@ html[data-theme="light"] {
   --theme-btn-secondary-text: var(--color-primary);
   --theme-btn-secondary-hover-bg: var(--color-secondary-soft);
   --theme-btn-secondary-hover-border: var(--color-secondary);
-  --theme-btn-muted-bg: #f0f6ff;
+  --theme-btn-muted-bg: #f0f4f9;
   --theme-btn-muted-border: #9eb7d2;
   --theme-btn-muted-text: var(--color-primary);
   --theme-btn-muted-hover-bg: #deebfb;

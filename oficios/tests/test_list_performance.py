@@ -207,8 +207,8 @@ class OficioListPaginacaoTests(TestCase):
         self.assertIn("aba=atuais", querystring)
         self.assertIn("sort=numero_asc", querystring)
         self.assertNotIn("page=", querystring)
-        # A aba e a ordenação continuam valendo na página 2.
-        self.assertEqual(pagina_2.context["aba"], "atuais")
+        # A situação e a ordenação continuam valendo na página 2.
+        self.assertEqual(pagina_2.context["abas_selecionadas"], ["atuais"])
         self.assertEqual(pagina_2.context["sort"], "numero_asc")
 
         numeros_1 = [o.numero for o in pagina_1.context["page_obj"].object_list]

@@ -37,7 +37,13 @@
   align-items: center;
   display: flex;
   flex: 1 1 320px;
-  flex-wrap: wrap;
+  /* UMA LINHA, sempre (2026-08-20). Era `wrap`, e com cinco controles a faixa
+     de Ofícios abria em duas linhas: a segunda ficava com a ordenação e os dois
+     períodos soltos sob um vão grande, e a faixa dobrava de altura empurrando a
+     lista para baixo. A faixa é uma banda de uma linha por desenho — o que não
+     couber ENCOLHE, e é para isso que cada controle abaixo tem `min-width`
+     próprio em vez do vão fixo de antes. */
+  flex-wrap: nowrap;
   gap: var(--gap);
   min-width: 0;
 }
@@ -47,11 +53,22 @@
   min-width: 0;
 }
 
-/* Filtros select no rail conservam largura suficiente para o rótulo, mas
-   cedem espaço à busca e quebram para outra linha em telas estreitas. */
+/* Filtros select no rail conservam largura suficiente para o rótulo, mas cedem
+   espaço à busca. O piso caiu de 240px para 180px junto com o `nowrap`: com o
+   piso antigo, dois selects mais os dois períodos não cabiam na linha e o
+   `nowrap` viraria transbordo em vez de encolhimento. */
 :is(html[data-theme]) .rail__form > .select {
-  flex: 0 1 320px;
-  min-width: 240px;
+  flex: 0 1 260px;
+  min-width: 180px;
+}
+
+/* Ordenação é o controle mais estreito da faixa: o rótulo dela é curto
+   ("Número: maior") e ela não precisa da largura de um filtro de situação, que
+   carrega rótulo mais a contagem. Vem DEPOIS da regra acima de propósito — os
+   dois seletores empatam em especificidade e quem decide é a ordem. */
+:is(html[data-theme]) .rail__form > .select--compact {
+  flex: 0 1 190px;
+  min-width: 150px;
 }
 
 /* O rail é o contêiner que segura as seções da página (os `form-block`), então

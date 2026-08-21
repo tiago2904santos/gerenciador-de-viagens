@@ -32,9 +32,9 @@
 
   {% if di.oficio.disponivel %}
     <c-v2.menu id="wizard-oficio-document-menu" extra_class="action-menu" aria_label="Documentos do ofício">
-      <c-v2.menu_item :href="di.oficio.url" title="Visualizar documento" description="Abrir o PDF no navegador" icon="eye" icon_tone="info" :target_blank="True" />
-      <c-v2.menu_item :href="di.oficio.download_pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" icon_tone="late" :download="True" />
-      <c-v2.menu_item :href="di.oficio.download_docx_url" title="Baixar DOCX" description="Arquivo editável do ofício" icon="docx" icon_tone="progress" :download="True" />
+      <c-v2.menu_item :href="di.oficio.url" title="Visualizar documento" description="Abrir o PDF no navegador" icon="eye" icon_tone="view" :target_blank="True" />
+      <c-v2.menu_item :href="di.oficio.download_pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" icon_tone="pdf" :download="True" />
+      <c-v2.menu_item :href="di.oficio.download_docx_url" title="Baixar DOCX" description="Arquivo editável do ofício" icon="docx" icon_tone="docx" :download="True" />
     </c-v2.menu>
   {% endif %}
 
@@ -59,9 +59,9 @@
 
   {% if di.justificativa.disponivel %}
     <c-v2.menu id="wizard-justificativa-document-menu" extra_class="action-menu" aria_label="Documentos da justificativa">
-      <c-v2.menu_item :href="di.justificativa.url" title="Visualizar documento" description="Abrir o PDF no navegador" icon="eye" icon_tone="info" :target_blank="True" />
-      <c-v2.menu_item :href="di.justificativa.download_pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" icon_tone="late" :download="True" />
-      <c-v2.menu_item :href="di.justificativa.download_docx_url" title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" icon_tone="progress" :download="True" />
+      <c-v2.menu_item :href="di.justificativa.url" title="Visualizar documento" description="Abrir o PDF no navegador" icon="eye" icon_tone="view" :target_blank="True" />
+      <c-v2.menu_item :href="di.justificativa.download_pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" icon_tone="pdf" :download="True" />
+      <c-v2.menu_item :href="di.justificativa.download_docx_url" title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" icon_tone="docx" :download="True" />
     </c-v2.menu>
   {% endif %}
 
@@ -115,9 +115,9 @@
 
           <c-v2.menu :id="menu_id" extra_class="action-menu" :aria_label="rotulo_termo">
             {% if t.disponivel %}
-              <c-v2.menu_item :href="t.inline_url" title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" icon_tone="info" :target_blank="True" />
-              <c-v2.menu_item :href="t.download_pdf_url" title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" icon_tone="late" :download="True" />
-              <c-v2.menu_item :href="t.download_docx_url" title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" icon_tone="progress" :download="True" />
+              <c-v2.menu_item :href="t.inline_url" title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" icon_tone="view" :target_blank="True" />
+              <c-v2.menu_item :href="t.download_pdf_url" title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" icon_tone="pdf" :download="True" />
+              <c-v2.menu_item :href="t.download_docx_url" title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" icon_tone="docx" :download="True" />
             {% endif %}
             {% if t.anexar_assinado_url %}
               <c-v2.menu_attach_signed
@@ -142,11 +142,11 @@
         title="Visualizar termos"
         description="Abrir todos os documentos disponíveis"
         icon="eye"
-        icon_tone="info"
+        icon_tone="view"
         hook="data-open-all-termos"
       />
-      <c-v2.menu_item :href="di.termos_download_todos_pdf_url" title="Baixar PDFs" description="Salvar todos os termos em PDF" icon="pdf" icon_tone="late" :download="True" />
-      <c-v2.menu_item :href="di.termos_download_todos_docx_url" title="Baixar DOCXs" description="Salvar todos os arquivos editáveis" icon="docx" icon_tone="progress" :download="True" />
+      <c-v2.menu_item :href="di.termos_download_todos_pdf_url" title="Baixar PDFs" description="Salvar todos os termos em PDF" icon="pdf" icon_tone="pdf" :download="True" />
+      <c-v2.menu_item :href="di.termos_download_todos_docx_url" title="Baixar DOCXs" description="Salvar todos os arquivos editáveis" icon="docx" icon_tone="docx" :download="True" />
     </c-v2.menu>
   {% endif %}
 {% endwith %}

@@ -272,14 +272,14 @@ html[data-theme="light"] {
   --border-list-panel:      #d4dde9;
   --shadow-list-panel:      var(--theme-shadow-hero);
 
-  --surface-filter-bar:     #f7fbff;
+  --surface-filter-bar:     #f0f4f9;
   --border-filter-bar:      #e3eaf2;
 
   --surface-list-row:       var(--surface-form-section); /* mesmo fundo das seções de formulário */
   --border-list-row:        #e3eaf2;
   --surface-list-row-hover: var(--color-primary-soft);
 
-  --surface-footer-actions: #f7fbff;
+  --surface-footer-actions: #f0f4f9;
   --border-footer-actions:  #d4dde9;
 
   --surface-pagination:     transparent;

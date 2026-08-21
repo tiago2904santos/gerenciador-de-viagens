@@ -180,46 +180,71 @@
   line-height: 1.3;
 }
 
+/* ---- COR POR FUNÇÃO ------------------------------------------------------
+ *
+ * Um item de menu diz o que faz por duas vias: o `data-tone` do ITEM, que tinge
+ * o rótulo inteiro, e o `data-tone` do ÍCONE, que tinge só a caixinha. A
+ * primeira é reservada ao destrutivo — um rótulo vermelho é um aviso, e barato
+ * demais para gastar em "baixar". A segunda é a que dá a cor da função, e é a
+ * que deixa o menu legível de relance, antes de ler os rótulos.
+ *
+ * É por isso que excluir e baixar PDF podem dividir o vermelho sem ambiguidade:
+ * um pinta o rótulo, o outro pinta só o ícone, e os dois nunca aparecem no mesmo
+ * canal.
+ *
+ * Uma regra só desenha a caixa, e cada tom apenas ESCOLHE a cor em `--tom-acao`.
+ * Antes eram cinco blocos repetindo as mesmas três declarações com a cor trocada,
+ * e foi assim que `preview` e `edit` acabaram sem bloco nenhum — os dois caíam no
+ * accent, e ninguém percebeu porque nada quebra quando uma cor não chega.
+ *
+ * `color-mix` com `transparent`, e não com a superfície: misturar com a
+ * superfície transforma dourado sobre azul-marinho em oliva.
+ */
+:is(html[data-theme]) .menu__icon[data-tone] {
+  background: color-mix(in srgb, var(--tom-acao, currentColor) 14%, transparent);
+  border-color: color-mix(in srgb, var(--tom-acao, currentColor) 30%, transparent);
+  color: var(--tom-acao, currentColor);
+}
+
+/* O vocabulário canônico: um tom por FUNÇÃO. */
+:is(html[data-theme]) .menu__icon[data-tone="view"]    { --tom-acao: var(--action-view); }
+:is(html[data-theme]) .menu__icon[data-tone="pdf"]     { --tom-acao: var(--action-pdf); }
+:is(html[data-theme]) .menu__icon[data-tone="docx"]    { --tom-acao: var(--action-docx); }
+:is(html[data-theme]) .menu__icon[data-tone="attach"]  { --tom-acao: var(--action-attach); }
+:is(html[data-theme]) .menu__icon[data-tone="cancel"]  { --tom-acao: var(--action-cancel); }
+:is(html[data-theme]) .menu__icon[data-tone="amend"]   { --tom-acao: var(--action-amend); }
+:is(html[data-theme]) .menu__icon[data-tone="delete"]  { --tom-acao: var(--action-delete); }
+:is(html[data-theme]) .menu__icon[data-tone="edit"]    { --tom-acao: var(--action-edit); }
+:is(html[data-theme]) .menu__icon[data-tone="neutral"] { --tom-acao: var(--action-neutral); }
+
+/* Apelidos do vocabulário ANTIGO, que falava de estado ("late", "progress") onde
+   queria dizer função. As chamadas foram migradas para os nomes acima; estes
+   apelidos ficam porque o `icon_tone` chega de presenter e de template, e um
+   apelido esquecido em algum canto deve continuar recebendo a cor CERTA da
+   função em vez de cair no accent em silêncio — que é exatamente o defeito que
+   este bloco corrige. */
+:is(html[data-theme]) .menu__icon[data-tone="preview"]  { --tom-acao: var(--action-view); }
+:is(html[data-theme]) .menu__icon[data-tone="late"]     { --tom-acao: var(--action-pdf); }
+:is(html[data-theme]) .menu__icon[data-tone="progress"] { --tom-acao: var(--action-docx); }
+:is(html[data-theme]) .menu__icon[data-tone="success"]  { --tom-acao: var(--action-attach); }
+:is(html[data-theme]) .menu__icon[data-tone="warning"]  { --tom-acao: var(--action-cancel); }
+:is(html[data-theme]) .menu__icon[data-tone="danger"]   { --tom-acao: var(--action-delete); }
+:is(html[data-theme]) .menu__icon[data-tone="info"]     { --tom-acao: var(--action-neutral); }
+
 /* Ação destrutiva: o tom tinge rótulo, ícone e a caixa dele — sem isso o ícone
    fica no accent ao lado de um rótulo vermelho, e o sinal se contradiz. */
-:is(html[data-theme]) .menu__item[data-tone="late"] .menu__title {
-  color: var(--status-late);
+:is(html[data-theme]) :is(.menu__item[data-tone="delete"], .menu__item[data-tone="late"]) .menu__title {
+  color: var(--action-delete);
 }
 
-:is(html[data-theme]) .menu__item[data-tone="late"] .menu__icon {
-  background: color-mix(in srgb, var(--status-late) 14%, transparent);
-  border-color: color-mix(in srgb, var(--status-late) 30%, transparent);
-  color: var(--status-late);
-}
-
-/* Tom do ÍCONE — os presenters já classificam cada item (pdf, docx, assinado,
-   cancelar), e a cor da caixinha é o que deixa o menu legível de relance, sem
-   ler os rótulos. `color-mix` com `transparent` é seguro em qualquer tema;
-   misturar com a superfície transforma dourado sobre azul-marinho em oliva. */
-:is(html[data-theme]) .menu__icon[data-tone="pdf"],
-:is(html[data-theme]) .menu__icon[data-tone="danger"] {
-  background: color-mix(in srgb, var(--status-late) 14%, transparent);
-  border-color: color-mix(in srgb, var(--status-late) 30%, transparent);
-  color: var(--status-late);
-}
-
-:is(html[data-theme]) .menu__icon[data-tone="docx"],
-:is(html[data-theme]) .menu__icon[data-tone="info"] {
-  background: color-mix(in srgb, var(--status-progress) 14%, transparent);
-  border-color: color-mix(in srgb, var(--status-progress) 30%, transparent);
-  color: var(--status-progress);
-}
-
-:is(html[data-theme]) .menu__icon[data-tone="success"] {
-  background: color-mix(in srgb, var(--status-done) 14%, transparent);
-  border-color: color-mix(in srgb, var(--status-done) 30%, transparent);
-  color: var(--status-done);
-}
-
-:is(html[data-theme]) .menu__icon[data-tone="warning"] {
-  background: color-mix(in srgb, var(--status-progress) 14%, transparent);
-  border-color: color-mix(in srgb, var(--status-progress) 30%, transparent);
-  color: var(--status-progress);
+:is(html[data-theme]) :is(.menu__item[data-tone="delete"], .menu__item[data-tone="late"]) .menu__icon {
+  /* Pinta por conta própria, e não só declarando `--tom-acao`: o ícone do
+     excluir chega SEM `data-tone` em quem ainda não foi migrado, e a regra base
+     acima exige o atributo para casar. Foi assim que o excluir saiu no accent na
+     primeira medição desta mudança — vermelho no rótulo e dourado no ícone. */
+  background: color-mix(in srgb, var(--action-delete) 14%, transparent);
+  border-color: color-mix(in srgb, var(--action-delete) 30%, transparent);
+  color: var(--action-delete);
 }
 
 /* O cabeçalho de grupo do menu foi APAGADO em 2026-08-16, com o componente
