@@ -84,11 +84,22 @@
      lugares para resolver a cor de um.
 
      Base BRANCA (`--surface-field`) e não o degrau tingido: é o que dá o
-     branco-azulado pedido. A 12% mede 1.11 contra o cartão, contra os 1.33 de
-     antes — a linha ficou mais suave de propósito, e quem carrega o sinal de
-     "este é o motorista" passa a ser a barra de 3px em accent na borda
-     esquerda, que não mudou. */
-  --surface-driver: color-mix(in srgb, var(--accent) 12%, var(--surface-field));
+     branco-azulado pedido.
+
+     A PORCENTAGEM foi calibrada com a cor na tela, e 18% é o meio do caminho.
+     A primeira tentativa usou 12%, que mede 1.11 contra o cartão: o dono viu e
+     disse que a linha tinha ficado com cara de fundo do painel — clarear até o
+     branco-azulado aproxima a linha do cartão, que também é quase branco, e
+     passa do ponto. Os 18% medem 1.238, contra os 1.329 de antes: clareia de
+     verdade e continua uma faixa, não um vazio.
+
+     Para referência de quem for mexer: a cor ANTIGA equivale a accent 22% sobre
+     branco. A escala inteira, contra o cartão, é 12%→1.11, 16%→1.19, 18%→1.24,
+     22%→1.33.
+
+     Quem carrega o sinal de "este é o motorista" segue sendo a barra de 3px em
+     accent na borda esquerda, que não mudou em nenhuma das versões. */
+  --surface-driver: color-mix(in srgb, var(--accent) 18%, var(--surface-field));
   /* Sombra da camada que flutua sobre a página (menu do select, lista do
      picker). Vira token porque as duas precisam ser a MESMA, e cada folha
      escrevendo o seu valor foi como elas divergiram. */

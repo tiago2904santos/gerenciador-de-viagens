@@ -10812,11 +10812,19 @@ para resolver a cor de um.
 E o empréstimo era errado de origem: a linha do motorista não é escolha de
 ninguém, é **marca de papel**. Ganhou token próprio, `--surface-driver`.
 
-No tema claro ele mistura o accent a 12% sobre BRANCO (`--surface-field`), e não
-sobre o degrau tingido — é o que dá o branco-azulado pedido: de `#c7d7e7` para
-`#e0e9f2`, com o contraste contra o cartão caindo de 1.33 para 1.11. A linha
-ficou mais suave de propósito; quem carrega o sinal de "este é o motorista"
-passa a ser a barra de 3px em accent na borda esquerda, que não mudou.
+No tema claro ele mistura o accent sobre BRANCO (`--surface-field`), e não sobre
+o degrau tingido — é o que dá o branco-azulado pedido.
+
+A porcentagem foi calibrada com a cor na tela, em duas passadas. A primeira usou
+12% (`#e0e9f2`, 1.11 contra o cartão) e o dono reprovou: a linha tinha ficado
+com cara de fundo do painel. É a armadilha do pedido — clarear até o
+branco-azulado aproxima a linha do cartão, que nesta tela também é quase branco.
+Ficou em **18%** (`#d1deeb`, 1.238), contra os 1.329 de `#c7d7e7`: clareia de
+verdade e continua lendo como faixa. Para referência, a cor antiga equivale a
+accent 22% sobre branco.
+
+Quem carrega o sinal de "este é o motorista" segue sendo a barra de 3px em
+accent na borda esquerda, que não mudou em nenhuma das versões.
 
 O tema ESCURO não foi tocado: o pedido era sobre o azul, e no escuro esta linha
 não tem azul nenhum — é o dourado misturado ao azul-marinho, que dá o oliva
