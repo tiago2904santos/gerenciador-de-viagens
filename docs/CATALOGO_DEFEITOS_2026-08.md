@@ -10798,6 +10798,31 @@ Duas ficam fora do vocabulário e **seguem o accent**, portanto mudam com o tema
 `edit` (Editar) e `neutral` (WhatsApp, Copiar mensagem). Estão assim porque ainda
 não foram decididas, não porque a regra abra exceção — aguardam o dono.
 
+### NOVO-20260821-030823-ec0ece29ac07 🟢 RESOLVIDO · `NOVO` A linha do motorista tomava emprestado o fundo de "item selecionado" · UI · risco baixo
+
+Pedido do dono: clarear o azul da linha do motorista no tema claro, "como se
+fosse uma base branca azulada".
+
+A linha usava `--surface-selected` — o token de **item ESCOLHIDO numa lista**,
+que veste o menu do select, o picker, o listbox, o choice-card e mais quatro
+lugares, e que está calibrado para 1.34 de contraste contra o fundo do menu nos
+dois temas. Clarear ali teria apagado a linha selecionada de oito componentes
+para resolver a cor de um.
+
+E o empréstimo era errado de origem: a linha do motorista não é escolha de
+ninguém, é **marca de papel**. Ganhou token próprio, `--surface-driver`.
+
+No tema claro ele mistura o accent a 12% sobre BRANCO (`--surface-field`), e não
+sobre o degrau tingido — é o que dá o branco-azulado pedido: de `#c7d7e7` para
+`#e0e9f2`, com o contraste contra o cartão caindo de 1.33 para 1.11. A linha
+ficou mais suave de propósito; quem carrega o sinal de "este é o motorista"
+passa a ser a barra de 3px em accent na borda esquerda, que não mudou.
+
+O tema ESCURO não foi tocado: o pedido era sobre o azul, e no escuro esta linha
+não tem azul nenhum — é o dourado misturado ao azul-marinho, que dá o oliva
+`#43473c` registrado em `v2/tokens.css` como exceção deliberada do
+`--surface-selected`. Segue como estava, aguardando decisão própria.
+
 ### NOVO-20260820-171008-7afb74d82d2c 🔴 ABERTO · `NOVO` O v2 entrega 517 KB de CSS em toda página: NOVO-70 e o aceite PF-02 ficam incompatíveis · FE/PERF · risco médio
 
 O `NOVO-70` mede quanto do CSS entregue numa rota é de fato usado, e é catraca:

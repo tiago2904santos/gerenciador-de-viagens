@@ -179,7 +179,9 @@
    numa lista em que todos foram escolhidos, o que se precisa saber de relance é
    quem dirige. Cor própria e âncora cheia, como o escolhido em destaque. */
 :is(html[data-theme]) .person-row--driver {
-  background: var(--surface-selected);
+  /* `--surface-driver`, e não `--surface-selected`: a linha do motorista é
+     marca de PAPEL, não item escolhido numa lista. Ver a nota do token. */
+  background: var(--surface-driver);
   box-shadow: inset 3px 0 0 0 var(--accent);
 }
 
