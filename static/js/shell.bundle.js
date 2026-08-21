@@ -3460,11 +3460,48 @@ document.documentElement.dataset.appReady = "true";
     return isNaN(declarado) ? PISO_PADRAO : declarado;
   }
 
+  function larguraDoTexto(el) {
+    /* Mede o TEXTO, com `Range`, e não a caixa com `scrollWidth`.
+     *
+     * `scrollWidth` não serve aqui, e o motivo é irônico: quando o elemento tem
+     * `text-overflow: ellipsis` — que é exatamente o caso deste componente —, o
+     * Chrome devolve `scrollWidth` LIMITADO ao `clientWidth`. Ou seja, assim que
+     * o texto começa a ser cortado, a medida passa a dizer que ele cabe. A rede
+     * de segurança do CSS cegava o JS que existe para nunca precisar dela.
+     *
+     * Foi assim que "TOYOTA COROLLA XEI" saía com reticências num bloco de
+     * sobra: medido, o texto tinha 334px numa caixa de 333px, o laço parava um
+     * degrau antes do necessário e o `ellipsis` comia o resto. Um pixel.
+     *
+     * O `Range` mede o conteúdo de verdade, independente de corte, e devolve
+     * valor fracionário — por isso a tolerância aqui é meio pixel, e não o pixel
+     * inteiro que o arredondamento do `scrollWidth` exigia. */
+    var faixa = document.createRange();
+    faixa.selectNodeContents(el);
+    var largura = faixa.getBoundingClientRect().width;
+    faixa.detach && faixa.detach();
+    return largura;
+  }
+
+  function larguraUtil(el) {
+    /* A caixa em fração, e não `clientWidth`, que é INTEIRO e arredonda.
+       Com os dois lados da comparação arredondando para lados diferentes,
+       sobrava exatamente a folga em que o defeito vivia. */
+    var estilo = window.getComputedStyle(el);
+    var recuo =
+      parseFloat(estilo.paddingLeft) + parseFloat(estilo.paddingRight) +
+      parseFloat(estilo.borderLeftWidth) + parseFloat(estilo.borderRightWidth);
+    return el.getBoundingClientRect().width - recuo;
+  }
+
   function transborda(el) {
-    /* Meio pixel de tolerância: `scrollWidth` é inteiro e arredonda para cima,
-       então um texto que cabe exatamente aparece como 1px maior e o laço
-       encolheria sem necessidade. */
-    return el.scrollWidth > el.clientWidth + 1;
+    /* Tolerância de um centésimo de pixel — praticamente zero, e é para ser.
+       O estouro que cortava "TOYOTA COROLLA XEI" media 0,06px: seis centésimos
+       bastam para o Chrome ligar o `ellipsis`, e ligar o `ellipsis` não custa
+       0,06px de texto, custa TRÊS CARACTERES — o navegador remove letras até
+       abrir espaço para o próprio "…". Qualquer tolerância generosa aqui é uma
+       palavra cortada na tela. */
+    return larguraDoTexto(el) > larguraUtil(el) + 0.01;
   }
 
   function ajustar(el) {

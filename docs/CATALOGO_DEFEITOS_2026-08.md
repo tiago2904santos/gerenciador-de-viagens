@@ -10831,6 +10831,46 @@ não tem azul nenhum — é o dourado misturado ao azul-marinho, que dá o oliva
 `#43473c` registrado em `v2/tokens.css` como exceção deliberada do
 `--surface-selected`. Segue como estava, aguardando decisão própria.
 
+### NOVO-20260821-031813-973f2e8e428d 🟢 RESOLVIDO · `NOVO` O `fit-text` media o estouro com `scrollWidth`, que o próprio `ellipsis` cega · UI/JS · risco baixo
+
+O modelo da viatura saía como "TOYOTA COROLLA …" num bloco com 5px de sobra.
+
+`fit-text.js` existe para encolher o valor do cartão até caber em uma linha,
+justamente para o `text-overflow: ellipsis` do CSS nunca precisar entrar. Ele
+media o estouro com `scrollWidth > clientWidth + 1` — e essa medida é cega
+exatamente no caso que o componente existe para evitar: com `text-overflow:
+ellipsis` aplicado, o Chrome devolve `scrollWidth` LIMITADO ao `clientWidth`.
+Assim que o texto começa a ser cortado, a medida passa a dizer que ele cabe. A
+rede de segurança do CSS cegava o JS que existe para nunca precisar dela.
+
+Medido: o texto tinha **333,06px numa caixa de 333px**. Seis centésimos de pixel
+— e o custo na tela não foi de 0,06px, foi de **três caracteres**, porque o
+navegador remove letras até abrir espaço para o próprio "…". O laço parava um
+degrau antes (30,7px em vez de 30,2px) acreditando ter terminado.
+
+Duas correções, e as duas eram necessárias:
+
+- **medir o TEXTO, com `Range`**, em vez da caixa com `scrollWidth`. É imune ao
+  corte e devolve valor fracionário;
+- **medir a CAIXA em fração** (`getBoundingClientRect` menos recuo) em vez de
+  `clientWidth`, que é inteiro. Com os dois lados da comparação arredondando
+  para lados diferentes, sobrava exatamente a folga em que o defeito vivia. A
+  tolerância caiu de 1px para 0,01px: qualquer folga generosa ali é uma palavra
+  cortada na tela.
+
+Depois: nenhum dos 16 valores da lista estoura, nos dois temas, e o modelo fecha
+com 5,39px de sobra.
+
+`core/tests/test_fit_text_contrato.py` trava as quatro metades disso. É teste
+ESTÁTICO de propósito: o defeito é de medição, e o jsdom não faz layout — um
+teste de unidade em JS devolveria zero para as duas larguras e passaria com o
+código errado.
+
+Armadilha encontrada de novo, agora no teste: ele leu o próprio comentário que
+explicava por que não usar `scrollWidth` e se auto-reprovou. É a mesma coisa que
+aconteceu com o auditor de paleta, que conta cor citada em prosa. O teste passou
+a tirar comentário antes de conferir.
+
 ### NOVO-20260820-171008-7afb74d82d2c 🔴 ABERTO · `NOVO` O v2 entrega 517 KB de CSS em toda página: NOVO-70 e o aceite PF-02 ficam incompatíveis · FE/PERF · risco médio
 
 O `NOVO-70` mede quanto do CSS entregue numa rota é de fato usado, e é catraca:
