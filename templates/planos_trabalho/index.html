@@ -41,8 +41,27 @@
           aria_label="Buscar planos de trabalho"
           hook="data-server-filter-search"
         />
-        <c-v2.select :options="abas" placeholder="Filtrar por situação" aria_label="Filtrar planos por situação" hook="data-server-filter-url" />
-        <c-v2.select name="sort" :value="sort" :options="sort_options" aria_label="Ordenação" hook="data-server-filter-control" />
+        {% comment %}
+          Situação é MULTISSELEÇÃO e nasce vazia: sem escolha a lista abre
+          inteira, e marcar duas situações soma os dois recortes. Mesmo contrato
+          de Ofícios, Eventos e Roteiros.
+        {% endcomment %}
+        <c-v2.select
+          name="aba"
+          :options="situacao_options"
+          :multiple="True"
+          placeholder="Filtrar por situação"
+          aria_label="Filtrar planos por situação"
+          hook="data-server-filter-control"
+        />
+        <c-v2.select
+          name="sort"
+          :value="sort"
+          :options="sort_options"
+          aria_label="Ordenação"
+          extra_class="select--compact"
+          hook="data-server-filter-control"
+        />
         {% comment %}
           O intervalo de viagem viaja em dois campos ocultos, sem formulário
           Django por trás: numa lista o filtro é querystring, não POST.

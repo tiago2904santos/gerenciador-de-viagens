@@ -48,7 +48,19 @@
           aria_label="Buscar termos"
           hook="data-server-filter-search"
         />
-        <c-v2.select :options="abas" placeholder="Filtrar por situação" aria_label="Filtrar termos por situação" hook="data-server-filter-url" />
+        {% comment %}
+          Situação é MULTISSELEÇÃO e nasce vazia: sem escolha a lista abre
+          inteira, e marcar duas soma os dois recortes. Mesmo contrato das
+          demais listas do sistema.
+        {% endcomment %}
+        <c-v2.select
+          name="aba"
+          :options="situacao_options"
+          :multiple="True"
+          placeholder="Filtrar por situação"
+          aria_label="Filtrar termos por situação"
+          hook="data-server-filter-control"
+        />
         {% if q %}<c-v2.button label="Limpar" icon="x" :href="termos_url" />{% endif %}
       </form>
     </c-slot>

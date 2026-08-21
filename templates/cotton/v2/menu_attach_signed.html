@@ -45,7 +45,7 @@
   {% if kinds_json %}data-attach-signed-kinds="{{ kinds_json }}"{% endif %}
   {{ attrs }}
 >
-  <span class="menu__icon" data-tone="success" aria-hidden="true">{% icone_svg "sign" %}</span>
+  <span class="menu__icon" data-tone="attach" aria-hidden="true">{% icone_svg "sign" %}</span>
   <span class="menu__copy">
     <strong class="menu__title">{% if title %}{{ title }}{% elif signed %}Gerenciar assinado{% else %}Anexar assinado{% endif %}</strong>
     <small class="menu__description">{% if description %}{{ description }}{% elif signed %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>

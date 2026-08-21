@@ -26,7 +26,12 @@ def index(request):
 
     q = request.GET.get("q", "").strip()
     status = request.GET.get("status", "").strip()
-    aba = tabs.normalizar_aba(request.GET.get("aba", ""))
+    # Situação é MULTISSELEÇÃO e nasce VAZIA (2026-08-21): a lista abre inteira e
+    # recortar é escolha de quem lê. Mesmo contrato de Ofícios, Eventos e
+    # Roteiros — a aba padrão escondia os outros recortes sem dizer que havia
+    # filtro ligado, e a tela abria mentindo o tamanho da lista.
+    valores_abas = request.GET.getlist("aba")
+    abas_selecionadas = tabs.normalizar_abas(valores_abas) if valores_abas else []
     viagem_de = request.GET.get("viagem_de", "").strip()
     viagem_ate = request.GET.get("viagem_ate", "").strip()
     sort = request.GET.get("sort", "").strip()
@@ -41,26 +46,39 @@ def index(request):
 
     cancelado_q = Q(cancelado=True)
     date_field = "data_evento_inicio"
-    lista = planos.filter(tabs.q_da_aba(aba, date_field=date_field, cancelado_q=cancelado_q))
     contagem = tabs.contar_por_aba(planos, date_field=date_field, cancelado_q=cancelado_q)
-    abas = tabs.build_abas(
-        reverse("planos_trabalho:index"), aba, contagem,
-        preserved={"q": q, "status": status, "sort": sort,
-                   "viagem_de": viagem_de, "viagem_ate": viagem_ate},
-    )
+    lista = planos
+    if abas_selecionadas:
+        lista = planos.filter(
+            tabs.q_das_abas(abas_selecionadas, date_field=date_field, cancelado_q=cancelado_q)
+        )
+    escolhidas = set(abas_selecionadas)
+    situacao_options = [
+        {
+            "value": chave,
+            "label": f"{label} ({contagem.get(chave, 0)})",
+            "selected": chave in escolhidas,
+        }
+        for chave, label in tabs.ABA_LABELS
+    ]
+    # As abas são mutuamente exclusivas E exaustivas, então somar as escolhidas —
+    # ou todas, quando nenhuma foi escolhida — dá o total exato, e o
+    # `KnownCountPaginator` segue sem pagar um COUNT a mais.
+    chaves_contadas = abas_selecionadas or [chave for chave, _ in tabs.ABA_LABELS]
+    known_count = sum(contagem.get(chave, 0) for chave in chaves_contadas)
 
     paginacao = contexto_paginacao(
         lista,
         request,
         20,
         paginator_class=KnownCountPaginator,
-        paginator_kwargs={"known_count": contagem[aba]},
+        paginator_kwargs={"known_count": known_count},
     )
     page_obj = paginacao["page_obj"]
     objetos_da_pagina = hidratar_planos_da_pagina(page_obj.object_list)
     page_obj.object_list = objetos_da_pagina
     cards = [apresentar_plano_card(plano) for plano in objetos_da_pagina]
-    has_filters = any([q, status, viagem_de, viagem_ate, sort])
+    has_filters = any([q, status, viagem_de, viagem_ate, sort, abas_selecionadas])
     return render(
         request,
         "planos_trabalho/index.html",
@@ -69,8 +87,8 @@ def index(request):
             "page_description": "Cadastre e gerencie planos de trabalho com numeração própria.",
             "q": q,
             "status": status,
-            "aba": aba,
-            "abas": abas,
+            "abas_selecionadas": abas_selecionadas,
+            "situacao_options": situacao_options,
             "viagem_de": viagem_de,
             "viagem_ate": viagem_ate,
             "sort": sort,
@@ -78,7 +96,10 @@ def index(request):
             "cards": cards,
             **paginacao,
             "create_url": reverse("planos_trabalho:novo"),
-            "search_clear_url": f"{reverse('planos_trabalho:index')}?aba={aba}",
+            # "Limpar" limpa TUDO, inclusive a situação: agora que a lista abre
+            # inteira, preservar a aba no limpar devolveria um filtro que quem
+            # clicou acabou de pedir para tirar.
+            "search_clear_url": reverse("planos_trabalho:index"),
             "programas_url": com_next(reverse("planos_trabalho:programas_index"), daqui(request)),
             "horarios_url": com_next(reverse("planos_trabalho:horarios_index"), daqui(request)),
             "sort_options": [

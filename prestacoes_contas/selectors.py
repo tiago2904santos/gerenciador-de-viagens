@@ -38,6 +38,30 @@ def normalizar_aba(aba: str | None) -> str:
     return aba if aba in ABAS_VALIDAS else ABA_PADRAO
 
 
+def normalizar_abas(valores) -> list[str]:
+    """Normaliza uma seleção múltipla preservando a ordem visual canônica.
+
+    Espelha `core.documento_abas.normalizar_abas`. As abas daqui são de ESTADO
+    da prestação, não de período, mas o contrato da faixa de filtros é o mesmo
+    em toda lista do sistema desde 2026-08-21.
+    """
+    if isinstance(valores, str):
+        valores = [valores]
+    escolhidas = {(valor or "").strip() for valor in (valores or [])}
+    ordem = (ABA_NAO_LIBERADAS, ABA_LIBERADAS, ABA_ARQUIVADOS, ABA_FINALIZADOS)
+    normalizadas = [chave for chave in ordem if chave in escolhidas]
+    return normalizadas or [ABA_PADRAO]
+
+
+def _q_das_abas(abas) -> Q:
+    """Combina por OR os recortes escolhidos. As abas são mutuamente exclusivas."""
+    filtros = [_q_da_aba(aba) for aba in normalizar_abas(abas)]
+    combinado = filtros[0]
+    for filtro in filtros[1:]:
+        combinado |= filtro
+    return combinado
+
+
 def _q_da_aba(aba: str) -> Q:
     """Filtro que define quais servidores pertencem a cada aba (mutuamente exclusivas)."""
     if aba == ABA_FINALIZADOS:
@@ -211,16 +235,27 @@ def _base_servidores(
 def listar_prestacoes(
     q: str | None = None,
     status: str | None = None,
-    aba: str | None = None,
+    aba=None,
     viagem_de: str | None = None,
     viagem_ate: str | None = None,
     sort: str | None = None,
 ):
-    """Servidores da aba pedida (um card por servidor), com filtros aplicados."""
+    """Servidores, com os filtros aplicados.
+
+    `aba` aceita uma situação, uma LISTA delas, ou nada. Nada significa **sem
+    recorte**: a lista abre inteira, que é o contrato da faixa de filtros em
+    todo o sistema desde 2026-08-21. Antes, `aba=None` era normalizado para a
+    aba padrão e a tela abria filtrada sem dizer.
+
+    Uma string continua aceita porque os testes de recorte pedem uma aba por
+    vez, e é a forma natural de perguntar "quem está nesta situação".
+    """
     base = _base_servidores(
         q=q, status=status, viagem_de=viagem_de, viagem_ate=viagem_ate, sort=sort
     )
-    return base.filter(_q_da_aba(normalizar_aba(aba)))
+    if not aba:
+        return base
+    return base.filter(_q_das_abas(aba))
 
 
 def contar_por_aba(

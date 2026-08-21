@@ -81,6 +81,30 @@ def q_da_aba(aba):
     return Q(_inicio__isnull=True) | Q(_inicio__lte=hoje, _fim__gte=hoje)
 
 
+def normalizar_abas(valores):
+    """Normaliza uma seleção múltipla preservando a ordem visual canônica.
+
+    Espelha `core.documento_abas.normalizar_abas`. As abas daqui são de PERÍODO
+    e não de estado, mas o contrato da faixa de filtros é o mesmo em toda lista
+    do sistema desde 2026-08-21: situação é multisseleção, e sem escolha a lista
+    abre inteira.
+    """
+    if isinstance(valores, str):
+        valores = [valores]
+    escolhidas = {(valor or "").strip() for valor in (valores or [])}
+    normalizadas = [chave for chave, _label in ABA_LABELS if chave in escolhidas]
+    return normalizadas or [ABA_PADRAO]
+
+
+def q_das_abas(abas):
+    """Combina por OR os recortes escolhidos. As abas são mutuamente exclusivas."""
+    filtros = [q_da_aba(aba) for aba in normalizar_abas(abas)]
+    combinado = filtros[0]
+    for filtro in filtros[1:]:
+        combinado |= filtro
+    return combinado
+
+
 def contar_por_aba(base_qs):
     """Total de cada aba numa consulta só, respeitando a busca já aplicada."""
     return anotar_periodo(base_qs).aggregate(
