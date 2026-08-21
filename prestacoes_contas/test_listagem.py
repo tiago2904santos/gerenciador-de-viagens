@@ -16,16 +16,40 @@ class PrestacaoListagemAtualTests(PrestacaoFixturesMixin, TestCase):
     def _card_pks(response):
         return [card["ps_pk"] for card in response.context["cards"]]
 
-    def test_aba_padrao_lista_somente_ativas_sem_liberacao(self):
+    def test_sem_situacao_escolhida_a_lista_abre_inteira(self):
+        """Sem `?aba=`, nenhum recorte (2026-08-21).
+
+        A tela abria na aba `nao_liberadas` — uma fila de trabalho legítima, mas
+        que escondia liberadas, arquivadas e finalizadas sem dizer que havia
+        filtro ligado. É o mesmo contrato das demais listas do sistema.
+        """
         ativa = self.criar_prestacao(numero=1)
-        self.criar_prestacao(numero=2, data_liberacao_diarias=timezone.localdate())
-        self.criar_prestacao(numero=3, arquivada=True)
-        self.criar_prestacao(numero=4, finalizada=True)
+        liberada = self.criar_prestacao(numero=2, data_liberacao_diarias=timezone.localdate())
+        arquivada = self.criar_prestacao(numero=3, arquivada=True)
+        finalizada = self.criar_prestacao(numero=4, finalizada=True)
 
         response = self.get_listagem()
 
+        self.assertEqual(response.context["abas_selecionadas"], [])
+        self.assertFalse(response.context["has_filters"])
+        self.assertEqual(
+            set(self._card_pks(response)),
+            {
+                fixture.prestacoes_servidor[0].pk
+                for fixture in (ativa, liberada, arquivada, finalizada)
+            },
+        )
+        self.assertEqual(response.context["page_obj"].paginator.count, 4)
+
+    def test_situacao_escolhida_recorta_a_lista(self):
+        ativa = self.criar_prestacao(numero=1)
+        self.criar_prestacao(numero=2, data_liberacao_diarias=timezone.localdate())
+
+        response = self.get_listagem(aba="nao_liberadas")
+
+        self.assertEqual(response.context["abas_selecionadas"], ["nao_liberadas"])
+        self.assertTrue(response.context["has_filters"])
         self.assertEqual(self._card_pks(response), [ativa.prestacoes_servidor[0].pk])
-        self.assertEqual(response.context["page_obj"].paginator.count, 1)
         self.assertEqual(response.context["cards"][0]["status_value"], "pendente")
 
     def test_card_expoe_identidade_e_status_atuais_da_prestacao(self):
@@ -117,8 +141,16 @@ class PrestacaoListagemAtualTests(PrestacaoFixturesMixin, TestCase):
                 response = self.get_listagem(aba=aba)
                 self.assertEqual(self._card_pks(response), [ps_pk])
                 self.assertEqual(
-                    {item["key"]: item["count"] for item in response.context["abas"]},
-                    {key: 1 for key in casos},
+                    {
+                        item["value"]: item["label"]
+                        for item in response.context["situacao_options"]
+                    },
+                    {
+                        "nao_liberadas": "Não liberadas (1)",
+                        "liberadas": "Liberadas (1)",
+                        "arquivados": "Arquivados (1)",
+                        "finalizados": "Finalizados (1)",
+                    },
                 )
 
     def test_filtro_status_retem_somente_status_de_dominio_solicitado(self):

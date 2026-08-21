@@ -41,10 +41,9 @@ from oficios.services import validar_oficio_para_documento
 
 from .abas import ABA_LABELS
 from .abas import anotar_periodo
-from .abas import build_abas
 from .abas import contar_por_aba
-from .abas import normalizar_aba
-from .abas import q_da_aba
+from .abas import normalizar_abas
+from .abas import q_das_abas
 from .forms import TermoAutorizacaoForm
 from .models import TermoAutorizacao
 from .card_builder import montar_card_de_termo
@@ -91,15 +90,33 @@ class TermosPaginator(Paginator):
 def index(request):
     q = request.GET.get("q", "").strip()
     q_digits = _digits(q)
-    aba = normalizar_aba(request.GET.get("aba", ""))
+    # Situação é MULTISSELEÇÃO e nasce VAZIA (2026-08-21): a lista abre inteira.
+    # Mesmo contrato das demais listas. A nota no topo de `termos/abas.py` já
+    # registrava esta armadilha uma vez: a aba padrão de composição ESCONDIA os
+    # termos sem equipe, e não havia na tela como pedir para vê-los.
+    valores_abas = request.GET.getlist("aba")
+    abas_selecionadas = normalizar_abas(valores_abas) if valores_abas else []
 
     busca = {"q": q or None, "q_digits": q_digits or None}
     # As abas são de PERÍODO (`termos/abas.py`): o que se pergunta a um termo na
     # lista é se a viagem já foi, está acontecendo ou ainda vem.
-    termos = anotar_periodo(listar_termos(**busca)).filter(q_da_aba(aba))
+    termos = anotar_periodo(listar_termos(**busca))
+    if abas_selecionadas:
+        termos = termos.filter(q_das_abas(abas_selecionadas))
     # Uma agregacao condicional em vez de tres .count(): as abas custam 1 query.
     contagem = contar_por_aba(listar_termos(**busca))
-    abas = build_abas(reverse("termos:index"), aba, contagem, {"q": q})
+    escolhidas = set(abas_selecionadas)
+    situacao_options = [
+        {
+            "value": chave,
+            "label": f"{label} ({contagem.get(chave, 0)})",
+            "selected": chave in escolhidas,
+        }
+        for chave, label in ABA_LABELS
+    ]
+    # Exclusivas e exaustivas: somar as escolhidas — ou todas — dá o total.
+    chaves_contadas = abas_selecionadas or [chave for chave, _ in ABA_LABELS]
+    known_count = sum(contagem.get(chave, 0) for chave in chaves_contadas)
 
     # A agregacao acima ja calculou exatamente o total da aba ativa. Reusar esse
     # numero evita executar a mesma busca pesada uma terceira vez no `.count()`
@@ -109,8 +126,8 @@ def index(request):
         request,
         TERMOS_PER_PAGE,
         paginator_class=TermosPaginator,
-        paginator_kwargs={"known_count": contagem[aba]},
-        query_params={"q": q, "aba": aba},
+        paginator_kwargs={"known_count": known_count},
+        query_params={"q": q, "aba": abas_selecionadas},
     )
     page_obj = paginacao["page_obj"]
     # `NOVO-08`: uma consulta para os artefatos da página inteira. Sem o mapa,
@@ -132,23 +149,36 @@ def index(request):
             "page_title": "Termos de Autorização",
             "page_description": "Cadastre termos avulsos ou vinculados a ofícios existentes.",
             "cards": cards,
-            "aba": aba,
-            "abas": abas,
+            "abas_selecionadas": abas_selecionadas,
+            "situacao_options": situacao_options,
             "q": q,
             **paginacao,
             "novo_url": reverse("termos:novo"),
             "oficios_url": reverse("oficios:index"),
             "termos_url": reverse("termos:index"),
-            # O vazio precisa dizer de QUAL vazio se trata: a aba sem nada, ou
-            # a busca que não achou. Um texto só faria um termo digitado errado
-            # parecer lista apagada.
+            # O vazio precisa dizer de QUAL vazio se trata: a busca que não
+            # achou, a situação escolhida sem nada, ou a lista realmente vazia.
+            # Um texto só faria um termo digitado errado parecer lista apagada.
+            #
+            # A terceira frase é nova: agora que a lista abre INTEIRA, um vazio
+            # sem busca e sem situação escolhida significa que não há termo
+            # nenhum — e mandar "veja as outras abas" ali seria mandar procurar
+            # onde já se está olhando.
             "empty_title": (
                 "Nenhum termo encontrado" if q else "Nenhum termo cadastrado"
             ),
             "empty_message": (
                 f"Nada corresponde a “{q}”. Limpe a busca para ver a lista inteira."
                 if q
-                else f"Nenhum termo em “{dict(ABA_LABELS)[aba]}”. Veja as outras abas."
+                else (
+                    "Nenhum termo em "
+                    + " ou ".join(
+                        f"“{dict(ABA_LABELS)[chave]}”" for chave in abas_selecionadas
+                    )
+                    + ". Veja as outras situações."
+                    if abas_selecionadas
+                    else "Nenhum termo cadastrado nesta área."
+                )
             ),
         },
     )

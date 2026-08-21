@@ -54,16 +54,28 @@ class ArquivamentoTests(PrestacaoFixturesMixin, TestCase):
         self.assertFalse(self.ps.arquivada)
         self.assertIsNone(self.ps.arquivada_em)
 
-    def test_arquivar_move_o_card_para_a_aba_de_arquivados(self):
+    def test_arquivar_move_o_card_para_a_situacao_de_arquivados(self):
+        """O recorte é comparado entre SITUAÇÕES, e não contra a lista sem filtro.
+
+        Antes, o teste conferia que o card sumia da lista sem `?aba=` — o que
+        valia enquanto a tela abria na aba `nao_liberadas`. Desde 2026-08-21 a
+        lista abre INTEIRA, e "some da lista inteira" seria justamente o
+        contrário do desejado: arquivar não some com o registro, muda a
+        situação dele.
+        """
         self.arquivar()
 
-        padrao = [c["ps_pk"] for c in self.get_listagem().context["cards"]]
+        pendentes = [
+            c["ps_pk"] for c in self.get_listagem(aba="nao_liberadas").context["cards"]
+        ]
         arquivados = [
             c["ps_pk"] for c in self.get_listagem(aba="arquivados").context["cards"]
         ]
+        inteira = [c["ps_pk"] for c in self.get_listagem().context["cards"]]
 
-        self.assertNotIn(self.ps.pk, padrao)
+        self.assertNotIn(self.ps.pk, pendentes)
         self.assertEqual(arquivados, [self.ps.pk])
+        self.assertIn(self.ps.pk, inteira)
 
     def test_get_nao_arquiva(self):
         """A ação é destrutiva o bastante para exigir POST."""
@@ -132,16 +144,21 @@ class FinalizacaoTests(PrestacaoFixturesMixin, TestCase):
         # A finalização não mexe no status de preenchimento.
         self.assertEqual(self.ps.status, PrestacaoServidor.STATUS_PENDENTE)
 
-    def test_finalizar_move_o_card_para_a_aba_de_finalizados(self):
+    def test_finalizar_move_o_card_para_a_situacao_de_finalizados(self):
+        """Comparado entre SITUAÇÕES — ver a nota do teste de arquivamento."""
         self.finalizar()
 
-        padrao = [c["ps_pk"] for c in self.get_listagem().context["cards"]]
+        pendentes = [
+            c["ps_pk"] for c in self.get_listagem(aba="nao_liberadas").context["cards"]
+        ]
         finalizados = [
             c["ps_pk"] for c in self.get_listagem(aba="finalizados").context["cards"]
         ]
+        inteira = [c["ps_pk"] for c in self.get_listagem().context["cards"]]
 
-        self.assertNotIn(self.ps.pk, padrao)
+        self.assertNotIn(self.ps.pk, pendentes)
         self.assertEqual(finalizados, [self.ps.pk])
+        self.assertIn(self.ps.pk, inteira)
 
     def test_finalizar_servidor_de_outra_area_responde_404(self):
         alheia = self.criar_prestacao(numero=91, area=self.outra_area)

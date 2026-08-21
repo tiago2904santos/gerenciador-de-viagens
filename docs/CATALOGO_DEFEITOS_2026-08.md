@@ -10871,6 +10871,69 @@ explicava por que não usar `scrollWidth` e se auto-reprovou. É a mesma coisa q
 aconteceu com o auditor de paleta, que conta cor citada em prosa. O teste passou
 a tirar comentário antes de conferir.
 
+### NOVO-20260821-034947-85fceb2bd9f0 🟢 RESOLVIDO · `NOVO` As correções da revisão visual valiam para o sistema, mas só tinham sido aplicadas em Ofícios · UI · risco médio
+
+Pedido do dono: aplicar em todo lugar que precisa, para não ter que refazer tela
+a tela.
+
+A revisão visual começou por Ofícios e encontrou lá quatro defeitos que **não
+eram daquela tela** — eram do sistema. Três já haviam sido corrigidos na raiz
+(fundo por tema, faixa em uma linha, cor por função); dois tinham ficado locais.
+
+**Listas que abriam filtradas.** `planos_trabalho`, `ordens_servico`, `termos` e
+`prestacoes_contas` continuavam normalizando a aba ausente para uma padrão, e
+abriam recortadas sem dizer que havia filtro ligado. Todas passaram ao contrato
+de Ofícios, Eventos e Roteiros: situação é multisseleção, nasce vazia, e marcar
+duas soma os dois recortes.
+
+Os dois módulos de aba próprios ganharam `normalizar_abas`/`q_das_abas`
+espelhando `core.documento_abas`; `listar_prestacoes(aba=...)` passou a aceitar
+uma situação, uma lista, ou nada — e nada agora significa SEM RECORTE, onde
+antes era normalizado para a aba padrão.
+
+Nota sobre Prestações: a aba padrão dela (`nao_liberadas`) era uma fila de
+trabalho legítima, não um acidente como nas outras. Ainda assim abria a tela
+escondendo liberadas, arquivadas e finalizadas sem sinal nenhum. Se o dono
+preferir a fila de volta como padrão, é uma linha.
+
+**Ordenação larga.** `select--compact` faltava em `planos_trabalho` e
+`ordens_servico`.
+
+**Vão fixo cortando conteúdo.** O vão variável tinha sido feito só para o bloco
+de diárias do cartão de Ofício. Medido nas 43 rotas, o cartão de Prestações
+cortava 14px em três blocos, pelo mesmo motivo. A regra passou a valer para todo
+`fact-list` de cartão.
+
+**Dois tons de menu esquecidos.** `data-tone="success"` sobrevivia em
+`eventos/partials/_card_menus.html` e em `cotton/v2/menu_attach_signed.html` —
+os dois são "anexar assinado", que é a função verde. Viraram `attach`.
+
+**A régua nova.** `scripts/audit_regras_visuais.py` varre as 43 rotas do corpus
+nos DOIS temas e reprova faixa em duas linhas, valor de fato cortado, bloco com
+conteúdo maior que a caixa e tom de menu fora do vocabulário. Foi ela que
+encontrou o corte de Prestações e os dois tons esquecidos — nenhum dos dois
+estava na tela que o olho tinha visitado.
+
+Ela mede o corte de texto com `Range` e a caixa em fração, e NÃO por
+`scrollWidth`/`clientWidth`: o `text-overflow: ellipsis` faz o `scrollWidth`
+mentir, como registrado em `NOVO-20260821-031813-973f2e8e428d`. Uma régua escrita
+do jeito ingênuo teria dado tudo verde.
+
+Não substitui a conferência em tela — ela vê alinhamento, hierarquia e cor, que
+nenhuma medição pega. Cobre o que é medível, para a conferência humana não
+gastar rodada com o que uma consulta ao DOM responde. **Não foi ligada no CI**:
+precisa de servidor no ar e banco populado, e o único job que tem isso é o que
+está vermelho pelo `NOVO-20260820-171008-7afb74d82d2c`.
+
+Depois: varredura limpa, 43 rotas × 2 temas, zero achados.
+
+**O que ficou de fora, com prova de grep:** `core.documento_abas.build_abas`,
+`termos.abas.build_abas` e `prestacoes_contas.views._build_abas` ficaram sem
+consumidor — as listas não montam mais abas como links. Não foram apagados nesta
+passada: são helpers exportados (o `_build_abas` está no `__all__` de
+`prestacoes_contas.views`) e há outra branch em voo no mesmo repositório.
+Apagá-los é limpeza própria, não ajuste de aparência.
+
 ### NOVO-20260820-171008-7afb74d82d2c 🔴 ABERTO · `NOVO` O v2 entrega 517 KB de CSS em toda página: NOVO-70 e o aceite PF-02 ficam incompatíveis · FE/PERF · risco médio
 
 O `NOVO-70` mede quanto do CSS entregue numa rota é de fato usado, e é catraca:

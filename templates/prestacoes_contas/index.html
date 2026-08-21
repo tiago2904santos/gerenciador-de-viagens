@@ -30,7 +30,6 @@
   >
     <c-slot name="controls">
       <form method="get" action="{{ request.path }}" class="rail__form" role="search" data-server-filter-form>
-        <input type="hidden" name="aba" value="{{ aba }}">
         <c-v2.input
           icon="search"
           name="q"
@@ -39,7 +38,18 @@
           aria_label="Buscar prestações"
           hook="data-server-filter-search"
         />
-        <c-v2.select :options="abas" placeholder="Filtrar por situação" aria_label="Filtrar prestações por situação" hook="data-server-filter-url" />
+        {% comment %}
+          Situação é MULTISSELEÇÃO e nasce vazia: sem escolha a lista abre
+          inteira. Mesmo contrato das demais listas do sistema.
+        {% endcomment %}
+        <c-v2.select
+          name="aba"
+          :options="situacao_options"
+          :multiple="True"
+          placeholder="Filtrar por situação"
+          aria_label="Filtrar prestações por situação"
+          hook="data-server-filter-control"
+        />
         {% if q %}<c-v2.button label="Limpar" icon="x" :href="search_clear_url" />{% endif %}
       </form>
     </c-slot>

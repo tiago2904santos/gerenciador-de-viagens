@@ -4456,7 +4456,8 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   overflow: hidden;
 }
 
-/* O vão entre "Valor total" e "Quantidade de diárias" é VARIÁVEL (2026-08-20).
+/* O vão entre os fatos de um bloco de cartão é VARIÁVEL (2026-08-20; passou a
+ * valer para TODO cartão em 2026-08-21).
  *
  * Era `row-gap: 12px` fixo, e 12px fixos não cabiam: medido na lista, 155px de
  * conteúdo em 149px úteis — o "1,5" saía cortado 6px embaixo. Um vão fixo é a
@@ -4468,14 +4469,21 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
  * conteúdo cresce, a sobra é zero e o vão fecha sozinho, sem cortar nada. É o
  * comportamento que um `gap` fixo não tem em nenhuma unidade.
  */
-:is(html[data-theme]) .record .oficio-card__allowance-facts .fact-list {
+:is(html[data-theme]) .record .form-block--v2 .fact-list {
   display: flex;
   flex-direction: column;
   row-gap: 0;
 }
 
-:is(html[data-theme]) .record .oficio-card__allowance-facts .fact + .fact {
+:is(html[data-theme]) .record .form-block--v2 .fact + .fact {
   margin-top: auto;
+}
+
+/* Para o vão ter folga a distribuir, o `fact-list` precisa da altura útil
+   inteira do bloco — `start` deixaria a lista do tamanho do conteúdo e a sobra
+   ficaria embaixo, fora do alcance do `margin-top: auto`. */
+:is(html[data-theme]) .record .form-block--v2 > .form-block__body {
+  align-content: stretch;
 }
 
 /* A quantidade é linha de APOIO do bloco — o que se lê primeiro é "R$ 420,00".

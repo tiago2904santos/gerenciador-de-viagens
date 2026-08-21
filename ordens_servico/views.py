@@ -62,7 +62,12 @@ def index(request):
     from core import documento_abas as tabs
 
     q = request.GET.get("q", "").strip()
-    aba = tabs.normalizar_aba(request.GET.get("aba", ""))
+    # Situação é MULTISSELEÇÃO e nasce VAZIA (2026-08-21): a lista abre inteira e
+    # recortar é escolha de quem lê. Mesmo contrato de Ofícios, Eventos e
+    # Roteiros — a aba padrão escondia os outros recortes sem dizer que havia
+    # filtro ligado, e a tela abria mentindo o tamanho da lista.
+    valores_abas = request.GET.getlist("aba")
+    abas_selecionadas = tabs.normalizar_abas(valores_abas) if valores_abas else []
     viagem_de = request.GET.get("viagem_de", "").strip()
     viagem_ate = request.GET.get("viagem_ate", "").strip()
     sort = request.GET.get("sort", "").strip()
@@ -76,12 +81,21 @@ def index(request):
 
     cancelado_q = Q(cancelado=True)
     date_field = "data_evento_inicio"
-    lista = ordens.filter(tabs.q_da_aba(aba, date_field=date_field, cancelado_q=cancelado_q))
     contagem = tabs.contar_por_aba(ordens, date_field=date_field, cancelado_q=cancelado_q)
-    abas = tabs.build_abas(
-        reverse("ordens_servico:index"), aba, contagem,
-        preserved={"q": q, "sort": sort, "viagem_de": viagem_de, "viagem_ate": viagem_ate},
-    )
+    lista = ordens
+    if abas_selecionadas:
+        lista = ordens.filter(
+            tabs.q_das_abas(abas_selecionadas, date_field=date_field, cancelado_q=cancelado_q)
+        )
+    escolhidas = set(abas_selecionadas)
+    situacao_options = [
+        {
+            "value": chave,
+            "label": f"{label} ({contagem.get(chave, 0)})",
+            "selected": chave in escolhidas,
+        }
+        for chave, label in tabs.ABA_LABELS
+    ]
 
     paginacao = contexto_paginacao(lista, request, ORDENS_POR_PAGINA)
     # Um assinante por pagina, nao um por card (`NOVO-07` do ciclo 2026-07,
@@ -91,7 +105,7 @@ def index(request):
         apresentar_ordem_servico_card(ordem, assinante=assinante)
         for ordem in paginacao["page_obj"].object_list
     ]
-    has_filters = any([q, viagem_de, viagem_ate, sort])
+    has_filters = any([q, viagem_de, viagem_ate, sort, abas_selecionadas])
 
     return render(
         request,
@@ -100,15 +114,18 @@ def index(request):
             "page_title": "Ordens de Serviço",
             "page_description": "Cadastre e gerencie ordens de serviço.",
             "q": q,
-            "aba": aba,
-            "abas": abas,
+            "abas_selecionadas": abas_selecionadas,
+            "situacao_options": situacao_options,
             "viagem_de": viagem_de,
             "viagem_ate": viagem_ate,
             "sort": sort,
             "has_filters": has_filters,
             "cards": cards,
             "nova_url": reverse("ordens_servico:nova"),
-            "search_clear_url": f"{reverse('ordens_servico:index')}?aba={aba}",
+            # "Limpar" limpa TUDO, inclusive a situação: agora que a lista abre
+            # inteira, preservar a aba no limpar devolveria um filtro que quem
+            # clicou acabou de pedir para tirar.
+            "search_clear_url": reverse("ordens_servico:index"),
             "sort_options": [
                 {"value": "numero_desc", "label": "Número: maior"},
                 {"value": "numero_asc", "label": "Número: menor"},

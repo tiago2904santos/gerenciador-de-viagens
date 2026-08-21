@@ -87,6 +87,7 @@ from .selectors import ABA_NAO_LIBERADAS
 from .selectors import contar_por_aba
 from .selectors import listar_prestacoes
 from .selectors import normalizar_aba
+from .selectors import normalizar_abas
 from .services import diaria_inicial_da_prestacao
 from .services import garantir_campos_padrao_relatorio_tecnico
 from .solicitacao_services import ResultadoSolicitacao
@@ -367,7 +368,12 @@ def index(request):
 
     q         = request.GET.get("q",         "").strip()
     status    = request.GET.get("status",    "").strip()
-    aba       = normalizar_aba(request.GET.get("aba", ""))
+    # Situação é MULTISSELEÇÃO e nasce VAZIA (2026-08-21): a lista abre inteira.
+    # Mesmo contrato das demais listas. A aba padrão daqui era `nao_liberadas`,
+    # que é uma fila de trabalho legítima — mas ela abria a tela escondendo
+    # liberadas, arquivadas e finalizadas sem dizer que havia recorte ligado.
+    valores_abas = request.GET.getlist("aba")
+    abas_selecionadas = normalizar_abas(valores_abas) if valores_abas else []
     viagem_de = request.GET.get("viagem_de", "").strip()
     viagem_ate = request.GET.get("viagem_ate", "").strip()
     sort      = request.GET.get("sort",      "").strip()
@@ -375,7 +381,7 @@ def index(request):
     prestacoes = listar_prestacoes(
         q=q or None,
         status=status or None,
-        aba=aba,
+        aba=abas_selecionadas,
         viagem_de=viagem_de or None,
         viagem_ate=viagem_ate or None,
         sort=sort or None,
@@ -392,7 +398,7 @@ def index(request):
         ]
     )
 
-    has_filters = any([q, status, viagem_de, viagem_ate, sort])
+    has_filters = any([q, status, viagem_de, viagem_ate, sort, abas_selecionadas])
 
     contagem = contar_por_aba(
         q=q or None,
@@ -400,7 +406,15 @@ def index(request):
         viagem_de=viagem_de or None,
         viagem_ate=viagem_ate or None,
     )
-    abas = _build_abas(request, aba, contagem, q=q, status=status, sort=sort)
+    escolhidas = set(abas_selecionadas)
+    situacao_options = [
+        {
+            "value": chave,
+            "label": f"{label} ({contagem.get(chave, 0)})",
+            "selected": chave in escolhidas,
+        }
+        for chave, label in _ABA_LABELS
+    ]
 
     return render(
         request,
@@ -412,16 +426,28 @@ def index(request):
             **paginacao,
             "q":          q,
             "status":     status,
-            "aba":        aba,
-            "abas":       abas,
+            "abas_selecionadas": abas_selecionadas,
+            "situacao_options": situacao_options,
             "viagem_de":  viagem_de,
             "viagem_ate": viagem_ate,
             "sort":       sort,
             "has_filters": has_filters,
-            "search_clear_url": f"{reverse('prestacoes_contas:index')}?aba={aba}",
+            # "Limpar" limpa TUDO, situação inclusive: com a lista abrindo
+            # inteira, preservar a aba devolveria o filtro que acabou de ser
+            # dispensado.
+            "search_clear_url": reverse("prestacoes_contas:index"),
             "status_options": [{"value": "", "label": "Todos os status"}]
             + [{"value": valor, "label": rotulo} for valor, rotulo in PrestacaoServidor.STATUS_CHOICES],
-            "empty_message": _ABA_EMPTY_MESSAGE.get(aba, "Nenhuma prestação de contas encontrada."),
+            # Com UMA situação escolhida, a frase dela; com várias ou nenhuma,
+            # a genérica — juntar quatro frases de vazio numa só não ajudaria
+            # ninguém a entender o que está faltando.
+            "empty_message": (
+                _ABA_EMPTY_MESSAGE.get(
+                    abas_selecionadas[0], "Nenhuma prestação de contas encontrada."
+                )
+                if len(abas_selecionadas) == 1
+                else "Nenhuma prestação de contas encontrada."
+            ),
             "sort_options": [
                 {"value": "criacao_desc",  "label": "Criação: mais recente"},
                 {"value": "criacao_asc",   "label": "Criação: mais antiga"},
