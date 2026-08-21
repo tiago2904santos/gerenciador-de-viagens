@@ -565,6 +565,10 @@ def _build_roteiro_form_context(
         'object': obj,
         'form': form,
         'destinos_atuais': destinos_atuais,
+        # O template do componente recebe `destinos_rows`; manter só o estado
+        # serializado fazia a tela nascer com a linha-molde, embora o editor já
+        # conhecesse todos os destinos do evento.
+        'destinos_rows': destinos_atuais,
         'estados': estados_qs,
         'api_cidades_por_estado_url': reverse('roteiros:api_cidades_por_estado', kwargs={'estado_id': 0}),
         'trechos': trechos_list,

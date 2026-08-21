@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import tinycss2
@@ -67,6 +68,39 @@ class DarkRedesignContractTests(SimpleTestCase):
         # o teste continue descrevendo o contrato, não a ordem dos novos
         # arquivos no bundle.
         self.css = "\n".join((self.tokens_css, self.components_css))
+
+    def test_estado_vazio_do_picker_tem_superficie_quando_token_da_etapa_nao_existe(self):
+        self.assertIn(
+            "background: var(--step1-empty, var(--surface-contrast, var(--surface-field))) !important;",
+            self.route_editor_css,
+        )
+
+    def test_sugestao_de_viatura_repete_o_estado_visual_do_motorista(self):
+        self.assertIn(
+            ".viatura-sugestao-chip[aria-pressed=\"true\"]",
+            self.route_editor_css,
+        )
+        self.assertIn("background: var(--surface-selected);", self.route_editor_css)
+        self.assertIn("box-shadow: inset 3px 0 0 0 var(--accent);", self.route_editor_css)
+
+    def test_termo_aninhado_usa_degrau_de_documento_e_nao_superficie_da_secao(self):
+        document_inline_css = (
+            Path(settings.BASE_DIR) / "static" / "css" / "v2" / "document-inline.css"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(
+            "background: var(--surface-contrast, var(--surface-field)) !important;",
+            document_inline_css,
+        )
+        self.assertNotIn("--step1-panel", document_inline_css)
+
+    def test_documentos_da_conferencia_usam_o_poco_do_componente(self):
+        document_inline_css = (
+            Path(settings.BASE_DIR) / "static" / "css" / "v2" / "document-inline.css"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(".oficio-documentos-conference", document_inline_css)
+        self.assertIn("background: var(--surface-rail) !important;", document_inline_css)
 
     def test_dark_redesign_is_the_final_global_css_layer(self):
         """A ordem da cascata mora no bundle; `base.html` so linka o bundle.
@@ -428,6 +462,49 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("{% comment %}", canonical)
         self.assertIn("{% endcomment %}", canonical)
         self.assertNotIn("{#\n", canonical)
+
+    def test_page_headers_never_render_status_chips(self):
+        templates = Path(settings.BASE_DIR) / "templates"
+        header_pattern = re.compile(
+            r"<c-v2\.(?:header|wizard_page)\b[^>]*>"
+            r"(?P<header>.*?)"
+            r"(?:<c-slot name=\"body\">|</c-v2\.(?:header|wizard_page)>)",
+            re.DOTALL,
+        )
+
+        for template in templates.rglob("*.html"):
+            source = template.read_text(encoding="utf-8")
+            for match in header_pattern.finditer(source):
+                with self.subTest(template=template.relative_to(templates)):
+                    self.assertNotIn("<c-v2.chip", match.group("header"))
+
+    def test_header_buttons_share_the_header_surface_until_hover(self):
+        header_css = (
+            Path(settings.BASE_DIR) / "static" / "css" / "v2" / "header.css"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(".header__aside .button {", header_css)
+        self.assertIn("background: var(--surface-brand);", header_css)
+        self.assertIn("border-color: color-mix", header_css)
+        self.assertIn(".header__aside .button:hover", header_css)
+        self.assertIn("background: var(--surface-selected-on-brand);", header_css)
+
+    def test_record_status_position_depends_on_list_type(self):
+        root = Path(settings.BASE_DIR)
+        template = (root / "templates" / "cotton" / "v2" / "record.html").read_text(
+            encoding="utf-8"
+        )
+        css = (root / "static" / "css" / "v2" / "record.css").read_text(
+            encoding="utf-8"
+        )
+
+        title_row = template.split('<div class="record__title-row">', 1)[1].split(
+            "</div>", 1
+        )[0]
+        self.assertIn("{% if box != 'panel' %}", title_row)
+        self.assertIn('class="record__status"', title_row)
+        self.assertIn(".record.panel > .record__row > .record__status", css)
+        self.assertNotIn("margin-left: auto;", css.split(".record__status {", 1)[1].split("}", 1)[0])
 
     def test_canonical_button_exposes_loading_and_disabled_contracts(self):
         button = (

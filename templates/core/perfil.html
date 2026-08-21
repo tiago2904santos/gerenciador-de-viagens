@@ -8,11 +8,7 @@
 
 {% block content %}
   <div class="form-page">
-    <c-v2.header :title="page_title">
-      {% if flow_status_label %}
-        <c-slot name="aside"><c-v2.chip :label="flow_status_label" :tone="flow_status_variant" /></c-slot>
-      {% endif %}
-    </c-v2.header>
+    <c-v2.header :title="page_title" />
 
     <c-v2.panel title="Conta e segurança" :description="page_description">
       <c-slot name="body">

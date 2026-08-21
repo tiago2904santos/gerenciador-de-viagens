@@ -37,7 +37,6 @@
   {% endcomment %}
   <c-v2.wizard_page eyebrow="Eventos" :title="page_title" :steps="evento_page_steps">
     <c-slot name="aside">
-      <c-v2.chip :label="flow_status_label" :tone="evento_status_tone" />
       <c-v2.button label="Voltar para lista" icon="arrow-left" :href="flow_back_url" />
     </c-slot>
 
@@ -126,7 +125,14 @@
         {% endif %}
 
         <c-v2.fab>
-          <c-v2.button label="Novo ofício" variant="primary" icon="plus" :href="create_urls.oficio" />
+          {% comment %}
+            Criar ofício é POST porque reserva numeração. Um link faria GET e a
+            view, corretamente, devolveria a lista sem criar nada.
+          {% endcomment %}
+          <form method="post" action="{{ create_urls.oficio }}">
+            {% csrf_token %}
+            <c-v2.button label="Novo ofício" variant="primary" icon="plus" type="submit" />
+          </form>
         </c-v2.fab>
       {% endif %}
 
@@ -145,12 +151,13 @@
               aria_label="Anexar documento de solicitação"
               title="Anexar documento"
               eyebrow="Documentos de solicitação"
-              accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
+              accept="application/pdf,.pdf,image/*"
+              :multiple="True"
               file_description="o ofício solicitante, convite, despacho ou imagem deste evento"
-              file_help="Selecione um arquivo em PDF, PNG, JPG ou JPEG."
+              file_help="Selecione um ou mais PDFs ou imagens. As imagens serão convertidas para PDF."
               hint="Ele fica disponível na lista de documentos de solicitação."
-              choose_label="Escolher arquivo"
-              upload_label="Anexar documento"
+              choose_label="Escolher arquivos"
+              upload_label="Anexar documentos"
             />
           </c-slot>
           <c-slot name="body">

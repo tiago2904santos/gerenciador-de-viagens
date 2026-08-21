@@ -230,6 +230,23 @@ class WizardV2Tests(TestCase):
 
         self.assertIn("form-block--split", section)
 
+        css = (ROOT / "static" / "css" / "v2" / "form-block.css").read_text(encoding="utf-8")
+        regra = css[css.index(".form-block--v2.form-block--split .form-block__description {") :]
+        regra = regra[: regra.index("}")]
+        self.assertIn("white-space: normal", regra)
+        self.assertIn("overflow-wrap: anywhere", regra)
+
+    def test_programa_ocupa_linha_e_divide_somente_quando_outro_aparece(self):
+        html = self._html("planos_trabalho:wizard_identificacao")
+
+        self.assertIn("field-grid--cols-2 programa-solicitante-grid", html)
+        self.assertIn("data-pt-programa-outros-field hidden", html)
+        css = (ROOT / "static" / "css" / "v2" / "form-block.css").read_text(encoding="utf-8")
+        self.assertIn(
+            ".programa-solicitante-grid:has(\n  > [data-pt-programa-outros-field][hidden]",
+            css,
+        )
+
     def test_periodo_do_evento_usa_form_block_split(self):
         html = self._html("planos_trabalho:wizard_identificacao")
         titulo = html.index('<h2 class="form-block__title">Período do evento</h2>')

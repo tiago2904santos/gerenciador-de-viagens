@@ -69,6 +69,7 @@
     var uploadButton = modal.querySelector("[data-file-upload-button]");
     var fileDefaults = {
       accept: fileInput ? fileInput.getAttribute("accept") || "" : "",
+      multiple: fileInput ? fileInput.multiple : false,
       description: fileDescription ? fileDescription.textContent : "",
       help: fileHelp ? fileHelp.textContent : "",
       choose: chooseLabel ? chooseLabel.textContent : "",
@@ -215,6 +216,8 @@
           "accept",
           trigger.getAttribute("data-attach-signed-accept") || fileDefaults.accept
         );
+        fileInput.multiple = trigger.getAttribute("data-attach-signed-multiple") === "true"
+          || fileDefaults.multiple;
       }
       if (fileDescription) {
         fileDescription.textContent =

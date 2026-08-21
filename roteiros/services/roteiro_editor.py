@@ -131,6 +131,10 @@ def montar_initial_roteiro_evento_sem_datas(evento):
     if cidade:
         initial["destino_cidade"] = cidade.pk
         initial["destino_cidade_id"] = cidade.pk
+    initial["destinos_atuais"] = [
+        {"estado_id": destino_estado.pk if destino_estado else None, "cidade_id": destino_cidade.pk if destino_cidade else None}
+        for destino_cidade, destino_estado in seed.get("destinos", [])
+    ]
     initial["seed_source_label"] = "Pre-preenchido pelo evento."
     return initial
 
@@ -174,6 +178,14 @@ def preparar_estado_editor_roteiro_para_get(initial=None, roteiro=None):
     destino_cidade = initial.get("destino_cidade") or initial.get("destino_cidade_id")
     destinos_atuais = [
         {
+            "estado_id": item.get("estado_id"),
+            "cidade_id": item.get("cidade_id"),
+            "cidade": None,
+            "estado": None,
+        }
+        for item in (initial.get("destinos_atuais") or [])
+    ] or [
+        {
             "estado_id": destino_estado,
             "cidade_id": destino_cidade,
             "cidade": None,
@@ -183,7 +195,10 @@ def preparar_estado_editor_roteiro_para_get(initial=None, roteiro=None):
     trechos_list = []
     roteiro_state = editor_state_builder._build_roteiro_state_from_estrutura(
         trechos_list,
-        [{"estado_id": destino_estado, "cidade_id": destino_cidade}],
+        [
+            {"estado_id": item.get("estado_id"), "cidade_id": item.get("cidade_id")}
+            for item in destinos_atuais
+        ],
         initial.get("origem_estado"),
         initial.get("origem_cidade"),
         initial.get("seed_source_label", ""),

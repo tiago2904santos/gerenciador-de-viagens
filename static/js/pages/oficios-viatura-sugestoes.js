@@ -116,7 +116,7 @@
            `viatura-sugestao-*` e a folha que as desenhava saíram junto. */
         var btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "toggle__item";
+        btn.className = "toggle__item viatura-sugestao-chip";
         btn.dataset.viaturaId = s.id;
         btn.setAttribute("aria-pressed", s.id === currentId ? "true" : "false");
 

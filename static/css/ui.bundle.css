@@ -1795,6 +1795,23 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+/* A identificação do ofício tem três campos no custeio comum e ganha o quarto
+   somente quando "Outra instituição" revela seu complemento. As trilhas devem
+   acompanhar a quantidade visível, sem deixar uma coluna vazia no primeiro
+   estado. */
+:is(html[data-theme]) .form-block--v2 .oficio-identity-grid:has(> .oficio-custeio-instituicao[hidden]) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Programa ocupa a largura disponível enquanto o complemento não participa do
+   formulário. Ao escolher "Outro", o JS revela o segundo filho e a grade volta
+   automaticamente às duas colunas iguais declaradas por `--cols-2`. */
+:is(html[data-theme]) .form-block--v2 .programa-solicitante-grid:has(
+  > [data-pt-programa-outros-field][hidden]
+) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 :is(html[data-theme]) .form-block--v2 .field-grid--cols-4[hidden] {
   display: none;
 }
@@ -1840,9 +1857,9 @@
  * colunas não se alinhavam entre si. Alinhar blocos é o motivo de existir um
  * sistema de grade — deixar cada um se medir sozinho o desfaz.
  *
- * Em troca, a descrição de um bloco split precisa caber em uma linha nesta
- * largura. Ela não quebra (`white-space: nowrap` abaixo): se passar, transborda
- * — e é para transbordar mesmo, senão o desalinhamento volta em silêncio. */
+ * A descrição quebra dentro dessa coluna fixa. Assim textos longos aumentam
+ * somente a altura do cabeçalho e nunca invadem o campo seguinte; a origem da
+ * coluna de campos continua idêntica entre todos os blocos. */
 :is(html[data-theme]) .form-block--v2.form-block--split {
   --split-label: 200px;
 
@@ -1857,11 +1874,12 @@
   gap: 2px;
 }
 
-/* Uma linha só. É por isso que o piso da coluna é `max-content`: a descrição
-   dita a largura em vez de quebrar dentro dela. Em troca, a descrição de um
-   bloco split precisa ser curta — se ela crescer, come a largura do campo. */
+/* Texto livre precisa respeitar a trilha de 200px. `overflow-wrap` também cobre
+   nomes ou identificadores sem espaços, sem deslocar a coluna dos campos. */
 :is(html[data-theme]) .form-block--v2.form-block--split .form-block__description {
-  white-space: nowrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 @media (max-width: 720px) {
@@ -1955,6 +1973,25 @@
   display: flex;
   flex: none;
   gap: var(--gap-tight);
+}
+
+/* A ação pertence à faixa: em repouso não abre uma segunda superfície dentro
+   do header. A borda dá o limite; o preenchimento só muda quando há intenção
+   (hover/foco). A regra vale para qualquer variante colocada neste slot. */
+:is(html[data-theme]) .header__aside .button {
+  background: var(--surface-brand);
+  border-color: color-mix(in srgb, var(--text-on-brand) 38%, transparent);
+  color: var(--text-on-brand);
+}
+
+:is(html[data-theme]) .header__aside .button:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--surface-selected-on-brand);
+  border-color: color-mix(in srgb, var(--text-on-brand) 58%, transparent);
+  color: var(--text-on-brand);
+}
+
+:is(html[data-theme]) .header__aside .button:focus-visible {
+  outline-color: var(--focus-ring-on-brand);
 }
 /* <<< css/v2/header.css <<< */
 
@@ -4300,20 +4337,8 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   padding-bottom: var(--gap-tight);
 }
 
-/* O selo vai para a PONTA DIREITA da linha (decisão do dono, 2026-08-18).
-
-   A posição foi e voltou algumas vezes em 2026-08-16, quando o argumento em uso
-   era "o selo qualifica o título, e os dois são uma frase só". O corte agora é
-   outro: com os selos alinhados numa coluna própria, percorrer a lista de cima a
-   baixo lendo só o estado deixa de exigir que o olho pare em cada título de
-   comprimento diferente.
-
-   Nas listas simples, onde as ações moram na mesma linha, o selo encosta nelas —
-   os dois fecham a linha juntos, e é por isso que `.record__row` não usa
-   `space-between`: ele abriria um vazio entre o selo e os botões.
-
-   `flex: none` para ele não encolher quando o título é longo: um selo espremido
-   perde a pílula e vira texto solto. */
+/* O selo não encolhe quando o título é longo: uma pílula espremida vira texto
+   solto. Na lista simples ele já mora em `record__title-row`, logo após o título. */
 :is(html[data-theme]) .record__status {
   align-items: center;
   display: inline-flex;
@@ -4321,13 +4346,19 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   /* Com dois selos (situação + temporal) eles precisam de um vão entre si; com
      um só, o `gap` não faz nada. */
   gap: var(--gap-tight);
+}
+
+/* Só a LISTA DE CARDS cria a coluna de estado à direita. Na lista simples o
+   selo permanece junto do texto, e as ações continuam sendo o único conteúdo
+   empurrado para a ponta da linha. */
+:is(html[data-theme]) .record.panel > .record__row > .record__status {
   margin-left: auto;
 }
 
 /* Com o selo empurrado para a direita, as ações não precisam empurrar de novo —
    e não podem: dois `margin-left: auto` na mesma linha abrem um vão ENTRE eles.
    O primeiro elemento a empurrar já leva os dois para a ponta. */
-:is(html[data-theme]) .record__row > .record__status ~ .record__actions {
+:is(html[data-theme]) .record.panel > .record__row > .record__status ~ .record__actions {
   margin-left: 0;
 }
 
@@ -5174,7 +5205,7 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 
 :is(html[data-theme])
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .search-picker__selected-empty {
-  background: var(--step1-empty) !important;
+  background: var(--step1-empty, var(--surface-contrast, var(--surface-field))) !important;
   border: 0 !important;
   color: var(--color-muted);
   padding: 12px 14px !important;
@@ -5184,7 +5215,7 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 /* Sugestões de viatura: mesmo poço dos campos; ativo = linguagem do card motorista. */
 :is(html[data-theme])
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip {
-  background: var(--step1-field);
+  background: var(--step1-field, var(--surface-contrast, var(--surface-field)));
   border: 0;
   border-radius: 12px;
   box-shadow: none;
@@ -5200,7 +5231,21 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip:focus-visible {
   background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field));
   outline: 0;
-}@media (max-width: 900px) {
+}
+
+/* Escolher uma sugestão é o mesmo estado semântico de marcar o motorista:
+   superfície selecionada e filete de accent, sem transformar todo o chip numa
+   massa de cor de navegação. */
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip[aria-pressed="true"],
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip[aria-pressed="true"]:hover {
+  background: var(--surface-selected);
+  box-shadow: inset 3px 0 0 0 var(--accent);
+  color: var(--text-strong);
+}
+
+@media (max-width: 900px) {
   :is(html[data-theme])
     :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block).form-block--split {
     align-items: stretch;
@@ -13005,18 +13050,13 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   cursor: default;
 }
 
-/* Termos aninhados: mesmo fundo da seção de preview (não o poço de campo). */
-.oficio-documentos-preview-section.document-inline-stack
-  .document-inline-card--termos
-  .document-inline-card--nested,
-.oficio-documentos-preview-section.document-inline-stack
-  .document-inline-card--termos
+/* Termos aninhados são documentos acionáveis dentro do grupo: usam o degrau de
+   controle para não se fundirem à superfície da seção que os contém. */
+.document-inline-card--termos .document-inline-card--nested,
+.document-inline-card--termos
   .document-inline-card--nested
   > .document-inline-card__header {
-  background: var(
-    --step1-panel,
-    var(--form-section-bg, var(--surface-form-section, var(--color-surface, #fff)))
-  ) !important;
+  background: var(--surface-contrast, var(--surface-field)) !important;
 }
 
 .document-inline-card__header {
@@ -13162,6 +13202,16 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   border-radius: var(--radius-field);
   margin: 0;
   overflow: hidden;
+}
+
+/* Na conferência do ofício, os três filhos diretos são documentos, não novas
+   seções: ficam no poço escuro do componente enquanto o form-block conserva a
+   superfície azul que agrupa a área. */
+:is(html[data-theme])
+  .oficio-documentos-conference
+  > .form-block__body
+  > .document-inline-card {
+  background: var(--surface-rail) !important;
 }
 
 /* O `<summary>` traz um triângulo próprio em toda plataforma; ele some porque a
@@ -13978,10 +14028,6 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
 :is(html[data-theme]) .route-summary-block > .form-block__header > div:first-child {
   flex: 1;
   min-width: 0;
-}
-
-:is(html[data-theme]) .route-summary-block .form-block__description {
-  text-align: right;
 }
 
 @media (max-width: 900px) {

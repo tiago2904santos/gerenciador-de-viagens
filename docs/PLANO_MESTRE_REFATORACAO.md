@@ -645,3 +645,39 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       pares completos header + sub-header, preservando os headers de teste originais
 - [x] `NOVO-20260813-170921-fcd0df6f2a36` emenda visualmente os três pares removendo vão, cantos
       internos e borda duplicada sem afetar os headers de teste
+- [x] `NOVO-20260821-172128-3ad8129911ce` restaura o contrato de que header de página nunca
+      recebe selo de estado em Eventos, Ofícios, Planos, Prestações ou Perfil, com trava automatizada
+- [x] `NOVO-20260821-173515-c2f013bafbbc` integra os botões à superfície do header em repouso,
+      deixando borda e hover como únicos sinais de separação nos dois temas
+- [x] `NOVO-20260821-173813-fa346f5501dc` separa a posição do selo por tipo de lista: junto ao
+      texto na lista simples e alinhado à direita somente na lista de cards
+- [x] `NOVO-20260821-174030-acb36df820f9` preserva todos os destinos, na ordem do evento, ao
+      pré-preencher um novo roteiro vinculado
+- [x] `NOVO-20260821-174522-213aa3dfa786` faz “Novo ofício” na etapa do evento submeter o POST
+      de criação, mantendo o evento e abrindo diretamente o cadastro
+- [x] `NOVO-20260821-174859-47968d874bbc` distribui a identificação do ofício em três colunas
+      iguais no custeio comum e quatro iguais quando “Outra instituição” revela o complemento
+- [x] `NOVO-20260821-175758-3a8fc60e1c2f` devolve a superfície de contraste aos estados vazios
+      dos pickers de viajantes e viatura quando o token opcional da etapa não está definido
+- [x] `NOVO-20260821-180011-6c160eea9189` troca o “+” genérico do atalho de novo servidor pelo
+      símbolo semântico de pessoa com adição, preservando rótulo acessível e tooltip
+- [x] `NOVO-20260821-180157-946404f82d52` troca o “+” genérico do atalho de nova viatura pelo
+      símbolo semântico de veículo com adição, preservando rótulo acessível, tooltip e destino
+- [x] `NOVO-20260821-180343-7a97834445d6` dá às sugestões de viatura a superfície correta em
+      repouso e replica em `aria-pressed` o estado visual do motorista selecionado
+- [x] `NOVO-20260821-181158-bb4547d6c135` remove a descrição redundante do resumo de roteiro na
+      etapa Documentos e poda sua regra CSS exclusiva, agora sem consumidor
+- [x] `NOVO-20260821-181345-178dae690a33` coloca cada Termo de Autorização aninhado no degrau de
+      superfície de documento, sem alterar o grupo externo nem o visualizador PDF
+- [x] `NOVO-20260821-182255-3b106eae124f` coloca os três cartões externos da conferência no poço
+      de documento, mantendo o painel agrupador e os resumos inferiores em seus próprios degraus
+- [x] `NOVO-20260821-182514-e914c1439f6b` transforma o botão inferior de “Voltar à lista” em
+      “Voltar” para a etapa Justificativa, preservando a saída para a lista somente no cabeçalho
+- [x] `NOVO-20260821-182700-85e4b28d391d` invalida o HTML v7 da lista para exibir Viatura,
+      Trechos e Diárias em três colunas, com o itinerário travado na segunda posição
+- [x] `NOVO-20260821-183201-786738afc625` permite selecionar vários documentos de solicitação
+      no evento e converte cada imagem aceita em um PDF próprio
+- [x] `NOVO-20260821-184332-a289b9a1edb5` permite que descrições longas dos blocos split
+      quebrem dentro da coluna de rótulo sem serem encobertas pelos campos
+- [x] `NOVO-20260821-184602-bb173eae5eda` faz o programa solicitante ocupar a linha inteira
+      e dividir o espaço somente quando “Outro programa” está visível

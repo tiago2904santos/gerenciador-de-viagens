@@ -110,6 +110,26 @@ class EditorRoteiroCaracterizacaoTests(TestCase):
         self.assertEqual(resposta.status_code, 302, _mensagens(resposta))
         return Roteiro.objects.order_by("-pk").first()
 
+    def test_novo_roteiro_do_evento_herda_todos_os_destinos_na_ordem(self):
+        evento = Evento.objects.create(
+            area=area_de_teste(),
+            titulo="Evento com dois destinos",
+            destino_uf="SC",
+            destino_cidade="FLORIANOPOLIS",
+            destinos_extras=[{"uf": "PR", "cidade": "LONDRINA"}],
+        )
+
+        resposta = self.client.get(reverse("roteiros:novo"), {"evento": evento.pk})
+
+        self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(
+            [item["cidade_id"] for item in resposta.context["destinos_atuais"]],
+            [self.destino.pk, self.destino_2.pk],
+        )
+        self.assertEqual(
+            [item["cidade_id"] for item in resposta.context["destinos_rows"]],
+            [self.destino.pk, self.destino_2.pk],
+        )
     # -- 1..4: redirect e mensagem de `editar` ------------------------------
 
     def test_1_editar_sem_duplicado_atualiza_e_volta_para_a_lista(self):

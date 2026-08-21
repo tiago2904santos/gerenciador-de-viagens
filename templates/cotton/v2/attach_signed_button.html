@@ -1,4 +1,4 @@
-{% cotton:vars accept aria_label choose_label current_name current_remove_url current_view_url doc_label eyebrow file_description file_help hint icon signed title upload_label url %}
+{% cotton:vars accept aria_label choose_label current_name current_remove_url current_view_url doc_label eyebrow file_description file_help hint icon multiple signed title upload_label url %}
 {% load icones %}
 {% comment %}
   Botão de linha que abre o diálogo de anexar arquivo.
@@ -47,6 +47,7 @@
   {% if title %}data-attach-signed-title="{{ title }}"{% endif %}
   {% if eyebrow %}data-attach-signed-eyebrow="{{ eyebrow }}"{% endif %}
   {% if accept %}data-attach-signed-accept="{{ accept }}"{% endif %}
+  {% if multiple %}data-attach-signed-multiple="true"{% endif %}
   {% if file_description %}data-attach-signed-file-description="{{ file_description }}"{% endif %}
   {% if file_help %}data-attach-signed-file-help="{{ file_help }}"{% endif %}
   {% if hint %}data-attach-signed-hint="{{ hint }}"{% endif %}

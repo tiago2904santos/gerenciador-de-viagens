@@ -32,18 +32,13 @@
   cursor: default;
 }
 
-/* Termos aninhados: mesmo fundo da seção de preview (não o poço de campo). */
-.oficio-documentos-preview-section.document-inline-stack
-  .document-inline-card--termos
-  .document-inline-card--nested,
-.oficio-documentos-preview-section.document-inline-stack
-  .document-inline-card--termos
+/* Termos aninhados são documentos acionáveis dentro do grupo: usam o degrau de
+   controle para não se fundirem à superfície da seção que os contém. */
+.document-inline-card--termos .document-inline-card--nested,
+.document-inline-card--termos
   .document-inline-card--nested
   > .document-inline-card__header {
-  background: var(
-    --step1-panel,
-    var(--form-section-bg, var(--surface-form-section, var(--color-surface, #fff)))
-  ) !important;
+  background: var(--surface-contrast, var(--surface-field)) !important;
 }
 
 .document-inline-card__header {
@@ -189,6 +184,16 @@
   border-radius: var(--radius-field);
   margin: 0;
   overflow: hidden;
+}
+
+/* Na conferência do ofício, os três filhos diretos são documentos, não novas
+   seções: ficam no poço escuro do componente enquanto o form-block conserva a
+   superfície azul que agrupa a área. */
+:is(html[data-theme])
+  .oficio-documentos-conference
+  > .form-block__body
+  > .document-inline-card {
+  background: var(--surface-rail) !important;
 }
 
 /* O `<summary>` traz um triângulo próprio em toda plataforma; ele some porque a

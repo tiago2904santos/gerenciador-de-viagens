@@ -62,3 +62,22 @@
   flex: none;
   gap: var(--gap-tight);
 }
+
+/* A ação pertence à faixa: em repouso não abre uma segunda superfície dentro
+   do header. A borda dá o limite; o preenchimento só muda quando há intenção
+   (hover/foco). A regra vale para qualquer variante colocada neste slot. */
+:is(html[data-theme]) .header__aside .button {
+  background: var(--surface-brand);
+  border-color: color-mix(in srgb, var(--text-on-brand) 38%, transparent);
+  color: var(--text-on-brand);
+}
+
+:is(html[data-theme]) .header__aside .button:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--surface-selected-on-brand);
+  border-color: color-mix(in srgb, var(--text-on-brand) 58%, transparent);
+  color: var(--text-on-brand);
+}
+
+:is(html[data-theme]) .header__aside .button:focus-visible {
+  outline-color: var(--focus-ring-on-brand);
+}

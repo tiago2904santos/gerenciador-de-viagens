@@ -360,6 +360,23 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+/* A identificação do ofício tem três campos no custeio comum e ganha o quarto
+   somente quando "Outra instituição" revela seu complemento. As trilhas devem
+   acompanhar a quantidade visível, sem deixar uma coluna vazia no primeiro
+   estado. */
+:is(html[data-theme]) .form-block--v2 .oficio-identity-grid:has(> .oficio-custeio-instituicao[hidden]) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Programa ocupa a largura disponível enquanto o complemento não participa do
+   formulário. Ao escolher "Outro", o JS revela o segundo filho e a grade volta
+   automaticamente às duas colunas iguais declaradas por `--cols-2`. */
+:is(html[data-theme]) .form-block--v2 .programa-solicitante-grid:has(
+  > [data-pt-programa-outros-field][hidden]
+) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 :is(html[data-theme]) .form-block--v2 .field-grid--cols-4[hidden] {
   display: none;
 }
@@ -405,9 +422,9 @@
  * colunas não se alinhavam entre si. Alinhar blocos é o motivo de existir um
  * sistema de grade — deixar cada um se medir sozinho o desfaz.
  *
- * Em troca, a descrição de um bloco split precisa caber em uma linha nesta
- * largura. Ela não quebra (`white-space: nowrap` abaixo): se passar, transborda
- * — e é para transbordar mesmo, senão o desalinhamento volta em silêncio. */
+ * A descrição quebra dentro dessa coluna fixa. Assim textos longos aumentam
+ * somente a altura do cabeçalho e nunca invadem o campo seguinte; a origem da
+ * coluna de campos continua idêntica entre todos os blocos. */
 :is(html[data-theme]) .form-block--v2.form-block--split {
   --split-label: 200px;
 
@@ -422,11 +439,12 @@
   gap: 2px;
 }
 
-/* Uma linha só. É por isso que o piso da coluna é `max-content`: a descrição
-   dita a largura em vez de quebrar dentro dela. Em troca, a descrição de um
-   bloco split precisa ser curta — se ela crescer, come a largura do campo. */
+/* Texto livre precisa respeitar a trilha de 200px. `overflow-wrap` também cobre
+   nomes ou identificadores sem espaços, sem deslocar a coluna dos campos. */
 :is(html[data-theme]) .form-block--v2.form-block--split .form-block__description {
-  white-space: nowrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 @media (max-width: 720px) {

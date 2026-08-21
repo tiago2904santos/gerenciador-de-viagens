@@ -11,7 +11,7 @@
   contrato dele, e `data-oficio-custeio-outra-value` carrega VALOR, por isso o
   invólucro é escrito aqui e não vem de um componente.
 {% endcomment %}
-<div class="field-grid field-grid--cols-4">
+<div class="field-grid field-grid--cols-4 oficio-identity-grid">
   <c-v2.document_number :field="form.numero" label="N° do Ofício" :suffix="oficio_numero_ano_hint" />
   <c-v2.form_field :field="form.protocolo" label="Protocolo" />
   {% comment %}

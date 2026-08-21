@@ -35,11 +35,6 @@
   {% endcomment %}
   <c-v2.wizard_page eyebrow="Planos de trabalho" :title="wizard_header.subtitle" :steps="wizard_page_steps">
     <c-slot name="aside">
-      {% if wizard_header.status_label %}
-        {% with tom_do_status=wizard_header.status_variant|yesno:"info,info" %}
-          <c-v2.chip :label="wizard_header.status_label" :tone="tom_do_status" />
-        {% endwith %}
-      {% endif %}
       {% comment %}
         `autosave_link` não é enfeite: `autosave.js` procura
         `[data-autosave-link="1"]` para chamar `prepareNavigation()` e esperar o

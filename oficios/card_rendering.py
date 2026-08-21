@@ -30,7 +30,9 @@ def renderizar_oficio_card_cacheado(card):
     # selo passou a ser o temporal.
     # v7 (2026-08-20): a composição da quantidade de diárias pode quebrar e o
     # bloco cresce, sem corte nem reticências.
-    key = f"oficios:list-card:v7:{digest}"
+    # v8 (2026-08-21): o itinerário passou a ocupar a segunda coluna entre
+    # viatura e diárias; invalida o HTML v7 que ainda tinha somente duas.
+    key = f"oficios:list-card:v8:{digest}"
     html = cache.get(key)
     if html is None:
         html = render_to_string("oficios/partials/oficio_list_card.html", {"card": card})

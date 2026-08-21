@@ -9,6 +9,8 @@ from django.utils import timezone
 from django.utils.http import urlencode
 
 from cadastros.models import Cargo
+from cadastros.models import Cidade
+from cadastros.models import Estado
 from cadastros.models import Servidor
 from cadastros.models import Unidade
 from justificativas.models import ModeloJustificativa
@@ -16,6 +18,7 @@ from justificativas.models import Justificativa
 from oficios.models import Oficio
 from oficios.selectors import listar_modelos_motivo
 from roteiros.models import Roteiro
+from roteiros.models import RoteiroTrecho
 from core.testing import area_de_teste
 from core.testing import vincular_area
 
@@ -35,6 +38,41 @@ class OficioViewsTests(TestCase):
     def test_get_index_retorna_200(self):
         response = self.client.get(reverse("oficios:index") + "?aba=atuais")
         self.assertEqual(response.status_code, 200)
+
+    def test_index_exibe_trechos_entre_viatura_e_diarias(self):
+        estado, _ = Estado.objects.get_or_create(nome="Paraná", sigla="PR")
+        origem = Cidade.objects.create(nome="Curitiba Lista", estado=estado, uf="PR")
+        destino = Cidade.objects.create(nome="Londrina Lista", estado=estado, uf="PR")
+        roteiro = Roteiro.objects.create(area=area_de_teste(), saida_dt=timezone.now())
+        RoteiroTrecho.objects.create(
+            roteiro=roteiro,
+            ordem=0,
+            origem_estado=estado,
+            origem_cidade=origem,
+            destino_estado=estado,
+            destino_cidade=destino,
+            saida_dt=timezone.now(),
+            chegada_dt=timezone.now() + timedelta(hours=2),
+        )
+        for numero in (91, 92):
+            Oficio.objects.create(
+                area=area_de_teste(),
+                numero=numero,
+                ano=2026,
+                roteiro=roteiro,
+                custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+            )
+
+        response = self.client.get(reverse("oficios:index"))
+        html = response.content.decode()
+        rota = "CURITIBA LISTA/PR → LONDRINA LISTA/PR"
+        self.assertEqual(html.count(rota), 2)
+        placa = html.index("Placa")
+        trecho = html.index(rota)
+        diarias = html.index("Valor total") if "Valor total" in html else len(html)
+
+        self.assertLess(placa, trecho)
+        self.assertLess(trecho, diarias)
 
     def test_index_usa_modal_para_excluir_oficio(self):
         """O item de excluir migrou para o menu sob demanda (`PF-04`).
@@ -89,7 +127,7 @@ class OficioViewsTests(TestCase):
         self.assertNotContains(response, "PendÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âªncias para concluir esta etapa")
         self.assertContains(response, "stepper__list")
         self.assertContains(response, "wizard-page")
-        self.assertContains(response, "chip--v2")
+        self.assertNotContains(response, "chip--v2")
         self.assertContains(response, "field-with-action")
         self.assertContains(response, "Modelo de motivo")
         self.assertContains(response, reverse("oficios:modelos_motivo_index"))
@@ -232,6 +270,7 @@ class OficioViewsTests(TestCase):
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Documentos para conferência")
+        self.assertContains(response, "oficio-documentos-conference")
         self.assertNotContains(response, "Visualizar documento")
         self.assertNotContains(response, "PDF pronto.")
         self.assertContains(response, reverse("oficios:index"))
@@ -289,6 +328,8 @@ class OficioViewsTests(TestCase):
         footer = html[footer_start:footer_end]
 
         self.assertIn("Voltar", footer)
+        self.assertNotIn("Voltar à lista", footer)
+        self.assertIn('value="wizard_back"', footer)
         self.assertIn("Finalizar Ofício", footer)
         self.assertNotIn("Salvar rascunho", footer)
         self.assertNotIn("DOCX", footer)
@@ -332,15 +373,15 @@ class OficioViewsTests(TestCase):
         self.assertLess(source.index("route-summary__column--legs"), source.index("route-summary__column--value"))
         self.assertLess(source.index("route-summary__column--value"), source.index("route-summary__column--details"))
 
-    def test_resumo_do_roteiro_alinha_descricao_a_direita(self):
+    def test_resumo_do_roteiro_nao_exibe_descricao_redundante(self):
         source = Path(
             "templates/oficios/partials/_documentos_wizard_body.html",
         ).read_text(encoding="utf-8")
         css = Path("static/css/v2/fact.css").read_text(encoding="utf-8")
 
         self.assertIn('extra_class="route-summary-block"', source)
-        self.assertIn(".route-summary-block .form-block__description", css)
-        self.assertIn("text-align: right;", css)
+        self.assertNotIn("Trechos e cálculo das diárias.", source)
+        self.assertNotIn(".route-summary-block .form-block__description", css)
 
     def test_valor_por_extenso_do_roteiro_pode_quebrar_em_duas_linhas(self):
         source = Path(
@@ -376,7 +417,18 @@ class OficioViewsTests(TestCase):
         self.assertIn(
             ".oficio-card__allowance-facts .fact + .fact .fact__value", record_css
         )
-        self.assertIn('oficios:list-card:v7:', cache_source)
+        self.assertIn('oficios:list-card:v8:', cache_source)
+
+    def test_card_da_lista_ordena_viatura_trechos_e_diarias_em_tres_colunas(self):
+        source = Path(
+            "templates/oficios/partials/oficio_list_card.html",
+        ).read_text(encoding="utf-8")
+
+        viatura = source.index(":value=\"card.veiculo_placa_display\"")
+        trechos = source.index(":legs=\"card.trechos\"")
+        diarias = source.index(":value=\"card.valor_diarias_display\"")
+        self.assertLess(viatura, trechos)
+        self.assertLess(trechos, diarias)
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "incomplete", "pendencias": ["Pendencia de teste"]})
@@ -419,6 +471,26 @@ class OficioViewsTests(TestCase):
         oficio.refresh_from_db()
         self.assertEqual(oficio.status, Oficio.STATUS_RASCUNHO)
         self.assertGreater(oficio.updated_at, updated_before)
+
+    @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
+    def test_post_wizard_documentos_voltar_abre_justificativa(self, _m_cache):
+        oficio = Oficio.objects.create(
+            area=area_de_teste(),
+            numero=1,
+            ano=2026,
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
+
+        response = self.client.post(
+            reverse("oficios:wizard_documentos", args=[oficio.pk]),
+            data={"wizard_action": "wizard_back"},
+        )
+
+        self.assertRedirects(
+            response,
+            reverse("oficios:wizard_justificativa", args=[oficio.pk]),
+            fetch_redirect_response=False,
+        )
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})

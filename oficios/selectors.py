@@ -208,19 +208,18 @@ def _anexar_servidores_da_pagina(oficios_por_id):
 
 def _anexar_rota_da_pagina(oficios_por_id):
     """Une destinos e trechos num round-trip e entrega só campos de exibição."""
-    roteiros = {
-        oficio.roteiro_id: oficio
-        for oficio in oficios_por_id.values()
-        if oficio.roteiro_id
-    }
+    oficios_por_roteiro = {}
+    for oficio in oficios_por_id.values():
+        if oficio.roteiro_id:
+            oficios_por_roteiro.setdefault(oficio.roteiro_id, []).append(oficio)
     for oficio in oficios_por_id.values():
         oficio._destinos_da_lista = []
         oficio._trechos_da_lista = []
-    if not roteiros:
+    if not oficios_por_roteiro:
         return
 
     destinos = (
-        RoteiroDestino.objects.filter(roteiro_id__in=roteiros)
+        RoteiroDestino.objects.filter(roteiro_id__in=oficios_por_roteiro)
         .order_by()
         .annotate(
             kind=Value("destino", output_field=CharField()),
@@ -237,7 +236,7 @@ def _anexar_rota_da_pagina(oficios_por_id):
         )
     )
     trechos = (
-        RoteiroTrecho.objects.filter(roteiro_id__in=roteiros)
+        RoteiroTrecho.objects.filter(roteiro_id__in=oficios_por_roteiro)
         .order_by()
         .annotate(
             kind=Value("trecho", output_field=CharField()),
@@ -254,11 +253,11 @@ def _anexar_rota_da_pagina(oficios_por_id):
         )
     )
     for item in destinos.union(trechos, all=True).order_by("roteiro_id", "kind", "ordem"):
-        oficio = roteiros[item["roteiro_id"]]
-        if item["kind"] == "destino":
-            oficio._destinos_da_lista.append(item)
-        else:
-            oficio._trechos_da_lista.append(item)
+        for oficio in oficios_por_roteiro[item["roteiro_id"]]:
+            if item["kind"] == "destino":
+                oficio._destinos_da_lista.append(item)
+            else:
+                oficio._trechos_da_lista.append(item)
 
 
 def get_oficio_by_id(pk: int):

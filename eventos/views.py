@@ -36,7 +36,6 @@ from core.retorno import daqui
 from .forms import EventoForm
 from .forms import EventoNovoCadastroForm
 from .models import Evento
-from .models import EVENTO_SOLICITACAO_EXTENSOES
 from .catalogs import tipo_editar  # noqa: F401  (re-export para urls.py)
 from .catalogs import tipo_excluir  # noqa: F401
 from .catalogs import tipos_index  # noqa: F401
@@ -295,28 +294,24 @@ def detalhe(request, pk, etapa=1):
 
     # — upload de documentos de solicitação (etapa 4) —
     if request.method == "POST" and request.POST.get("action") == "upload_solicitacao":
-        from django.core.validators import FileExtensionValidator
-        from django.core.exceptions import ValidationError
         from PIL import UnidentifiedImageError
 
         from .services import converter_para_pdf_se_necessario
 
         arquivos = request.FILES.getlist("solicitacao_arquivos")
-        validator = FileExtensionValidator(EVENTO_SOLICITACAO_EXTENSOES)
         erros = False
         convertidos = []
         for arquivo in arquivos:
             try:
-                validator(arquivo)
                 convertidos.append(converter_para_pdf_se_necessario(arquivo))
-            except (ValidationError, UnidentifiedImageError):
+            except (UnidentifiedImageError, OSError, ValueError):
                 erros = True
                 break
         if erros or not arquivos:
             if not arquivos:
                 messages.error(request, "Nenhum arquivo selecionado.")
             else:
-                messages.error(request, "Formato inválido. Aceita apenas PDF, PNG, JPG ou JPEG.")
+                messages.error(request, "Formato inválido. Envie um PDF ou arquivo de imagem.")
         else:
             anexar_documentos_solicitacao(evento, convertidos)
             messages.success(request, "Documentos de solicitação anexados com sucesso.")
@@ -416,8 +411,6 @@ def detalhe(request, pk, etapa=1):
 @require_POST
 def anexar_solicitacao(request, pk):
     """Upload via modal Anexar documento (campo ``arquivo`` do attach-signed)."""
-    from django.core.validators import FileExtensionValidator
-    from django.core.exceptions import ValidationError
     from PIL import UnidentifiedImageError
 
     from core.retorno import voltar_para
@@ -425,20 +418,18 @@ def anexar_solicitacao(request, pk):
 
     evento = get_evento_by_id(pk)
     fallback = reverse("eventos:guiado_etapa", kwargs={"pk": pk, "etapa": 4})
-    arquivo = request.FILES.get("arquivo")
-    if not arquivo:
+    arquivos = request.FILES.getlist("arquivo")
+    if not arquivos:
         messages.error(request, "Nenhum arquivo selecionado.")
         return redirect(voltar_para(request, fallback))
 
-    validator = FileExtensionValidator(EVENTO_SOLICITACAO_EXTENSOES)
     try:
-        validator(arquivo)
-        convertido = converter_para_pdf_se_necessario(arquivo)
-    except (ValidationError, UnidentifiedImageError):
-        messages.error(request, "Formato inválido. Aceita apenas PDF, PNG, JPG ou JPEG.")
+        convertidos = [converter_para_pdf_se_necessario(arquivo) for arquivo in arquivos]
+    except (UnidentifiedImageError, OSError, ValueError):
+        messages.error(request, "Formato inválido. Envie PDFs ou arquivos de imagem.")
         return redirect(voltar_para(request, fallback))
 
-    anexar_documentos_solicitacao(evento, [convertido])
+    anexar_documentos_solicitacao(evento, convertidos)
     messages.success(request, "Documentos de solicitação anexados com sucesso.")
     return redirect(voltar_para(request, fallback))
 

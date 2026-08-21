@@ -44,9 +44,6 @@
   {% endcomment %}
   <c-v2.wizard_page :title="page_title" :steps="wizard_page_steps">
     <c-slot name="aside">
-      {% if flow_status_label %}
-        <c-v2.chip :label="flow_status_label" :tone="flow_status_tone_v2" />
-      {% endif %}
       {% comment %}
         `autosave_link` no "Voltar": as quatro etapas salvam sozinhas, e sair
         sem passar pelo autosave custaria o que acabou de ser digitado.

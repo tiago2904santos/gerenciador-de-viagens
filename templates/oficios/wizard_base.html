@@ -26,9 +26,6 @@
   {% endcomment %}
   <c-v2.wizard_page :title="wizard_header.title" :steps="wizard_page_steps">
     <c-slot name="aside">
-      {% if wizard_header.status_label %}
-        <c-v2.chip :label="wizard_header.status_label" :tone="wizard_header.status_tone_v2" />
-      {% endif %}
       {% comment %}
         `autosave_link` no "Voltar": sair da etapa não pode custar o que já foi
         digitado. É o `autosave.js` quem salva, e ele procura o botão por

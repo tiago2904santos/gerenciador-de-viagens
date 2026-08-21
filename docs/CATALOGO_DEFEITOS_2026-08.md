@@ -11128,3 +11128,136 @@ lê-la — e no tema claro ninguém lia a versão escura.
 Encosta no `NOVO-20260820-171008-7afb74d82d2c`: a decisão de estender os perfis ao `ui.bundle.css`
 não deve sair antes deste conserto, ou o mesmo corte de tema atingiria também o v2 — hoje o v2
 escapa só porque `ui.bundle.css` não passa pelo podador.
+
+### NOVO-20260821-172128-3ad8129911ce ✅ RESOLVIDO · `NOVO` Headers de página voltaram a exibir selos de estado · HT/UI · risco baixo
+
+O contrato de `NOVO-20260813-164208-774d64105a96` regrediu durante a migração para os componentes
+v2: Eventos, Ofícios, Planos de Trabalho, Prestações de Contas e Perfil injetavam chips de estado
+no slot lateral do header. Os selos foram removidos sem deslocar as ações de navegação, e uma trava
+automatizada agora confere os cinco cascos de página para impedir a reintrodução.
+
+### NOVO-20260821-173515-c2f013bafbbc ✅ RESOLVIDO · `NOVO` Botões do header abriam uma superfície clara dentro da faixa · UI · risco baixo
+
+O botão secundário herdava `--surface-contrast` e aparecia como uma caixa clara desconectada do
+header. Dentro de `.header__aside`, qualquer botão agora usa o mesmo `--surface-brand` da faixa em
+repouso, com limite dado somente por borda translúcida. Hover e foco usam os tokens `on-brand`,
+preservando contraste e a mudança automática entre os temas claro e escuro.
+
+### NOVO-20260821-173813-fa346f5501dc ✅ RESOLVIDO · `NOVO` Lista simples e lista de cards compartilhavam a posição do selo · UI · risco baixo
+
+O `record` empurrava todo `.record__status` para a direita, embora seus dois modos tenham leitura
+diferente. No modo simples, o selo agora integra `record__title-row` imediatamente depois do texto.
+Somente `record.panel` — a lista de cards — mantém o estado como coluna à direita. As ações da lista
+simples continuam na ponta, sem arrastar o selo com elas.
+
+### NOVO-20260821-174030-acb36df820f9 ✅ RESOLVIDO · `NOVO` Novo roteiro herdava apenas o primeiro destino do evento · BE · risco médio
+
+O seed documental resolvia somente `destino_uf`/`destino_cidade` e ignorava
+`destinos_extras`. A resolução agora devolve a sequência completa do evento e o estado inicial do
+editor cria uma linha para cada cidade, preservando a ordem. O comportamento anterior do primeiro
+destino continua disponível para consumidores que usam as chaves singulares do seed.
+
+### NOVO-20260821-174522-213aa3dfa786 ✅ RESOLVIDO · `NOVO` “Novo ofício” no evento abria a lista em vez do cadastro · BE/HT · risco médio
+
+A criação de Ofício reserva numeração e, por contrato, aceita somente POST; o GET de
+`oficios:novo` redireciona com segurança para a lista. A etapa 3 do evento emitia um link GET.
+Agora o FAB contém um formulário POST com CSRF, preserva `?evento=<id>`, cria o rascunho vinculado
+e redireciona diretamente para a primeira etapa do cadastro. Dois testes cobrem marcação e fluxo.
+
+### NOVO-20260821-174859-47968d874bbc ✅ RESOLVIDO · `NOVO` Identificação do ofício reservava uma quarta coluna vazia · UI · risco baixo
+
+A grade de identificação declarava sempre quatro trilhas, embora o campo “Nome da Instituição”
+só exista visualmente quando o custeio é “Outra instituição”. A grade agora distribui os três
+campos comuns em três colunas iguais enquanto o complemento está oculto e retorna automaticamente
+a quatro colunas iguais quando ele é revelado. Tablet e celular mantêm as quebras responsivas do
+componente comum.
+
+### NOVO-20260821-175758-3a8fc60e1c2f ✅ RESOLVIDO · `NOVO` Estados vazios dos pickers ficavam transparentes · UI · risco baixo
+
+Os avisos “Nenhum viajante selecionado” e “Nenhuma viatura selecionada” definiam o fundo apenas
+com `--step1-empty`, token ausente nesta página. A declaração inteira se tornava inválida e deixava
+transparecer a superfície azul do painel. O estado vazio agora cai na superfície de contraste do
+próprio picker, com fallback final para a superfície de campo e texto secundário preservado.
+
+### NOVO-20260821-180011-6c160eea9189 ✅ RESOLVIDO · `NOVO` Atalho de novo servidor usava ícone genérico · UI · risco baixo
+
+O atalho ao lado da busca de servidores mostrava apenas o sinal de adição, sem comunicar qual
+entidade seria criada. A folha de símbolos ganhou `user-plus`, combinando silhueta de pessoa e
+adição no mesmo desenho, e o picker de equipe passou a usá-lo. O nome acessível e o tooltip
+“Novo viajante” permanecem inalterados.
+
+### NOVO-20260821-180157-946404f82d52 ✅ RESOLVIDO · `NOVO` Atalho de nova viatura usava ícone genérico · UI · risco baixo
+
+O atalho ao lado da busca de viaturas também mostrava apenas o sinal de adição. A folha de
+símbolos ganhou `car-plus`, combinando a silhueta frontal de uma viatura com o sinal de adição,
+e somente esse picker passou a usá-lo. O nome acessível, tooltip e URL de “Nova viatura” foram
+preservados.
+
+### NOVO-20260821-180343-7a97834445d6 ✅ RESOLVIDO · `NOVO` Sugestões de viatura ignoravam superfície e estado selecionado · UI · risco baixo
+
+O script criava cada sugestão apenas como `toggle__item`, embora a folha esperasse a classe
+semântica `viatura-sugestao-chip`; por isso o fundo normal não era aplicado e a seleção caía no
+accent cheio de navegação. O script agora emite a classe contratada. O repouso usa a superfície de
+campo com fallback, e `aria-pressed="true"` repete o desenho de motorista selecionado: superfície
+selecionada e filete lateral de accent.
+
+### NOVO-20260821-181158-bb4547d6c135 ✅ RESOLVIDO · `NOVO` Resumo do roteiro exibia descrição redundante · HT/UI · risco baixo
+
+O bloco final de roteiro na etapa Documentos repetia “Trechos e cálculo das diárias.” abaixo de
+um título que já identifica o conteúdo. A descrição foi removida sem alterar título, ações, selo
+ou corpo do resumo. A regra CSS exclusiva que alinhava essa linha, agora sem consumidor, também
+foi retirada com trava de ausência no teste.
+
+### NOVO-20260821-181345-178dae690a33 ✅ RESOLVIDO · `NOVO` Termo aninhado usava a cor da seção externa · UI · risco baixo
+
+Cada “Termo de Autorização — servidor” é um documento acionável dentro do grupo de termos, mas
+usava a mesma superfície de seção do contêiner externo. O cartão e seu cabeçalho agora usam o
+degrau `--surface-contrast`, com fallback para `--surface-field`, separando corretamente documento
+e grupo nos dois temas sem alterar o visualizador PDF.
+
+### NOVO-20260821-182255-3b106eae124f ✅ RESOLVIDO · `NOVO` Cartões de conferência usavam a cor do painel · UI · risco baixo
+
+“Documento original”, “Justificativa” e o grupo “Termos de Autorização” são documentos acionáveis,
+mas apareciam no mesmo azul estrutural do painel. O bloco ganhou um modificador local e seus três
+filhos diretos agora usam `--surface-rail`, o poço escuro do componente. A regra não alcança os
+resumos inferiores nem o conteúdo dos visualizadores.
+
+### NOVO-20260821-182514-e914c1439f6b ✅ RESOLVIDO · `NOVO` Rodapé de Documentos voltava à lista em vez da etapa anterior · BE/HT · risco baixo
+
+O botão secundário da última etapa dizia “Voltar à lista”, usava ícone de lista e submetia
+`save_draft_list`, duplicando a saída já disponível no cabeçalho. Agora ele é apenas “Voltar”, usa
+seta para a esquerda e submete `wizard_back`, que preserva o rascunho e abre a etapa Justificativa.
+Teste de fluxo trava o destino.
+
+### NOVO-20260821-182700-85e4b28d391d ✅ RESOLVIDO · `NOVO` Lista de Ofícios servia card antigo sem a coluna de trechos · HT/PF · risco baixo
+
+O template e o presenter já definiam Viatura, Trechos e Diárias nessa ordem, mas a hidratação
+montava um mapa singular `roteiro_id → ofício`. Quando dois documentos compartilhavam o mesmo
+roteiro, só o último recebia seus trechos. O mapa agora guarda todos os ofícios por roteiro e
+replica o payload carregado em lote para cada um, sem consulta adicional. A chave do cache também
+passou de `v7` para `v8`, invalidando o HTML incompleto, e o teste cobre dois ofícios compartilhando
+o mesmo roteiro com Trechos na segunda coluna.
+
+### NOVO-20260821-183201-786738afc625 ✅ RESOLVIDO · `NOVO` Anexo de solicitação aceitava somente um arquivo · BE/HT · risco médio
+
+Na etapa PT/OS, o gatilho reutilizava o modal de documento assinado, mas o endpoint lia somente
+`FILES.get()` e limitava imagens a quatro extensões. O gatilho agora ativa seleção múltipla apenas
+para documentos de solicitação, aceita `image/*`, e o endpoint percorre todos os arquivos na ordem
+recebida. Cada PDF é preservado; cada formato de imagem reconhecido pelo Pillow é convertido para
+um PDF próprio antes da persistência. Um teste de ponta a ponta envia PNG e BMP juntos, prova os
+dois registros e confere que ambos os conteúdos armazenados começam como PDF.
+
+### NOVO-20260821-184332-a289b9a1edb5 ✅ RESOLVIDO · `NOVO` Descrição longa do bloco split era encoberta pelo campo · UI · risco baixo
+
+O componente fixava a coluna de rótulo em 200 px para alinhar todos os campos, mas também forçava
+a descrição a uma única linha. O texto de “Programa solicitante” media cerca de 430 px e avançava
+por baixo da coluna seguinte, cuja superfície ocultava seu final. Descrições split agora quebram
+naturalmente dentro dos 200 px — inclusive palavras sem espaços — aumentando somente a altura do
+cabeçalho e preservando a origem alinhada dos campos.
+
+### NOVO-20260821-184602-bb173eae5eda ✅ RESOLVIDO · `NOVO` Programa reservava metade da linha para campo oculto · UI · risco baixo
+
+A grade declarava sempre duas colunas, mesmo enquanto “Outro programa” estava oculto, deixando o
+select principal com apenas metade da largura útil. A grade identificada agora reduz-se a uma
+coluna quando o complemento está `hidden`; ao selecionar “Outro”, o JavaScript já existente revela
+o campo e a declaração original de duas colunas iguais volta a valer automaticamente.

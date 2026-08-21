@@ -70,7 +70,7 @@ def salvar_identificacao_evento(form, *, area, destinos_json):
 
 
 def converter_para_pdf_se_necessario(arquivo):
-    """Converte um upload de imagem (PNG/JPG/JPEG) para PDF; um PDF passa direto.
+    """Converte um upload de imagem reconhecido pelo Pillow; PDF passa direto.
 
     Documentos de solicitação aceitam foto/print como conveniência de upload,
     mas o arquivo guardado (e depois enviado ao Drive) precisa ser sempre PDF,
@@ -226,26 +226,40 @@ def resolve_evento_from_request(request):
 
 
 def resolve_evento_cidade_estado(evento):
+    destinos = resolve_evento_destinos(evento)
+    return destinos[0] if destinos else (None, None)
+
+
+def resolve_evento_destinos(evento):
+    """Resolve todos os destinos textuais do evento, preservando a ordem."""
     if evento is None:
-        return None, None
-    cidade_nome = (evento.destino_cidade or "").strip()
-    uf = (evento.destino_uf or "").strip().upper()
-    if not cidade_nome and not uf:
-        return None, None
+        return []
 
     from cadastros.models import Cidade
     from cadastros.models import Estado
 
-    estado = Estado.objects.filter(sigla=uf).first() if uf else None
-    cidade = None
-    if cidade_nome:
-        cidades = Cidade.objects.select_related("estado").filter(nome__iexact=cidade_nome)
-        if estado:
-            cidades = cidades.filter(estado=estado)
-        cidade = cidades.order_by("nome").first()
-        if cidade and not estado:
-            estado = cidade.estado
-    return cidade, estado
+    brutos = [
+        {"uf": evento.destino_uf or "", "cidade": evento.destino_cidade or ""},
+        *(evento.destinos_extras or []),
+    ]
+    resolvidos = []
+    for bruto in brutos:
+        cidade_nome = str(bruto.get("cidade") or "").strip()
+        uf = str(bruto.get("uf") or "").strip().upper()
+        if not cidade_nome and not uf:
+            continue
+        estado = Estado.objects.filter(sigla=uf).first() if uf else None
+        cidade = None
+        if cidade_nome:
+            cidades = Cidade.objects.select_related("estado").filter(nome__iexact=cidade_nome)
+            if estado:
+                cidades = cidades.filter(estado=estado)
+            cidade = cidades.order_by("nome").first()
+            if cidade and not estado:
+                estado = cidade.estado
+        if cidade or estado:
+            resolvidos.append((cidade, estado))
+    return resolvidos
 
 
 def build_evento_document_seed(evento) -> dict:
@@ -254,11 +268,13 @@ def build_evento_document_seed(evento) -> dict:
     if evento is None:
         return {}
 
-    cidade, estado = resolve_evento_cidade_estado(evento)
+    destinos = resolve_evento_destinos(evento)
+    cidade, estado = destinos[0] if destinos else (None, None)
     seed = {
         "evento": evento,
         "cidade": cidade,
         "estado": estado,
+        "destinos": destinos,
         "data_inicio": evento.data_inicio,
         "data_fim": evento.data_fim or evento.data_inicio,
         "motivo": (evento.motivo or evento.descricao or "").strip(),

@@ -501,7 +501,7 @@
 
 :is(html[data-theme])
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .search-picker__selected-empty {
-  background: var(--step1-empty) !important;
+  background: var(--step1-empty, var(--surface-contrast, var(--surface-field))) !important;
   border: 0 !important;
   color: var(--color-muted);
   padding: 12px 14px !important;
@@ -511,7 +511,7 @@
 /* Sugestões de viatura: mesmo poço dos campos; ativo = linguagem do card motorista. */
 :is(html[data-theme])
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip {
-  background: var(--step1-field);
+  background: var(--step1-field, var(--surface-contrast, var(--surface-field)));
   border: 0;
   border-radius: 12px;
   box-shadow: none;
@@ -527,7 +527,21 @@
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip:focus-visible {
   background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field));
   outline: 0;
-}@media (max-width: 900px) {
+}
+
+/* Escolher uma sugestão é o mesmo estado semântico de marcar o motorista:
+   superfície selecionada e filete de accent, sem transformar todo o chip numa
+   massa de cor de navegação. */
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip[aria-pressed="true"],
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip[aria-pressed="true"]:hover {
+  background: var(--surface-selected);
+  box-shadow: inset 3px 0 0 0 var(--accent);
+  color: var(--text-strong);
+}
+
+@media (max-width: 900px) {
   :is(html[data-theme])
     :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block).form-block--split {
     align-items: stretch;

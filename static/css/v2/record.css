@@ -54,20 +54,8 @@
   padding-bottom: var(--gap-tight);
 }
 
-/* O selo vai para a PONTA DIREITA da linha (decisão do dono, 2026-08-18).
-
-   A posição foi e voltou algumas vezes em 2026-08-16, quando o argumento em uso
-   era "o selo qualifica o título, e os dois são uma frase só". O corte agora é
-   outro: com os selos alinhados numa coluna própria, percorrer a lista de cima a
-   baixo lendo só o estado deixa de exigir que o olho pare em cada título de
-   comprimento diferente.
-
-   Nas listas simples, onde as ações moram na mesma linha, o selo encosta nelas —
-   os dois fecham a linha juntos, e é por isso que `.record__row` não usa
-   `space-between`: ele abriria um vazio entre o selo e os botões.
-
-   `flex: none` para ele não encolher quando o título é longo: um selo espremido
-   perde a pílula e vira texto solto. */
+/* O selo não encolhe quando o título é longo: uma pílula espremida vira texto
+   solto. Na lista simples ele já mora em `record__title-row`, logo após o título. */
 :is(html[data-theme]) .record__status {
   align-items: center;
   display: inline-flex;
@@ -75,13 +63,19 @@
   /* Com dois selos (situação + temporal) eles precisam de um vão entre si; com
      um só, o `gap` não faz nada. */
   gap: var(--gap-tight);
+}
+
+/* Só a LISTA DE CARDS cria a coluna de estado à direita. Na lista simples o
+   selo permanece junto do texto, e as ações continuam sendo o único conteúdo
+   empurrado para a ponta da linha. */
+:is(html[data-theme]) .record.panel > .record__row > .record__status {
   margin-left: auto;
 }
 
 /* Com o selo empurrado para a direita, as ações não precisam empurrar de novo —
    e não podem: dois `margin-left: auto` na mesma linha abrem um vão ENTRE eles.
    O primeiro elemento a empurrar já leva os dois para a ponta. */
-:is(html[data-theme]) .record__row > .record__status ~ .record__actions {
+:is(html[data-theme]) .record.panel > .record__row > .record__status ~ .record__actions {
   margin-left: 0;
 }
 

@@ -103,6 +103,10 @@ def _initial_roteiro_evento(evento):
     if cidade:
         initial["destino_cidade"] = cidade.pk
         initial["destino_cidade_id"] = cidade.pk
+    initial["destinos_atuais"] = [
+        {"estado_id": destino_estado.pk if destino_estado else None, "cidade_id": destino_cidade.pk if destino_cidade else None}
+        for destino_cidade, destino_estado in seed.get("destinos", [])
+    ]
     inicio = seed.get("data_inicio")
     fim = seed.get("data_fim") or inicio
     if inicio:

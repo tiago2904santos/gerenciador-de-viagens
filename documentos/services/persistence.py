@@ -190,5 +190,3 @@ def remover_arquivo_assinado(artefato: DocumentoArtefato) -> DocumentoArtefato:
     artefato.assinado_nome_original = ""
     artefato.save(update_fields=["arquivo_assinado", "assinado_em", "assinado_nome_original"])
     return artefato
-
-

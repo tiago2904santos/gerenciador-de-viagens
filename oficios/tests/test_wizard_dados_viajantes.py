@@ -108,7 +108,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, f"/ {oficio.ano}")
         self.assertNotContains(response, "Data criação:")
         self.assertContains(response, "form-block--v2")
-        self.assertContains(response, "field-grid field-grid--cols-4")
+        self.assertContains(response, "field-grid field-grid--cols-4 oficio-identity-grid")
         self.assertRegex(
             html,
             re.compile(
@@ -165,6 +165,8 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertIn('href="#main-content"', html)
         self.assertIn('id="main-content"', html)
         self.assertContains(response, "Novo viajante")
+        self.assertContains(response, 'href="#cv-icon-user-plus"')
+        self.assertContains(response, 'href="#cv-icon-car-plus"')
         self.assertContains(response, 'data-placeholder="Buscar por nome, CPF ou RG"')
         self.assertContains(response, 'data-panel-title="PESSOAS NA EQUIPE"')
         self.assertContains(response, 'data-empty-selected="Nenhum viajante selecionado."')
@@ -411,8 +413,8 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, 'name="numero" value="1"')
         self.assertContains(response, "/ 2026")
         self.assertNotContains(response, "Data criação:")
-        self.assertContains(response, "chip--v2")
-        self.assertContains(response, oficio.get_status_display())
+        self.assertNotContains(response, "chip--v2")
+        self.assertNotContains(response, oficio.get_status_display())
 
     def test_post_dados_viajantes_atualiza_sem_apagar_transporte(self):
         oficio = Oficio.objects.create(area=area_de_teste(), 

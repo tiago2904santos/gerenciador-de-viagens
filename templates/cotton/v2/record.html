@@ -23,12 +23,9 @@
   O degrau de superfície continua vindo de `v2/surface.css`, onde a escada mora.
 
   DUAS linhas, no máximo: eyebrow, título e selo na primeira; a meta na
-  segunda. Numa lista longa cada linha extra multiplica pela quantidade de
-  registros, e a varredura vertical fica mais lenta.
-
-  O selo fica AO LADO DO TEXTO, logo depois do bloco de título e meta — ele
-  qualifica o registro, e jogado na ponta oposta obrigava o olho a atravessar a
-  linha para ligar um ao outro. Quem vai para a ponta são as ações.
+  segunda. Na LISTA SIMPLES o selo fica imediatamente ao lado do título, pois
+  qualifica aquele texto. Na LISTA DE CARDS ele ocupa a ponta direita: ali os
+  estados formam uma coluna de varredura entre cartões complexos.
 
   As ações ficam no RODAPÉ, à direita, QUANDO o cartão tem miolo: aí ele se lê de
   cima para baixo — o que é, o que tem dentro, o que dá para fazer. Sem miolo
@@ -55,6 +52,15 @@
       <div class="record__title-row">
         {% if eyebrow %}<span class="record__eyebrow">{{ eyebrow }}</span>{% endif %}
         <h{{ heading_level|default:2 }} class="record__title">{{ title }}</h{{ heading_level|default:2 }}>
+        {% if box != 'panel' %}
+          {% if chips %}
+            <span class="record__status">
+              {% for chip in chips %}<c-v2.chip :label="chip.label" :tone="chip.tone" />{% endfor %}
+            </span>
+          {% elif status %}
+            <span class="record__status"><c-v2.chip :label="status" :tone="status_tone" /></span>
+          {% endif %}
+        {% endif %}
       </div>
       {% if meta %}<p class="record__meta">{{ meta }}</p>{% endif %}
     </div>
@@ -67,12 +73,14 @@
       `chips` é a lista; `status` continua para quem tem um selo só, que é a
       maioria das listas.
     {% endcomment %}
-    {% if chips %}
-      <span class="record__status">
-        {% for chip in chips %}<c-v2.chip :label="chip.label" :tone="chip.tone" />{% endfor %}
-      </span>
-    {% elif status %}
-      <span class="record__status"><c-v2.chip :label="status" :tone="status_tone" /></span>
+    {% if box == 'panel' %}
+      {% if chips %}
+        <span class="record__status">
+          {% for chip in chips %}<c-v2.chip :label="chip.label" :tone="chip.tone" />{% endfor %}
+        </span>
+      {% elif status %}
+        <span class="record__status"><c-v2.chip :label="status" :tone="status_tone" /></span>
+      {% endif %}
     {% endif %}
     {% comment %}
       Cartão SEM miolo: as ações voltam para a linha do título. Num registro de

@@ -23,6 +23,12 @@ def _png_bytes() -> bytes:
     return buffer.getvalue()
 
 
+def _bmp_bytes() -> bytes:
+    buffer = BytesIO()
+    Image.new("RGB", (10, 10), color="blue").save(buffer, format="BMP")
+    return buffer.getvalue()
+
+
 class ConverterParaPdfSeNecessarioTests(TestCase):
     def test_pdf_passa_direto_sem_conversao(self):
         arquivo = SimpleUploadedFile("doc.pdf", b"%PDF-1.4\n%%EOF\n", content_type="application/pdf")
@@ -78,6 +84,21 @@ class UploadSolicitacaoViewTests(TestCase):
         anexo = EventoDocumentoSolicitacao.objects.get(evento=self.evento)
         self.assertTrue(anexo.arquivo.name.lower().endswith(".pdf"))
 
+    def test_modal_anexar_aceita_varios_arquivos_e_converte_toda_imagem(self):
+        arquivos = [
+            SimpleUploadedFile("convite.png", _png_bytes(), content_type="image/png"),
+            SimpleUploadedFile("foto.bmp", _bmp_bytes(), content_type="image/bmp"),
+        ]
+
+        resp = self.client.post(self.anexar_url, {"arquivo": arquivos})
+
+        self.assertEqual(resp.status_code, 302)
+        anexos = list(EventoDocumentoSolicitacao.objects.filter(evento=self.evento))
+        self.assertEqual([anexo.nome_original for anexo in anexos], ["convite.pdf", "foto.pdf"])
+        for anexo in anexos:
+            with anexo.arquivo.open("rb") as arquivo:
+                self.assertTrue(arquivo.read().startswith(b"%PDF"))
+
     def test_etapa4_oferece_anexar_documento_e_menu_unico_de_criacao(self):
         """A etapa 4 concentra os dois fluxos de criação em um único FAB V2."""
         resp = self.client.get(self.url)
@@ -86,6 +107,8 @@ class UploadSolicitacaoViewTests(TestCase):
         self.assertContains(resp, "Anexar documento")
         self.assertContains(resp, "panel__header panel__header--centered")
         self.assertContains(resp, "data-attach-signed-url")
+        self.assertContains(resp, 'data-attach-signed-multiple="true"')
+        self.assertContains(resp, 'data-attach-signed-accept="application/pdf,.pdf,image/*"')
         self.assertContains(resp, self.anexar_url)
         self.assertContains(resp, 'data-overlay-target="evento-planejamento-create-menu"')
         self.assertContains(resp, 'id="evento-planejamento-create-menu"')

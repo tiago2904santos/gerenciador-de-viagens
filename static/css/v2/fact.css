@@ -431,10 +431,6 @@
   min-width: 0;
 }
 
-:is(html[data-theme]) .route-summary-block .form-block__description {
-  text-align: right;
-}
-
 @media (max-width: 900px) {
   :is(html[data-theme]) .route-summary {
     grid-template-columns: minmax(0, 1fr);
