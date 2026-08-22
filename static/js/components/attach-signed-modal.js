@@ -94,18 +94,67 @@
       erroBox.hidden = false;
     }
 
-    function clearSelectedFile() {
-      if (!form) return;
-      var input = form.querySelector('input[type="file"]');
-      if (!input || !input.value) return;
-      input.value = "";
-      input.dispatchEvent(new Event("change", { bubbles: true }));
-    }
-
     /* Tipos do gatilho ativo, já sem os que não têm URL de upload — um documento
      * sem `anexar_url` não é anexável e nunca deve virar botão. */
     var kindsAtivos = [];
     var documentoAtual = null;
+    var kindAtual = "";
+    var arquivosSelecionados = Object.create(null);
+    var trocaProgramatica = false;
+
+    function arquivosPendentes() {
+      return kindsAtivos.filter(function (item) {
+        return !!arquivosSelecionados[item.key];
+      });
+    }
+
+    function atualizarAcaoDeUpload() {
+      if (!uploadButton) return;
+      uploadButton.disabled = kindsAtivos.length > 1
+        ? arquivosPendentes().length === 0
+        : !(fileInput && fileInput.files && fileInput.files.length);
+    }
+
+    function atualizarBotoesDeTipo() {
+      if (!kindOptions) return;
+      Array.prototype.forEach.call(
+        kindOptions.querySelectorAll("[data-attach-signed-kind]"),
+        function (button) {
+          var kind = button.getAttribute("data-attach-signed-kind");
+          var temArquivo = !!arquivosSelecionados[kind];
+          var status = button.querySelector("[data-attach-signed-kind-status]");
+          button.classList.toggle("has-file", temArquivo);
+          if (status) status.hidden = !temArquivo;
+        }
+      );
+    }
+
+    function substituirArquivoDoPicker(file) {
+      if (!fileInput) return;
+      trocaProgramatica = true;
+      if (window.CV.filePicker && window.CV.filePicker.replaceFiles) {
+        window.CV.filePicker.replaceFiles(fileInput, file ? [file] : [], true);
+      } else {
+        fileInput.value = "";
+        fileInput.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      trocaProgramatica = false;
+    }
+
+    function clearSelectedFile() {
+      substituirArquivoDoPicker(null);
+    }
+
+    function guardarSelecaoAtual() {
+      if (!kindAtual || !fileInput) return;
+      var arquivo = fileInput.files && fileInput.files.length
+        ? fileInput.files[0]
+        : null;
+      if (arquivo) arquivosSelecionados[kindAtual] = arquivo;
+      else delete arquivosSelecionados[kindAtual];
+      atualizarBotoesDeTipo();
+      atualizarAcaoDeUpload();
+    }
 
     function documentData(kind) {
       var achado = kindsAtivos.filter(function (item) {
@@ -157,16 +206,18 @@
       if (currentMeta) currentMeta.hidden = !mostrarAtual;
     }
 
-    function selectDocument(kind, clearFile) {
+    function selectDocument(kind, preserveCurrentFile) {
       var data = documentData(kind);
       if (!data || !data.url || !form) return;
-      if (clearFile) clearSelectedFile();
+      if (preserveCurrentFile) guardarSelecaoAtual();
 
       form.setAttribute("action", data.url);
       if (label) label.textContent = data.label;
+      kindAtual = kind;
       documentoAtual = data;
       currentRemoveUrl = data.currentRemoveUrl;
       if (currentOpen) currentOpen.setAttribute("href", data.currentViewUrl || "#");
+      substituirArquivoDoPicker(arquivosSelecionados[kind] || null);
       sincronizarDocumentoAtual();
       updateReturnUrl(kind);
 
@@ -179,6 +230,8 @@
           button.setAttribute("aria-pressed", active ? "true" : "false");
         }
       );
+      atualizarBotoesDeTipo();
+      atualizarAcaoDeUpload();
     }
 
     /* Os botões de tipo são montados a partir do payload do gatilho, não escritos
@@ -201,6 +254,13 @@
         var rotulo = document.createElement("span");
         rotulo.textContent = item.option_label || "";
         button.appendChild(rotulo);
+        var status = document.createElement("span");
+        status.className = "attach-signed__kind-status";
+        status.setAttribute("data-attach-signed-kind-status", "");
+        status.setAttribute("aria-label", "Arquivo selecionado");
+        status.textContent = "✓";
+        status.hidden = true;
+        button.appendChild(status);
         kindOptions.appendChild(button);
       });
     }
@@ -210,6 +270,8 @@
       activeTrigger = null;
       documentoAtual = null;
       currentRemoveUrl = "";
+      kindAtual = "";
+      arquivosSelecionados = Object.create(null);
       clearSelectedFile();
       limparErro();
       var hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
@@ -230,6 +292,9 @@
 
       limparErro();
       activeTrigger = trigger;
+      kindAtual = "";
+      arquivosSelecionados = Object.create(null);
+      clearSelectedFile();
 
       kindsAtivos = kindsDoGatilho(trigger).filter(function (item) {
         return item && item.url;
@@ -360,7 +425,9 @@
     }
     function onFilePickerChange(event) {
       if (event.target && event.target.closest("[data-file-picker]")) {
+        if (!trocaProgramatica) guardarSelecaoAtual();
         sincronizarDocumentoAtual();
+        atualizarAcaoDeUpload();
       }
     }
     document.addEventListener("click", onDocumentClick);
@@ -370,19 +437,92 @@
       desmontar: function () {
         document.removeEventListener("click", onDocumentClick);
         modal.removeEventListener("cv:file-picker:change", onFilePickerChange);
+        if (form) form.removeEventListener("submit", anexarArquivosSelecionados);
         modal.removeAttribute(BOUND);
       },
     });
 
-    if (form) {
-      form.addEventListener("submit", function () {
+    function anexarArquivosSelecionados(event) {
+      if (kindsAtivos.length < 2) {
         if (window.CV && window.CV.documentProgress) {
           window.CV.documentProgress.begin(uploadButton, {
             title: "Anexando documento…",
             detail: "O arquivo será salvo; você pode continuar navegando.",
           });
         }
+        return;
+      }
+
+      event.preventDefault();
+      guardarSelecaoAtual();
+      limparErro();
+      var pendentes = arquivosPendentes();
+      if (!pendentes.length) {
+        mostrarErro("Selecione ao menos um arquivo para anexar.");
+        atualizarAcaoDeUpload();
+        return;
+      }
+
+      if (uploadButton) uploadButton.disabled = true;
+      if (window.CV && window.CV.documentProgress) {
+        window.CV.documentProgress.begin(uploadButton, {
+          title: "Anexando arquivos…",
+          detail: "Os arquivos selecionados serão salvos em sequência.",
+        });
+      }
+
+      var enviados = 0;
+      pendentes.reduce(function (promessa, item) {
+        return promessa.then(function () {
+          var payload = new FormData();
+          payload.append("arquivo", arquivosSelecionados[item.key]);
+          if (nextInput && nextInput.value) payload.append("next", nextInput.value);
+          return window.CV.http.request(item.url, {
+            method: "POST",
+            form: form,
+            body: payload,
+          }).then(function (response) {
+            if (!response.ok) {
+              var erro = new Error(
+                "O servidor recusou " + (item.option_label || item.doc_label || "um arquivo")
+                + " (HTTP " + response.status + ")."
+              );
+              erro.paraUsuario = true;
+              throw erro;
+            }
+            enviados += 1;
+            delete arquivosSelecionados[item.key];
+            if (item.key === kindAtual) substituirArquivoDoPicker(null);
+            atualizarBotoesDeTipo();
+          });
+        });
+      }, Promise.resolve()).then(function () {
+        window.location.reload();
+      }).catch(function (error) {
+        if (
+          window.CV && window.CV.documentProgress
+          && typeof window.CV.documentProgress.error === "function"
+        ) {
+          window.CV.documentProgress.error(
+            uploadButton,
+            "Revise os arquivos que não puderam ser anexados."
+          );
+        }
+        var prefixo = enviados
+          ? enviados + " de " + pendentes.length + " arquivo(s) foram anexados. "
+          : "";
+        mostrarErro(
+          prefixo + (error && error.paraUsuario
+            ? error.message
+            : "Não foi possível concluir os anexos. Tente novamente.")
+        );
+        atualizarAcaoDeUpload();
+        window.CV.log.error("attachSigned", "falha ao anexar arquivos", error);
       });
+    }
+
+    if (form) {
+      form.addEventListener("submit", anexarArquivosSelecionados);
     }
 
     var reopenParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));

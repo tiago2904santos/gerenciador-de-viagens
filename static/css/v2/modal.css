@@ -79,6 +79,16 @@
   display: none;
 }
 
+:is(html[data-theme]) .attach-signed__kind-status {
+  color: var(--accent);
+  font-weight: var(--font-weight-bold);
+  margin-inline-start: var(--gap-tight);
+}
+
+:is(html[data-theme]) .attach-signed__kind-status[hidden] {
+  display: none;
+}
+
 /* O corpo do diálogo é uma PILHA com vão: seletor de tipo, seletor de arquivo,
    erro, arquivo já anexado. Sem isto o toggle encostava no bloco do picker, como
    se fossem a mesma peça. Grade, e não margem em cada filho: quem entra ou sai da

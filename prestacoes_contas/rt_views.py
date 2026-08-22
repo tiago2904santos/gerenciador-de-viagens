@@ -98,6 +98,7 @@ def rt_servidor(request, ps_pk):
         form = RelatorioTecnicoForm(instance=relatorio, relatorio=relatorio, initial=initial)
 
     servidores_ctx = [_servidor_rt_ctx(ps)]
+    rt_url = reverse("prestacoes_contas:rt_servidor", args=[ps.pk])
 
     return render(
         request,
@@ -105,7 +106,7 @@ def rt_servidor(request, ps_pk):
         {
             "page_title": f"Relatório Técnico — {ps.servidor.nome}",
             "form": form,
-            "campos_modelo": _build_campos_modelo(form),
+            "campos_modelo": _build_campos_modelo(form, return_url=rt_url),
             "campos_custeio": _build_campos_custeio(form),
             "relatorio": relatorio,
             "prestacao": prestacao,

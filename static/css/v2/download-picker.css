@@ -114,6 +114,14 @@
   box-shadow: inset 3px 0 0 0 var(--accent);
 }
 
+:is(html[data-theme]) .download-picker__item[data-disabled="true"] {
+  opacity: 0.48;
+}
+
+:is(html[data-theme]) .download-picker__item[data-disabled="true"] .download-picker__check {
+  cursor: not-allowed;
+}
+
 :is(html[data-theme]) .download-picker__item-copy {
   display: grid;
   gap: 2px;
@@ -163,6 +171,10 @@
   margin: 0;
   min-width: 0;
   padding: 0;
+}
+
+:is(html[data-theme]) .download-picker__option[hidden] {
+  display: none;
 }
 
 :is(html[data-theme]) .download-picker__legend {

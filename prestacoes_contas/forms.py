@@ -595,17 +595,17 @@ class RelatorioTecnicoForm(forms.ModelForm):
     translado_outro = forms.CharField(
         label="Translado - outro",
         required=False,
-        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL), "data-rt-other-input": "translado"}),
+        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.INPUT_V2), "data-rt-other-input": "translado"}),
     )
     combustivel_outro = forms.CharField(
         label="Combustível - outro",
         required=False,
-        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL), "data-rt-other-input": "combustivel"}),
+        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.INPUT_V2), "data-rt-other-input": "combustivel"}),
     )
     passagem_outro = forms.CharField(
         label="Passagem - outro",
         required=False,
-        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL), "data-rt-other-input": "passagem"}),
+        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.INPUT_V2), "data-rt-other-input": "passagem"}),
     )
 
     class Meta:
@@ -645,8 +645,7 @@ class RelatorioTecnicoForm(forms.ModelForm):
 
         set_widget_style(
             self.fields["diaria"].widget,
-            WidgetStyle.FORM_CONTROL_FIELD_CONTROL,
-            overwrite=False,
+            WidgetStyle.INPUT_V2,
         )
         for campo, label in CAMPOS_CUSTEIO_COM_OUTRO:
             self.fields[campo] = forms.ChoiceField(

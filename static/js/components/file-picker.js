@@ -293,6 +293,7 @@
   window.CV.filePicker = {
     clear: clear,
     init: init,
+    replaceFiles: replaceFiles,
     setBusy: setBusy,
     update: update,
   };

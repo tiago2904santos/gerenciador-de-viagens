@@ -21,6 +21,28 @@ from core.normalizers import normalize_spaces
 
 from .services import marcar_servidor_em_preenchimento
 
+
+def _agendar_recarimbo(prestacoes) -> None:
+    """Redesenha o ofício assinado depois do commit, uma vez por prestação.
+
+    O número carimbado no anexo é lido de `numero_solicitacao` na hora de desenhar, e
+    não copiado — então mudar o número aqui deixa o anexo desatualizado até que alguém
+    redesenhe. Quem redesenha é isto.
+
+    Depois do commit, e não dentro: carimbar abre arquivo no storage, que não desfaz com
+    `ROLLBACK`. É o mesmo motivo pelo qual `anexo_services` adia a remoção de arquivo.
+    """
+    if not prestacoes:
+        return
+
+    from .carimbo_services import recarimbar_prestacao
+
+    def rodar():
+        for prestacao in prestacoes:
+            recarimbar_prestacao(prestacao)
+
+    transaction.on_commit(rodar)
+
 _CAMPOS_DO_LOTE = {
     "numero_solicitacao": re.compile(r"^ps-(\d+)-numero_solicitacao$"),
     "data_liberacao_diarias": re.compile(r"^ps-(\d+)-data_liberacao_diarias$"),
@@ -109,6 +131,9 @@ def salvar_solicitacoes_em_lote(servidores, valores) -> ResultadoSolicitacao:
         preparados.append((servidor_prestacao, campos, datas))
 
     gravados = 0
+    # Um recarimbo por prestação, não por servidor: o lote costuma ser a equipe inteira
+    # do mesmo ofício, e redesenhar N vezes o mesmo PDF é trabalho jogado fora.
+    recarimbo: dict[int, object] = {}
     for servidor_prestacao, campos, datas in preparados:
         update_fields = []
         if "numero_solicitacao" in campos:
@@ -124,6 +149,9 @@ def salvar_solicitacoes_em_lote(servidores, valores) -> ResultadoSolicitacao:
             servidor_prestacao.save(update_fields=[*update_fields, "atualizado_em"])
             marcar_servidor_em_preenchimento(servidor_prestacao)
             gravados += 1
+            if "numero_solicitacao" in update_fields:
+                recarimbo[servidor_prestacao.prestacao_id] = servidor_prestacao.prestacao
+    _agendar_recarimbo(list(recarimbo.values()))
     return ResultadoSolicitacao(servidores_gravados=gravados)
 
 
@@ -156,5 +184,7 @@ def salvar_solicitacao_do_autosave(
     if gravados:
         servidor_prestacao.save(update_fields=[*gravados, "atualizado_em"])
         marcar_servidor_em_preenchimento(servidor_prestacao)
+        if "numero_solicitacao" in gravados:
+            _agendar_recarimbo([servidor_prestacao.prestacao])
 
     return ResultadoSolicitacao(campos_gravados=tuple(gravados))

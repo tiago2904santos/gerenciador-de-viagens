@@ -1,9 +1,12 @@
 {% comment %}
-Corpos dos menus de um card de prestação, servidos por `prestacoes_contas:card_menus` (PF-04).
+Corpo do menu de um card de prestação, servido por `prestacoes_contas:card_menus` (PF-04).
 
-Duas famílias por servidor: baixar documentos e o aviso de liberação por WhatsApp.
+O fragmento contém somente o aviso de liberação por WhatsApp. Os documentos
+assinados são gerenciados pela ação consolidada do rodapé do card; não existe
+mais um segundo botão de documentos na linha do servidor.
+
 O card traz um servidor só (`"servidores": [servidor]` no presenter), mas o laço
-fica: é ele que dá nome aos `id` dos dois menus.
+fica: é ele que dá nome ao `id` do menu.
 
 `extra_class="action-menu"` não é decoração. Dois motores procuram por esse
 seletor literal: o `overlay.js`, que colhe da resposta os menus a materializar
@@ -12,44 +15,10 @@ botão até o menu por `closest(".action-menu")` para descobrir de qual servidor
 o aviso — o menu aberto já não está mais dentro do card, porque o overlay o move
 para o `<body>`.
 
-O cabeçalho ("Baixar documentos / <nome>") saiu na migração para o v2: o menu do
-v2 não tem cabeçalho — o nome do servidor virou `aria_label`, como nos menus de
-termo do ofício. O menu abre a partir da linha daquele servidor, que é de onde
-vem o contexto na tela.
+O menu abre a partir da linha daquele servidor, que é de onde vem o contexto na
+tela; o nome permanece no `aria_label` para identificar essa relação.
 {% endcomment %}
 {% for servidor in card.servidores %}
-<c-v2.menu id="prestacao-docs-menu-{{ servidor.ps_pk }}" extra_class="action-menu" aria_label="Baixar documentos de {{ servidor.name }}">
-  <c-v2.menu_item :href="servidor.rt_download_url" title="Relatório técnico" description="Salvar PDF individual" icon="pdf" icon_tone="pdf" :download="True" />
-  {% if servidor.diario_pdf_url %}
-    <c-v2.menu_item :href="servidor.diario_pdf_url" title="Diário de bordo" description="Salvar PDF do diário" icon="route" icon_tone="pdf" :download="True" />
-  {% else %}
-    <c-v2.menu_item title="Diário de bordo" description="Ainda não foi criado" icon="route" icon_tone="pdf" :disabled="True" />
-  {% endif %}
-  {% comment %}
-    Eram 17 atributos ordinais no gatilho abaixo, e o `primary` dele era o
-    relatório técnico enquanto o `primary` da etapa Documentos era o despacho —
-    mesmo modal, mesmo nome, documento diferente (H-03). O payload agora vem do
-    presenter, com chave semântica.
-
-    Os seis `data-attach-signed-*` soltos são os ajustes desta tela: ela aceita
-    imagem além de PDF (o comprovante de saque costuma ser um print), e a chave
-    de reabertura é o que traz o diálogo de volta no lugar certo depois do
-    upload. Vão soltos porque quem os lê é `getAttribute` no
-    `attach-signed-modal.js`; o componente os repassa por `attrs`.
-  {% endcomment %}
-  <c-v2.menu_attach_signed
-    :kinds_json="card.attach_kinds_json"
-    title="{% if servidor.rt_assinado.assinado or servidor.diario_assinado.assinado or servidor.comprovante_anexo.assinado %}Gerenciar documentos assinados{% else %}Anexar documentos assinados{% endif %}"
-    description="RT, diário ou comprovante"
-    data-attach-signed-reopen-key="prestacao-servidor-{{ servidor.ps_pk }}"
-    data-attach-signed-accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
-    data-attach-signed-file-description="um arquivo em PDF, PNG ou JPEG"
-    data-attach-signed-file-help="Selecione um único arquivo em PDF, PNG, JPG ou JPEG."
-    data-attach-signed-choose-label="Escolher arquivo"
-    data-attach-signed-upload-label="Anexar arquivo"
-  />
-  <c-v2.menu_item :href="servidor.pacote_url" title="Anexo completo" description="Salvar PDF consolidado" icon="folder" icon_tone="pdf" :download="True" />
-</c-v2.menu>
 <c-v2.menu id="diaria-wa-menu-{{ servidor.ps_pk }}" extra_class="action-menu" aria_label="Aviso de liberação de {{ servidor.name }}">
   <c-v2.menu_button hook="data-diaria-wa-send" data-wa-app="normal" title="WhatsApp" description="Abrir no aplicativo pessoal" icon="whatsapp-modern" icon_tone="neutral" />
   <c-v2.menu_button hook="data-diaria-wa-send" data-wa-app="business" title="WhatsApp Business" description="Abrir no aplicativo profissional" icon="whatsapp-business" icon_tone="neutral" />

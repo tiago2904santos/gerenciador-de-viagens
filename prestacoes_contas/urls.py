@@ -9,6 +9,9 @@ app_name = "prestacoes_contas"
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("servidor-prestacao/<int:ps_pk>/downloads/", views.prestacao_downloads, name="prestacao_downloads"),
+    path("servidor-prestacao/<int:ps_pk>/downloads/compilado/", views.prestacao_download_compilado, name="prestacao_download_compilado"),
+    path("servidor-prestacao/<int:ps_pk>/downloads/assinado/<str:item_id>/<str:formato>/", views.prestacao_download_assinado, name="prestacao_download_assinado"),
     # Ações por servidor (canônicas)
     path(
         "servidor-prestacao/<int:ps_pk>/arquivar/",
@@ -50,6 +53,16 @@ urlpatterns = [
         "prestacao/<int:pc_pk>/oficio-assinado/anexar/",
         views.prestacao_oficio_assinado_anexar,
         name="prestacao_oficio_assinado_anexar",
+    ),
+    path(
+        "prestacao/<int:pc_pk>/oficio-assinado/carimbo/",
+        views.prestacao_carimbo_ajustar,
+        name="prestacao_carimbo_ajustar",
+    ),
+    path(
+        "prestacao/<int:pc_pk>/oficio-assinado/cru/",
+        views.prestacao_oficio_assinado_cru,
+        name="prestacao_oficio_assinado_cru",
     ),
     path(
         "servidor-prestacao/<int:ps_pk>/assinado/<str:tipo>/anexar/",

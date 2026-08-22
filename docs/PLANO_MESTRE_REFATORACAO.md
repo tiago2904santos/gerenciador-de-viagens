@@ -737,3 +737,25 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       do seletor de upload, sem renderizar um segundo card abaixo
 - [x] `NOVO-20260822-184452-a00c10904f98` faz o input da solicitação consumir a superfície
       semântica do contexto em vez da superfície fixa de campo
+- [x] `NOVO-20260822-190655-54f65d9f0dc1` posiciona o período das diárias ao lado do número
+      da solicitação na linha de Prestações de Contas.
+- [x] `NOVO-20260822-191217-11ee5a647047` reduz pela metade o espaço reservado ao número da
+      solicitação sem separar o seletor de período.
+- [x] `NOVO-20260822-191423-fe74cb745a5f` aplica a superfície rail ao número da solicitação e ao
+      seletor de período na linha de Prestações de Contas.
+- [x] `NOVO-20260822-191716-b05d1200b426` mantém um arquivo independente por aba no modal de
+      anexos e salva todas as escolhas em uma única ação, sem perder seleções ao alternar o tipo.
+- [x] `NOVO-20260822-193417-0e25b4c7fd04` remove da linha do servidor o botão duplicado de
+      documentos e conserva apenas a ação consolidada do rodapé do cartão.
+- [x] `NOVO-20260822-193803-1c392a79950f` adiciona ao rodapé da prestação o seletor consolidado
+      de downloads, com documentos, formato, saída e origem condicionados à disponibilidade.
+- [x] `NOVO-20260822-195659-34bdc5bfcd91` alinha os quatro fatos administrativos da prestação
+      em cartões `rail`, seguindo a composição do resumo do ofício e preservando responsividade.
+- [x] `NOVO-20260822-200640-4b0e94fa047f` migra a diária e os campos condicionais de custeio do
+      relatório técnico para o controle de entrada v2, removendo a herança visual legada.
+- [x] `NOVO-20260822-201249-4a0275f8a1cb` remove a repetição visual dos rótulos nos campos
+      condicionais de custeio, preservando a associação acessível e o input v2 na grade.
+- [x] `NOVO-20260822-201718-1743d6739c86` remove o aviso redundante de catálogo vazio dos
+      campos de texto do relatório técnico, mantendo o gerenciamento integrado ao seletor.
+- [x] `NOVO-20260822-202310-c2f6b992d23c` preserva o relatório de origem ao abrir o catálogo
+      de modelos e oferece no cabeçalho um retorno contextual e seguro ao documento.

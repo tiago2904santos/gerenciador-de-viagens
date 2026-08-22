@@ -41,9 +41,6 @@
   const drawCanvas = document.getElementById("asgn-draw");
   const drawClear = document.getElementById("asgn-draw-clear");
 
-  let pdfDoc = null;
-  let currentPage = 1;
-  let totalPages = 1;
   let signatureReady = false;
   let signatureAspect = 4; // largura/altura do PNG
   let pendingPng = null; // dataURL preparado no builder, ainda não aplicado
@@ -51,61 +48,22 @@
   let pendingFonte = "";
 
   // ── PDF.js ─────────────────────────────────────────────────────
-  function renderPage(num) {
-    if (!pdfDoc) return;
-    pdfDoc.getPage(num).then(function (page) {
-      const dpr = window.devicePixelRatio || 1;
-      const containerW = viewer.clientWidth || 320;
-      const base = page.getViewport({ scale: 1 });
-      const scale = containerW / base.width;
-      const vp = page.getViewport({ scale: scale });
-      canvas.width = Math.floor(vp.width * dpr);
-      canvas.height = Math.floor(vp.height * dpr);
-      canvas.style.width = vp.width + "px";
-      canvas.style.height = vp.height + "px";
-      stage.style.width = vp.width + "px";
-      stage.style.height = vp.height + "px";
-      const ctx = canvas.getContext("2d");
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      page.render({ canvasContext: ctx, viewport: vp });
-      currentPage = num;
-      fPagina.value = String(num - 1);
-      if (pageLabel) pageLabel.textContent = num + " / " + totalPages;
-      btnPrev.disabled = num <= 1;
-      btnNext.disabled = num >= totalPages;
-    });
-  }
-
-  function loadPdf() {
-    if (typeof pdfjsLib === "undefined") return;
-    if (app.dataset.workerSrc) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = app.dataset.workerSrc;
-    }
-    pdfjsLib
-      .getDocument({ url: pdfUrl, withCredentials: true })
-      .promise.then(function (doc) {
-        pdfDoc = doc;
-        totalPages = doc.numPages;
-        renderPage(1);
-      })
-      .catch(function () {
-        if (hint) hint.textContent = "Não foi possível carregar o documento. Recarregue a página.";
-      });
-  }
-
-  btnPrev.addEventListener("click", function () {
-    if (currentPage > 1) renderPage(currentPage - 1);
-  });
-  btnNext.addEventListener("click", function () {
-    if (currentPage < totalPages) renderPage(currentPage + 1);
-  });
-  let resizeFrame = null;
-  window.addEventListener("resize", function () {
-    if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
-    resizeFrame = window.requestAnimationFrame(function () {
-      resizeFrame = null;
-      if (pdfDoc) renderPage(currentPage);
-    });
+  // O visualizador e o arraste moram em `components/pdf-place.js`: a tela de ajuste do
+  // carimbo do número de solicitação faz a mesma coisa, e duas cópias de canvas + alça
+  // de redimensionar divergiriam na primeira correção.
+  window.CV.pdfPlace.visualizador({
+    url: pdfUrl,
+    workerSrc: app.dataset.workerSrc,
+    canvas: canvas,
+    stage: stage,
+    viewer: viewer,
+    pageLabel: pageLabel,
+    btnPrev: btnPrev,
+    btnNext: btnNext,
+    onPagina: function (indice) { fPagina.value = String(indice); },
+    onErro: function () {
+      if (hint) hint.textContent = "Não foi possível carregar o documento. Recarregue a página.";
+    },
   });
 
   // ── Builder: abas ──────────────────────────────────────────────
@@ -172,7 +130,7 @@
       pendingPng = png.dataUrl;
       pendingModo = "fonte";
       pendingFonte = chip.dataset.key || fam;
-      signatureAspect = png.aspect;
+      definirAspecto(png.aspect);
       updateApplyState();
     };
     if (document.fonts && document.fonts.load) {
@@ -271,7 +229,7 @@
     pendingPng = png.dataUrl;
     pendingModo = "desenho";
     pendingFonte = "";
-    signatureAspect = png.aspect;
+    definirAspecto(png.aspect);
     updateApplyState();
   }
 
@@ -302,68 +260,26 @@
     setBox((sw - w) / 2, sh * 0.7, w, h);
   }
 
-  function setBox(left, top, w, h) {
-    const sw = stage.clientWidth;
-    const sh = stage.clientHeight;
-    left = clamp(left, 0, Math.max(0, sw - w));
-    top = clamp(top, 0, Math.max(0, sh - h));
-    drag.style.left = left + "px";
-    drag.style.top = top + "px";
-    drag.style.width = w + "px";
-    drag.style.height = h + "px";
-  }
-
-  // ── Drag & resize da caixa ─────────────────────────────────────
-  let mode = null; // 'move' | 'resize'
-  let start = null;
-
-  function pointer(e) {
-    const t = e.touches ? e.touches[0] : e;
-    return { x: t.clientX, y: t.clientY };
-  }
-  function onDown(e, m) {
-    if (drag.hidden) return;
-    e.preventDefault();
-    mode = m;
-    const p = pointer(e);
-    start = {
-      px: p.x,
-      py: p.y,
-      left: drag.offsetLeft,
-      top: drag.offsetTop,
-      w: drag.offsetWidth,
-      h: drag.offsetHeight,
-    };
-  }
-  function onMove(e) {
-    if (!mode) return;
-    e.preventDefault();
-    const p = pointer(e);
-    const dx = p.x - start.px;
-    const dy = p.y - start.py;
-    if (mode === "move") {
-      setBox(start.left + dx, start.top + dy, start.w, start.h);
-    } else {
-      const w = clamp(start.w + dx, 60, stage.clientWidth);
-      setBox(start.left, start.top, w, w / signatureAspect);
-    }
-  }
-  function onUp() { mode = null; start = null; }
-
-  drag.addEventListener("mousedown", function (e) {
-    if (e.target === resizeHandle) return;
-    onDown(e, "move");
+  const caixa = window.CV.pdfPlace.caixaArrastavel({
+    caixa: drag,
+    alca: resizeHandle,
+    stage: stage,
+    aspecto: signatureAspect,
+    larguraMinima: 60,
   });
-  drag.addEventListener("touchstart", function (e) {
-    if (e.target === resizeHandle) return;
-    onDown(e, "move");
-  }, { passive: false });
-  resizeHandle.addEventListener("mousedown", function (e) { onDown(e, "resize"); });
-  resizeHandle.addEventListener("touchstart", function (e) { onDown(e, "resize"); }, { passive: false });
-  window.addEventListener("mousemove", onMove);
-  window.addEventListener("touchmove", onMove, { passive: false });
-  window.addEventListener("mouseup", onUp);
-  window.addEventListener("touchend", onUp);
+
+  function setBox(left, top, w, h) {
+    caixa.posicionar(left, top, w, h);
+  }
+
+  /* O aspecto da assinatura muda a cada troca de fonte ou desenho, e a caixa precisa
+   * saber: é ele que mantém a proporção ao redimensionar. Guardar em dois lugares é o
+   * preço de a caixa nascer antes da primeira assinatura existir. */
+  function definirAspecto(valor) {
+    if (!valor) return;
+    signatureAspect = valor;
+    caixa.definirAspecto(valor);
+  }
 
   // ── Submit ─────────────────────────────────────────────────────
   document.getElementById("asgn-form").addEventListener("submit", function (e) {
@@ -372,19 +288,16 @@
       if (hint) hint.textContent = "Crie e posicione sua assinatura antes de enviar.";
       return;
     }
-    const cw = canvas.clientWidth || stage.clientWidth;
-    const ch = canvas.clientHeight || stage.clientHeight;
-    fX.value = clamp(drag.offsetLeft / cw, 0, 1).toFixed(5);
-    fY.value = clamp(drag.offsetTop / ch, 0, 1).toFixed(5);
-    fW.value = clamp(drag.offsetWidth / cw, 0, 1).toFixed(5);
-    fH.value = clamp(drag.offsetHeight / ch, 0, 1).toFixed(5);
+    const fracoes = caixa.fracoes();
+    fX.value = fracoes.x.toFixed(5);
+    fY.value = fracoes.y.toFixed(5);
+    fW.value = fracoes.largura.toFixed(5);
+    fH.value = fracoes.altura.toFixed(5);
     btnSubmit.disabled = true;
     btnSubmit.textContent = "Enviando…";
   });
 
   // ── Utils ──────────────────────────────────────────────────────
-  function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
-
   function trimCanvas(src) {
     const ctx = src.getContext("2d");
     const w = src.width;
@@ -419,6 +332,6 @@
   }
 
   // ── Init ───────────────────────────────────────────────────────
+  // O PDF já começa a carregar quando `pdfPlace.visualizador` é criado, lá em cima.
   atualizarChips();
-  loadPdf();
 })();

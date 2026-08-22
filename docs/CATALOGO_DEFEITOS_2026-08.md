@@ -11457,3 +11457,82 @@ uma substituição, a mesma linha passa a representar o novo arquivo sem duplica
 A regra específica do número da solicitação fixava o fundo em `--surface-field`, ignorando a
 superfície semântica do cartão em que o controle está inserido. O input agora consome `--surface`
 do contexto, mantendo as demais propriedades e o destaque independente da linha do motorista.
+
+### NOVO-20260822-190655-54f65d9f0dc1 ✅ RESOLVIDO · `NOVO` Período das diárias separado do número da solicitação · UI · risco baixo
+
+Na linha de cada servidor em Prestações de Contas, o seletor do período ficava no grupo de
+ações da extremidade direita, embora seja um dado operacional diretamente relacionado ao
+número da solicitação. O calendário agora compartilha o mesmo formulário de autosave e aparece
+imediatamente ao lado do número, mantendo as ações de documentos separadas.
+
+### NOVO-20260822-191217-11ee5a647047 ✅ RESOLVIDO · `NOVO` Número da solicitação ocupava largura excessiva · UI · risco baixo
+
+Depois de aproximar o período das diárias do número da solicitação, o input ainda reservava uma
+faixa desproporcional para um identificador curto. A largura máxima foi reduzida para 120 px —
+aproximadamente metade da medida observada — e o controle continua autorizado a encolher em telas
+estreitas.
+
+### NOVO-20260822-191423-fe74cb745a5f ✅ RESOLVIDO · `NOVO` Solicitação e período não usavam a superfície rail · UI · risco baixo
+
+Os dois controles operacionais da linha de prestação ainda usavam degraus de superfície distintos.
+O número da solicitação e o seletor de período agora usam `--surface-rail`; no período preenchido,
+a borda accent preserva a indicação de estado sem substituir o fundo solicitado.
+
+### NOVO-20260822-191716-b05d1200b426 ✅ RESOLVIDO · `NOVO` Trocar a aba do anexo descartava o arquivo selecionado · JS/HT · risco médio
+
+O modal compartilhava um único input entre os cinco tipos de documento e o limpava sempre que o
+usuário trocava de aba. Agora cada tipo mantém seu próprio `File`, as abas sinalizam as seleções
+pendentes e o seletor restaura o arquivo correspondente quando o usuário retorna. “Anexar
+arquivos” executa uma única ação do usuário e envia todas as escolhas, em ordem, pelos endpoints
+existentes; uma falha mantém o modal aberto e informa quantos anexos já foram persistidos.
+
+### NOVO-20260822-193417-0e25b4c7fd04 ✅ RESOLVIDO · `NOVO` Linha do servidor duplicava a ação de documentos · HT · risco baixo
+
+Cada servidor ainda exibia um botão de pasta que abria o menu antigo de downloads e anexos,
+embora o rodapé do cartão já concentre o gerenciamento dos documentos assinados. O botão foi
+removido da linha e o fragmento sob demanda deixou de renderizar o menu agora inacessível,
+permanecendo responsável somente pelo aviso de liberação via WhatsApp.
+
+### NOVO-20260822-193803-1c392a79950f ✅ RESOLVIDO · `NOVO` Card da prestação não oferecia download consolidado configurável · BE/HT/JS · risco médio
+
+O rodapé da prestação não permitia escolher quais documentos baixar nem distinguir a versão
+gerada pelo sistema da versão assinada anexada. Cada card agora abre o seletor compartilhado de
+downloads e consulta a disponibilidade real de Ofício, Despacho, Diário de bordo, Relatório
+técnico e Comprovante. O operador escolhe PDF ou DOCX, arquivos separados ou compilados e a
+origem original ou assinada; combinações inexistentes ficam desabilitadas e o compilado recebe
+somente os itens marcados.
+
+### NOVO-20260822-195659-34bdc5bfcd91 ✅ RESOLVIDO · `NOVO` Identificação do relatório técnico empilhava fatos administrativos sem superfície semântica · HT/CSS · risco baixo
+
+Número do ofício, protocolo, destino e período da viagem eram renderizados como fatos soltos em
+uma coluna, produzindo um bloco alto e diferente do resumo do próprio ofício. A identificação da
+prestação agora usa quatro cartões equivalentes na mesma faixa, todos na superfície `rail`, com
+quebra responsiva em duas e uma coluna quando a largura não comporta os valores.
+
+### NOVO-20260822-200640-4b0e94fa047f ✅ RESOLVIDO · `NOVO` Campo de diária do relatório técnico herdava o controle legado · HT/CSS · risco baixo
+
+O componente v2 recebia do formulário a diária como `form-control cv-field__control`; como o
+widget estava dentro da casca `.input`, a regra de compatibilidade não o alcançava e a cascata
+legada repunha borda, raio e superfície antigos. A diária e os três campos condicionais de
+custeio agora saem diretamente como `input__control`, sem depender da ponte de compatibilidade.
+
+### NOVO-20260822-201249-4a0275f8a1cb ✅ RESOLVIDO · `NOVO` Campos condicionais de custeio repetiam rótulos e deformavam a grade · HT · risco baixo
+
+Ao selecionar “Outro”, translado, combustível e passagem exibiam um rótulo “Informe…” acima do
+input que já trazia a mesma instrução no placeholder. Nas quatro colunas estreitas, a duplicação
+cortava os textos e fazia o controle parecer um componente diferente. O rótulo continua ligado ao
+campo para acessibilidade, mas agora fica visualmente oculto e a grade mostra somente o input v2.
+
+### NOVO-20260822-201718-1743d6739c86 ✅ RESOLVIDO · `NOVO` Relatório técnico repetia aviso de catálogo vazio sob o seletor · HT · risco baixo
+
+Cada bloco de texto exibia “Nenhum modelo cadastrado...” e um segundo atalho para cadastro,
+embora o seletor já tenha a ação de gerenciamento integrada. A linha redundante foi removida;
+o estado vazio continua representado pelo próprio seletor e o gerenciamento permanece disponível
+no botão de ação.
+
+### NOVO-20260822-202310-c2f6b992d23c ✅ RESOLVIDO · `NOVO` Catálogo de modelos do RT perdia o relatório de origem · HT/BE · risco baixo
+
+Ao abrir o gerenciamento de modelos por um campo do relatório técnico, a URL não carregava a
+origem e o catálogo não oferecia caminho de volta ao documento em edição. O link agora preserva
+o RT do servidor em um `next` interno validado, e o cabeçalho do catálogo exibe “Voltar para o
+relatório técnico”; a busca e os atalhos de novo modelo mantêm o mesmo contexto.

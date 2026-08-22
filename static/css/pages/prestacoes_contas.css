@@ -57,6 +57,18 @@
   min-width: 0;
 }
 
+/* Identificação administrativa — quatro fatos equivalentes, como no resumo
+   do ofício. Cada fato conserva a superfície rail e o destino pode quebrar
+   dentro da própria coluna sem empurrar os demais cartões. */
+.prestacao-identificacao-facts > .form-block--v2 {
+  min-width: 0;
+}
+
+.prestacao-identificacao-facts .fact__value {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
 :is(.rt-wizard-card, .diario-wizard-card, .docs-wizard-card, .consolidado-wizard-card)
   .oficio-documentos-viajantes-section
   .oficio-documentos-card--travellers {
@@ -165,6 +177,7 @@
 }
 
 @media (max-width: 900px) {
+  .prestacao-identificacao-facts,
   .rt-summary-card .oficio-documentos-facts,
   .rt-custeios-grid,
   .diario-wizard-card .oficio-documentos-facts {
@@ -173,6 +186,7 @@
 }
 
 @media (max-width: 600px) {
+  .prestacao-identificacao-facts,
   .rt-summary-card .oficio-documentos-facts,
   .rt-custeios-grid,
   .diario-wizard-card .oficio-documentos-facts {

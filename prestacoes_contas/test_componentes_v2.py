@@ -54,7 +54,12 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
     def test_identificacao_administrativa_usa_fatos_globais_v2(self):
         source = marcacao(PRESTACOES / "partials" / "_rt_identificacao_body.html")
 
-        self.assertIn('class="fact-list"', source)
+        self.assertIn(
+            'class="fact-list fact-list--band-4 prestacao-identificacao-facts"',
+            source,
+        )
+        self.assertEqual(source.count("<c-v2.form_block"), 4)
+        self.assertEqual(source.count('surface="rail"'), 4)
         self.assertEqual(source.count("<c-v2.fact"), 4)
         self.assertNotIn("oficio-documentos-admin-facts", source)
         self.assertNotIn("oficio-documentos-facts", source)
@@ -116,6 +121,24 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
             self.assertIn("input__control--textarea", classes)
             self.assertNotIn("cv-field__control--textarea", classes)
 
+    def test_inputs_de_custeio_do_relatorio_usam_controle_global_v2(self):
+        from prestacoes_contas.forms import RelatorioTecnicoForm
+
+        form = RelatorioTecnicoForm()
+        for campo in ("diaria", "translado_outro", "combustivel_outro", "passagem_outro"):
+            classes = form.fields[campo].widget.attrs.get("class", "").split()
+            self.assertEqual(classes, ["input__control"])
+            self.assertNotIn("form-control", classes)
+            self.assertNotIn("cv-field__control", classes)
+
+    def test_inputs_condicionais_de_custeio_nao_repetem_rotulo_visual(self):
+        source = marcacao(PRESTACOES / "partials" / "_rt_custeio_body.html")
+
+        self.assertIn(
+            ':field="item.other" :label="cotton_attr_label" :input="True" :hide_label="True"',
+            source,
+        )
+
     def test_modelos_do_relatorio_usam_select_com_acao_v2(self):
         campo = marcacao(PRESTACOES / "_campo_com_modelo.html")
         wizard = marcacao(PRESTACOES / "partials" / "_rt_wizard_body.html")
@@ -123,6 +146,8 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
         self.assertIn(':action_url="c.manage_url"', campo)
         self.assertIn('action_label="Gerenciar modelos"', campo)
         self.assertIn(':hide_label="True"', campo)
+        self.assertNotIn("Nenhum modelo cadastrado para este campo", campo)
+        self.assertNotIn("Cadastrar modelo", campo)
         self.assertNotIn('action_label="Gerenciar modelos"', wizard)
 
     def test_custeios_do_relatorio_usam_controles_globais_v2(self):
@@ -156,7 +181,13 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
     def test_card_edita_periodo_em_calendario_compacto_com_autosave(self):
         source = marcacao(TEMPLATES / "cotton" / "v2" / "prestacao_card.html")
 
-        self.assertIn("prestacao-row__period-form", source)
+        inicio_form = source.index('class="prestacao-row__form"')
+        fim_form = source.index("</form>", inicio_form)
+        formulario_operacional = source[inicio_form:fim_form]
+
+        self.assertNotIn("prestacao-row__period-form", source)
+        self.assertIn("prestacao-row__solicitacao", formulario_operacional)
+        self.assertIn('<c-v2.date_picker', formulario_operacional)
         self.assertIn('<c-v2.date_picker', source)
         self.assertIn('mode="range"', source)
         self.assertIn('button_label="Período"', source)
@@ -179,13 +210,19 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
             source,
         )
 
-    def test_solicitacao_usa_a_superficie_do_contexto(self):
+    def test_solicitacao_e_periodo_usam_a_superficie_rail(self):
         css = (ROOT / "static" / "css" / "v2" / "record.css").read_text(encoding="utf-8")
         regra = css[css.index(".prestacao-row__solicitacao") :]
         regra = regra[: regra.index("}")]
+        date_picker_css = (ROOT / "static" / "css" / "v2" / "date-picker.css").read_text(encoding="utf-8")
+        regra_periodo = date_picker_css[date_picker_css.index(".prestacao-row__form") :]
+        regra_periodo = regra_periodo[: regra_periodo.index("}")]
 
-        self.assertIn("background: var(--surface);", regra)
+        self.assertIn("background: var(--surface-rail);", regra)
+        self.assertIn("flex: 0 1 120px;", regra)
+        self.assertIn("max-width: 120px;", regra)
         self.assertNotIn("background: var(--surface-field);", regra)
+        self.assertIn("background: var(--surface-rail);", regra_periodo)
 
     def test_prestacoes_nao_chamam_componentes_visuais_anteriores_ao_v2(self):
         namespaces_legados = (

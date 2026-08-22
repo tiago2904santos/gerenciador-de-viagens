@@ -20,6 +20,8 @@ from django.core.files.base import ContentFile
 from django.utils import timezone
 
 from core.errors import capture
+from documentos.services.pdf_overlay import PdfOverlayError
+from documentos.services.pdf_overlay import desenhar_overlay
 
 from .models import AssinaturaDocumento
 from .models import DiarioBordo
@@ -213,10 +215,50 @@ def _limpar_assinatura(doc: AssinaturaDocumento) -> None:
 
 
 def _carimbar_pdf(origem_bytes, png_bytes, *, pagina, x, y, w, h, nome, codigo) -> bytes:
-    from pypdf import PdfReader
-    from pypdf import PdfWriter
+    """Funde o PNG da assinatura na página escolhida pelo signatário.
+
+    A manipulação do PDF em volta do desenho — decifrar, normalizar rotação, medir e
+    fundir — mora em `documentos.services.pdf_overlay`, compartilhada com o carimbo do
+    número de solicitação. Aqui fica só o que é da assinatura: a imagem e a legenda.
+    """
     from reportlab.lib.utils import ImageReader
-    from reportlab.pdfgen import canvas
+
+    total = _total_de_paginas(origem_bytes)
+    if total == 0:
+        raise AssinaturaError("O documento não possui páginas para assinar.")
+    idx = max(0, min(int(pagina or 0), total - 1))
+
+    def desenhar(c, medidas):
+        # Frações vêm do navegador com origem no topo-esquerdo; PDF tem origem embaixo.
+        box_w = max(1.0, float(w) * medidas.largura)
+        box_h = max(1.0, float(h) * medidas.altura)
+        box_x = medidas.x_pdf(x)
+        box_y_bottom = medidas.y_pdf(y, box_h)
+
+        c.drawImage(
+            ImageReader(BytesIO(png_bytes)),
+            box_x,
+            box_y_bottom,
+            width=box_w,
+            height=box_h,
+            mask="auto",
+            preserveAspectRatio=True,
+            anchor="sw",
+        )
+        legenda = f"Assinado eletronicamente por {nome} em {timezone.localtime().strftime('%d/%m/%Y %H:%M')} — cód {codigo}"
+        c.setFont("Helvetica", 6)
+        c.setFillColorRGB(0.30, 0.36, 0.43)
+        cap_y = max(2.0, box_y_bottom - 8)
+        c.drawCentredString(box_x + box_w / 2, cap_y, legenda[:120])
+
+    try:
+        return desenhar_overlay(origem_bytes, {idx: desenhar})
+    except PdfOverlayError as exc:
+        raise AssinaturaError(str(exc)) from exc
+
+
+def _total_de_paginas(origem_bytes) -> int:
+    from pypdf import PdfReader
 
     reader = PdfReader(BytesIO(origem_bytes))
     if getattr(reader, "is_encrypted", False):
@@ -224,58 +266,7 @@ def _carimbar_pdf(origem_bytes, png_bytes, *, pagina, x, y, w, h, nome, codigo) 
             reader.decrypt("")
         except Exception as exc:
             capture(exc, "prestacoes.assinatura.decrypt_pdf")
-
-    total = len(reader.pages)
-    if total == 0:
-        raise AssinaturaError("O documento não possui páginas para assinar.")
-    idx = max(0, min(int(pagina or 0), total - 1))
-
-    page = reader.pages[idx]
-    if page.rotation:
-        # Normaliza páginas giradas (ex.: diário em paisagem) para a mediabox bater
-        # com o que foi exibido ao signatário.
-        page.transfer_rotation_to_content()
-
-    page_w = float(page.mediabox.width)
-    page_h = float(page.mediabox.height)
-
-    # Frações vêm do navegador com origem no topo-esquerdo; PDF tem origem embaixo.
-    box_w = max(1.0, float(w) * page_w)
-    box_h = max(1.0, float(h) * page_h)
-    box_x = float(x) * page_w
-    box_y_bottom = page_h - (float(y) * page_h) - box_h
-
-    overlay_buf = BytesIO()
-    c = canvas.Canvas(overlay_buf, pagesize=(page_w, page_h))
-    image = ImageReader(BytesIO(png_bytes))
-    c.drawImage(
-        image,
-        box_x,
-        box_y_bottom,
-        width=box_w,
-        height=box_h,
-        mask="auto",
-        preserveAspectRatio=True,
-        anchor="sw",
-    )
-    legenda = f"Assinado eletronicamente por {nome} em {timezone.localtime().strftime('%d/%m/%Y %H:%M')} — cód {codigo}"
-    c.setFont("Helvetica", 6)
-    c.setFillColorRGB(0.30, 0.36, 0.43)
-    cap_y = max(2.0, box_y_bottom - 8)
-    c.drawCentredString(box_x + box_w / 2, cap_y, legenda[:120])
-    c.save()
-    overlay_buf.seek(0)
-
-    overlay_page = PdfReader(overlay_buf).pages[0]
-    page.merge_page(overlay_page)
-
-    writer = PdfWriter()
-    for p in reader.pages:
-        writer.add_page(p)
-    out = BytesIO()
-    writer.write(out)
-    writer.close()
-    return out.getvalue()
+    return len(reader.pages)
 
 
 def aplicar_assinatura(doc, *, png_bytes, modo, fonte, pagina, x, y, w, h, ip="") -> None:

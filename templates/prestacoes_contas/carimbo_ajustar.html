@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load l10n static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
+{% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
+
+{% comment %}
+  SEM `extra_css`: `css/v2/pdf-place.css` entra no bundle do shell, com as demais folhas
+  do v2. Um `<link>` a mais no template subiria a catraca de imports de CSS em
+  templates, que só pode cair (`core/tests/test_entity_card_styles.py`).
+{% endcomment %}
+
+{% block content %}
+  {% comment %}
+    Ajustar a posição do número de solicitação no ofício assinado.
+
+    Só se chega aqui por um botão: o carimbo é automático, e esta tela é a saída para
+    quando o automático erra — eProtocolo que recompõe o texto, ou PDF escaneado, em que
+    não há âncora para transportar a posição.
+
+    Os `id` e os `data-*` são contrato de `js/pages/prestacoes-carimbo.js`, e o
+    visualizador em si vem de `js/components/pdf-place.js`, o mesmo da tela pública de
+    assinatura. Renomear um gancho deixa a tela na tela e desliga o arraste.
+  {% endcomment %}
+  <form method="post"
+        id="carimbo-form"
+        class="pdf-place"
+        data-pdf-place
+        data-pdf-url="{{ pdf_url }}"
+        data-worker-src="{% static 'vendor/pdfjs/pdf.worker.min.js' %}"
+        data-caixas="{{ caixas_json }}">
+    {% csrf_token %}
+
+    <c-v2.panel title="Ajustar posição do número de solicitação"
+                description="Arraste cada número para a linha do servidor no ofício assinado. A alça no canto muda o tamanho.">
+      <c-slot name="actions">
+        <div class="pdf-place__pager">
+          <c-v2.icon_button icon="arrow-left" element_id="carimbo-prev" aria_label="Página anterior" tooltip="Página anterior" />
+          <span id="carimbo-page-label" class="pdf-place__pager-label">1 / 1</span>
+          <c-v2.icon_button icon="arrow-right" element_id="carimbo-next" aria_label="Próxima página" tooltip="Próxima página" />
+        </div>
+      </c-slot>
+
+      <c-slot name="body">
+        {% if not caixas %}
+          <c-v2.alert tone="warning" message="Esta prestação não tem servidores para carimbar." />
+        {% endif %}
+
+        <div class="pdf-place__viewer" id="carimbo-viewer">
+          <div class="pdf-place__stage" id="carimbo-stage">
+            <canvas id="carimbo-canvas"></canvas>
+            {% comment %}
+              Uma caixa por servidor. Ela nasce oculta e o JS mostra só as da página
+              atual — o número do trecho 3 não pode aparecer sobre a página 1.
+            {% endcomment %}
+            {% for caixa in caixas %}
+              <div class="pdf-place__box"
+                   data-pdf-place-box
+                   data-ps="{{ caixa.ps_pk }}"
+                   data-pagina="{{ caixa.pagina|unlocalize }}"
+                   hidden>
+                <span class="pdf-place__box-text" data-pdf-place-text>{{ caixa.numero|default:"—" }}</span>
+                <span class="pdf-place__box-handle" data-pdf-place-handle aria-hidden="true"></span>
+              </div>
+              {% comment %}
+                `unlocalize` em cada número: com o locale pt-BR o Django escreve
+                `0,74`, e do outro lado `parseFloat("0,74")` devolve **0** — a caixa
+                nascia grudada no canto superior esquerdo com 2px de altura. No POST o
+                estrago é igual, com `float("0,74")` estourando.
+
+                Isto é DADO DE MÁQUINA indo e voltando, não número para ler na tela.
+              {% endcomment %}
+              <input type="hidden" name="caixa-{{ caixa.ps_pk }}-pagina" value="{{ caixa.pagina|unlocalize }}" data-pdf-place-field="pagina" data-ps="{{ caixa.ps_pk }}">
+              <input type="hidden" name="caixa-{{ caixa.ps_pk }}-x" value="{{ caixa.x|unlocalize }}" data-pdf-place-field="x" data-ps="{{ caixa.ps_pk }}">
+              <input type="hidden" name="caixa-{{ caixa.ps_pk }}-y" value="{{ caixa.y|unlocalize }}" data-pdf-place-field="y" data-ps="{{ caixa.ps_pk }}">
+              <input type="hidden" name="caixa-{{ caixa.ps_pk }}-tamanho" value="{{ caixa.tamanho|unlocalize }}" data-pdf-place-field="tamanho" data-ps="{{ caixa.ps_pk }}">
+            {% endfor %}
+          </div>
+        </div>
+
+        <p class="field__help" id="carimbo-hint">
+          Cada número acima é o do servidor na lista abaixo. Arraste até a linha dele na
+          tabela do ofício.
+        </p>
+
+        <ul class="pdf-place__legenda">
+          {% for caixa in caixas %}
+            <li class="pdf-place__legenda-item" data-pdf-place-legenda data-ps="{{ caixa.ps_pk }}">
+              <span class="pdf-place__legenda-nome">{{ caixa.nome }}</span>
+              {% if caixa.numero %}
+                <span class="pdf-place__legenda-numero">{{ caixa.numero }}</span>
+                <c-v2.button label="Ir para a caixa" variant="ghost" size="sm" element_id="ir-{{ caixa.ps_pk }}" />
+              {% else %}
+                <c-v2.chip label="sem número" tone="warning" />
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </c-slot>
+
+      <c-slot name="footer">
+        <c-v2.button label="Salvar posição" variant="primary" type="submit" />
+        <c-v2.button label="Voltar" variant="secondary" :href="voltar_url" />
+      </c-slot>
+    </c-v2.panel>
+  </form>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'vendor/pdfjs/pdf.min.js' %}"></script>
+  {% comment %}
+    `pdf-place.js` antes da página, que o procura em `CV.pdfPlace` na primeira linha.
+    Fora do bundle do shell: só duas telas mostram PDF em canvas.
+  {% endcomment %}
+  <script src="{% static 'js/components/pdf-place.js' %}" defer></script>
+  <script src="{% static 'js/pages/prestacoes-carimbo.js' %}" defer></script>
+{% endblock %}

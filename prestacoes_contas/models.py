@@ -27,6 +27,15 @@ def prestacao_documento_anexo_upload_to(instance, filename):
     return f"prestacoes_contas/{instance.prestacao_id or 'nova'}/{filename}"
 
 
+def prestacao_anexo_original_upload_to(instance, filename):
+    """O PDF como veio do eProtocolo, antes de receber os números.
+
+    Fica separado do carimbado porque é dele que todo recarimbo parte: sem o cru,
+    ajustar a posição desenharia por cima de um arquivo que já tem os números.
+    """
+    return f"prestacoes_contas/{instance.prestacao_id or 'nova'}/originais/{filename}"
+
+
 def assinatura_origem_upload_to(instance, filename):
     return f"prestacoes_contas/{instance.prestacao_id or 'nova'}/assinaturas/origem_{instance.tipo}_{filename}"
 
@@ -439,8 +448,26 @@ class PrestacaoDocumentoAnexo(models.Model):
         upload_to=prestacao_documento_anexo_upload_to,
         validators=[validate_private_document_upload],
     )
+    # O que o usuário enviou, intocado. `arquivo` guarda a versão que o sistema
+    # entrega — para o ofício assinado, a carimbada com os números de solicitação.
+    # Nos demais tipos os dois são o mesmo conteúdo e este campo fica vazio.
+    arquivo_original = models.FileField(
+        upload_to=prestacao_anexo_original_upload_to,
+        blank=True,
+        help_text="PDF como enviado, antes do carimbo. Origem de todo recarimbo.",
+    )
     nome_original = models.CharField(max_length=255, blank=True, default="")
     criado_em = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def arquivo_para_carimbar(self):
+        """De onde o carimbo parte: o cru quando existe, senão o próprio arquivo.
+
+        O `or` cobre os anexos criados antes deste campo — carimbá-los uma vez é
+        correto; o segundo carimbo é que duplicaria, e a partir da primeira vez o cru
+        passa a existir.
+        """
+        return self.arquivo_original if self.arquivo_original else self.arquivo
 
     class Meta:
         ordering = ["tipo", "criado_em", "pk"]
@@ -449,6 +476,55 @@ class PrestacaoDocumentoAnexo(models.Model):
 
     def __str__(self):
         return self.nome_original or self.arquivo.name
+
+
+class CarimboSolicitacao(models.Model):
+    """Onde o número de solicitação de um servidor é desenhado no ofício assinado.
+
+    O ofício que volta do eProtocolo traz a coluna de solicitação em branco — o número
+    só existe depois de protocolar. Esta linha guarda o LUGAR do carimbo; o texto é
+    sempre `PrestacaoServidor.numero_solicitacao`, lido na hora de desenhar. Uma fonte
+    só: corrigir o número no cadastro refaz o carimbo sem ninguém sincronizar nada.
+
+    As coordenadas seguem a convenção do navegador e de
+    `documentos.services.pdf_overlay`: frações da página, origem no topo-esquerdo.
+    """
+
+    anexo = models.ForeignKey(
+        PrestacaoDocumentoAnexo,
+        on_delete=models.CASCADE,
+        related_name="carimbos",
+    )
+    servidor_prestacao = models.ForeignKey(
+        PrestacaoServidor,
+        on_delete=models.CASCADE,
+        related_name="carimbos_solicitacao",
+    )
+    pagina = models.PositiveSmallIntegerField(default=0)
+    x = models.FloatField(help_text="Fração da largura, 0 = borda esquerda.")
+    y = models.FloatField(help_text="Fração da altura, 0 = topo da página.")
+    # Corpo da fonte em fração da ALTURA da página, e não em pontos: o mesmo carimbo
+    # tem de sair proporcional em A4 e em ofício, e é assim que a tela de ajuste mede.
+    tamanho = models.FloatField(default=0.012)
+    # Posição mexida à mão não é recalculada quando o número muda — o automático já
+    # errou uma vez ali, e reescrever por cima devolveria o erro que o usuário corrigiu.
+    ajustado_manualmente = models.BooleanField(default=False)
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["anexo", "servidor_prestacao"],
+                name="carimbo_unico_por_servidor_no_anexo",
+            )
+        ]
+        ordering = ["pagina", "y", "x", "pk"]
+        verbose_name = "Carimbo do número de solicitação"
+        verbose_name_plural = "Carimbos do número de solicitação"
+
+    def __str__(self):
+        return f"carimbo p{self.pagina} de {self.servidor_prestacao_id}"
 
 
 class RelatorioTecnico(models.Model):

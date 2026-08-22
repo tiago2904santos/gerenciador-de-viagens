@@ -57,6 +57,12 @@
      1.104 e page→rail sobe de 1.130 para 1.241. */
   --surface-rail: #f0f4f9;
   --surface-field: #ffffff;
+  /* PAPEL e TINTA do documento exibido, não da interface. Os dois valem igual nos dois
+     temas, e é essa a razão de existirem: a folha de um PDF é branca e o carimbo é
+     preto na impressão, então escurecê-los no tema escuro mostraria ao operador algo
+     diferente do que vai sair. Por isso não são redefinidos no bloco escuro. */
+  --paper: #ffffff;
+  --paper-ink: #000000;
   --surface-brand: #155b9a;
   /* Fundo da linha escolhida numa lista de opções. É a cor que o desenho antigo
      usava para "selecionado" — no tema escuro, o azul-marinho profundo do

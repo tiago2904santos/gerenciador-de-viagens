@@ -222,7 +222,10 @@ class AssinaturaCardRenderTests(TestCase):
         r = self.client.get(reverse("prestacoes_contas:consolidado_servidor", args=[self.ps.pk]))
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, "Resumo, conferência e pacote consolidado deste servidor")
-        self.assertContains(r, 'class="fact-list"')
+        self.assertContains(
+            r,
+            'class="fact-list fact-list--band-4 prestacao-identificacao-facts"',
+        )
         self.assertContains(r, 'class="person-list"')
         self.assertNotContains(r, "oficio-documentos-admin-facts")
         self.assertNotContains(r, "oficio-documentos-facts")

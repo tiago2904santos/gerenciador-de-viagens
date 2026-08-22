@@ -10,6 +10,8 @@ from django.urls import reverse
 from core.normalizers import remove_accents
 from core.deletion import DelecaoProtegidaError
 from core.presenters.meta import build_meta
+from core.retorno import com_next
+from core.retorno import next_valido
 from core.tenancy import filter_queryset_by_area
 
 from .forms import ModeloTextoRelatorioTecnicoForm
@@ -23,6 +25,7 @@ _CAMPO_LABELS = dict(ModeloTextoRelatorioTecnico.CAMPO_CHOICES)
 
 def modelos_index(request):
     q = (request.GET.get("q") or "").strip()
+    return_url = next_valido(request)
     novo_base = reverse("prestacoes_contas:modelo_create")
 
     grupos = []
@@ -52,7 +55,7 @@ def modelos_index(request):
                 "campo": campo,
                 "label": label,
                 "rows": rows,
-                "new_url": f"{novo_base}?campo={campo}",
+                "new_url": com_next(f"{novo_base}?campo={campo}", return_url),
             }
         )
 
@@ -64,6 +67,9 @@ def modelos_index(request):
             "page_description": "Textos reutilizáveis para preencher rapidamente os campos do relatório técnico.",
             "q": q,
             "grupos": grupos,
+            "back_url": return_url,
+            "back_label": "Voltar para o relatório técnico",
+            "next_url": return_url,
         },
     )
 

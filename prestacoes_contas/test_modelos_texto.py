@@ -41,6 +41,25 @@ class ModelosDeTextoRTTests(TestCase):
         self._criar()
         self.assertEqual(self.client.get(reverse("prestacoes_contas:modelos_index")).status_code, 200)
 
+    def test_index_exibe_retorno_para_relatorio_tecnico_de_origem(self):
+        retorno = "/prestacoes-contas/servidor-prestacao/41/rt/"
+
+        response = self.client.get(reverse("prestacoes_contas:modelos_index"), {"next": retorno})
+
+        self.assertEqual(response.context["back_url"], retorno)
+        self.assertEqual(response.context["back_label"], "Voltar para o relatório técnico")
+        self.assertContains(response, f'href="{retorno}"')
+        self.assertContains(response, "Voltar para o relatório técnico")
+
+    def test_index_ignora_retorno_externo(self):
+        response = self.client.get(
+            reverse("prestacoes_contas:modelos_index"),
+            {"next": "https://externo.invalido/rt/"},
+        )
+
+        self.assertEqual(response.context["back_url"], "")
+        self.assertNotContains(response, "Voltar para o relatório técnico")
+
     def test_novo_com_campo_na_querystring_abre(self):
         """A leitura de `_CAMPO_LABELS` acontece antes de qualquer coisa nesta view."""
         response = self.client.get(reverse("prestacoes_contas:modelo_create"), {"campo": CAMPO})

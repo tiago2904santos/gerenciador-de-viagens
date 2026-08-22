@@ -18,6 +18,10 @@ from .models import PrestacaoDocumentoAnexo
 from .presenters import _anexo_assinado_info
 from .anexo_services import excluir_anexo
 from .anexo_services import substituir_anexo_assinado
+from .carimbo_services import anexo_do_oficio_assinado
+from .carimbo_services import caixas_para_ajuste
+from .carimbo_services import preparar_e_carimbar
+from .carimbo_services import salvar_posicoes
 from .presenters import kinds_de_anexo_assinado
 from .services import marcar_servidor_em_preenchimento
 from .services import marcar_servidores_pendentes
@@ -62,6 +66,19 @@ def prestacao_documento_conteudo(request, pc_pk, anexo_pk):
         prestacao=prestacao,
     )
     return private_file_response(anexo.arquivo)
+
+
+def prestacao_oficio_assinado_cru(request, pc_pk):
+    """Serve o PDF **sem** os números, que é o que a tela de ajuste desenha por cima.
+
+    Mostrar o carimbado ali faria o operador arrastar uma caixa sobre um número que já
+    está impresso, e ver dois — o desenhado e o da caixa.
+    """
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
+    anexo = anexo_do_oficio_assinado(prestacao)
+    if anexo is None:
+        return HttpResponse(status=404)
+    return private_file_response(anexo.arquivo_para_carimbar)
 
 
 def _servidor_documentos_ctx(prestacao, ps):
@@ -145,6 +162,10 @@ def documentos_servidor(request, ps_pk):
             args=[prestacao.pk],
         ),
         prestacao_pk=prestacao.pk,
+        ajustar_url=reverse(
+            "prestacoes_contas:prestacao_carimbo_ajustar",
+            args=[prestacao.pk],
+        ),
     )
     identificacao = _build_identificacao(prestacao)
     numero = identificacao.get("numero") or ""
@@ -255,6 +276,7 @@ def _prestacao_assinado_upload(
     tipo,
     servidor_prestacao=None,
     substituir_todos_do_tipo=False,
+    pos_anexo=None,
 ):
     fallback_url = reverse("prestacoes_contas:index")
     destino = voltar_para(request, fallback_url)
@@ -277,7 +299,7 @@ def _prestacao_assinado_upload(
 
     # A validação vem antes da exclusão dos anteriores de propósito: recusar um
     # arquivo novo não pode custar o que já estava anexado.
-    substituir_anexo_assinado(
+    resultado = substituir_anexo_assinado(
         prestacao,
         tipo=tipo,
         arquivo=arquivo,
@@ -285,7 +307,10 @@ def _prestacao_assinado_upload(
         servidor_prestacao=servidor_prestacao,
         substituir_todos_do_tipo=substituir_todos_do_tipo,
     )
-    messages.success(request, "Documento assinado anexado.")
+    if pos_anexo is not None and resultado.anexo is not None:
+        pos_anexo(resultado.anexo)
+    else:
+        messages.success(request, "Documento assinado anexado.")
     return redirect(destino)
 
 
@@ -299,12 +324,76 @@ def prestacao_despacho_assinado_anexar(request, pc_pk):
 
 
 def prestacao_oficio_assinado_anexar(request, pc_pk):
+    """Anexa o ofício que voltou do eProtocolo e já grava os números de solicitação.
+
+    O carimbo não é um passo à parte: o assinado volta com a coluna de solicitação em
+    branco, e é essa versão que o consolidado usa. Sem carimbar aqui, anexar o assinado
+    faria a prestação PERDER os números que a versão gerada tinha.
+    """
     prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
+
+    def carimbar(anexo):
+        resultado = preparar_e_carimbar(anexo, prestacao=prestacao)
+        for mensagem, nivel in _mensagens_do_carimbo(resultado):
+            nivel(request, mensagem)
+
     return _prestacao_assinado_upload(
         request,
         prestacao=prestacao,
         tipo=PrestacaoDocumentoAnexo.TIPO_OFICIO_ASSINADO,
+        pos_anexo=carimbar,
     )
+
+
+def _mensagens_do_carimbo(resultado):
+    """Traduz o resultado do carimbo no que o operador precisa saber.
+
+    Sempre diz o que ENTROU antes do que faltou: anexar com metade dos números é um
+    avanço, e abrir com a pendência faria parecer recusa.
+    """
+    if resultado.erro:
+        return [(f"Documento anexado, mas o carimbo falhou: {resultado.erro}", messages.warning)]
+
+    saida = []
+    if resultado.carimbados:
+        plural = "s" if resultado.carimbados > 1 else ""
+        saida.append(
+            (
+                f"Ofício assinado anexado com {resultado.carimbados} número{plural} "
+                f"de solicitação gravado{plural}.",
+                messages.success,
+            )
+        )
+    else:
+        saida.append(("Ofício assinado anexado.", messages.success))
+
+    if resultado.sem_numero:
+        saida.append(
+            (
+                "Sem número de solicitação, e por isso fora do carimbo: "
+                + ", ".join(resultado.sem_numero)
+                + ". Preencha o número e o ofício é recarimbado sozinho.",
+                messages.warning,
+            )
+        )
+    if resultado.sem_posicao:
+        saida.append(
+            (
+                "Não foi possível descobrir onde carimbar: "
+                + ", ".join(resultado.sem_posicao)
+                + ". Use “Ajustar posição” para posicionar à mão.",
+                messages.warning,
+            )
+        )
+    elif resultado.incertos:
+        saida.append(
+            (
+                "A posição de alguns números foi estimada — confira o documento e use "
+                "“Ajustar posição” se algum saiu fora do lugar.",
+                messages.info,
+            )
+        )
+    return saida
 
 
 def prestacao_servidor_assinado_anexar(request, ps_pk, tipo):
@@ -327,6 +416,74 @@ def prestacao_servidor_assinado_anexar(request, ps_pk, tipo):
         tipo=tipo,
         substituir_todos_do_tipo=diario_compartilhado,
     )
+
+
+def prestacao_carimbo_ajustar(request, pc_pk):
+    """Tela de ajuste: arrastar cada número sobre o ofício assinado.
+
+    Existe porque o automático pode errar — eProtocolo que recompõe o texto, ou PDF
+    escaneado, em que não há âncora para transportar a posição. É a saída manual, e não
+    o caminho comum.
+    """
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
+    anexo = anexo_do_oficio_assinado(prestacao)
+    if anexo is None:
+        messages.error(request, "Anexe o ofício assinado antes de ajustar o carimbo.")
+        return redirect(voltar_para(request, reverse("prestacoes_contas:index")))
+
+    caixas = caixas_para_ajuste(prestacao, anexo)
+
+    if request.method == "POST":
+        posicoes, erro = _posicoes_do_post(request.POST, caixas)
+        if erro:
+            messages.error(request, erro)
+        else:
+            resultado = salvar_posicoes(anexo, posicoes)
+            if resultado.erro:
+                messages.error(request, resultado.erro)
+            else:
+                messages.success(request, "Carimbo reposicionado.")
+        return redirect(voltar_para(request, reverse("prestacoes_contas:index")))
+
+    return render(
+        request,
+        "prestacoes_contas/carimbo_ajustar.html",
+        {
+            "page_title": "Ajustar posição do número de solicitação",
+            "prestacao": prestacao,
+            "anexo": anexo,
+            "caixas": caixas,
+            "caixas_json": json.dumps(caixas, ensure_ascii=False),
+            "pdf_url": reverse(
+                "prestacoes_contas:prestacao_oficio_assinado_cru", args=[prestacao.pk]
+            ),
+            "voltar_url": voltar_para(request, reverse("prestacoes_contas:index")),
+        },
+    )
+
+
+def _posicoes_do_post(post, caixas):
+    """Lê `caixa-<ps>-<campo>` do POST. Só forma; a faixa quem valida é o service.
+
+    Recebe o `QueryDict`, não o `request` (`docs/PADRAO_SERVICES.md`). Caixa ausente do
+    POST é ignorada em silêncio — o navegador pode não ter mandado a de uma página que o
+    operador não abriu, e apagar a posição dela seria perder trabalho anterior.
+    """
+    posicoes = {}
+    for caixa in caixas:
+        prefixo = f"caixa-{caixa['ps_pk']}-"
+        if f"{prefixo}x" not in post:
+            continue
+        try:
+            posicoes[caixa["ps_pk"]] = (
+                int(post.get(f"{prefixo}pagina") or 0),
+                float(post.get(f"{prefixo}x") or 0),
+                float(post.get(f"{prefixo}y") or 0),
+                float(post.get(f"{prefixo}tamanho") or 0),
+            )
+        except (TypeError, ValueError):
+            return {}, "Posição inválida; refaça o ajuste."
+    return posicoes, ""
 
 
 @require_POST

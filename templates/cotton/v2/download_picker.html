@@ -67,6 +67,20 @@
         `toggle` do sistema — as regras moram em `v2/toggle.css`, uma fonte só.
       {% endcomment %}
       <div class="download-picker__options">
+        <fieldset class="download-picker__option" data-download-picker-origin hidden>
+          <legend class="download-picker__legend">Origem</legend>
+          <div class="toggle toggle--state toggle--sm download-picker__segments">
+            <label class="toggle__item download-picker__radio">
+              <input type="radio" name="{{ picker_id }}-origem" value="original" checked>
+              <span>Original do sistema</span>
+            </label>
+            <label class="toggle__item download-picker__radio">
+              <input type="radio" name="{{ picker_id }}-origem" value="assinado">
+              <span>Documento assinado</span>
+            </label>
+          </div>
+        </fieldset>
+
         <fieldset class="download-picker__option">
           <legend class="download-picker__legend">Formato</legend>
           <div class="toggle toggle--state toggle--sm download-picker__segments">

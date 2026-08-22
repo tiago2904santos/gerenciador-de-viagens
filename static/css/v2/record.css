@@ -377,9 +377,10 @@
 
 /* ---- linha de prestação: a que se edita na própria lista --------------------
  *
- * Cada servidor traz um formulário com o número da solicitação. Ele fica ANTES
- * do nome, na mesma linha: é o que se vem
- * fazer nesta tela, e mandá-lo para baixo do nome faria a lista crescer o dobro.
+ * Cada servidor traz um formulário com o número da solicitação e o período das
+ * diárias. Os dois controles ficam juntos, ANTES do nome, na mesma linha: são
+ * dados operacionais do mesmo servidor e separá-los em pontas opostas escondia
+ * essa relação.
  */
 :is(html[data-theme]) .prestacao-row__form {
   align-items: center;
@@ -391,9 +392,14 @@
 }
 
 :is(html[data-theme]) .prestacao-row__solicitacao {
-  background: var(--surface);
-  flex: 1 1 140px;
+  background: var(--surface-rail);
+  flex: 0 1 120px;
+  max-width: 120px;
   min-width: 0;
+}
+
+:is(html[data-theme]) .prestacao-row__form .date-field {
+  flex: 0 0 auto;
 }
 
 /* Os três blocos de fato do cartão dividem a largura; em tela estreita eles

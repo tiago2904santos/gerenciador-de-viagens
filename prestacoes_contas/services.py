@@ -576,7 +576,7 @@ def _solicitacoes_do_oficio(prestacao) -> dict[int, str]:
     return solicitacoes
 
 
-def gerar_oficio_prestacao_pdf(prestacao) -> bytes:
+def gerar_oficio_prestacao_documento(prestacao, formato: DocumentoFormato) -> bytes:
     oficio = prestacao.oficio
     payload = build_canonical_document_payload(oficio, DocumentoTipo.OFICIO)
     docxtpl = build_oficio_docxtpl_context(
@@ -586,12 +586,16 @@ def gerar_oficio_prestacao_pdf(prestacao) -> bytes:
     reference = oficio.numero_formatado.replace("/", "-")
     doc = build_default_facade().gerar(
         tipo=DocumentoTipo.OFICIO,
-        formato=DocumentoFormato.PDF,
+        formato=formato,
         payload=payload,
         reference=reference,
         docxtpl_context=docxtpl,
     )
     return doc.conteudo
+
+
+def gerar_oficio_prestacao_pdf(prestacao) -> bytes:
+    return gerar_oficio_prestacao_documento(prestacao, DocumentoFormato.PDF)
 
 
 @track_document_generation("prestacao_gerar_consolidado_pdf")

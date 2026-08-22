@@ -30,7 +30,13 @@ def _whatsapp_phone(servidor):
     return f"55{telefone}" if len(telefone) == 11 and telefone.isdigit() else ""
 
 
-def _anexo_assinado_info(anexos, *, tipo, anexar_url, prestacao_pk):
+def _anexo_assinado_info(anexos, *, tipo, anexar_url, prestacao_pk, ajustar_url=""):
+    """Estado do anexo assinado de um tipo, para o cartão da tela de documentos.
+
+    `ajustar_url` só é passado pelo ofício: é ele que recebe o carimbo do número de
+    solicitação, e é dele o botão de reposicionar. Vazio nos demais, e o cartão não
+    mostra o botão — despacho e comprovante não têm o que ajustar.
+    """
     atual = next(
         (anexo for anexo in reversed(list(anexos)) if anexo.tipo == tipo),
         None,
@@ -42,6 +48,7 @@ def _anexo_assinado_info(anexos, *, tipo, anexar_url, prestacao_pk):
             "nome_original": "",
             "view_url": "",
             "remover_url": "",
+            "ajustar_url": "",
         }
     return {
         "assinado": True,
@@ -55,6 +62,7 @@ def _anexo_assinado_info(anexos, *, tipo, anexar_url, prestacao_pk):
             "prestacoes_contas:prestacao_documento_delete",
             args=[prestacao_pk, atual.pk],
         ),
+        "ajustar_url": ajustar_url,
     }
 
 
@@ -356,6 +364,8 @@ def apresentar_prestacao_servidor_card(
         "finalizada": ps.finalizada,
         "arquivar_url": reverse("prestacoes_contas:prestacao_servidor_arquivar", args=[ps.pk]),
         "finalizar_url": reverse("prestacoes_contas:prestacao_servidor_finalizar", args=[ps.pk]),
+        "downloads_url": reverse("prestacoes_contas:prestacao_downloads", args=[ps.pk]),
+        "downloads_picker_id": f"prestacao-downloads-{ps.pk}",
         # Os gatilhos de menu do `_prestacao_card_body.html` apontam para cá (PF-04).
         "menus_url": menus_src,
         "servidores": [servidor],

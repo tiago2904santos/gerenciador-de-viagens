@@ -156,6 +156,50 @@
     });
   }
 
+  function urlsDoItem(item, origem) {
+    if (item.versoes) return item.versoes[origem] || {};
+    return item.urls || {};
+  }
+
+  function atualizarDisponibilidade(raiz, dados) {
+    var origem = selecionado(raiz, "origem") || "original";
+    var formatos = raiz.querySelectorAll('input[name$="-formato"]');
+    formatos.forEach(function (radio) {
+      radio.disabled = !dados.itens.some(function (item) {
+        return Boolean(urlsDoItem(item, origem)[radio.value]);
+      });
+    });
+    var formatoAtual = raiz.querySelector('input[name$="-formato"]:checked');
+    if (formatoAtual && formatoAtual.disabled) {
+      var primeiro = raiz.querySelector('input[name$="-formato"]:not(:disabled)');
+      if (primeiro) primeiro.checked = true;
+    }
+    var formato = selecionado(raiz, "formato") || "pdf";
+    raiz.querySelectorAll("[data-download-picker-item]").forEach(function (caixa) {
+      var item = dados.itens[Number(caixa.getAttribute("data-download-picker-item"))];
+      var disponivel = Boolean(urlsDoItem(item, origem)[formato]);
+      if (caixa.disabled && disponivel) caixa.checked = true;
+      caixa.disabled = !disponivel;
+      if (!disponivel) caixa.checked = false;
+      var linha = caixa.closest(".download-picker__item");
+      if (linha) linha.setAttribute("data-disabled", disponivel ? "false" : "true");
+    });
+  }
+
+  function urlCompilado(dados, formato, origem, escolhidos) {
+    var base = dados.compilado;
+    if (typeof base !== "string") {
+      base = base[origem] ? base[origem][formato] : base[formato];
+    }
+    if (!base) return "";
+    if (!dados.compilado_aceita_itens) return base;
+    var separador = base.indexOf("?") === -1 ? "?" : "&";
+    return base + separador
+      + "formato=" + encodeURIComponent(formato)
+      + "&origem=" + encodeURIComponent(origem)
+      + "&itens=" + encodeURIComponent(escolhidos.map(function (item) { return item.id; }).join(","));
+  }
+
   function mostrarErro(raiz, mensagem) {
     var alvo = raiz.querySelector("[data-download-picker-error]");
     if (!alvo) return;
@@ -166,6 +210,7 @@
   function processar(raiz, dados) {
     var formato = selecionado(raiz, "formato") || "pdf";
     var saida = selecionado(raiz, "saida") || "separados";
+    var origem = selecionado(raiz, "origem") || "original";
     var fila = raiz.querySelector("[data-download-picker-queue]");
     var confirmar = raiz.querySelector("[data-download-picker-confirm]")
       || raiz.closest("dialog").querySelector("[data-download-picker-confirm]");
@@ -184,10 +229,15 @@
        navegador recebe um download só. Fundir aqui exigiria um motor de PDF no
        cliente para refazer o que o `modo=compilado` já faz. */
     var tarefas = saida === "compilado"
-      ? [{ titulo: "Documento compilado", url: dados.compilado[formato] }]
+      ? [{ titulo: "Documento compilado", url: urlCompilado(dados, formato, origem, escolhidos) }]
       : escolhidos.map(function (item) {
-        return { titulo: item.titulo, url: item.urls[formato] };
+        return { titulo: item.titulo, url: urlsDoItem(item, origem)[formato] };
       });
+
+    if (tarefas.some(function (tarefa) { return !tarefa.url; })) {
+      mostrarErro(raiz, "Esta combinação de origem e formato não está disponível.");
+      return;
+    }
 
     fila.textContent = "";
     fila.hidden = false;
@@ -222,11 +272,21 @@
     }).then(function (dados) {
       /* Um documento só: não há o que escolher, e abrir o diálogo seria um
          clique a mais para marcar a única caixa disponível. */
-      if (dados.unico) {
+      if (dados.unico && !dados.sempre_escolher) {
         var unico = dados.itens[0];
         return baixarUm(unico.urls.pdf, unico.titulo);
       }
       montarLista(raiz, dados);
+      var origem = raiz.querySelector("[data-download-picker-origin]");
+      if (origem) origem.hidden = !dados.origens;
+      var assinado = raiz.querySelector('input[name$="-origem"][value="assinado"]');
+      if (assinado) {
+        assinado.disabled = !dados.itens.some(function (item) {
+          return item.versoes && Object.keys(item.versoes.assinado || {}).length;
+        });
+      }
+      raiz._downloadPickerDados = dados;
+      atualizarDisponibilidade(raiz, dados);
       raiz.querySelector("[data-download-picker-queue]").hidden = true;
       mostrarErro(raiz, "");
       dialogo.showModal();
@@ -234,7 +294,15 @@
       if (confirmar && !confirmar.hasAttribute("data-download-picker-bound")) {
         confirmar.setAttribute("data-download-picker-bound", "");
         confirmar.addEventListener("click", function () {
-          processar(raiz, dados);
+          processar(raiz, raiz._downloadPickerDados);
+        });
+      }
+      if (!raiz.hasAttribute("data-download-picker-options-bound")) {
+        raiz.setAttribute("data-download-picker-options-bound", "");
+        raiz.addEventListener("change", function (evento) {
+          if (!evento.target.matches('input[type="radio"]')) return;
+          atualizarDisponibilidade(raiz, raiz._downloadPickerDados);
+          mostrarErro(raiz, "");
         });
       }
       return null;

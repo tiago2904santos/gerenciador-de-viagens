@@ -68,6 +68,17 @@
               value="{{ servidor.numero_solicitacao }}"
             >
 
+            <c-v2.date_picker
+              mode="range"
+              picker_id="prestacao-periodo-picker-{{ servidor.ps_pk }}"
+              button_label="Período"
+              trigger_aria_label="Definir período das diárias de {{ servidor.name }}"
+              start_hidden_name="ps-{{ servidor.ps_pk }}-data_liberacao_diarias"
+              end_hidden_name="ps-{{ servidor.ps_pk }}-prazo_limite_saque"
+              :start_hidden_value="servidor.data_liberacao_diarias"
+              :end_hidden_value="servidor.prazo_limite_saque"
+              :show_summary="False"
+            />
           </form>
 
           <div class="person-row__body">
@@ -82,45 +93,6 @@
           </div>
 
           <div class="person-row__actions">
-            <form
-              method="post"
-              action="{% url 'prestacoes_contas:index' %}"
-              class="prestacao-row__period-form"
-              data-autosave="true"
-              data-autosave-model="prestacao_servidor"
-              data-autosave-step="lista"
-              data-autosave-url="{{ servidor.solicitacao_autosave_url }}"
-              data-autosave-object-id="{{ servidor.ps_pk }}"
-            >
-              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-              <input type="hidden" name="action" value="save_solicitacoes">
-              <c-v2.date_picker
-                mode="range"
-                picker_id="prestacao-periodo-picker-{{ servidor.ps_pk }}"
-                button_label="Período"
-                trigger_aria_label="Definir período das diárias de {{ servidor.name }}"
-                start_hidden_name="ps-{{ servidor.ps_pk }}-data_liberacao_diarias"
-                end_hidden_name="ps-{{ servidor.ps_pk }}-prazo_limite_saque"
-                :start_hidden_value="servidor.data_liberacao_diarias"
-                :end_hidden_value="servidor.prazo_limite_saque"
-                :show_summary="False"
-              />
-            </form>
-
-            <button
-              type="button"
-              class="icon-button"
-              aria-label="Abrir opções de documentos de {{ servidor.name }}"
-              data-tooltip="Baixar documentos"
-              aria-haspopup="true"
-              aria-expanded="false"
-              aria-controls="prestacao-docs-menu-{{ servidor.ps_pk }}"
-              data-overlay-trigger
-              data-overlay-kind="menu"
-              data-overlay-target="prestacao-docs-menu-{{ servidor.ps_pk }}"
-              data-overlay-src="{{ card.menus_url }}"
-            >{% icone_svg "folder" %}</button>
-
             {% comment %}
               Os seis `data-wa-*` são os campos da mensagem que
               `prestacoes-diaria-wa.js` monta antes de abrir o WhatsApp.
@@ -188,6 +160,11 @@
   <c-slot name="actions">
     <c-v2.icon_button icon="edit" :href="card.rt_url" aria_label="Abrir prestação na etapa 1" tooltip="Abrir prestação" />
 
+    <c-v2.download_picker
+      :picker_id="card.downloads_picker_id"
+      :src="card.downloads_url"
+    />
+
     {% comment %}
       Uma única ação reúne ofício assinado, despacho, diário de bordo, relatório
       técnico e comprovante. O payload semântico é consumido pelo modal comum.
@@ -201,9 +178,9 @@
       data-attach-signed-reopen-key="prestacao-documentos-{{ card.ps_pk }}"
       data-attach-signed-accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
       data-attach-signed-file-description="um arquivo em PDF, PNG ou JPEG"
-      data-attach-signed-file-help="Selecione um único arquivo em PDF, PNG, JPG ou JPEG."
+      data-attach-signed-file-help="Selecione um arquivo por tipo. As escolhas são mantidas ao trocar de aba."
       data-attach-signed-choose-label="Escolher arquivo"
-      data-attach-signed-upload-label="Anexar arquivo"
+      data-attach-signed-upload-label="Anexar arquivos"
       data-attach-signed-kinds="{{ card.attach_kinds_json }}"
     >{% icone_svg "sign" %}</button>
 

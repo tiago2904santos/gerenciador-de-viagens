@@ -7,6 +7,7 @@ from django.utils.html import escape
 
 from core.tenancy import filter_queryset_by_area, get_current_area
 from core.presenters.text import join_non_empty
+from core.retorno import com_next
 from core.utils.masks import format_protocolo
 
 from .forms import CAMPOS_COM_MODELO, CAMPOS_CUSTEIO_COM_OUTRO
@@ -70,7 +71,7 @@ def _periodo_display(oficio) -> str:
         return ""
 
 
-def _build_campos_modelo(form) -> list:
+def _build_campos_modelo(form, *, return_url="") -> list:
     """Para cada campo de texto longo: select de modelos + textarea + URL de gerência."""
     base_url = reverse("prestacoes_contas:modelos_index")
     campos = []
@@ -82,7 +83,7 @@ def _build_campos_modelo(form) -> list:
                 "label": label,
                 "select": select,
                 "textarea": form[campo],
-                "manage_url": f"{base_url}#grupo-{campo}",
+                "manage_url": f"{com_next(base_url, return_url)}#grupo-{campo}",
                 "tem_modelos": select.field.queryset.exists(),
                 "section_id": f"rt-topic-{campo}-title",
             }

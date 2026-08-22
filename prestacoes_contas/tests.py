@@ -129,6 +129,25 @@ class RelatorioTecnicoDiariaTests(TestCase):
         self.assertEqual(relatorio.combustivel, "Cartão Prime")
         self.assertEqual(relatorio.passagem, "Não houve")
 
+    def test_link_de_modelos_preserva_retorno_para_o_relatorio(self):
+        oficio = Oficio.objects.create(
+            area=area_de_teste(),
+            numero=2,
+            ano=2026,
+            protocolo="987654321",
+        )
+        oficio.servidores.add(self.servidor_a)
+        prestacao = PrestacaoContas.objects.get(oficio=oficio)
+        ps = prestacao.servidores_prestacao.get(servidor=self.servidor_a)
+        rt_url = reverse("prestacoes_contas:rt_servidor", args=[ps.pk])
+
+        response = self.client.get(rt_url)
+
+        manage_url = response.context["campos_modelo"][0]["manage_url"]
+        self.assertIn("next=%2Fprestacoes-contas%2Fservidor-prestacao%2F", manage_url)
+        self.assertIn(f"%2F{ps.pk}%2Frt%2F", manage_url)
+        self.assertTrue(manage_url.endswith("#grupo-motivo"))
+
     def test_salvar_oficio_sincroniza_prestacoes_para_equipe_existente(self):
         oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=2,
@@ -312,6 +331,61 @@ class PrestacaoServidorDiariaOverrideTests(TestCase):
         self.assertEqual(
             servidor["pacote_url"],
             reverse("prestacoes_contas:consolidado_download", args=[self.ps_a.pk]),
+        )
+
+    def test_card_oferece_seletor_consolidado_de_downloads_no_rodape(self):
+        card = apresentar_prestacao_servidor_card(self.ps_a)
+
+        self.assertEqual(
+            card["downloads_url"],
+            reverse("prestacoes_contas:prestacao_downloads", args=[self.ps_a.pk]),
+        )
+        response = self.client.get(reverse("prestacoes_contas:index"))
+        self.assertContains(response, 'aria-label="Escolher documentos para baixar"')
+        self.assertContains(response, f'id="prestacao-downloads-{self.ps_a.pk}"')
+
+    def test_downloads_lista_origens_e_disponibilidade_por_documento(self):
+        DiarioBordo.objects.create(prestacao=self.prestacao)
+        PrestacaoDocumentoAnexo.objects.create(
+            prestacao=self.prestacao,
+            servidor_prestacao=self.ps_a,
+            tipo=PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO,
+            arquivo=SimpleUploadedFile("rt.pdf", b"%PDF-1.4\n%%EOF", content_type="application/pdf"),
+            nome_original="rt.pdf",
+        )
+
+        response = self.client.get(
+            reverse("prestacoes_contas:prestacao_downloads", args=[self.ps_a.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertTrue(payload["sempre_escolher"])
+        self.assertEqual(
+            [origem["value"] for origem in payload["origens"]],
+            ["original", "assinado"],
+        )
+        itens = {item["id"]: item for item in payload["itens"]}
+        self.assertEqual(set(itens["oficio"]["versoes"]["original"]), {"pdf", "docx"})
+        self.assertEqual(set(itens["diario"]["versoes"]["original"]), {"pdf"})
+        self.assertEqual(set(itens["rt"]["versoes"]["original"]), {"pdf", "docx"})
+        self.assertEqual(set(itens["rt"]["versoes"]["assinado"]), {"pdf"})
+        self.assertNotIn("comprovante", itens)
+
+    @mock.patch("prestacoes_contas.download_views.compilar_download", return_value=b"pacote")
+    def test_download_compilado_recebe_somente_itens_marcados(self, compilar):
+        response = self.client.get(
+            reverse("prestacoes_contas:prestacao_download_compilado", args=[self.ps_a.pk]),
+            {"formato": "docx", "origem": "original", "itens": "oficio,rt,invalido"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"pacote")
+        compilar.assert_called_once_with(
+            mock.ANY,
+            origem="original",
+            formato="docx",
+            escolhidos=["oficio", "rt"],
         )
 
     def test_card_expoe_quantidade_persistida_de_diarias(self):
@@ -569,17 +643,17 @@ class PrestacaoAssinadoUploadTests(TestCase):
         )
 
     def test_lista_exibe_uploads_assinados_conforme_o_papel(self):
-        """O item de anexar assinados migrou para o menu sob demanda (`PF-04`).
+        """O anexo consolidado fica no rodapé, sem menu duplicado por servidor.
 
-        O modal e o seletor de tipo continuam na lista — são um por página. O item
-        que os dispara é que passou a vir de `prestacoes_contas:card_menus`, um
-        fragmento por card, e é lá que este teste foi conferir.
+        O modal e o seletor de tipo continuam na lista — são um por página. O
+        fragmento sob demanda da linha serve somente ao aviso de WhatsApp.
         """
         response = self.client.get(reverse("prestacoes_contas:index"))
 
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "Anexar RT assinado")
         self.assertNotContains(response, "Anexar diário assinado")
+        self.assertNotContains(response, "Abrir opções de documentos de")
 
         fragmentos = [
             self.client.get(
@@ -589,9 +663,9 @@ class PrestacaoAssinadoUploadTests(TestCase):
         ]
         self.assertEqual(len(fragmentos), 2)
         for fragmento in fragmentos:
-            self.assertContains(fragmento, "Anexar documentos assinados", count=1)
-            self.assertNotContains(fragmento, "Anexar RT assinado")
-            self.assertNotContains(fragmento, "Anexar diário assinado")
+            self.assertNotContains(fragmento, "prestacao-docs-menu-")
+            self.assertNotContains(fragmento, "data-attach-signed-trigger")
+            self.assertContains(fragmento, "diaria-wa-menu-", count=1)
         # `H-03`: era medido pelo nome dos atributos ordinais
         # (`...-secondary-url`, `...-tertiary-option-label`). O contrato de
         # verdade é *quais* documentos a ação única do card oferece e com que
@@ -610,8 +684,13 @@ class PrestacaoAssinadoUploadTests(TestCase):
                 ],
             )
             self.assertEqual(len({kind["url"] for kind in payload}), 5)
-        for fragmento in fragmentos:
-            self.assertContains(fragmento, "data-attach-signed-kinds", count=1)
+        self.assertContains(response, "data-attach-signed-kinds", count=2)
+        self.assertContains(response, "Anexar arquivos", count=2)
+        self.assertContains(
+            response,
+            "As escolhas são mantidas ao trocar de aba.",
+            count=2,
+        )
         self.assertContains(response, "data-attach-signed-kind-selector", count=1)
         self.assertContains(response, "Anexar documentos assinados", count=4)
         self.assertNotContains(response, "Anexar despacho assinado")

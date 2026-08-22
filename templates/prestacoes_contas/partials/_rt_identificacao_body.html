@@ -1,6 +1,14 @@
-<div class="fact-list" aria-label="Dados administrativos">
-  <c-v2.fact label="Número do ofício" :value="identificacao.numero" />
-  <c-v2.fact label="Protocolo" :value="identificacao.protocolo" />
-  <c-v2.fact label="Destino" :value="identificacao.destino" />
-  <c-v2.fact label="Período da viagem" :value="identificacao.periodo" />
+<div class="fact-list fact-list--band-4 prestacao-identificacao-facts" aria-label="Dados administrativos">
+  <c-v2.form_block aria_label="Número do ofício" surface="rail">
+    <c-slot name="body"><c-v2.fact label="Número do ofício" :value="identificacao.numero" /></c-slot>
+  </c-v2.form_block>
+  <c-v2.form_block aria_label="Protocolo" surface="rail">
+    <c-slot name="body"><c-v2.fact label="Protocolo" :value="identificacao.protocolo" /></c-slot>
+  </c-v2.form_block>
+  <c-v2.form_block aria_label="Destino" surface="rail">
+    <c-slot name="body"><c-v2.fact label="Destino" :value="identificacao.destino" /></c-slot>
+  </c-v2.form_block>
+  <c-v2.form_block aria_label="Período da viagem" surface="rail">
+    <c-slot name="body"><c-v2.fact label="Período da viagem" :value="identificacao.periodo" /></c-slot>
+  </c-v2.form_block>
 </div>

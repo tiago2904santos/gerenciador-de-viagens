@@ -1,7 +1,7 @@
-"""Menus de ação de um card de prestação, servidos sob demanda (`PF-04`).
+"""Menu de aviso de um card de prestação, servido sob demanda (`PF-04`).
 
-Duas famílias por servidor — baixar documentos e o aviso de liberação por
-WhatsApp —, ambas com `hidden` no HTML inicial.
+Os documentos usam a ação consolidada do rodapé; somente o aviso de liberação
+por WhatsApp permanece sob demanda e oculto no HTML inicial.
 
 Este domínio não tinha selector de registro único: a lista sempre pediu página
 inteira. `get_servidor_prestacao_by_id` nasceu aqui, reusando

@@ -9,6 +9,14 @@
   actions_label="Ações do documento"
 >
   <c-slot name="actions">
+    {% comment %}
+      Só o ofício traz `ajustar_url`: é nele que o número de solicitação é carimbado.
+      O botão aparece depois que há documento assinado — sem PDF anexado não há o que
+      reposicionar.
+    {% endcomment %}
+    {% if doc.ajustar_url and doc.assinado %}
+      <c-v2.button label="Ajustar posição" icon="edit" variant="secondary" size="sm" :href="doc.ajustar_url" />
+    {% endif %}
     <c-v2.attach_signed_button
       :url="doc.anexar_url"
       :doc_label="title"

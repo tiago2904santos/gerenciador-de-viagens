@@ -31,10 +31,12 @@ from .document_views import (
     documentos,
     documentos_servidor,
     prestacao_arquivo_autosave,
+    prestacao_carimbo_ajustar,
     prestacao_despacho_assinado_anexar,
     prestacao_documento_conteudo,
     prestacao_documento_excluir,
     prestacao_oficio_assinado_anexar,
+    prestacao_oficio_assinado_cru,
     prestacao_servidor_arquivo_autosave,
     prestacao_servidor_assinado_anexar,
 )
@@ -42,6 +44,9 @@ from .model_views import modelo_editar
 from .model_views import modelo_excluir
 from .model_views import modelo_novo
 from .model_views import modelos_index
+from .download_views import prestacao_download_assinado
+from .download_views import prestacao_download_compilado
+from .download_views import prestacao_downloads
 from .assinatura_services import AssinaturaError
 from .assinatura_services import assinatura_db
 from .assinatura_services import assinatura_rt

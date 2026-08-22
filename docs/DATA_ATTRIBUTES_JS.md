@@ -7,7 +7,7 @@ que ele publica em `window.CV`. Não altera regra de negócio.
 
 Este documento cobre `static/js/core/`, `static/js/components/` e os motores de raiz — o código que
 qualquer tela pode acionar. **Não** indexa os atributos de uma página só (`static/js/pages/`): são
-**141** deles, cada um com um único consumidor, e a documentação certa para esses é o próprio
+**147** deles, cada um com um único consumidor, e a documentação certa para esses é o próprio
 módulo da página.
 
 A regra que decide: se o atributo aparece num motor compartilhado, ele está aqui. Isso é verificado
@@ -319,6 +319,25 @@ Depois de inserir DOM dinamicamente:
 ```javascript
 window.CV.fields.init(panelElement);
 ```
+
+## Posicionar sobre um PDF — `components/pdf-place.js`
+
+Sem atributos: recebe os elementos por parâmetro, e por isso não aparece nos gates de
+`data-*`. Duas telas o usam — a assinatura eletrônica (`pages/prestacoes-assinatura.js`) e
+o ajuste do carimbo do número de solicitação (`pages/prestacoes-carimbo.js`).
+
+Não entra no bundle do shell: depende do `pdfjsLib`, que só essas duas telas carregam.
+
+| API | Uso |
+|---|---|
+| `CV.pdfPlace.visualizador({url, workerSrc, canvas, stage, viewer, pageLabel, btnPrev, btnNext, onPagina, onErro})` | Renderiza o PDF em canvas e navega entre páginas. `onPagina` recebe o índice em BASE ZERO |
+| `CV.pdfPlace.caixaArrastavel({caixa, alca, stage, aspecto, larguraMinima, onMudou})` | Move e redimensiona uma caixa presa ao palco, mantendo o aspecto |
+| `.posicionar(esquerda, topo, largura, altura, silencioso)` | Coloca a caixa. `silencioso` NÃO dispara `onMudou` — é o que o posicionamento programático usa, para não gravar posição a partir de um palco ainda sem medida |
+| `.fracoes()` | `{x, y, largura, altura}` como frações da página, origem no topo-esquerdo |
+
+Essa convenção de coordenadas é a mesma de `documentos/services/pdf_overlay.py`, que
+desenha do outro lado. Converter num lugar só é o que evita o sinal trocado no eixo Y
+reaparecer a cada tela nova.
 
 ## Outros motores compartilhados
 

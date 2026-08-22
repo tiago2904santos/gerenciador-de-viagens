@@ -32,9 +32,18 @@ class ServidorComponentesV2SourceTests(TestCase):
             '<c-v2.form_field :field="form.nome" extra_class="field-grid__span-all" />',
             identificacao,
         )
-        self.assertIn('class="field-grid field-grid--cols-2"', identificacao)
         self.assertIn('data-rg-field-wrap', identificacao)
         self.assertNotIn('class="field-grid field-grid--cols-4"', identificacao)
+
+        # CPF, RG e telefone são IRMÃOS na grade de três colunas, e não dois deles
+        # espremidos numa grade aninhada. A aninhada dava a cada um metade da largura do
+        # telefone, embora os três sejam o mesmo tipo de campo — número curto de
+        # identificação. Sem esta linha o aninhamento volta sem ninguém notar: ele não
+        # quebra nada, só desalinha.
+        self.assertNotIn('class="field-grid field-grid--cols-2"', identificacao)
+        for campo in ("form.cpf", "form.rg", "form.telefone"):
+            with self.subTest(campo=campo):
+                self.assertIn(f'<c-v2.form_field :field="{campo}" />', identificacao)
 
     def test_campos_relacionais_usam_componentes_especializados_v2(self):
         identificacao = (

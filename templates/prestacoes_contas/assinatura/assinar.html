@@ -5,10 +5,11 @@
 
 {% block content %}
   {% comment %}
-    Assinar — a única tela do sistema com um visualizador de PDF em canvas e uma
-    assinatura arrastável. Esse miolo continua sendo dela: `asgn-viewer`,
-    `asgn-stage`, `asgn-drag` e a folha de criação (`asgn-sheet`) não têm par no
-    v2 porque não há segunda tela que faça isso.
+    Assinar — visualizador de PDF em canvas com uma assinatura arrastável. O miolo
+    do visualizador e do arraste saiu daqui para `js/components/pdf-place.js` quando
+    o ajuste do carimbo do número de solicitação passou a fazer a mesma coisa; o que
+    sobrou de próprio é a folha de criação da assinatura (`asgn-sheet`), que não tem
+    par em lugar nenhum.
 
     O que MUDOU na migração: a caixa, os avisos, os campos e todos os botões
     passaram a ser os do sistema. Onde havia `asgn-btn`, `asgn-alert`,
@@ -132,5 +133,11 @@
 
 {% block body_js %}
   <script src="{{ pdfjs_src }}"></script>
+  {% comment %}
+    `pdf-place.js` ANTES da página: ele publica `CV.pdfPlace`, que o script da tela
+    procura na primeira linha. Fica fora do bundle do shell de propósito — só duas telas
+    mostram PDF em canvas, e carregá-lo em todas custaria a todo mundo.
+  {% endcomment %}
+  <script src="{% static 'js/components/pdf-place.js' %}" defer></script>
   <script src="{% static 'js/pages/prestacoes-assinatura.js' %}" defer></script>
 {% endblock %}

@@ -5,6 +5,13 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_js %}
+  {% comment %}
+    O motor do seletor de download, como em `termos/index.html`. O cartão de prestação
+    monta o gatilho e o diálogo (`c-v2.download_picker`), mas quem escuta o clique é
+    este arquivo, por delegação no `document` — sem ele o botão renderiza e não faz
+    nada, sem erro nenhum no console.
+  {% endcomment %}
+  <script src="{% static 'js/components/download-queue.js' %}" defer></script>
   <script src="{% static 'js/pages/prestacoes-diaria-wa.js' %}" defer></script>
 {% endblock %}
 

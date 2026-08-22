@@ -1,10 +1,17 @@
 {% comment %}
   Identificação do servidor. O RG tem invólucro próprio (`data-rg-field-wrap`):
-  `servidores-form.js` o esconde quando "sem RG" está marcado.
+  `components/card-toggle.js` o esconde quando "sem RG" está marcado.
+
+  CPF, RG e telefone ficam LADO A LADO, cada um numa coluna inteira da grade. Antes o
+  CPF e o RG moravam numa grade de duas colunas ANINHADA, que ocupava uma única coluna
+  da externa: os dois saíam com metade da largura do telefone, embora os três sejam a
+  mesma coisa — um número curto de identificação. O cargo passou para a linha dele por
+  consequência, e ganhou com isso: o nome da unidade vinha cortado em um terço da
+  largura ("POLÍ…").
 {% endcomment %}
 <div class="field-grid field-grid--cols-3">
   <c-v2.form_field :field="form.nome" extra_class="field-grid__span-all" />
-  <c-v2.field :label="form.cargo.label" :label_for="form.cargo.id_for_label" :error="form.cargo.errors.0">
+  <c-v2.field :label="form.cargo.label" :label_for="form.cargo.id_for_label" :error="form.cargo.errors.0" extra_class="field-grid__span-all">
     <c-slot name="control">
       <c-v2.select_with_action
         :field="form.cargo"
@@ -16,11 +23,9 @@
       />
     </c-slot>
   </c-v2.field>
-  <div class="field-grid field-grid--cols-2">
-    <c-v2.form_field :field="form.cpf" />
-    <div data-rg-field-wrap>
-      <c-v2.form_field :field="form.rg" />
-    </div>
+  <c-v2.form_field :field="form.cpf" />
+  <div data-rg-field-wrap>
+    <c-v2.form_field :field="form.rg" />
   </div>
   <c-v2.form_field :field="form.telefone" />
 </div>

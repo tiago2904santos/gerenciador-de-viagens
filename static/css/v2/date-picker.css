@@ -751,6 +751,24 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   white-space: nowrap;
 }
 
+/* Na linha de prestação, período e solicitação formam um único grupo
+   operacional sobre a superfície da pessoa. Ambos usam o degrau rail; o estado
+   preenchido continua indicado pela borda accent, sem trocar o fundo. */
+:is(html[data-theme])
+  .prestacao-row__form
+  .date-field
+  .travel-period-filter__btn,
+:is(html[data-theme])
+  .prestacao-row__form
+  .date-field.travel-period-filter--active
+  .travel-period-filter__btn,
+:is(html[data-theme])
+  .prestacao-row__form
+  .date-field.travel-period-filter--active
+  .travel-period-filter__btn:hover:not(:disabled) {
+  background: var(--surface-rail);
+}
+
 /* ---- o painel do calendário ----------------------------------------------
  *
  * O painel é transplantado para o `body` e perde os ancestrais, então a raiz

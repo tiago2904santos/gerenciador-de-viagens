@@ -84,7 +84,12 @@ def substituir_anexo_assinado(
     if not substituir_todos_do_tipo:
         anteriores = anteriores.filter(servidor_prestacao=servidor_prestacao)
 
-    arquivos_antigos = [anexo.arquivo for anexo in anteriores if anexo.arquivo]
+    arquivos_antigos = [
+        campo
+        for anexo in anteriores
+        for campo in (anexo.arquivo, anexo.arquivo_original)
+        if campo
+    ]
     substituidos = anteriores.count()
     anteriores.delete()
 
@@ -114,9 +119,12 @@ def excluir_anexo(anexo, prestacao) -> ResultadoAnexo:
     virou consequência de onde a chamada está.
     """
     servidor_prestacao = anexo.servidor_prestacao
-    campo_arquivo = anexo.arquivo if anexo.arquivo else None
+    # Os DOIS arquivos: o entregue e o cru de onde o carimbo parte. Esquecer o cru
+    # deixaria órfão o PDF do eProtocolo, que é o maior dos dois.
+    campos = [campo for campo in (anexo.arquivo, anexo.arquivo_original) if campo]
     anexo.delete()
-    _apagar_arquivo_apos_commit(campo_arquivo)
+    for campo_arquivo in campos:
+        _apagar_arquivo_apos_commit(campo_arquivo)
 
     if servidor_prestacao is not None:
         marcar_servidor_em_preenchimento(servidor_prestacao)
