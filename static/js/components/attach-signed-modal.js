@@ -59,6 +59,7 @@
     var nextInput = modal.querySelector("[data-attach-signed-next]");
     var currentBlock = modal.querySelector("[data-attach-signed-current]");
     var currentName = modal.querySelector("[data-attach-signed-current-name]");
+    var currentMeta = modal.querySelector("[data-attach-signed-current-meta]");
     var currentOpen = modal.querySelector("[data-attach-signed-current-open]");
     var kindSelector = modal.querySelector("[data-attach-signed-kind-selector]");
     var kindOptions = modal.querySelector("[data-attach-signed-kind-options]");
@@ -104,6 +105,7 @@
     /* Tipos do gatilho ativo, já sem os que não têm URL de upload — um documento
      * sem `anexar_url` não é anexável e nunca deve virar botão. */
     var kindsAtivos = [];
+    var documentoAtual = null;
 
     function documentData(kind) {
       var achado = kindsAtivos.filter(function (item) {
@@ -130,6 +132,31 @@
         : base + window.location.hash;
     }
 
+    /* O arquivo persistido ocupa a própria linha de resultado do picker. Ao
+       escolher uma substituição, o `file-picker.js` passa a controlar o nome e
+       estas ações somem; ao limpar a seleção, o anexo atual volta para a mesma
+       linha, sem criar um segundo card abaixo do campo. */
+    function sincronizarDocumentoAtual() {
+      if (!currentName) return;
+      var temSelecao = !!(
+        fileInput && fileInput.files && fileInput.files.length
+      );
+      var temAtual = !!(documentoAtual && documentoAtual.currentName);
+      var mostrarAtual = temAtual && !temSelecao;
+
+      if (!temSelecao) {
+        currentName.textContent = temAtual
+          ? documentoAtual.currentName
+          : currentName.getAttribute("data-default-label") || "Nenhum arquivo selecionado";
+        currentName.classList.toggle(
+          "prestacao-file-picker__value--selected",
+          temAtual
+        );
+      }
+      if (currentBlock) currentBlock.hidden = !mostrarAtual;
+      if (currentMeta) currentMeta.hidden = !mostrarAtual;
+    }
+
     function selectDocument(kind, clearFile) {
       var data = documentData(kind);
       if (!data || !data.url || !form) return;
@@ -137,10 +164,10 @@
 
       form.setAttribute("action", data.url);
       if (label) label.textContent = data.label;
+      documentoAtual = data;
       currentRemoveUrl = data.currentRemoveUrl;
-      if (currentBlock) currentBlock.hidden = !data.currentName;
-      if (currentName) currentName.textContent = data.currentName;
       if (currentOpen) currentOpen.setAttribute("href", data.currentViewUrl || "#");
+      sincronizarDocumentoAtual();
       updateReturnUrl(kind);
 
       if (!kindOptions) return;
@@ -181,6 +208,7 @@
     function closeModal() {
       window.CV.overlay.closeDialog(modal);
       activeTrigger = null;
+      documentoAtual = null;
       currentRemoveUrl = "";
       clearSelectedFile();
       limparErro();
@@ -330,11 +358,18 @@
         selectDocument(kindButton.getAttribute("data-attach-signed-kind"), true);
       }
     }
+    function onFilePickerChange(event) {
+      if (event.target && event.target.closest("[data-file-picker]")) {
+        sincronizarDocumentoAtual();
+      }
+    }
     document.addEventListener("click", onDocumentClick);
+    modal.addEventListener("cv:file-picker:change", onFilePickerChange);
     instancias.push({
       root: modal,
       desmontar: function () {
         document.removeEventListener("click", onDocumentClick);
+        modal.removeEventListener("cv:file-picker:change", onFilePickerChange);
         modal.removeAttribute(BOUND);
       },
     });

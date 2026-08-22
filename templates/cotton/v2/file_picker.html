@@ -1,4 +1,4 @@
-{% cotton:vars accept action_label empty_label field_id field_name required single upload_label %}
+{% cotton:vars accept action_label current_attachment empty_label field_id field_name required single upload_label %}
 {% comment %}
   File picker v2 — escolher arquivo, ver o escolhido, anexar. Par de
   `static/css/v2/file-picker.css`.
@@ -67,12 +67,38 @@
     </li>
 
     <li class="file-picker__row">
-      <span
-        class="file-picker__name"
-        data-file-picker-name
-        data-default-label="{{ empty_label|default:'Nenhum arquivo selecionado' }}"
-      >{{ empty_label|default:"Nenhum arquivo selecionado" }}</span>
+      <span class="file-picker__copy">
+        <strong
+          class="file-picker__name"
+          data-file-picker-name
+          {% if current_attachment %}data-attach-signed-current-name{% endif %}
+          data-default-label="{{ empty_label|default:'Nenhum arquivo selecionado' }}"
+        >{{ empty_label|default:"Nenhum arquivo selecionado" }}</strong>
+        {% if current_attachment %}
+          <small class="file-picker__meta" data-attach-signed-current-meta hidden>Arquivo anexado</small>
+        {% endif %}
+      </span>
       <span class="file-picker__actions" data-file-inline-actions hidden></span>
+      {% if current_attachment %}
+        <span class="file-picker__actions attach-signed__current" data-attach-signed-current hidden>
+          <a
+            class="icon-button"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visualizar arquivo assinado"
+            data-tooltip="Visualizar"
+            data-attach-signed-current-open
+          >{% icone_svg "eye" %}</a>
+          <button
+            type="button"
+            class="icon-button"
+            data-tone="late"
+            aria-label="Remover arquivo assinado"
+            data-tooltip="Remover"
+            data-attach-signed-remove
+          >{% icone_svg "trash" %}</button>
+        </span>
+      {% endif %}
     </li>
   </ul>
 

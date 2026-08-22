@@ -11444,3 +11444,16 @@ O botão do rodapé tratava apenas o despacho, enquanto o modal do menu oferecia
 técnico, diário de bordo e comprovante; o ofício assinado ficava fora dessa ação. O cartão agora
 entrega ao modal único as cinco opções — ofício assinado, despacho, diário de bordo, relatório
 técnico e comprovante — preservando as rotas e os arquivos atuais de cada tipo.
+
+### NOVO-20260822-183751-82ba709dc205 ✅ RESOLVIDO · `NOVO` Arquivo assinado aparecia fora do seletor de upload · HT/JS · risco baixo
+
+O modal mostrava “Nenhum documento escolhido” dentro do seletor e renderizava o arquivo já
+anexado em um segundo card abaixo, separando dois estados do mesmo campo. O anexo persistido agora
+ocupa a linha principal do seletor, com nome, estado e ações de visualizar e remover. Ao escolher
+uma substituição, a mesma linha passa a representar o novo arquivo sem duplicar conteúdo.
+
+### NOVO-20260822-184452-a00c10904f98 ✅ RESOLVIDO · `NOVO` Input da solicitação usava a superfície fixa de campo · UI · risco baixo
+
+A regra específica do número da solicitação fixava o fundo em `--surface-field`, ignorando a
+superfície semântica do cartão em que o controle está inserido. O input agora consome `--surface`
+do contexto, mantendo as demais propriedades e o destaque independente da linha do motorista.

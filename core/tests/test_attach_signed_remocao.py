@@ -44,6 +44,9 @@ MODAL = (
     / "v2"
     / "attach_signed_modal.html"
 )
+FILE_PICKER = (
+    Path(settings.BASE_DIR) / "templates" / "cotton" / "v2" / "file_picker.html"
+)
 
 
 def _corpo_de(nome: str) -> str:
@@ -136,3 +139,30 @@ class RemocaoContinuaAcontecendoTests(SimpleTestCase):
         self.assertIn("window.CV.http.request(currentRemoveUrl", corpo)
         self.assertIn('method: "POST"', corpo)
         self.assertIn("window.location.reload()", corpo)
+
+
+class AnexoAtualIntegradoAoPickerTests(SimpleTestCase):
+    def test_modal_nao_renderiza_segunda_lista_para_o_anexo_atual(self):
+        modal = MODAL.read_text(encoding="utf-8")
+
+        self.assertIn(':current_attachment="True"', modal)
+        self.assertNotIn('class="person-list attach-signed__current"', modal)
+
+    def test_acoes_do_anexo_atual_moram_na_linha_principal_do_picker(self):
+        picker = FILE_PICKER.read_text(encoding="utf-8")
+        inicio_linha = picker.index('<li class="file-picker__row">')
+        fim_linha = picker.index("</li>", inicio_linha)
+        linha = picker[inicio_linha:fim_linha]
+
+        self.assertIn("data-file-picker-name", linha)
+        self.assertIn("data-attach-signed-current-name", linha)
+        self.assertIn("data-attach-signed-current", linha)
+        self.assertIn("data-attach-signed-current-open", linha)
+        self.assertIn("data-attach-signed-remove", linha)
+
+    def test_selecao_nova_oculta_temporariamente_as_acoes_do_anexo_atual(self):
+        corpo = _corpo_de("sincronizarDocumentoAtual")
+
+        self.assertIn("fileInput.files.length", corpo)
+        self.assertIn("currentBlock.hidden = !mostrarAtual", corpo)
+        self.assertIn("currentMeta.hidden = !mostrarAtual", corpo)

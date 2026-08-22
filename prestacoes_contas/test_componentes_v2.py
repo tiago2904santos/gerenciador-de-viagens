@@ -179,12 +179,13 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
             source,
         )
 
-    def test_solicitacao_usa_a_superficie_do_panel(self):
+    def test_solicitacao_usa_a_superficie_do_contexto(self):
         css = (ROOT / "static" / "css" / "v2" / "record.css").read_text(encoding="utf-8")
         regra = css[css.index(".prestacao-row__solicitacao") :]
         regra = regra[: regra.index("}")]
 
-        self.assertIn("background: var(--surface-field);", regra)
+        self.assertIn("background: var(--surface);", regra)
+        self.assertNotIn("background: var(--surface-field);", regra)
 
     def test_prestacoes_nao_chamam_componentes_visuais_anteriores_ao_v2(self):
         namespaces_legados = (

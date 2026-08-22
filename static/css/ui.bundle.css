@@ -4674,7 +4674,7 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 }
 
 :is(html[data-theme]) .prestacao-row__solicitacao {
-  background: var(--surface-field);
+  background: var(--surface);
   flex: 1 1 140px;
   min-width: 0;
 }

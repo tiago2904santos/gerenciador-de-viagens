@@ -29,7 +29,8 @@
   - `data-attach-signed-error`: remover o assinado é a única ação AJAX daqui, e sem
     esta faixa a falha não tinha onde aparecer (`NOVO-23`);
   - `data-attach-signed-current` + `-current-name` + `-current-open` + `-remove`:
-    o estado "já existe um assinado anexado", com visualizar e remover.
+    o estado "já existe um assinado anexado", com visualizar e remover, integrado
+    à linha principal do seletor de arquivo.
 
   Diferenças em relação ao legado, e só estas: a casca é o `c-v2.modal` (`<dialog>`
   nativo, com foco preso e Esc de graça), o erro usa o `alert` global no lugar do
@@ -87,40 +88,12 @@
           field_name="arquivo"
           accept="application/pdf,.pdf"
           :single="True"
+          :current_attachment="True"
           action_label="Escolher PDF"
           empty_label="Nenhum documento escolhido"
         />
 
         <p class="alert" data-tone="error" data-attach-signed-error hidden role="alert"></p>
-
-        <ul class="person-list attach-signed__current" data-attach-signed-current hidden>
-          <li class="person-row person-row--fact">
-            <div class="person-row__body">
-              <div class="person-row__name-row">
-                <span class="person-row__name" data-attach-signed-current-name></span>
-              </div>
-              <span class="person-row__meta">Arquivo anexado</span>
-            </div>
-            <div class="person-row__actions">
-              <a
-                class="icon-button"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Visualizar arquivo assinado"
-                data-tooltip="Visualizar"
-                data-attach-signed-current-open
-              >{% icone_svg "eye" %}</a>
-              <button
-                type="button"
-                class="icon-button"
-                data-tone="late"
-                aria-label="Remover arquivo assinado"
-                data-tooltip="Remover"
-                data-attach-signed-remove
-              >{% icone_svg "trash" %}</button>
-            </div>
-          </li>
-        </ul>
       </form>
     </div>
   </c-slot>

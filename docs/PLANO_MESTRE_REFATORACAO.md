@@ -733,3 +733,7 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       prestações, com edição das datas de liberação e vencimento no autosave existente
 - [x] `NOVO-20260822-183122-debe4728dc73` reúne no mesmo botão da prestação o ofício assinado,
       despacho, diário de bordo, relatório técnico e comprovante
+- [x] `NOVO-20260822-183751-82ba709dc205` integra o arquivo assinado existente à linha principal
+      do seletor de upload, sem renderizar um segundo card abaixo
+- [x] `NOVO-20260822-184452-a00c10904f98` faz o input da solicitação consumir a superfície
+      semântica do contexto em vez da superfície fixa de campo
