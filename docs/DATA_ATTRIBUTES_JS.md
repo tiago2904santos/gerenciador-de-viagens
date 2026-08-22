@@ -243,8 +243,8 @@ Raiz: `data-attach-signed-modal`, aberto por `data-attach-signed-trigger`.
 | Grupo | Atributos |
 |---|---|
 | Fluxo | `data-attach-signed-form`, `data-attach-signed-next`, `data-attach-signed-cancel`, `data-attach-signed-error`, `data-attach-signed-reopen-key` |
-| Tipo | `data-attach-signed-kind`, `data-attach-signed-kind-selector`, `data-attach-signed-kind-options`, `data-attach-signed-label` |
-| Arquivo atual | `data-attach-signed-current`, `data-attach-signed-current-name`, `data-attach-signed-current-open`, `data-attach-signed-remove` |
+| Tipo | `data-attach-signed-kind`, `data-attach-signed-kind-selector`, `data-attach-signed-kind-options`, `data-attach-signed-kind-status` (✓ no botão do tipo que já tem arquivo), `data-attach-signed-label` |
+| Arquivo atual | `data-attach-signed-current`, `data-attach-signed-current-name`, `data-attach-signed-current-meta` (metadados do anexo exibido), `data-attach-signed-current-open`, `data-attach-signed-remove` |
 | Upload | `data-attach-signed-file-description`, `data-attach-signed-file-help`, `data-file-upload-button`, `data-file-picker-action-label` |
 
 ## Linhas de localidade — `components/location-rows.js`
@@ -347,7 +347,7 @@ reaparecer a cada tela nova.
 | `data-cv-signature-card`, `data-cv-signature-link`, `data-cv-signature-copy`, `data-cv-signature-wa` | `components/signature-actions.js` | Cartão de assinatura: copiar link e enviar por WhatsApp |
 | `data-font-try`, `data-font-sample`, `data-font-try-current`, `data-font-weight-step`, `data-font-weight-current`, `data-font-try-reset` | `components/font-try.js` | Provador de fontes do UI Lab: reescreve `--font-sans` no `<html>` e a interface inteira troca de família, ao vivo. A pilha é lida da amostra vizinha (`data-font-sample`) por `getComputedStyle`, e não de um atributo do botão — gancho impresso com escape quebrava as aspas da pilha. Nada é gravado — recarregar volta ao padrão. Carregado só na galeria |
 | `data-fit-text`, `data-fit-text-min`, `data-fit-text-max` | `components/fit-text.js` | Texto que encolhe até caber em UMA linha, e só o necessário: o CSS declara o corpo ideal, o JS desce dali. `-min` é o piso (padrão 11px); `-max` é gravado pelo próprio motor no primeiro ajuste, para o texto voltar a crescer quando o bloco alargar. Reage a mudança de largura por `ResizeObserver` |
-| `data-download-picker`, `data-download-picker-trigger`, `data-download-picker-list`, `data-download-picker-item`, `data-download-picker-queue`, `data-download-picker-confirm`, `data-download-picker-error` | `components/download-queue.js` | Seletor de download do termo: o gatilho pergunta ao `data-src` o que existe (com um documento só, baixa direto), e a confirmação baixa em FILA, um arquivo de cada vez |
+| `data-download-picker`, `data-download-picker-trigger`, `data-download-picker-list`, `data-download-picker-item`, `data-download-picker-queue`, `data-download-picker-confirm`, `data-download-picker-close` (fecha o diálogo), `data-download-picker-origin` (fieldset Original/Assinado; some quando o payload não traz origens), `data-download-picker-error` | `components/download-queue.js` | Seletor de download do termo: o gatilho pergunta ao `data-src` o que existe (com um documento só, baixa direto), e a confirmação baixa em FILA, um arquivo de cada vez |
 | `data-map-focus-lat`, `data-map-focus-lng` | `pages/roteiros-map.js` | Centro inicial do mapa |
 | `data-oficio-glance-panel`, `data-oficio-glance-toggle`, `data-oficio-glance-toggle-label`, `data-oficio-sticky-header` | `pages/roteiros-wizard.js` | Painel de resumo do ofício no wizard de roteiro |
 

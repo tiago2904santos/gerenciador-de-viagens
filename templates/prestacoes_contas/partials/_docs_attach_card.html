@@ -15,7 +15,7 @@
       reposicionar.
     {% endcomment %}
     {% if doc.ajustar_url and doc.assinado %}
-      <c-v2.button label="Ajustar posição" icon="edit" variant="secondary" size="sm" :href="doc.ajustar_url" />
+      <c-v2.icon_button icon="edit" :href="doc.ajustar_url" aria_label="Ajustar posição" tooltip="Ajustar posição" />
     {% endif %}
     <c-v2.attach_signed_button
       :url="doc.anexar_url"

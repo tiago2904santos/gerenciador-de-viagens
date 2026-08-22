@@ -11584,3 +11584,29 @@ Os campos KM inicial e KM final eram renderizados pelo componente `input` v2, ma
 Django ainda emitiam a classe `cv-field__control`. Como o controle ficava aninhado no componente,
 a regra contextual do v2 não o alcançava e o estilo legado prevalecia. Os dois widgets agora usam
 diretamente `input__control`, igual aos demais campos de entrada do diário.
+
+### NOVO-20260822-213202-63a678d639f1 ✅ RESOLVIDO · `NOVO` Rodapé do diário duplicava ações de geração de arquivos · HT · risco baixo
+
+O rodapé repetia “Gerar XLSX” e “Gerar PDF” embora a própria tela já ofereça visualização e
+downloads no bloco do Diário de Bordo, e a etapa seguinte concentre os documentos. As duas ações
+redundantes foram removidas; permanecem somente o retorno ao relatório técnico e o avanço para
+Documentos.
+
+### NOVO-20260822-213623-ce10318c67c4 ✅ RESOLVIDO · `NOVO` Solicitação ficava separada do servidor e herdava input legado · HT/PY/CSS · risco baixo
+
+Na etapa Documentos, o número da solicitação ocupava uma linha inteira abaixo do servidor e o
+widget ainda emitia as classes legadas `form-control cv-field__control`. O campo agora integra as
+ações da própria `person-row`, usa `input__control` e mantém largura compacta na mesma linha; em
+telas estreitas ocupa uma faixa inteira abaixo dos dados da pessoa.
+
+### NOVO-20260822-214157-a0c51bdd9759 ✅ RESOLVIDO · `NOVO` Ajuste de posição destoava das ações circulares de documento · HT · risco baixo
+
+A ação “Ajustar posição” era um botão textual retangular dentro do cabeçalho do documento,
+enquanto as demais ações equivalentes usam botões circulares de ícone. A ação agora reutiliza
+`icon_button`, conservando o ícone de edição, a URL, o rótulo acessível e o tooltip.
+
+### NOVO-20260822-214618-95d9e16cb2bf ✅ RESOLVIDO · `NOVO` Ofício assinado aparecia depois do despacho · HT · risco baixo
+
+Na etapa Documentos, o arquivo principal do processo era apresentado depois do despacho dentro
+do grupo compartilhado. “Ofício assinado” agora é o primeiro item, seguido por “Despacho
+assinado”, sem alterar anexos, ações ou chaves de reabertura de cada documento.

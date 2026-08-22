@@ -43,7 +43,7 @@
 
 {# Outro servidor do mesmo ofício #}
 <div data-motorista-group="SERVIDOR" hidden>
-  <c-v2.form_field :field="form.motorista_servidor" label="Servidor deste ofício" />
+  <c-v2.form_field :field="form.motorista_servidor" label="Servidor deste ofício" :select="True" />
 </div>
 
 {# Motorista de outro ofício / manual #}
@@ -57,12 +57,14 @@
       <c-slot name="body">
         <c-v2.field label="Ofício de origem" :hide_label="True" label_for="dmv-oficio-prefill">
           <c-slot name="control">
-            <select id="dmv-oficio-prefill" class="form-select" data-oficio-prefill data-source-document="dmv-oficios-source">
-              <option value="">Selecione um ofício…</option>
-              {% for o in oficios_prefill %}
-                <option value="{{ o.id }}">{{ o.label }}</option>
-              {% endfor %}
-            </select>
+            <c-v2.select
+              :options="oficios_prefill_options"
+              select_id="dmv-oficio-prefill"
+              aria_label="Ofício de origem"
+              placeholder="Selecione um ofício…"
+              hook="data-oficio-prefill"
+              attrs='data-source-document="dmv-oficios-source"'
+            />
           </c-slot>
         </c-v2.field>
       </c-slot>
@@ -70,9 +72,9 @@
   {% endif %}
 
   <div class="field-grid field-grid--cols-2">
-    <c-v2.form_field :field="form.motorista_manual_nome" label="Nome do motorista" extra_class="field-grid__span-2" />
-    <c-v2.form_field :field="form.motorista_manual_cpf" label="CPF" />
-    <c-v2.form_field :field="form.motorista_oficio_referencia" label="Ofício do motorista" help_text="Formato número/ano (ex.: 15/2026)." />
-    <c-v2.form_field :field="form.motorista_protocolo_ref" label="Protocolo do motorista" />
+    <c-v2.form_field :field="form.motorista_manual_nome" label="Nome do motorista" extra_class="field-grid__span-2" :input="True" />
+    <c-v2.form_field :field="form.motorista_manual_cpf" label="CPF" :input="True" />
+    <c-v2.form_field :field="form.motorista_oficio_referencia" label="Ofício do motorista" help_text="Formato número/ano (ex.: 15/2026)." :input="True" />
+    <c-v2.form_field :field="form.motorista_protocolo_ref" label="Protocolo do motorista" :input="True" />
   </div>
 </div>

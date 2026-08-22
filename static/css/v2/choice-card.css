@@ -38,7 +38,8 @@
 /* Em número ímpar, o último ocupa a linha inteira. Sozinho em meia largura ele
    fica ao lado de um vazio, e o vazio se lê como opção faltando. */
 :is(html[data-theme]) .os-model-picker__grid > .os-model-card:last-child:nth-child(odd),
-:is(html[data-theme]) .choice-grid:not(.choice-grid--dense) > .choice-card:last-child:nth-child(odd) {
+:is(html[data-theme]) .choice-grid:not(.choice-grid--dense) > .choice-card:last-child:nth-child(odd),
+:is(html[data-theme]) .choice-grid:not(.choice-grid--dense) > .choice-card-field:last-child:nth-child(odd) {
   grid-column: 1 / -1;
 }
 

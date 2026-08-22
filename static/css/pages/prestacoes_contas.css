@@ -84,6 +84,13 @@
   margin-top: var(--space-2);
 }
 
+/* Documentos do servidor — a solicitação é dado operacional da própria pessoa,
+   por isso acompanha a linha em vez de abrir uma segunda faixa abaixo dela. */
+.docs-equipe__solicitacao {
+  min-width: 0;
+  width: min(220px, 34vw);
+}
+
 :is(.rt-wizard-card, .diario-wizard-card, .docs-wizard-card, .consolidado-wizard-card)
   .oficio-documentos-viajantes-section
   .oficio-documentos-card--travellers {
@@ -207,6 +214,12 @@
   .rt-custeios-grid,
   .diario-wizard-card .oficio-documentos-facts {
     grid-template-columns: 1fr;
+  }
+
+  .docs-equipe__row .person-row__actions,
+  .docs-equipe__solicitacao {
+    grid-column: 1 / -1;
+    width: 100%;
   }
 }
 

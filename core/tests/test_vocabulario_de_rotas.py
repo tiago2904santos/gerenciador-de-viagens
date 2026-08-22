@@ -35,7 +35,10 @@ SUFIXOS_PT = ("_novo", "_editar", "_excluir", "_lista", "_listar")
 SUFIXOS_EN = ("_index", "_create", "_update", "_delete")
 
 #: Catraca: este número só sobe. 70 em 06/08/2026, depois do `BE-23`.
-PISO_EN = 69
+#: 69 → 68 em 22/08/2026: `prestacoes_contas:modelo_create` saiu junto com a página
+#: "novo modelo de texto", substituída pelo quick add — a rota morreu sem referência
+#: viva, não foi rebatizada em português. Queda legítima, prevista na mensagem abaixo.
+PISO_EN = 68
 
 #: Tradução sugerida na mensagem de falha — o mesmo mapa usado na renomeação.
 EQUIVALENTE = {"_novo": "_create", "_editar": "_update", "_excluir": "_delete", "_lista": "_index"}

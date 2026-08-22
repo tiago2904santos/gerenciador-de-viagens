@@ -21,6 +21,8 @@ from django.test import SimpleTestCase
 from django.test import TestCase
 
 from prestacoes_contas.forms import DiarioBordoTrechoForm
+from prestacoes_contas.forms import DiarioMotoristaForm
+from prestacoes_contas.forms import PrestacaoServidorDocumentosForm
 
 
 ROOT = Path(settings.BASE_DIR)
@@ -38,26 +40,85 @@ def marcacao(template: Path) -> str:
 
 
 class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
+    def test_troca_de_motorista_e_viatura_nao_expoe_controles_legados(self):
+        motorista = marcacao(PRESTACOES / "partials" / "_dmv_motorista_body.html")
+        viatura = marcacao(PRESTACOES / "partials" / "_dmv_viatura_body.html")
+        pagina = marcacao(PRESTACOES / "diario_motorista_form.html")
+        choice_css = (ROOT / "static" / "css" / "v2" / "choice-card.css").read_text(
+            encoding="utf-8",
+        )
+        form = DiarioMotoristaForm()
+
+        self.assertIn(':field="form.motorista_servidor"', motorista)
+        self.assertIn(':select="True"', motorista)
+        self.assertIn('<c-v2.select', motorista)
+        self.assertNotIn('<select id="dmv-oficio-prefill"', motorista)
+        self.assertEqual(motorista.count(':input="True"'), 4)
+
+        self.assertEqual(viatura.count(':select="True"'), 2)
+        self.assertEqual(viatura.count(':input="True"'), 3)
+        self.assertIn('<c-v2.alert', pagina)
+        self.assertNotIn('<p class="field__help">', pagina)
+
+        for nome in (
+            "motorista_manual_nome",
+            "motorista_manual_cpf",
+            "motorista_oficio_referencia",
+            "motorista_protocolo_ref",
+            "viatura_manual_modelo",
+            "viatura_manual_placa",
+            "viatura_manual_combustivel",
+        ):
+            self.assertEqual(form.fields[nome].widget.attrs["class"], "input__control")
+
+        self.assertIn(
+            ".choice-grid:not(.choice-grid--dense) > .choice-card-field:last-child:nth-child(odd)",
+            choice_css,
+        )
+
     def test_campos_de_km_do_diario_usam_input_v2(self):
         form = DiarioBordoTrechoForm()
 
         self.assertEqual(form.fields["km_inicial"].widget.attrs["class"], "input__control")
         self.assertEqual(form.fields["km_final"].widget.attrs["class"], "input__control")
 
+    def test_rodape_do_diario_nao_repete_downloads_da_pre_visualizacao(self):
+        source = marcacao(PRESTACOES / "partials" / "_diario_footer.html")
+
+        self.assertNotIn('label="Gerar XLSX"', source)
+        self.assertNotIn('label="Gerar PDF"', source)
+        self.assertIn('label="Voltar ao Relatório Técnico"', source)
+        self.assertIn('label="Ir para Documentos"', source)
+
     def test_documentos_da_prestacao_usam_componentes_globais_v2(self):
         equipe = marcacao(PRESTACOES / "partials" / "_docs_equipe_body.html")
         documento = marcacao(PRESTACOES / "partials" / "_docs_attach_card.html")
+        documentos_oficio = marcacao(PRESTACOES / "partials" / "_docs_despacho_body.html")
+        form = PrestacaoServidorDocumentosForm()
 
         self.assertIn("<c-v2.person_row", equipe)
+        self.assertIn('<c-slot name="actions">', equipe)
         self.assertIn(":field=\"servidor.form.numero_solicitacao\"", equipe)
         self.assertIn(":input=\"True\"", equipe)
+        self.assertIn(':hide_label="True"', equipe)
+        self.assertEqual(
+            form.fields["numero_solicitacao"].widget.attrs["class"],
+            "input__control",
+        )
         self.assertNotIn("oficio-documentos-traveller", equipe)
         self.assertNotIn("oficio-documentos-fact", equipe)
 
         self.assertIn("<c-v2.document_inline", documento)
         self.assertIn("<c-v2.attach_signed_button", documento)
+        self.assertIn('<c-v2.icon_button icon="edit"', documento)
+        self.assertIn('aria_label="Ajustar posição"', documento)
+        self.assertNotIn('<c-v2.button label="Ajustar posição"', documento)
         self.assertNotIn("icon-btn--sign", documento)
         self.assertNotIn("oficio-documentos-traveller", documento)
+        self.assertLess(
+            documentos_oficio.index('title="Ofício assinado"'),
+            documentos_oficio.index('title="Despacho assinado"'),
+        )
 
     def test_identificacao_administrativa_usa_fatos_globais_v2(self):
         source = marcacao(PRESTACOES / "partials" / "_rt_identificacao_body.html")

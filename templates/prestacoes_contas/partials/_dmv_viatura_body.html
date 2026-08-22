@@ -36,15 +36,15 @@
 
 {# Viatura do cadastro #}
 <div data-viatura-group="BANCO" hidden>
-  <c-v2.form_field :field="form.viatura" label="Viatura do cadastro" />
+  <c-v2.form_field :field="form.viatura" label="Viatura do cadastro" :select="True" />
 </div>
 
 {# Viatura manual #}
 <div data-viatura-group="MANUAL" hidden>
   <div class="field-grid field-grid--cols-2">
-    <c-v2.form_field :field="form.viatura_manual_modelo" label="Modelo" extra_class="field-grid__span-2" />
-    <c-v2.form_field :field="form.viatura_manual_placa" label="Placa" />
-    <c-v2.form_field :field="form.viatura_manual_tipo" label="Tipo" />
-    <c-v2.form_field :field="form.viatura_manual_combustivel" label="Combustível" />
+    <c-v2.form_field :field="form.viatura_manual_modelo" label="Modelo" extra_class="field-grid__span-2" :input="True" />
+    <c-v2.form_field :field="form.viatura_manual_placa" label="Placa" :input="True" />
+    <c-v2.form_field :field="form.viatura_manual_tipo" label="Tipo" :select="True" />
+    <c-v2.form_field :field="form.viatura_manual_combustivel" label="Combustível" :input="True" />
   </div>
 </div>

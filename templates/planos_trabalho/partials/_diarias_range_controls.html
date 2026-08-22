@@ -4,9 +4,9 @@
     <label class="cv-field__label" for="{{ start_input_id }}">{{ start_field.label }}</label>
     <div class="date-picker__control">
       <input type="text" class="cv-field__control" id="{{ start_input_id }}" placeholder="{{ start_placeholder }}" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-start-display readonly>
-      <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendário">
+      <c-v2.button class_name="date-picker__trigger date-picker__trigger--icon" type="button" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria_label="Abrir calendário">
         {% icone_svg "calendar" %}
-      </button>
+      </c-v2.button>
     </div>
   </div>
   <c-v2.form_field :field="start_adjacent_field" label="Hora de saída" />
@@ -14,9 +14,9 @@
     <label class="cv-field__label" for="{{ end_input_id }}">{{ end_field.label }}</label>
     <div class="date-picker__control">
       <input type="text" class="cv-field__control" id="{{ end_input_id }}" placeholder="{{ end_placeholder }}" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-end-display readonly>
-      <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendário">
+      <c-v2.button class_name="date-picker__trigger date-picker__trigger--icon" type="button" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria_label="Abrir calendário">
         {% icone_svg "calendar" %}
-      </button>
+      </c-v2.button>
     </div>
   </div>
   <c-v2.form_field :field="end_adjacent_field" label="Hora de chegada" />

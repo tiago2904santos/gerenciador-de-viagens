@@ -309,6 +309,10 @@ def diario_servidor_motorista(request, ps_pk):
         _oficio_prefill_dados(o)
         for o in oficios_para_prefill_de_motorista(prestacao.oficio)
     ]
+    oficios_prefill_options = [
+        {"value": "", "label": "Selecione um ofício…"},
+        *({"value": o["id"], "label": o["label"]} for o in oficios_prefill),
+    ]
 
     viatura_oficio = viatura_resumo_oficio(prestacao.oficio)
     return render(
@@ -340,6 +344,7 @@ def diario_servidor_motorista(request, ps_pk):
                 f" · {viatura_oficio['placa']}" if viatura_oficio.get("placa") else ""
             ),
             "oficios_prefill": oficios_prefill,
+            "oficios_prefill_options": oficios_prefill_options,
             "diario_url": diario_url,
         },
     )

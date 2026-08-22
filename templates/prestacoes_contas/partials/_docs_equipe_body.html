@@ -1,15 +1,15 @@
-<div class="form-stack" aria-label="Servidor e número da solicitação">
-  {% with s=servidor.identificacao %}
-    <ul class="person-list">
-      <c-v2.person_row
-        :initials="s.iniciais"
-        :name="s.nome_servidor"
-        :meta="s.meta"
-        badge="{% if s.is_motorista %}Motorista{% endif %}"
-        extra_class="{% if s.is_motorista %}person-row--driver{% endif %}"
-      />
-    </ul>
-  {% endwith %}
-
-  <c-v2.form_field :field="servidor.form.numero_solicitacao" label="Número da solicitação" :input="True" />
-</div>
+{% with s=servidor.identificacao %}
+  <ul class="person-list" aria-label="Servidor e número da solicitação">
+    <c-v2.person_row
+      :initials="s.iniciais"
+      :name="s.nome_servidor"
+      :meta="s.meta"
+      badge="{% if s.is_motorista %}Motorista{% endif %}"
+      extra_class="docs-equipe__row{% if s.is_motorista %} person-row--driver{% endif %}"
+    >
+      <c-slot name="actions">
+        <c-v2.form_field :field="servidor.form.numero_solicitacao" label="Número da solicitação" :input="True" :hide_label="True" extra_class="docs-equipe__solicitacao" />
+      </c-slot>
+    </c-v2.person_row>
+  </ul>
+{% endwith %}

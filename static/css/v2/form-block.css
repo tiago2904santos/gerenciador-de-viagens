@@ -386,6 +386,11 @@
   min-width: 0;
 }
 
+:is(html[data-theme]) .form-block--v2 .field-grid__span-3 {
+  grid-column: span 3;
+  min-width: 0;
+}
+
 :is(html[data-theme]) .form-block--v2 .field-grid__span-all {
   grid-column: 1 / -1;
   min-width: 0;

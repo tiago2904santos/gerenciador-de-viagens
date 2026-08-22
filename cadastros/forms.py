@@ -595,14 +595,17 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
         self.fields["unidade"].required = False
         self.fields["unidade"].empty_label = ""
         self.fields["unidade"].label = "Unidade"
+        # A dica vira `help_text` (sai ABAIXO do controle) em vez de `data-picker-hint`:
+        # o par label/hint interno do picker se empilhava entre o rótulo do campo e a
+        # caixa — "Unidade" duas vezes seguidas. E ela fica: dizer que a SIGLA também
+        # busca é informação que o placeholder não dá.
+        self.fields["unidade"].help_text = "Busque por sigla ou nome da unidade."
         self.fields["unidade"].widget = UnidadePorExtensoSearchSelect(
             attrs={
                 **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                 "data-entity-picker": "true",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "compact",
-                "data-picker-label": "Unidade",
-                "data-picker-hint": "Busque por sigla ou nome da unidade.",
                 "data-placeholder": "Buscar unidade",
                 "data-empty-message": "Nenhuma unidade encontrada.",
             }

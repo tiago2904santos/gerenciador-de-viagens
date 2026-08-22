@@ -773,3 +773,11 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       com dois cartões `rail` equivalentes e resposta em uma coluna nas telas estreitas.
 - [x] `NOVO-20260822-212515-f4ae36c3d6b3` corrige os widgets de KM inicial e final do diário para
       o contrato `input__control` do componente v2, impedindo a aparência legada nos trechos.
+- [x] `NOVO-20260822-213202-63a678d639f1` remove do rodapé do Diário de Bordo as ações redundantes
+      de gerar XLSX e PDF, mantendo apenas retorno ao RT e avanço para Documentos.
+- [x] `NOVO-20260822-213623-ce10318c67c4` incorpora o número da solicitação à linha do servidor na
+      etapa Documentos e troca o widget legado pelo contrato visual `input__control` do v2.
+- [x] `NOVO-20260822-214157-a0c51bdd9759` converte “Ajustar posição” no cabeçalho do documento em
+      botão circular de ícone, preservando URL, acessibilidade e tooltip.
+- [x] `NOVO-20260822-214618-95d9e16cb2bf` coloca “Ofício assinado” antes de “Despacho assinado”
+      no grupo compartilhado da etapa Documentos.

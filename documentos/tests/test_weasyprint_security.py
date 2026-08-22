@@ -38,7 +38,18 @@ from __future__ import annotations
 import contextlib
 from unittest import mock
 
-import weasyprint
+import unittest
+
+# O import é guardado porque o WeasyPrint depende de bibliotecas NATIVAS (Pango,
+# GDK-Pixbuf) que a máquina de desenvolvimento Windows tipicamente não tem — e um
+# módulo de teste que estoura no import derruba a coleta da suíte inteira com ERROR,
+# não com skip. No CI, que instala as bibliotecas e é onde este gate justifica o
+# ignore da CVE no `pip-audit`, o import funciona e os testes RODAM.
+try:
+    import weasyprint
+except (ImportError, OSError):  # OSError: as .dll do Pango ausentes no Windows
+    weasyprint = None
+
 from django.test import SimpleTestCase
 
 from documentos.services.adapters.weasyprint_pdf import render_pdf_bytes_weasyprint
@@ -114,6 +125,10 @@ def _espiar_render(*, forcar_hints=None):
         yield chamadas
 
 
+@unittest.skipIf(
+    weasyprint is None,
+    "WeasyPrint sem as bibliotecas nativas nesta máquina; o CI as tem e roda o gate.",
+)
 class WeasyPrintSecurityTests(SimpleTestCase):
     def _render(self, *, forcar_hints=None):
         with _espiar_render(forcar_hints=forcar_hints) as chamadas:

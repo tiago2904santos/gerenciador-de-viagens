@@ -45,6 +45,17 @@ AMBIENTE_CRU = {
     "ENV_FILE": ".env.que-nao-existe-para-simular-o-ci",
 }
 
+#: Encanamento do SO no Windows — não é configuração, é o chão em que o Python pisa.
+#: Sem `SystemRoot` o Winsock não inicializa e QUALQUER `import asyncio` no
+#: subprocesso morre com `WinError 10106` antes de o Django abrir a boca; `TEMP`
+#: idem para `tempfile`. No Linux do CI nada disso existe nem faz falta, então o
+#: gate continua guardando exatamente o que guardava: nenhum `.env`, nenhuma chave.
+if os.name == "nt":
+    for _variavel in ("SYSTEMROOT", "SYSTEMDRIVE", "WINDIR", "TEMP", "TMP", "LOCALAPPDATA"):
+        _valor = os.environ.get(_variavel, "")
+        if _valor:
+            AMBIENTE_CRU[_variavel] = _valor
+
 
 class AuditorDeAreaRodaSemEnvTests(SimpleTestCase):
     def test_auditor_sobe_o_django_sem_chave_de_cifragem(self):

@@ -4,13 +4,22 @@
   `section_prefix`, porque o cadastro e o painel do evento renderizam este mesmo
   bloco na mesma página em alguns fluxos.
 {% endcomment %}
-<div class="field-grid">
+{% comment %}
+  Quatro colunas, duas linhas:
+
+    UF | cidade (3 colunas)
+    período (2) | horário inicial | horário final
+
+  Era `field-grid` sem contagem — uma coluna só, cinco campos empilhados — com
+  `field--wide` marcando a intenção numa classe que nenhuma folha desenha.
+{% endcomment %}
+<div class="field-grid field-grid--cols-4">
   <c-v2.form_field :field="form.destino_uf" />
-  <c-v2.form_field :field="form.destino_cidade" extra_class="field--wide" />
+  <c-v2.form_field :field="form.destino_cidade" extra_class="field-grid__span-3" />
 
   {% with prefixo=section_prefix|default:"evento" %}
     {% with picker_id=prefixo|add:"-date-picker" inicio_id=prefixo|add:"-data-inicio-display" fim_id=prefixo|add:"-data-fim-display" %}
-      <c-v2.field label="Período do evento" extra_class="field--wide">
+      <c-v2.field label="Período do evento" extra_class="field-grid__span-2">
         <c-slot name="control">
           <c-v2.date_picker
             mode="range"

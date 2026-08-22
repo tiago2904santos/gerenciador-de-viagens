@@ -113,7 +113,7 @@ class DiarioMotoristaForm(forms.ModelForm):
         max_length=14,
         widget=forms.TextInput(
             attrs={
-                **widget_attrs(WidgetStyle.FIELD_CONTROL),
+                **widget_attrs(WidgetStyle.INPUT_V2),
                 "placeholder": "000.000.000-00",
                 "autocomplete": "off",
                 "inputmode": "numeric",
@@ -126,7 +126,7 @@ class DiarioMotoristaForm(forms.ModelForm):
         max_length=30,
         widget=forms.TextInput(
             attrs={
-                **widget_attrs(WidgetStyle.FIELD_CONTROL),
+                **widget_attrs(WidgetStyle.INPUT_V2),
                 "placeholder": "00.000.000-0",
                 "autocomplete": "off",
                 "inputmode": "numeric",
@@ -139,7 +139,7 @@ class DiarioMotoristaForm(forms.ModelForm):
         max_length=8,
         widget=forms.TextInput(
             attrs={
-                **widget_attrs(WidgetStyle.FIELD_CONTROL),
+                **widget_attrs(WidgetStyle.INPUT_V2),
                 "placeholder": "ABC-1D23",
                 "autocomplete": "off",
                 "data-mask": "placa",
@@ -167,14 +167,14 @@ class DiarioMotoristaForm(forms.ModelForm):
             "motorista_modo": forms.RadioSelect(),
             "motorista_manual_nome": forms.TextInput(
                 attrs={
-                    **text_attrs(WidgetStyle.FIELD_CONTROL),
+                    **text_attrs(WidgetStyle.INPUT_V2),
                     "placeholder": "Nome do motorista",
                     "autocomplete": "off",
                 },
             ),
             "motorista_oficio_referencia": forms.TextInput(
                 attrs={
-                    **text_attrs(WidgetStyle.FIELD_CONTROL),
+                    **text_attrs(WidgetStyle.INPUT_V2),
                     "placeholder": "15/2026",
                     "autocomplete": "off",
                 },
@@ -182,14 +182,14 @@ class DiarioMotoristaForm(forms.ModelForm):
             "viatura_modo": forms.RadioSelect(),
             "viatura_manual_modelo": forms.TextInput(
                 attrs={
-                    **text_attrs(WidgetStyle.FIELD_CONTROL),
+                    **text_attrs(WidgetStyle.INPUT_V2),
                     "placeholder": "Ex.: Onix",
                     "autocomplete": "off",
                 },
             ),
             "viatura_manual_combustivel": forms.TextInput(
                 attrs={
-                    **text_attrs(WidgetStyle.FIELD_CONTROL),
+                    **text_attrs(WidgetStyle.INPUT_V2),
                     "placeholder": "Ex.: Gasolina",
                     "autocomplete": "off",
                 },
@@ -489,7 +489,7 @@ class PrestacaoServidorDocumentosForm(forms.ModelForm):
         widgets = {
             "numero_solicitacao": forms.TextInput(
                 attrs={
-                    **text_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL),
+                    **text_attrs(WidgetStyle.INPUT_V2),
                     "placeholder": "Informe o número da solicitação",
                     "autocomplete": "off",
                 },

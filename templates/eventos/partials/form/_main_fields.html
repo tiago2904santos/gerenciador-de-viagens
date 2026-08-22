@@ -1,7 +1,15 @@
-<div class="field-grid">
-  <c-v2.form_field :field="form.titulo" extra_class="field--wide" />
-  <c-v2.form_field :field="form.descricao" extra_class="field--wide" />
+{% comment %}
+  Duas colunas: título e descrição em linha cheia, status ao lado da unidade, e o
+  responsável de novo em linha cheia — exatamente o que as marcas `field--wide`
+  originais pediam. Elas não faziam nada: `field--wide` não existe em folha nenhuma
+  do v2, e `field-grid` sem contagem de colunas rende UMA coluna — dez campos
+  empilhados na largura inteira do painel. Quem faz o trabalho é `field-grid--cols-2`
+  + `field-grid__span-all`.
+{% endcomment %}
+<div class="field-grid field-grid--cols-2">
+  <c-v2.form_field :field="form.titulo" extra_class="field-grid__span-all" />
+  <c-v2.form_field :field="form.descricao" extra_class="field-grid__span-all" />
   <c-v2.form_field :field="form.status" />
   <c-v2.form_field :field="form.unidade_responsavel" />
-  <c-v2.form_field :field="form.responsavel" extra_class="field--wide" />
+  <c-v2.form_field :field="form.responsavel" extra_class="field-grid__span-all" />
 </div>
