@@ -153,11 +153,16 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
 
         self.assertEqual(_periodo_display(oficio), "17/08 a 23/08/2026")
 
-    def test_card_nao_exibe_mais_periodo_de_liberacao_e_saque(self):
+    def test_card_edita_periodo_em_calendario_compacto_com_autosave(self):
         source = marcacao(TEMPLATES / "cotton" / "v2" / "prestacao_card.html")
 
-        self.assertNotIn("Liberação → saque", source)
-        self.assertNotIn("periodo_saque", source)
+        self.assertIn("prestacao-row__period-form", source)
+        self.assertIn('<c-v2.date_picker', source)
+        self.assertIn('mode="range"', source)
+        self.assertIn('button_label="Período"', source)
+        self.assertIn('start_hidden_name="ps-{{ servidor.ps_pk }}-data_liberacao_diarias"', source)
+        self.assertIn('end_hidden_name="ps-{{ servidor.ps_pk }}-prazo_limite_saque"', source)
+        self.assertNotIn("prestacao-periodo-modal", source)
 
     def test_placa_e_modelo_usam_a_mesma_composicao_de_fato(self):
         source = marcacao(TEMPLATES / "cotton" / "v2" / "prestacao_card.html")
@@ -179,7 +184,7 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
         regra = css[css.index(".prestacao-row__solicitacao") :]
         regra = regra[: regra.index("}")]
 
-        self.assertIn("background: var(--surface);", regra)
+        self.assertIn("background: var(--surface-field);", regra)
 
     def test_prestacoes_nao_chamam_componentes_visuais_anteriores_ao_v2(self):
         namespaces_legados = (

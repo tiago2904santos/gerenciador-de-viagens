@@ -82,6 +82,31 @@
           </div>
 
           <div class="person-row__actions">
+            <form
+              method="post"
+              action="{% url 'prestacoes_contas:index' %}"
+              class="prestacao-row__period-form"
+              data-autosave="true"
+              data-autosave-model="prestacao_servidor"
+              data-autosave-step="lista"
+              data-autosave-url="{{ servidor.solicitacao_autosave_url }}"
+              data-autosave-object-id="{{ servidor.ps_pk }}"
+            >
+              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+              <input type="hidden" name="action" value="save_solicitacoes">
+              <c-v2.date_picker
+                mode="range"
+                picker_id="prestacao-periodo-picker-{{ servidor.ps_pk }}"
+                button_label="Período"
+                trigger_aria_label="Definir período das diárias de {{ servidor.name }}"
+                start_hidden_name="ps-{{ servidor.ps_pk }}-data_liberacao_diarias"
+                end_hidden_name="ps-{{ servidor.ps_pk }}-prazo_limite_saque"
+                :start_hidden_value="servidor.data_liberacao_diarias"
+                :end_hidden_value="servidor.prazo_limite_saque"
+                :show_summary="False"
+              />
+            </form>
+
             <button
               type="button"
               class="icon-button"
@@ -164,27 +189,22 @@
     <c-v2.icon_button icon="edit" :href="card.rt_url" aria_label="Abrir prestação na etapa 1" tooltip="Abrir prestação" />
 
     {% comment %}
-      Anexar o despacho assinado. Os treze `data-attach-signed-*` são o contrato
-      de `components/attach-signed-modal.js`; `reopen-key` é o que faz o diálogo
-      voltar a abrir no lugar certo depois do upload.
+      Uma única ação reúne ofício assinado, despacho, diário de bordo, relatório
+      técnico e comprovante. O payload semântico é consumido pelo modal comum.
     {% endcomment %}
     <button
       type="button"
-      class="icon-button{% if card.despacho_assinado.assinado %} is-assinado{% endif %}"
-      aria-label="{% if card.despacho_assinado.assinado %}Gerenciar despacho assinado{% else %}Anexar despacho assinado{% endif %}"
-      data-tooltip="{% if card.despacho_assinado.assinado %}Despacho assinado — gerenciar{% else %}Anexar despacho assinado{% endif %}"
+      class="icon-button{% if card.tem_documento_assinado %} is-assinado{% endif %}"
+      aria-label="{% if card.tem_documento_assinado %}Gerenciar documentos assinados{% else %}Anexar documentos assinados{% endif %}"
+      data-tooltip="{% if card.tem_documento_assinado %}Documentos assinados — gerenciar{% else %}Anexar documentos assinados{% endif %}"
       data-attach-signed-trigger
-      data-attach-signed-reopen-key="prestacao-despacho-{{ card.prestacao_pk }}"
+      data-attach-signed-reopen-key="prestacao-documentos-{{ card.ps_pk }}"
       data-attach-signed-accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
       data-attach-signed-file-description="um arquivo em PDF, PNG ou JPEG"
       data-attach-signed-file-help="Selecione um único arquivo em PDF, PNG, JPG ou JPEG."
       data-attach-signed-choose-label="Escolher arquivo"
       data-attach-signed-upload-label="Anexar arquivo"
-      data-attach-signed-url="{{ card.despacho_assinado.anexar_url }}"
-      data-attach-signed-doc-label="o despacho do ofício {{ card.numero_display }}"
-      data-attach-signed-current-name="{{ card.despacho_assinado.nome_original }}"
-      data-attach-signed-current-view-url="{{ card.despacho_assinado.view_url }}"
-      data-attach-signed-current-remove-url="{{ card.despacho_assinado.remover_url }}"
+      data-attach-signed-kinds="{{ card.attach_kinds_json }}"
     >{% icone_svg "sign" %}</button>
 
     <form method="post" action="{{ card.finalizar_url }}" class="prestacao-card__inline-action">

@@ -391,7 +391,7 @@
 }
 
 :is(html[data-theme]) .prestacao-row__solicitacao {
-  background: var(--surface);
+  background: var(--surface-field);
   flex: 1 1 140px;
   min-width: 0;
 }

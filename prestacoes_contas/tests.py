@@ -594,7 +594,7 @@ class PrestacaoAssinadoUploadTests(TestCase):
             self.assertNotContains(fragmento, "Anexar diário assinado")
         # `H-03`: era medido pelo nome dos atributos ordinais
         # (`...-secondary-url`, `...-tertiary-option-label`). O contrato de
-        # verdade é *quais* três documentos o menu do card oferece e com que
+        # verdade é *quais* documentos a ação única do card oferece e com que
         # rótulo — hoje isso vem no payload, com chave semântica.
         payloads = [json.loads(card["attach_kinds_json"]) for card in response.context["cards"]]
         self.assertEqual(len(payloads), 2)
@@ -602,15 +602,19 @@ class PrestacaoAssinadoUploadTests(TestCase):
             self.assertEqual(
                 [(k["key"], k["option_label"]) for k in payload],
                 [
-                    ("rt", "Relatório técnico"),
+                    ("oficio", "Ofício assinado"),
+                    ("despacho", "Despacho"),
                     ("diario", "Diário de bordo"),
+                    ("rt", "Relatório técnico"),
                     ("comprovante", "Comprovante"),
                 ],
             )
+            self.assertEqual(len({kind["url"] for kind in payload}), 5)
         for fragmento in fragmentos:
             self.assertContains(fragmento, "data-attach-signed-kinds", count=1)
         self.assertContains(response, "data-attach-signed-kind-selector", count=1)
-        self.assertContains(response, "Anexar despacho assinado", count=4)
+        self.assertContains(response, "Anexar documentos assinados", count=4)
+        self.assertNotContains(response, "Anexar despacho assinado")
         self.assertContains(response, "data-attach-signed-modal", count=1)
 
 

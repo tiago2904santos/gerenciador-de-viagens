@@ -727,3 +727,9 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       ofícios selecionados ao iniciar uma Ordem de Serviço pelo evento
 - [x] `NOVO-20260822-181021-f2584ce48015` preserva a casca e o padding do modal de downloads
       quando o seletor é renderizado dentro de um formulário de edição
+- [x] `NOVO-20260822-181658-a2ae8f0d8eb3` fixa o input de solicitação na superfície de painel,
+      impedindo que ele herde o realce visual da linha do motorista
+- [x] `NOVO-20260822-181957-f2347640792a` adiciona a ação de período por servidor na lista de
+      prestações, com edição das datas de liberação e vencimento no autosave existente
+- [x] `NOVO-20260822-183122-debe4728dc73` reúne no mesmo botão da prestação o ofício assinado,
+      despacho, diário de bordo, relatório técnico e comprovante

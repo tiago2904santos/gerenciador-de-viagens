@@ -183,3 +183,57 @@ class GlobalDatePickerTests(SimpleTestCase):
                 offenders.append(str(source_path.relative_to(base_dir)))
 
         self.assertEqual(offenders, [])
+
+
+class PainelAndaComAPaginaTests(SimpleTestCase):
+    """O painel é ancorado ao campo, não à janela.
+
+    Com `position: fixed` ele só acompanhava a âncora enquanto coubesse na tela;
+    quando não cabia, a conta terminava numa trava contra as bordas da janela e
+    ele parava, com a página rolando por baixo. Medido no editor de roteiro:
+    120px de rolagem moviam a âncora 120 e o painel 60.
+    """
+
+    def _motor(self):
+        return (
+            Path(settings.BASE_DIR)
+            / "static"
+            / "js"
+            / "components"
+            / "date-picker.js"
+        ).read_text(encoding="utf-8")
+
+    def _folha(self):
+        return (
+            Path(settings.BASE_DIR)
+            / "static"
+            / "css"
+            / "v2"
+            / "date-picker.css"
+        ).read_text(encoding="utf-8")
+
+    def test_o_painel_e_posicionado_em_coordenadas_de_documento(self):
+        motor = self._motor()
+        self.assertIn("panel.style.position = 'absolute';", motor)
+        self.assertIn("panel.style.top = (top + scrollY) + 'px';", motor)
+        self.assertIn("panel.style.left = (left + scrollX) + 'px';", motor)
+        self.assertNotIn("panel.style.position = 'fixed';", motor)
+
+    def test_a_folha_declara_o_mesmo_posicionamento_do_motor(self):
+        regra = self._folha().split(".date-picker__panel {", 1)[1].split("}", 1)[0]
+        self.assertIn("position: absolute;", regra)
+        self.assertNotIn("position: fixed;", regra)
+
+    def test_nao_ha_trava_vertical_contra_a_janela(self):
+        """A trava era o que descolava o painel do campo."""
+        motor = self._motor()
+        self.assertNotIn("vh - panelHeight - margin", motor)
+
+    def test_o_lado_do_painel_e_escolhido_uma_vez_na_abertura(self):
+        """Refazer a escolha a cada rolagem faria o painel pular de lado do
+        campo enquanto o usuário lê."""
+        motor = self._motor()
+        self.assertIn("function positionPanel(recalcularLado) {", motor)
+        self.assertIn("if (recalcularLado) {", motor)
+        self.assertIn("positionPanel(true);", motor)
+

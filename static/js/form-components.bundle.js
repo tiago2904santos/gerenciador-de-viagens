@@ -3077,6 +3077,7 @@
     var selectedDates = []; // multi mode
     var routeSteps = [];
     var isOpen = false;
+    var abreParaCima = false;
     var focusedDate = null;
     var dayButtons = [];
     var confirmBtn = root.querySelector('[data-cv-date-picker-confirm]');
@@ -3177,7 +3178,7 @@
     }
 
 
-    function positionPanel() {
+    function positionPanel(recalcularLado) {
       if (panel.parentElement !== document.body) {
         /* O painel vai para o `body` e perde os ancestrais — com eles some a
          * única forma de o CSS saber de que campo ele veio. Como o partial do
@@ -3198,8 +3199,23 @@
       if (vw) {
         width = Math.min(width, Math.max(vw - (margin * 2), 280));
       }
-      panel.style.position = 'fixed';
+      /* ABSOLUTO no documento, não fixo na janela.
+       *
+       * Com `fixed` o painel só acompanhava a âncora enquanto coubesse na tela;
+       * quando não cabia, a conta terminava num `clamp` contra as bordas da
+       * janela e ele PARAVA — a página rolava por baixo e o calendário ficava
+       * boiando, cada vez mais longe do campo que o abriu. Medido no editor de
+       * roteiro: 120px de rolagem moviam a âncora 120 e o painel 60.
+       *
+       * Em coordenadas de documento ele não precisa de trava nenhuma: anda com
+       * a página porque É a página. E se for mais alto do que a janela, o que
+       * passa do fim continua alcançável — basta rolar, e o painel rola junto,
+       * em vez de ficar cortado num ponto fixo. */
+      panel.style.position = 'absolute';
       panel.style.width = width + 'px';
+
+      var scrollX = window.scrollX || window.pageXOffset || 0;
+      var scrollY = window.scrollY || window.pageYOffset || 0;
 
       var left = rect.right - width;
       if (vw) {
@@ -3207,18 +3223,20 @@
         left = Math.max(left, margin);
       }
 
-      var top = rect.bottom + 8;
+      /* Abre para BAIXO; para cima só quando não cabe embaixo e cabe em cima. A
+       * escolha é feita uma vez, na abertura (`recalcularLado`): refazê-la a
+       * cada rolagem faria o painel pular de um lado do campo para o outro
+       * enquanto o usuário lê. */
       var panelHeight = panel.offsetHeight || 0;
-      if (vh && panelHeight) {
-        var belowSpace = vh - top - margin;
-        if (belowSpace < panelHeight && rect.top - 8 - panelHeight > margin) {
-          top = rect.top - 8 - panelHeight;
-        }
-        top = Math.max(margin, Math.min(top, vh - panelHeight - margin));
+      if (recalcularLado) {
+        abreParaCima = !!(vh && panelHeight)
+          && (vh - (rect.bottom + 8) - margin) < panelHeight
+          && (rect.top - 8 - panelHeight) > margin;
       }
+      var top = abreParaCima ? (rect.top - 8 - panelHeight) : (rect.bottom + 8);
 
-      panel.style.top = top + 'px';
-      panel.style.left = left + 'px';
+      panel.style.top = (top + scrollY) + 'px';
+      panel.style.left = (left + scrollX) + 'px';
     }
 
     function setOpen(nextOpen) {
@@ -3229,7 +3247,7 @@
         btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       });
       if (isOpen) {
-        positionPanel();
+        positionPanel(true);
         // Garante animação mesmo com o panel fora do root (portal)
         panel.classList.remove('date-picker__panel--entering');
         void panel.offsetWidth; // force reflow
@@ -3714,7 +3732,11 @@
       },
     });
 
-    // Reposicionar ao scrollar ou redimensionar para o panel acompanhar o anchor
+    /* O painel mora em coordenadas de documento, então a rolagem da PÁGINA já o
+     * leva junto e este ouvinte não tem trabalho. Ele existe pela rolagem de um
+     * contêiner INTERNO: ali a âncora anda sem que a página role, e sem
+     * recalcular o painel ficaria para trás. O lado (acima/abaixo) não é
+     * refeito — só a posição. */
     function onScrollOrResize() {
       if (isOpen) positionPanel();
     }

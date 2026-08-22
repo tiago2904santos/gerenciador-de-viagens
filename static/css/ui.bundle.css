@@ -4674,7 +4674,7 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 }
 
 :is(html[data-theme]) .prestacao-row__solicitacao {
-  background: var(--surface);
+  background: var(--surface-field);
   flex: 1 1 140px;
   min-width: 0;
 }
@@ -10584,7 +10584,11 @@ html[data-theme="light"] {
   display: grid;
   gap: var(--space-3);
   padding: var(--space-4);
-  position: fixed;
+  /* ABSOLUTO, e o `date-picker.js` escreve as coordenadas em documento. Era
+     `fixed`, e aí o painel descolava do campo: quando não cabia na janela, a
+     conta terminava numa trava contra a borda e ele parava, enquanto a página
+     seguia rolando por baixo. */
+  position: absolute;
   width: min(calc(var(--date-picker-grid-width) + (2 * var(--space-4))), calc(100vw - 16px));
   z-index: calc(var(--z-sticky-stepper, 1100) + 20);
 }

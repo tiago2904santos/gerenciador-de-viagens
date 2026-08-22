@@ -247,6 +247,19 @@
   /* Delegação no `document`: os cartões da lista são trocados pelo filtro AJAX,
      e um `addEventListener` preso ao botão morre junto com o HTML antigo. */
   document.addEventListener("click", function (evento) {
+    var fechar = evento.target.closest("[data-download-picker-close]");
+    if (fechar) {
+      var dialogo = fechar.closest("dialog");
+      if (!dialogo) return;
+      evento.preventDefault();
+      if (window.CV.overlay && typeof window.CV.overlay.closeDialog === "function") {
+        window.CV.overlay.closeDialog(dialogo);
+      } else if (dialogo.open) {
+        dialogo.close();
+      }
+      return;
+    }
+
     var gatilho = evento.target.closest("[data-download-picker-trigger]");
     if (!gatilho) return;
     var montagem = gatilho.closest(".download-picker-mount");

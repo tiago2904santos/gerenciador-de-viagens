@@ -11423,3 +11423,24 @@ O seletor de downloads pode ser renderizado dentro de um formulário de edição
 outro formulário como casca. Por ser aninhamento inválido, o navegador descartava essa casca e,
 com ela, a classe responsável pelo padding. O modal agora usa a variação sem formulário próprio e
 fecha pelo gancho comum de overlay, preservando o recuo sem alterar o componente visual global.
+
+### NOVO-20260822-181658-a2ae8f0d8eb3 ✅ RESOLVIDO · `NOVO` Campo de solicitação herdava a cor da linha do motorista · UI · risco baixo
+
+O input usava o token genérico e herdável `--surface`; dentro da linha destacada do motorista,
+isso fazia o campo receber o mesmo fundo oliva da pessoa. A regra específica agora usa
+`--surface-field`, a superfície explícita dos painéis e controles, sem alterar o destaque da linha.
+
+### NOVO-20260822-181957-f2347640792a ✅ RESOLVIDO · `NOVO` Período das diárias não podia ser editado na lista de prestações · HT/JS · risco baixo
+
+As datas de liberação e de vencimento já pertenciam ao cadastro e ao autosave da prestação, mas a
+lista não oferecia nenhum controle para preenchê-las. Cada servidor agora possui a pílula compacta
+“Período”, igual à usada nos filtros de lista: ela abre o calendário compartilhado, permite escolher
+as duas datas e troca o rótulo pelo intervalo selecionado. Os campos ocultos reutilizam o mesmo
+salvamento transacional da solicitação, sem modal ou formulário paralelo visível.
+
+### NOVO-20260822-183122-debe4728dc73 ✅ RESOLVIDO · `NOVO` Anexos assinados estavam divididos em ações diferentes na prestação · BE/HT · risco baixo
+
+O botão do rodapé tratava apenas o despacho, enquanto o modal do menu oferecia somente relatório
+técnico, diário de bordo e comprovante; o ofício assinado ficava fora dessa ação. O cartão agora
+entrega ao modal único as cinco opções — ofício assinado, despacho, diário de bordo, relatório
+técnico e comprovante — preservando as rotas e os arquivos atuais de cada tipo.

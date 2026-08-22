@@ -269,6 +269,52 @@ def apresentar_prestacao_servidor_card(
         ),
         prestacao_pk=prestacao.pk,
     )
+    oficio_assinado = _anexo_assinado_info(
+        prestacao_anexos,
+        tipo=PrestacaoDocumentoAnexo.TIPO_OFICIO_ASSINADO,
+        anexar_url=reverse(
+            "prestacoes_contas:prestacao_oficio_assinado_anexar",
+            args=[prestacao.pk],
+        ),
+        prestacao_pk=prestacao.pk,
+    )
+    attach_kinds = kinds_de_anexo_assinado(
+        [
+            (
+                "oficio",
+                "Ofício assinado",
+                f"o ofício assinado {oficio.numero_formatado}",
+                oficio_assinado,
+            ),
+            (
+                "despacho",
+                "Despacho",
+                f"o despacho do ofício {oficio.numero_formatado}",
+                despacho_assinado,
+            ),
+            (
+                "diario",
+                "Diário de bordo",
+                f"o diário de bordo do ofício {oficio.numero_formatado}",
+                servidor["diario_assinado"],
+            ),
+            (
+                "rt",
+                "Relatório técnico",
+                f"o relatório técnico de {servidor['name']}",
+                servidor["rt_assinado"],
+            ),
+            (
+                "comprovante",
+                "Comprovante",
+                (
+                    "o comprovante de saque ou transferência de "
+                    f"{servidor['name']}"
+                ),
+                servidor["comprovante_anexo"],
+            ),
+        ]
+    )
 
     protocolo_display = format_protocolo(oficio.protocolo) or ""
     header_value = " · ".join(
@@ -293,37 +339,10 @@ def apresentar_prestacao_servidor_card(
             header_chips,
         ),
         "numero_display": oficio.numero_formatado,
-        # Os três anexáveis do menu de ações do card. Rótulos mantidos como
-        # estavam no template (ver comentário abaixo): este PR troca o ordinal,
-        # não o microcopy.
-        "attach_kinds_json": json.dumps(
-            kinds_de_anexo_assinado(
-                [
-                    (
-                        "rt",
-                        "Relatório técnico",
-                        f"o relatório técnico de {servidor['name']}",
-                        servidor["rt_assinado"],
-                    ),
-                    (
-                        "diario",
-                        "Diário de bordo",
-                        f"o diário de bordo do ofício {oficio.numero_formatado}",
-                        servidor["diario_assinado"],
-                    ),
-                    (
-                        "comprovante",
-                        "Comprovante",
-                        (
-                            "o comprovante de saque ou transferência de "
-                            f"{servidor['name']}"
-                        ),
-                        servidor["comprovante_anexo"],
-                    ),
-                ]
-            ),
-            ensure_ascii=False,
-        ),
+        # A ação única do card reúne documentos compartilhados pelo ofício e
+        # documentos próprios deste servidor, na ordem exibida pelo modal.
+        "attach_kinds_json": json.dumps(attach_kinds, ensure_ascii=False),
+        "tem_documento_assinado": any(kind["current_name"] for kind in attach_kinds),
         "protocolo_display": protocolo_display,
         "destino_display": destino_display,
         "data_evento_display": data_evento_display,
