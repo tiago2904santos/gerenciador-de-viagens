@@ -28,10 +28,14 @@ class ServidorComponentesV2SourceTests(TestCase):
             pagina,
         )
         self.assertIn('class="field-grid field-grid--cols-3"', identificacao)
+        # Nome em DUAS colunas e cargo na terceira: a primeira linha fecha sem trilha
+        # sobrando, e o cargo não fica com um terço da largura, onde o nome da unidade
+        # vinha cortado ("POLÍ…").
         self.assertIn(
-            '<c-v2.form_field :field="form.nome" extra_class="field-grid__span-all" />',
+            '<c-v2.form_field :field="form.nome" extra_class="field-grid__span-2" />',
             identificacao,
         )
+        self.assertNotIn("field-grid__span-all", identificacao)
         self.assertIn('data-rg-field-wrap', identificacao)
         self.assertNotIn('class="field-grid field-grid--cols-4"', identificacao)
 

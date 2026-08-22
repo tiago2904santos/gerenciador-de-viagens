@@ -759,3 +759,17 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       campos de texto do relatório técnico, mantendo o gerenciamento integrado ao seletor.
 - [x] `NOVO-20260822-202310-c2f6b992d23c` preserva o relatório de origem ao abrir o catálogo
       de modelos e oferece no cabeçalho um retorno contextual e seguro ao documento.
+- [x] `NOVO-20260822-202955-8ac3d1f720b1` substitui os cadastros separados dos grupos de
+      modelos do RT por quick adds v2 inline, com validação e contexto do tópico preservados.
+- [x] `NOVO-20260822-204552-8d5c41fef153` separa as cinco listas do catálogo de modelos do RT
+      por um toggle v2, renderizando apenas o tópico selecionado e preservando seus filtros.
+- [x] `NOVO-20260822-205157-5320173713d8` remove a rota e a view legadas de criação separada
+      dos modelos do RT, deixando novos cadastros exclusivamente a cargo do quick add v2.
+- [x] `NOVO-20260822-205657-f66cf48fad25` limita a justificativa de troca ao motorista vindo de
+      outro ofício e mantém motorista interno, viatura e ajustes como registros informativos.
+- [x] `NOVO-20260822-210932-dbc4ed65332a` remove do rodapé do RT o salvamento manual redundante,
+      preservando o autosave e a ação principal de avanço ao Diário de Bordo.
+- [x] `NOVO-20260822-211325-fa86c63249cb` alinha o resumo do motorista do diário à identificação,
+      com dois cartões `rail` equivalentes e resposta em uma coluna nas telas estreitas.
+- [x] `NOVO-20260822-212515-f4ae36c3d6b3` corrige os widgets de KM inicial e final do diário para
+      o contrato `input__control` do componente v2, impedindo a aparência legada nos trechos.

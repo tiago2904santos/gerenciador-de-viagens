@@ -5,3 +5,22 @@
 {% else %}
   <c-v2.panel empty_title="Nenhum modelo cadastrado" empty_message="Nenhum modelo cadastrado para este campo." />
 {% endif %}
+
+<c-v2.quick_add
+  :action="grupo.quick_add_action"
+  :form="grupo.quick_add_form"
+  :panel_id="grupo.quick_add_panel_id"
+  submit_label="Salvar modelo"
+  toggle_label="Novo modelo"
+>
+  <c-v2.quick_add_section :split="True" title="Dados do modelo" description="Nome e texto reutilizável">
+    <c-slot name="body">
+      <input type="hidden" name="quick_add_campo" value="{{ grupo.campo }}">
+      <input type="hidden" name="{{ grupo.quick_add_form.campo.html_name }}" value="{{ grupo.campo }}">
+      <div class="field-grid">
+        <c-v2.form_field :field="grupo.quick_add_form.nome" only />
+        <c-v2.form_field :field="grupo.quick_add_form.texto" only />
+      </div>
+    </c-slot>
+  </c-v2.quick_add_section>
+</c-v2.quick_add>

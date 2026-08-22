@@ -1,0 +1,25 @@
+{% comment %}
+  Assinante e destinatário do ofício, no MESMO bloco.
+
+  Eram dois blocos irmãos dentro do painel "Assinantes e destinatário", cada um com
+  cabeçalho próprio — três títulos empilhados dizendo a mesma coisa antes do primeiro
+  campo aparecer. São quatro campos ao todo; um bloco basta.
+
+  Os campos vêm de dois formulários diferentes (`assinaturas_form` e
+  `destinatario_form`), e por isso este partial recebe os dois: a grade é uma só, e
+  campo de formulários distintos na mesma grade não é problema — o `<form>` em volta é
+  o mesmo.
+
+    assinante (linha inteira)
+    nome do destinatário (2 colunas) | cargo | unidade lotada
+
+  O assinante fica sozinho na primeira linha de propósito: ele é de OUTRA pessoa que
+  não as três células abaixo, que descrevem o destinatário. Emparelhá-lo com o nome do
+  destinatário poria dois nomes lado a lado sem dizer qual é qual.
+{% endcomment %}
+<div class="field-grid field-grid--cols-4">
+  <c-v2.form_field :field="assinaturas_form.assinante_oficio" extra_class="field-grid__span-all" />
+  <c-v2.form_field :field="destinatario_form.destinatario_oficio" extra_class="field-grid__span-2" />
+  <c-v2.form_field :field="destinatario_form.destinatario_oficio_cargo" />
+  <c-v2.form_field :field="destinatario_form.destinatario_oficio_unidade" />
+</div>

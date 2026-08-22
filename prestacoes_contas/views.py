@@ -42,7 +42,6 @@ from .document_views import (
 )
 from .model_views import modelo_editar
 from .model_views import modelo_excluir
-from .model_views import modelo_novo
 from .model_views import modelos_index
 from .download_views import prestacao_download_assinado
 from .download_views import prestacao_download_compilado
@@ -256,7 +255,6 @@ __all__ = [
     "marcar_agrupamento_cards",
     "modelo_editar",
     "modelo_excluir",
-    "modelo_novo",
     "modelos_index",
     "motorista_diario",
     "motorista_do_oficio",

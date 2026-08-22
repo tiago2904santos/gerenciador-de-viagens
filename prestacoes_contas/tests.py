@@ -25,6 +25,8 @@ from prestacoes_contas.models import PrestacaoDocumentoAnexo
 from prestacoes_contas.models import RelatorioTecnico
 from prestacoes_contas.presenters import apresentar_prestacao_servidor_card
 from prestacoes_contas.services import build_relatorio_tecnico_context
+from prestacoes_contas.services import descricao_ajustes_prestacao
+from prestacoes_contas.services import garantir_campos_padrao_relatorio_tecnico
 from prestacoes_contas.test_helpers import imagem_bytes
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroTrecho
@@ -147,6 +149,23 @@ class RelatorioTecnicoDiariaTests(TestCase):
         self.assertIn("next=%2Fprestacoes-contas%2Fservidor-prestacao%2F", manage_url)
         self.assertIn(f"%2F{ps.pk}%2Frt%2F", manage_url)
         self.assertTrue(manage_url.endswith("#grupo-motivo"))
+
+    def test_rodape_do_rt_nao_exibe_botao_salvar_texto(self):
+        oficio = Oficio.objects.create(
+            area=area_de_teste(),
+            numero=3,
+            ano=2026,
+            protocolo="123123123",
+        )
+        oficio.servidores.add(self.servidor_a)
+        prestacao = PrestacaoContas.objects.get(oficio=oficio)
+        ps = prestacao.servidores_prestacao.get(servidor=self.servidor_a)
+
+        response = self.client.get(reverse("prestacoes_contas:rt_servidor", args=[ps.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Salvar texto")
+        self.assertContains(response, "Ir para Diário de Bordo")
 
     def test_salvar_oficio_sincroniza_prestacoes_para_equipe_existente(self):
         oficio = Oficio.objects.create(area=area_de_teste(), 
@@ -738,6 +757,130 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.assertIn("Rua Central", contexto["endereco"])
         self.assertIn("Curitiba/PR", contexto["endereco"])
         self.assertEqual(contexto["email"], "teste@pc.pr.gov.br")
+
+    def test_troca_por_motorista_do_mesmo_oficio_apenas_informa(self):
+        motorista_original = Servidor.objects.create(
+            area=area_de_teste(),
+            nome="Motorista Original",
+            cargo=self.cargo,
+            cpf="22233344455",
+        )
+        self.oficio.servidores.add(motorista_original)
+        self.oficio.motorista = motorista_original
+        self.oficio.save(update_fields=["motorista", "updated_at"])
+        self.prestacao.refresh_from_db()
+        DiarioBordo.objects.create(
+            prestacao=self.prestacao,
+            motorista_modo=DiarioBordo.MOTORISTA_MODO_SERVIDOR,
+            motorista_servidor=self.servidor,
+        )
+
+        texto = descricao_ajustes_prestacao(self.prestacao)
+
+        self.assertEqual(
+            texto,
+            "Houve a troca do motorista Motorista Original para Servidor Rt.",
+        )
+
+    def test_troca_de_viatura_apenas_informa(self):
+        DiarioBordo.objects.create(
+            prestacao=self.prestacao,
+            viatura_modo=DiarioBordo.VIATURA_MODO_MANUAL,
+            viatura_manual_modelo="Duster",
+            viatura_manual_placa="AAA1234",
+        )
+
+        texto = descricao_ajustes_prestacao(self.prestacao)
+
+        self.assertEqual(
+            texto,
+            "Houve a troca da viatura não informada para Duster — AAA-1234.",
+        )
+
+    def test_motorista_de_outro_oficio_exige_justificativa(self):
+        motorista_original = Servidor.objects.create(
+            area=area_de_teste(),
+            nome="Motorista Original",
+            cargo=self.cargo,
+            cpf="22233344455",
+        )
+        self.oficio.servidores.add(motorista_original)
+        self.oficio.motorista = motorista_original
+        self.oficio.save(update_fields=["motorista", "updated_at"])
+        self.prestacao.refresh_from_db()
+        DiarioBordo.objects.create(
+            prestacao=self.prestacao,
+            motorista_modo=DiarioBordo.MOTORISTA_MODO_OUTRO,
+            motorista_manual_nome="Motorista Externo",
+            motorista_manual_cpf="33344455566",
+            motorista_oficio_referencia="20/2026",
+        )
+
+        texto = descricao_ajustes_prestacao(self.prestacao)
+
+        self.assertEqual(
+            texto,
+            "Houve a troca do motorista Motorista Original para Motorista Externo. Justificativa: ",
+        )
+
+    def test_texto_automatico_legado_sem_justificativa_digitada_e_corrigido(self):
+        motorista_original = Servidor.objects.create(
+            area=area_de_teste(),
+            nome="Motorista Original",
+            cargo=self.cargo,
+            cpf="22233344455",
+        )
+        self.oficio.servidores.add(motorista_original)
+        self.oficio.motorista = motorista_original
+        self.oficio.save(update_fields=["motorista", "updated_at"])
+        self.prestacao.refresh_from_db()
+        DiarioBordo.objects.create(
+            prestacao=self.prestacao,
+            motorista_modo=DiarioBordo.MOTORISTA_MODO_SERVIDOR,
+            motorista_servidor=self.servidor,
+        )
+        self.relatorio.info_complementares = (
+            "Houve a troca do motorista Motorista Original para Servidor Rt. Justificativa: "
+        )
+        self.relatorio.save(update_fields=["info_complementares", "atualizado_em"])
+
+        atualizados = garantir_campos_padrao_relatorio_tecnico(self.relatorio)
+
+        self.relatorio.refresh_from_db()
+        self.assertIn("info_complementares", atualizados)
+        self.assertEqual(
+            self.relatorio.info_complementares,
+            "Houve a troca do motorista Motorista Original para Servidor Rt.",
+        )
+
+    def test_justificativa_digitada_pelo_usuario_e_preservada(self):
+        motorista_original = Servidor.objects.create(
+            area=area_de_teste(),
+            nome="Motorista Original",
+            cargo=self.cargo,
+            cpf="22233344455",
+        )
+        self.oficio.servidores.add(motorista_original)
+        self.oficio.motorista = motorista_original
+        self.oficio.save(update_fields=["motorista", "updated_at"])
+        self.prestacao.refresh_from_db()
+        DiarioBordo.objects.create(
+            prestacao=self.prestacao,
+            motorista_modo=DiarioBordo.MOTORISTA_MODO_SERVIDOR,
+            motorista_servidor=self.servidor,
+        )
+        texto_editado = (
+            "Houve a troca do motorista Motorista Original para Servidor Rt. "
+            "Justificativa: necessidade operacional."
+        )
+        self.relatorio.info_complementares = texto_editado
+        self.relatorio.save(update_fields=["info_complementares", "atualizado_em"])
+
+        atualizados = garantir_campos_padrao_relatorio_tecnico(self.relatorio)
+
+        self.relatorio.refresh_from_db()
+        self.assertNotIn("info_complementares", atualizados)
+        self.assertEqual(self.relatorio.info_complementares, texto_editado)
 
     def test_data_rt_nao_fica_antes_do_retorno(self):
         roteiro = Roteiro.objects.create(area=area_de_teste(), 

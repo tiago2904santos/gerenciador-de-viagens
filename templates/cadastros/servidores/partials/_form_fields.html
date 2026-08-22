@@ -2,16 +2,19 @@
   Identificação do servidor. O RG tem invólucro próprio (`data-rg-field-wrap`):
   `components/card-toggle.js` o esconde quando "sem RG" está marcado.
 
-  CPF, RG e telefone ficam LADO A LADO, cada um numa coluna inteira da grade. Antes o
-  CPF e o RG moravam numa grade de duas colunas ANINHADA, que ocupava uma única coluna
-  da externa: os dois saíam com metade da largura do telefone, embora os três sejam a
-  mesma coisa — um número curto de identificação. O cargo passou para a linha dele por
-  consequência, e ganhou com isso: o nome da unidade vinha cortado em um terço da
-  largura ("POLÍ…").
+  Duas linhas de três colunas, e nenhuma trilha sobrando:
+
+    nome (2 colunas) | cargo (1)
+    CPF | RG | telefone
+
+  O nome leva duas porque é o único campo longo do bloco; o cargo cabe em uma sem
+  cortar o rótulo. Embaixo, os três números de identificação ficam do MESMO tamanho —
+  antes CPF e RG moravam numa grade de duas colunas ANINHADA, que ocupava uma única
+  coluna da externa, e saíam com metade da largura do telefone.
 {% endcomment %}
 <div class="field-grid field-grid--cols-3">
-  <c-v2.form_field :field="form.nome" extra_class="field-grid__span-all" />
-  <c-v2.field :label="form.cargo.label" :label_for="form.cargo.id_for_label" :error="form.cargo.errors.0" extra_class="field-grid__span-all">
+  <c-v2.form_field :field="form.nome" extra_class="field-grid__span-2" />
+  <c-v2.field :label="form.cargo.label" :label_for="form.cargo.id_for_label" :error="form.cargo.errors.0">
     <c-slot name="control">
       <c-v2.select_with_action
         :field="form.cargo"

@@ -69,6 +69,21 @@
   white-space: normal;
 }
 
+/* Motorista do diário — a mesma leitura em cartões rail da identificação,
+   reduzida aos dois fatos próprios deste bloco. */
+.diario-motorista-facts > .form-block--v2 {
+  min-width: 0;
+}
+
+.diario-motorista-facts .fact__value {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.diario-motorista-facts .fact-chips {
+  margin-top: var(--space-2);
+}
+
 :is(.rt-wizard-card, .diario-wizard-card, .docs-wizard-card, .consolidado-wizard-card)
   .oficio-documentos-viajantes-section
   .oficio-documentos-card--travellers {
@@ -187,6 +202,7 @@
 
 @media (max-width: 600px) {
   .prestacao-identificacao-facts,
+  :is(html[data-theme]) .diario-motorista-facts,
   .rt-summary-card .oficio-documentos-facts,
   .rt-custeios-grid,
   .diario-wizard-card .oficio-documentos-facts {

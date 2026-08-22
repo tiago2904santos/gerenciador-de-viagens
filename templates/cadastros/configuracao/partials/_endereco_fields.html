@@ -2,15 +2,28 @@
   `form.uf` sai SOZINHO, sem campo em volta: é o oculto que guarda a sigla que o
   `configuracoes.js` preenche a partir do CEP. O que a pessoa vê é `uf_nome`.
 {% endcomment %}
-<div class="field-grid">
+{% comment %}
+  Quatro colunas, três linhas, e o endereço se lê como endereço:
+
+    CEP | número | logradouro (2 colunas)
+    bairro (2) | cidade | UF
+    e-mail (2) | telefone | ramal
+
+  Antes era `field-grid` SEM contagem de colunas — e `.field-grid` sozinho não declara
+  `grid-template-columns`, então virava UMA coluna: dez campos, dez linhas, com o CEP
+  ocupando a largura inteira do painel. Os campos longos levavam `field--wide`, classe
+  que não existe em folha nenhuma do v2 e portanto não fazia nada; quem faz é
+  `field-grid__span-2`.
+{% endcomment %}
+<div class="field-grid field-grid--cols-4">
   <c-v2.form_field :field="form.cep" />
   <c-v2.form_field :field="form.numero" />
-  <c-v2.form_field :field="form.logradouro" extra_class="field--wide" />
-  <c-v2.form_field :field="form.bairro" extra_class="field--wide" />
+  <c-v2.form_field :field="form.logradouro" extra_class="field-grid__span-2" />
+  <c-v2.form_field :field="form.bairro" extra_class="field-grid__span-2" />
   <c-v2.form_field :field="form.cidade_endereco" />
   <c-v2.form_field :field="form.uf_nome" />
   {{ form.uf }}
-  <c-v2.form_field :field="form.email" extra_class="field--wide" />
+  <c-v2.form_field :field="form.email" extra_class="field-grid__span-2" />
   <c-v2.form_field :field="form.telefone" />
   <c-v2.form_field :field="form.ramal" />
 </div>

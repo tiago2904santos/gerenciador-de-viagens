@@ -13699,6 +13699,10 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+:is(html[data-theme]) .fact-list--band-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 /* Três linhas EMPILHADAS: rótulo, valor, apoio.
  *
  * Tentei o apoio ao lado do valor para economizar altura dentro do teto de

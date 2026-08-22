@@ -123,7 +123,6 @@ urlpatterns = [
     path("assinar/<str:token>/<str:tipo>/pdf/", assinatura_views.publico_pdf_origem, name="assinatura_pdf_origem"),
     # Modelos de texto reutilizáveis
     path("modelos-texto/", views.modelos_index, name="modelos_index"),
-    path("modelos-texto/novo/", views.modelo_novo, name="modelo_create"),
     path("modelos-texto/<int:pk>/editar/", views.modelo_editar, name="modelo_update"),
     path("modelos-texto/<int:pk>/excluir/", views.modelo_excluir, name="modelo_delete"),
 ]

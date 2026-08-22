@@ -10,13 +10,16 @@
     <c-slot name="controls">
       <form method="get" action="{{ request.path }}" class="rail__controls" data-server-filter-form>
         {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+        <input type="hidden" name="campo" value="{{ campo_ativo }}">
         <c-v2.input name="q" :value="q" placeholder="Buscar modelos de texto" aria_label="Buscar modelos de texto" icon="search" hook="data-server-filter-search" />
       </form>
     </c-slot>
+    <c-slot name="tabs">
+      <c-v2.toggle :items="abas" aria_label="Tópicos dos modelos de texto" />
+    </c-slot>
     <c-slot name="rows">
       {% for grupo in grupos %}
-        <c-v2.form_block :title="grupo.label" extra_class="modelos-grupo">
-          <c-slot name="actions">{% include "prestacoes_contas/partials/_modelos_grupo_actions.html" with grupo=grupo only %}</c-slot>
+        <c-v2.form_block :title="grupo.label" :element_id="grupo.section_id" extra_class="modelos-grupo">
           <c-slot name="body">{% include "prestacoes_contas/partials/_modelos_grupo_body.html" with grupo=grupo only %}</c-slot>
         </c-v2.form_block>
       {% endfor %}

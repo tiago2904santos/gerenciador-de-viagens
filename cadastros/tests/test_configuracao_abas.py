@@ -39,8 +39,17 @@ class ConfiguracaoAbasTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Assinantes e destinatário")
-        self.assertContains(response, "Destinatário do Ofício")
-        self.assertContains(response, "Assinante do Ofício")
+        # Um bloco só para os quatro campos. Eram dois irmãos, cada um com cabeçalho
+        # próprio, dentro de um painel que já se chamava "Assinantes e destinatário" —
+        # três títulos antes do primeiro campo.
+        self.assertContains(response, "Assinante e destinatário do Ofício")
+        self.assertNotContains(response, "Destinatário do Ofício")
+
+        # O picker NÃO desenha rótulo próprio: com `data-picker-label` ele repetia,
+        # dentro do campo, o que o `<label>` da tela já dizia logo acima — dois títulos
+        # empilhados antes da caixa de busca. Mesma trava que as telas de servidor e
+        # viatura já têm.
+        self.assertNotContains(response, "data-picker-label")
 
         response = self.client.get(
             reverse("cadastros:configuracao_aba", kwargs={"aba": "roteiros"})

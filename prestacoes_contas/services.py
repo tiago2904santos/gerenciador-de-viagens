@@ -36,7 +36,7 @@ from oficios.documents import build_canonical_document_payload
 from oficios.docxtpl_context import build_oficio_docxtpl_context
 
 from .diario_services import alteracoes_datas_horarios_roteiro
-from .diario_services import alteracoes_motorista_viatura
+from .diario_services import alteracoes_motorista_viatura_e_exigencia
 from .diario_services import diferencas_entre_roteiros
 from .diario_services import roteiro_efetivo
 from .diario_services import sincronizar_trechos
@@ -193,17 +193,20 @@ def _ajustes_roteiro_itens(prestacao) -> list[str]:
 
 
 def descricao_ajustes_prestacao(prestacao) -> str:
-    """Texto-prévia (com espaço para justificativa) para 'Informações complementares'
-    do RT, listando o que mudou nesta prestação em relação ao ofício: troca de
-    motorista, troca de viatura e ajustes de roteiro (datas/horários e diária).
-    Vazio quando nada mudou."""
-    itens = list(alteracoes_motorista_viatura(prestacao))
+    """Texto-prévia das alterações para ``Informações complementares`` do RT.
+
+    Apenas motorista vindo de outro ofício abre o pedido de justificativa. As
+    demais trocas e ajustes são registrados como informação objetiva.
+    """
+    itens, exige_justificativa = alteracoes_motorista_viatura_e_exigencia(prestacao)
+    itens = list(itens)
     itens += _ajustes_roteiro_itens(prestacao)
     if not itens:
         return ""
     corpo = "; ".join(itens)
     corpo = corpo[:1].upper() + corpo[1:]
-    return f"{corpo}. Justificativa: "
+    sufixo = ". Justificativa: " if exige_justificativa else "."
+    return f"{corpo}{sufixo}"
 
 
 def valor_diaria_liberado(servidor_prestacao) -> Decimal | None:
@@ -321,6 +324,13 @@ def garantir_campos_padrao_relatorio_tecnico(relatorio: RelatorioTecnico) -> lis
             # Ainda é o valor automático anterior (não editado manualmente):
             # sincroniza com o novo valor ajustado do roteiro.
             deve_atualizar = valor_atual != normalize_spaces(valor_padrao)
+
+        if campo == "info_complementares" and valor_atual and not valor_padrao.endswith("Justificativa:"):
+            # Corrige somente a prévia automática antiga, que terminava no
+            # marcador vazio. Qualquer justificativa realmente digitada pelo
+            # usuário continua intocada.
+            valor_automatico_legado = normalize_spaces(f"{valor_padrao} Justificativa:")
+            deve_atualizar = valor_atual == valor_automatico_legado
 
         if deve_atualizar:
             setattr(relatorio, campo, valor_padrao)

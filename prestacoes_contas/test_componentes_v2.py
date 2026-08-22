@@ -20,6 +20,8 @@ from django.conf import settings
 from django.test import SimpleTestCase
 from django.test import TestCase
 
+from prestacoes_contas.forms import DiarioBordoTrechoForm
+
 
 ROOT = Path(settings.BASE_DIR)
 TEMPLATES = ROOT / "templates"
@@ -36,6 +38,12 @@ def marcacao(template: Path) -> str:
 
 
 class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
+    def test_campos_de_km_do_diario_usam_input_v2(self):
+        form = DiarioBordoTrechoForm()
+
+        self.assertEqual(form.fields["km_inicial"].widget.attrs["class"], "input__control")
+        self.assertEqual(form.fields["km_final"].widget.attrs["class"], "input__control")
+
     def test_documentos_da_prestacao_usam_componentes_globais_v2(self):
         equipe = marcacao(PRESTACOES / "partials" / "_docs_equipe_body.html")
         documento = marcacao(PRESTACOES / "partials" / "_docs_attach_card.html")
@@ -67,13 +75,18 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
 
     def test_resumo_do_motorista_usa_fatos_globais_v2(self):
         source = marcacao(PRESTACOES / "partials" / "_diario_motorista_body.html")
+        wizard = marcacao(PRESTACOES / "partials" / "_diario_wizard_body.html")
 
-        self.assertIn('class="fact-list"', source)
+        self.assertIn('class="fact-list fact-list--band-2 diario-motorista-facts"', source)
+        self.assertEqual(source.count("<c-v2.form_block"), 2)
+        self.assertEqual(source.count('surface="rail"'), 2)
         self.assertIn('<c-v2.fact label="Motorista"', source)
         self.assertIn('<c-v2.fact label="Origem do motorista"', source)
+        self.assertIn('title="Motorista" description="Motorista efetivo deste diário"', wizard)
+        self.assertIn('label="Alterado" tone="warning"', source)
         self.assertNotIn("oficio-documentos-admin-facts", source)
         self.assertNotIn("oficio-documentos-facts", source)
-        self.assertNotIn("diario-motorista-fact", source)
+        self.assertNotIn('class="diario-motorista-fact"', source)
 
     def test_trechos_do_diario_reutilizam_a_composicao_v2_do_roteiro(self):
         corpo = marcacao(PRESTACOES / "partials" / "_diario_trecho_body.html")

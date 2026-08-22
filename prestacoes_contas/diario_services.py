@@ -439,18 +439,23 @@ def _viatura_texto(dados: dict) -> str:
     return txt or "não informada"
 
 
-def alteracoes_motorista_viatura(prestacao) -> list[str]:
-    """Frases descrevendo a troca de motorista e/ou viatura no diário desta prestação,
-    em relação ao ofício. Vazio quando nada foi trocado (ou não há diário)."""
+def alteracoes_motorista_viatura_e_exigencia(prestacao) -> tuple[list[str], bool]:
+    """Descreve as trocas e informa se elas exigem justificativa no RT.
+
+    Trocar para outro servidor já pertencente ao ofício e trocar a viatura são
+    ocorrências meramente informativas. A justificativa só é exigida quando o
+    motorista vem de outro ofício.
+    """
     diario = (
         DiarioBordo.objects.filter(prestacao=prestacao)
         .select_related("viatura", "viatura__combustivel", "motorista_servidor")
         .first()
     )
     if diario is None:
-        return []
+        return [], False
     oficio = prestacao.oficio
     itens = []
+    exige_justificativa = False
 
     if diario.motorista_alterado:
         nome_of, _ = motorista_do_oficio(oficio)
@@ -459,6 +464,7 @@ def alteracoes_motorista_viatura(prestacao) -> list[str]:
         para = format_document_display(nome_novo) or "não informado"
         if de != para:
             itens.append(f"houve a troca do motorista {de} para {para}")
+            exige_justificativa = diario.motorista_modo == DiarioBordo.MOTORISTA_MODO_OUTRO
 
     if diario.viatura_alterada:
         de = _viatura_texto(_viatura_dados(oficio))
@@ -466,6 +472,13 @@ def alteracoes_motorista_viatura(prestacao) -> list[str]:
         if de != para:
             itens.append(f"houve a troca da viatura {de} para {para}")
 
+    return itens, exige_justificativa
+
+
+def alteracoes_motorista_viatura(prestacao) -> list[str]:
+    """Frases descrevendo a troca de motorista e/ou viatura no diário desta prestação,
+    em relação ao ofício. Vazio quando nada foi trocado (ou não há diário)."""
+    itens, _ = alteracoes_motorista_viatura_e_exigencia(prestacao)
     return itens
 
 

@@ -44,7 +44,7 @@ class DiarioBordoTrechoForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(
             attrs={
-                **widget_attrs(WidgetStyle.FIELD_CONTROL),
+                **widget_attrs(WidgetStyle.INPUT_V2),
                 "inputmode": "numeric",
                 "placeholder": "0",
                 "autocomplete": "off",
@@ -56,7 +56,7 @@ class DiarioBordoTrechoForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(
             attrs={
-                **widget_attrs(WidgetStyle.FIELD_CONTROL),
+                **widget_attrs(WidgetStyle.INPUT_V2),
                 "inputmode": "numeric",
                 "placeholder": "0",
                 "autocomplete": "off",
@@ -734,13 +734,13 @@ class ModeloTextoRelatorioTecnicoForm(forms.ModelForm):
     nome = forms.CharField(
         label="Nome",
         help_text="Use um nome curto para identificar o modelo.",
-        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL)}),
+        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.INPUT_V2)}),
     )
     texto = forms.CharField(
         label="Texto do modelo",
         help_text="Este texto será copiado para o campo do relatório e poderá ser editado antes de gerar.",
         widget=forms.Textarea(
-            attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "rows": 6, "style": "width: 100%; height: 150px;"},
+            attrs={**widget_attrs(WidgetStyle.INPUT_V2_TEXTAREA), "rows": 6},
         ),
     )
 

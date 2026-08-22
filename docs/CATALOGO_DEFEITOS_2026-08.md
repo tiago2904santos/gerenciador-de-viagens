@@ -11536,3 +11536,51 @@ Ao abrir o gerenciamento de modelos por um campo do relatório técnico, a URL n
 origem e o catálogo não oferecia caminho de volta ao documento em edição. O link agora preserva
 o RT do servidor em um `next` interno validado, e o cabeçalho do catálogo exibe “Voltar para o
 relatório técnico”; a busca e os atalhos de novo modelo mantêm o mesmo contexto.
+
+### NOVO-20260822-202955-8ac3d1f720b1 ✅ RESOLVIDO · `NOVO` Cadastro de modelos do RT retirava o usuário da lista · HT/BE · risco baixo
+
+Cada grupo do catálogo enviava “Novo modelo” para uma página de formulário separada, obrigando o
+usuário a perder a visão dos modelos daquele tópico. Os grupos agora usam o quick add v2 no próprio
+bloco, com o campo do relatório fixado, validação localizada e retorno à âncora do grupo após salvar.
+
+### NOVO-20260822-204552-8d5c41fef153 ✅ RESOLVIDO · `NOVO` Catálogo do RT exibia simultaneamente as cinco listas de modelos · HT/BE · risco baixo
+
+Descrição do evento, objetivo da participação, conclusão, medidas a serem adotadas pelo órgão e
+informações complementares eram empilhados numa única página longa. O catálogo agora usa o toggle
+v2 como navegação entre tópicos e renderiza somente a lista e o quick add do tópico selecionado,
+preservando a busca e o retorno ao relatório técnico.
+
+### NOVO-20260822-205157-5320173713d8 ✅ RESOLVIDO · `NOVO` Rota legada ainda permitia criar modelo do RT fora do quick add · BE/HT · risco baixo
+
+Mesmo após o catálogo adotar quick add, a rota `/prestacoes-contas/modelos-texto/novo/`
+continuava oferecendo um formulário independente para qualquer tópico. A rota e sua view foram
+removidas; a criação de modelos agora existe exclusivamente no quick add do tópico selecionado.
+O formulário compartilhado permanece apenas para editar registros existentes.
+
+### NOVO-20260822-205657-f66cf48fad25 ✅ RESOLVIDO · `NOVO` Toda troca operacional do diário exigia justificativa no RT · BE · risco médio
+
+A prévia de informações complementares acrescentava “Justificativa” indistintamente para troca
+de motorista, viatura ou ajustes do roteiro. O relatório agora exige justificativa somente quando
+o motorista vem de outro ofício; motorista da equipe e viatura trocada são apenas informados. A
+mensagem automática legada sem conteúdo digitado é corrigida ao abrir o RT, preservando qualquer
+texto efetivamente editado pelo usuário.
+
+### NOVO-20260822-210932-dbc4ed65332a ✅ RESOLVIDO · `NOVO` Rodapé do relatório técnico repetia ação de salvamento · HT · risco baixo
+
+Embora os textos do relatório sejam persistidos pelo autosave, o rodapé ainda exibia “Salvar
+texto”, sugerindo uma segunda etapa manual e redundante. A ação foi removida; permanecem o retorno
+à lista e o avanço para o Diário de Bordo.
+
+### NOVO-20260822-211325-fa86c63249cb ✅ RESOLVIDO · `NOVO` Resumo do motorista divergia da identificação administrativa · HT/CSS · risco baixo
+
+Motorista, CPF e origem eram fatos soltos em um corpo largo, produzindo valores excessivamente
+grandes e sem a superfície semântica usada logo acima. O resumo agora distribui motorista e origem
+em dois cartões iguais na superfície `rail`, com o selo de alteração integrado ao segundo cartão e
+quebra para uma coluna em telas estreitas.
+
+### NOVO-20260822-212515-f4ae36c3d6b3 ✅ RESOLVIDO · `NOVO` Campos de quilometragem do diário herdavam o input legado · HT/PY · risco baixo
+
+Os campos KM inicial e KM final eram renderizados pelo componente `input` v2, mas seus widgets
+Django ainda emitiam a classe `cv-field__control`. Como o controle ficava aninhado no componente,
+a regra contextual do v2 não o alcançava e o estilo legado prevalecia. Os dois widgets agora usam
+diretamente `input__control`, igual aos demais campos de entrada do diário.

@@ -1,18 +1,17 @@
-{% if motorista_resumo.cpf %}
-  {% with cpf_motorista="CPF "|add:motorista_resumo.cpf %}
-    <div class="fact-list" aria-label="Motorista do diário">
-      <c-v2.fact label="Motorista" :value="motorista_resumo.nome" :note="cpf_motorista" />
+<div class="fact-list fact-list--band-2 diario-motorista-facts" aria-label="Motorista do diário">
+  <c-v2.form_block aria_label="Motorista" surface="rail">
+    <c-slot name="body">
+      {% if motorista_resumo.cpf %}
+        {% with cpf_motorista="CPF "|add:motorista_resumo.cpf %}<c-v2.fact label="Motorista" :value="motorista_resumo.nome" :note="cpf_motorista" />{% endwith %}
+      {% else %}
+        <c-v2.fact label="Motorista" :value="motorista_resumo.nome" />
+      {% endif %}
+    </c-slot>
+  </c-v2.form_block>
+  <c-v2.form_block aria_label="Origem do motorista" surface="rail">
+    <c-slot name="body">
       <c-v2.fact label="Origem do motorista" :value="motorista_resumo.origem" />
-    </div>
-  {% endwith %}
-{% else %}
-  <div class="fact-list" aria-label="Motorista do diário">
-    <c-v2.fact label="Motorista" :value="motorista_resumo.nome" />
-    <c-v2.fact label="Origem do motorista" :value="motorista_resumo.origem" />
-  </div>
-{% endif %}
-{% if motorista_resumo.alterado %}
-  <div class="fact-chips">
-    <c-v2.chip label="Alterado" tone="warning" size="compact" only />
-  </div>
-{% endif %}
+      {% if motorista_resumo.alterado %}<div class="fact-chips"><c-v2.chip label="Alterado" tone="warning" size="compact" only /></div>{% endif %}
+    </c-slot>
+  </c-v2.form_block>
+</div>

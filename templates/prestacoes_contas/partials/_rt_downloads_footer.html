@@ -3,7 +3,6 @@
     {% with cotton_attr_href=back_url|default:"/prestacoes-contas/" %}<c-v2.button :href="cotton_attr_href" label="Voltar à lista" variant="secondary" icon="arrow-left" only />{% endwith %}
   </c-slot>
   <c-slot name="primary">
-    <c-v2.button label="Salvar texto" variant="secondary" type="submit" name="action" value="save" only />
     <c-v2.button :href="diario_url" label="Ir para Diário de Bordo" variant="primary" icon="arrow-right" :icon_after="True" only />
   </c-slot>
 </c-v2.card_footer>

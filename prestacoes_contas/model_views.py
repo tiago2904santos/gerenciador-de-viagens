@@ -1,5 +1,7 @@
 """CRUD dos modelos de texto reutilizáveis do relatório técnico."""
 
+from urllib.parse import urlencode
+
 from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -26,10 +28,45 @@ _CAMPO_LABELS = dict(ModeloTextoRelatorioTecnico.CAMPO_CHOICES)
 def modelos_index(request):
     q = (request.GET.get("q") or "").strip()
     return_url = next_valido(request)
-    novo_base = reverse("prestacoes_contas:modelo_create")
+    index_url = reverse("prestacoes_contas:modelos_index")
+    quick_add_campo = (request.POST.get("quick_add_campo") or "").strip()
+    campo_solicitado = quick_add_campo or (request.GET.get("campo") or "").strip()
+    campo_ativo = campo_solicitado if campo_solicitado in _CAMPO_LABELS else ModeloTextoRelatorioTecnico.CAMPO_CHOICES[0][0]
+
+    abas = []
+    for campo, label in ModeloTextoRelatorioTecnico.CAMPO_CHOICES:
+        params = {"campo": campo}
+        if q:
+            params["q"] = q
+        if return_url:
+            params["next"] = return_url
+        abas.append(
+            {
+                "campo": campo,
+                "label": label,
+                "url": f"{index_url}?{urlencode(params)}",
+                "is_active": campo == campo_ativo,
+            }
+        )
 
     grupos = []
     for campo, label in ModeloTextoRelatorioTecnico.CAMPO_CHOICES:
+        if campo != campo_ativo:
+            continue
+        prefixo = f"modelo-{campo}"
+        quick_add_form = ModeloTextoRelatorioTecnicoForm(
+            request.POST if request.method == "POST" and quick_add_campo == campo else None,
+            initial={"campo": campo},
+            prefix=prefixo,
+        )
+        if request.method == "POST" and quick_add_campo == campo and quick_add_form.is_valid():
+            modelo = quick_add_form.save(commit=False)
+            modelo.area = getattr(request, "area", None)
+            modelo.save()
+            messages.success(request, "Modelo criado com sucesso.")
+            destino = com_next(_voltar_modelos_url(campo), return_url)
+            return redirect(f"{destino}#grupo-{campo}")
+
         modelos = filter_queryset_by_area(ModeloTextoRelatorioTecnico.objects).filter(campo=campo)
         if q:
             q_unaccent = remove_accents(q)
@@ -55,7 +92,10 @@ def modelos_index(request):
                 "campo": campo,
                 "label": label,
                 "rows": rows,
-                "new_url": com_next(f"{novo_base}?campo={campo}", return_url),
+                "section_id": f"grupo-{campo}",
+                "quick_add_form": quick_add_form,
+                "quick_add_panel_id": f"quick-add-modelo-{campo}",
+                "quick_add_action": f"{com_next(index_url, return_url)}#grupo-{campo}",
             }
         )
 
@@ -67,35 +107,11 @@ def modelos_index(request):
             "page_description": "Textos reutilizáveis para preencher rapidamente os campos do relatório técnico.",
             "q": q,
             "grupos": grupos,
+            "abas": abas,
+            "campo_ativo": campo_ativo,
             "back_url": return_url,
             "back_label": "Voltar para o relatório técnico",
             "next_url": return_url,
-        },
-    )
-
-def modelo_novo(request):
-    initial = {}
-    campo = (request.GET.get("campo") or "").strip()
-    if campo in _CAMPO_LABELS:
-        initial["campo"] = campo
-
-    form = ModeloTextoRelatorioTecnicoForm(request.POST or None, initial=initial)
-    if request.method == "POST" and form.is_valid():
-        modelo = form.save(commit=False)
-        modelo.area = getattr(request, "area", None)
-        modelo.save()
-        messages.success(request, "Modelo criado com sucesso.")
-        return redirect(_voltar_modelos_url(form.cleaned_data["campo"]))
-
-    return render(
-        request,
-        "prestacoes_contas/modelos_texto/form.html",
-        {
-            "page_title": "Novo modelo de texto",
-            "page_description": "Crie textos reutilizáveis para agilizar o preenchimento do relatório técnico.",
-            "form": form,
-            "back_url": reverse("prestacoes_contas:modelos_index"),
-            "submit_label": "Salvar modelo",
         },
     )
 

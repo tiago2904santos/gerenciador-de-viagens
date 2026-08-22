@@ -1,9 +1,5 @@
-<c-v2.form_block title="Assinante do Ofício" description="Servidor que assina o ofício por padrão">
-  <c-slot name="body">{% include "cadastros/configuracao/partials/_assinante_oficio_fields.html" with assinaturas_form=assinaturas_form only %}</c-slot>
-</c-v2.form_block>
-
-<c-v2.form_block title="Destinatário do Ofício" description="Nome, cargo e unidade lotada">
-  <c-slot name="body">{% include "cadastros/configuracao/partials/_destinatario_fields.html" with destinatario_form=destinatario_form only %}</c-slot>
+<c-v2.form_block title="Assinante e destinatário do Ofício" description="Quem assina e para quem o ofício é endereçado">
+  <c-slot name="body">{% include "cadastros/configuracao/partials/_assinante_destinatario_fields.html" with assinaturas_form=assinaturas_form destinatario_form=destinatario_form only %}</c-slot>
 </c-v2.form_block>
 
 <c-v2.form_block title="Demais assinantes" description="Servidor que assina cada espécie por padrão">

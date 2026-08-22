@@ -707,14 +707,6 @@ class _AssinanteServidorSelect(forms.Select):
         return option
 
 
-_ASSINANTE_PICKER_LABELS = {
-    "assinante_oficio": "Assinante do Ofício",
-    "assinante_justificativa": "Assinante da Justificativa",
-    "assinante_plano_trabalho": "Assinante do Plano de Trabalho",
-    "assinante_ordem_servico": "Assinante da Ordem de Serviço",
-}
-
-
 class ConfiguracaoAssinaturasForm(forms.Form):
     """Seleção de assinante padrão por tipo de documento."""
 
@@ -727,7 +719,6 @@ class ConfiguracaoAssinaturasForm(forms.Form):
                 existing[ass.tipo] = ass.servidor
 
         for tipo, field_name, label in _TIPO_FIELD_MAP:
-            picker_label = _ASSINANTE_PICKER_LABELS.get(field_name, label)
             self.fields[field_name] = forms.ModelChoiceField(
                 queryset=qs,
                 required=False,
@@ -739,8 +730,12 @@ class ConfiguracaoAssinaturasForm(forms.Form):
                         "data-entity-picker": "true",
                         "data-entity-picker-mode": "single",
                         "data-picker-variant": "compact",
-                        "data-picker-label": picker_label,
-                        "data-picker-hint": "Busque por nome, cargo ou CPF.",
+                        # SEM `data-picker-label`: com ele o picker desenha um SEGUNDO
+                        # rótulo dentro do campo, embaixo do `<label>` que a tela já
+                        # emite — "Assinante padrão – Ofício" e logo abaixo "Assinante
+                        # do Ofício", dizendo a mesma coisa duas vezes. O nome
+                        # acessível do input não se perde: `components/picker.js` cai
+                        # no `<label for>` da tela quando o atributo falta.
                         "data-placeholder": "Buscar servidor",
                         "data-empty-message": "Nenhum servidor encontrado.",
                     }
@@ -801,7 +796,7 @@ class ConfiguracaoDestinatarioForm(forms.ModelForm):
                 "data-entity-picker": "true",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "compact",
-                "data-picker-label": "Nome",
+                # Mesma razão do assinante: o rótulo do campo já diz "Nome".
                 "data-placeholder": "Buscar ou digitar nome",
                 "data-empty-message": "Nenhum servidor encontrado.",
                 "data-picker-allow-free-text": "true",
