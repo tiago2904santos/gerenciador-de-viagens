@@ -181,6 +181,8 @@ class PlanoIdentificacaoForm(forms.ModelForm):
             kwargs["data"] = data
 
         super().__init__(*args, **kwargs)
+        for campo in ("coordenador_adm_genero", "coordenador_op_genero"):
+            self.fields[campo].choices = PlanoTrabalho.COORDENADOR_GENERO_CHOICES
         estado_id, cidade_id = self._resolve_destino_inicial()
         programa_choices = [("", "Selecione um programa (opcional)"), (self.PROGRAMA_OUTRO_VALUE, "Outro")]
         programa_choices.extend(
@@ -338,7 +340,15 @@ class PlanoIdentificacaoForm(forms.ModelForm):
         else:
             destinos = []
             if self.instance and self.instance.pk:
-                destinos = list(self.instance.destinos.select_related("cidade", "estado").order_by("ordem", "pk"))
+                # O relacionamento também contém as cópias persistidas de cada
+                # EventoPlano. A etapa edita somente o scratchpad; misturar os
+                # dois conjuntos renderiza cada destino duas vezes ao abrir um
+                # evento já salvo para edição.
+                destinos = list(
+                    self.instance.destinos.filter(evento__isnull=True)
+                    .select_related("cidade", "estado")
+                    .order_by("ordem", "pk")
+                )
             if destinos:
                 rows.append(self._destination_row_from_values(0, destinos[0].estado_id, destinos[0].cidade_id))
                 for idx, destino in enumerate(destinos[1:], 1):
@@ -862,10 +872,41 @@ class PresetAtividadesQuickAddForm(forms.ModelForm):
 
 
 class HorarioAtendimentoForm(forms.ModelForm):
+    faixa = forms.CharField(required=False, widget=forms.HiddenInput())
+    horario_inicio = forms.TimeField(
+        label="Horário de início",
+        input_formats=["%H:%M"],
+        widget=forms.TimeInput(
+            format="%H:%M",
+            attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "type": "time"},
+        ),
+    )
+    horario_fim = forms.TimeField(
+        label="Horário de fim",
+        input_formats=["%H:%M"],
+        widget=forms.TimeInput(
+            format="%H:%M",
+            attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "type": "time"},
+        ),
+    )
+
     class Meta:
         model = HorarioAtendimento
-        fields = ["faixa", "ativo", "ordem"]
-        widgets = {
-            "faixa": forms.TextInput(attrs={**text_attrs(WidgetStyle.FIELD_CONTROL), "placeholder": "Ex.: 09:00 até 17:00"}),
-            "ordem": forms.NumberInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "min": "0", "step": "1"}),
-        }
+        fields = ["faixa"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.is_bound or not self.instance.pk:
+            return
+        inicio, separador, fim = (self.instance.faixa or "").partition(" até ")
+        if separador:
+            self.initial["horario_inicio"] = inicio.strip()
+            self.initial["horario_fim"] = fim.strip()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        inicio = cleaned_data.get("horario_inicio")
+        fim = cleaned_data.get("horario_fim")
+        if inicio and fim:
+            cleaned_data["faixa"] = f"{inicio:%H:%M} até {fim:%H:%M}"
+        return cleaned_data

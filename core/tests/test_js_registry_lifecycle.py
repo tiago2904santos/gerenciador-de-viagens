@@ -74,9 +74,19 @@ class JavascriptRegistryLifecycleTests(SimpleTestCase):
         self.assertIn("window.CV.registry = {", self.registry_source)
         self.assertIn("destroy: destroy", self.registry_source)
         self.assertIn(
-            "Array.prototype.forEach.call(mutation.removedNodes, destroy)",
+            "Array.prototype.forEach.call(mutation.removedNodes, function (node) {",
             self.registry_source,
         )
+        self.assertIn("destroy(node);", self.registry_source)
+
+    def test_registry_nao_desmonta_no_que_so_mudou_de_lugar(self):
+        """MOVER um no o lista em `removedNodes`; desmontar ali arranca os
+        listeners de algo que continua na tela. Foi o que aconteceu com o
+        calendario dos trechos, que o editor tira do estacionamento e poe no
+        cabecalho do primeiro trecho: ele perdia o fechar-ao-clicar-fora e o
+        reposicionamento na rolagem, e nao voltava — `initPicker` para na marca
+        de ja-montado."""
+        self.assertIn("if (node && node.isConnected) return;", self.registry_source)
 
     def test_live_search_destroys_old_panel_before_replacing_it(self):
         destroy_call = "window.CV.registry.destroy(currentPanel)"

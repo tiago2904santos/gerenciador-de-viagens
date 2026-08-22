@@ -49,7 +49,6 @@
           {% with opcoes_do_erro=erro_id|add:"," %}
             {% with erro_ref=erro_atividades|yesno:opcoes_do_erro %}
               <c-v2.choice_grid
-                :dense="True"
                 aria_label="Atividades do preset"
                 :describedby="ajuda_id"
                 :error_id="erro_ref"

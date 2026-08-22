@@ -237,3 +237,23 @@
   flex: 1 1 auto;
   min-width: 0;
 }
+
+/* Na etapa de atividades, a busca ocupa uma metade completa; limpar e aplicar
+   preset compartilham a outra. A marcação agrupada continua sendo a do
+   componente, mas aqui as duas responsabilidades têm pesos iguais. */
+:is(html[data-theme]) [data-pt-activity] .choice-grid__toolbar {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+:is(html[data-theme]) [data-pt-activity] .choice-grid__toolbar-start,
+:is(html[data-theme]) [data-pt-activity] .choice-grid__toolbar-end {
+  margin-left: 0;
+  width: 100%;
+}
+
+@media (max-width: 720px) {
+  :is(html[data-theme]) [data-pt-activity] .choice-grid__toolbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

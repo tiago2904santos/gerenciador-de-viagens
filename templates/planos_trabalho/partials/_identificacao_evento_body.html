@@ -9,14 +9,14 @@
   bloco ocupava a altura de uma seção para um `<select>`.
 {% endcomment %}
 <c-v2.form_block
-  :split="True"
   title="Período do evento"
   description="Data inicial e final, e o horário de atendimento."
 >
   <c-slot name="body">
-    <div class="field-grid field-grid--cols-2">
+    <div class="field-grid field-grid--cols-3">
       <c-v2.date_picker
         mode="range"
+        extra_class="field-grid__span-2"
         picker_id="pt-evento-date-picker"
         :start_field="form.data_evento_inicio"
         :end_field="form.data_evento_fim"

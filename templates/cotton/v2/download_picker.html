@@ -14,9 +14,9 @@
   A lista vem do servidor (`termos:termo_cadastro_downloads`), montada a partir
   do MESMO card da lista — os rótulos aqui e no cartão não podem divergir.
 
-  O `data-download-picker` mora num `<div>` dentro do corpo, e não no `<dialog>`:
-  `c-v2.modal` não repassa atributos, e o JS chega ao diálogo com `closest`.
-  Trocar isso exigiria mudar o modal para todo mundo.
+  O modal usa `own_form`: o picker também aparece dentro de formulários de edição,
+  e um `<form method="dialog">` aninhado seria descartado pelo navegador junto com
+  a classe `modal__shell` que aplica o padding. O fechamento usa o gancho comum.
 
   O gancho do gatilho é SEM VALOR, e o JS acha o diálogo pelo elemento que
   envolve os dois. Um `hook` com valor sairia escapado (`&quot;`) e o seletor
@@ -35,7 +35,7 @@
   hook="data-download-picker-trigger"
 />
 
-<c-v2.modal :modal_id="picker_id" title="Baixar documentos">
+<c-v2.modal :modal_id="picker_id" title="Baixar documentos" :own_form="True">
   <c-slot name="body">
     <div class="download-picker" data-download-picker data-src="{{ src }}">
       <p class="download-picker__hint">Marque o que você quer baixar.</p>
@@ -106,7 +106,7 @@
   </c-slot>
 
   <c-slot name="actions">
-    <c-v2.button label="Fechar" type="submit" />
+    <c-v2.button label="Fechar" type="button" hook="data-overlay-close" />
     <c-v2.button
       label="Baixar"
       variant="primary"

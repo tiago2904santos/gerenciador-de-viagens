@@ -195,6 +195,8 @@ class PresetsTests(CatalogoCaracterizacaoMixin, TestCase):
         self.assertIn("Atividades previstas", html)
         self.assertIn('role="group"', html)
         self.assertIn('aria-label="Atividades do preset"', html)
+        self.assertIn('class="choice-grid"', html)
+        self.assertNotIn('choice-grid--dense', html)
         self.assertIn(
             'id="id_atividades_helptext">Clique nas atividades para incluir ou retirar do preset.',
             html,
@@ -292,6 +294,24 @@ class ProgramasTests(CatalogoCaracterizacaoMixin, TestCase):
 class HorariosTests(CatalogoCaracterizacaoMixin, TestCase):
     url_index = "planos_trabalho:horarios_index"
 
+    def test_next_do_plano_exibe_acao_para_retornar_ao_ponto_de_origem(self):
+        destino = "/planos-trabalho/5/identificacao/"
+
+        response = self.client.get(self._index(next=destino))
+
+        self.assertEqual(response.context["back_url"], destino)
+        self.assertEqual(response.context["back_label"], "Voltar ao plano de trabalho")
+        self.assertEqual(response.context["quick_add_next_url"], destino)
+        self.assertContains(response, 'href="/planos-trabalho/5/identificacao/"')
+        self.assertContains(response, "Voltar ao plano de trabalho")
+
+    def test_next_externo_nao_e_aceito_como_retorno(self):
+        response = self.client.get(self._index(next="https://example.com/armadilha"))
+
+        self.assertEqual(response.context["back_url"], reverse("planos_trabalho:index"))
+        self.assertEqual(response.context["back_label"], "Voltar")
+        self.assertEqual(response.context["quick_add_next_url"], "")
+
     def test_lista_abre_com_a_faixa_como_titulo(self):
         HorarioAtendimento.objects.create(area=area_de_teste(), faixa="07:15 até 11:45", ordem=9)
 
@@ -300,16 +320,42 @@ class HorariosTests(CatalogoCaracterizacaoMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("07:15 até 11:45", [linha["title"] for linha in response.context["linhas"]])
 
+    def test_formulario_e_lista_nao_expoem_ativo_nem_ordem(self):
+        horario = HorarioAtendimento.objects.create(
+            area=area_de_teste(), faixa="07:15 até 11:45", ordem=9, ativo=False
+        )
+
+        response = self.client.get(self._index())
+        linha = next(item for item in response.context["linhas"] if item["title"] == horario.faixa)
+
+        self.assertNotContains(response, 'name="ativo"')
+        self.assertNotContains(response, 'name="ordem"')
+        self.assertContains(response, 'name="horario_inicio"')
+        self.assertContains(response, 'name="horario_fim"')
+        self.assertContains(response, "quick-add__section-layout--split")
+        self.assertEqual(linha["badges"], [])
+        self.assertEqual(linha["meta"], [])
+
+    def test_criacao_sem_controles_ocultos_usa_defaults_do_modelo(self):
+        response = self.client.post(
+            reverse(self.url_index), {"horario_inicio": "06:00", "horario_fim": "14:00"}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        horario = HorarioAtendimento.objects.get(faixa="06:00 até 14:00")
+        self.assertTrue(horario.ativo)
+        self.assertEqual(horario.ordem, 100)
+
     def test_criacao_e_edicao_avisam_com_as_frases_do_horario(self):
         response = self.client.post(
-            reverse(self.url_index), {"faixa": "07:20 até 12:40", "ativo": "on", "ordem": "9"}
+            reverse(self.url_index), {"horario_inicio": "07:20", "horario_fim": "12:40"}
         )
         self.assertIn("Horário cadastrado.", self._mensagens(response))
 
         horario = HorarioAtendimento.objects.get(faixa="07:20 até 12:40")
         response = self.client.post(
             reverse("planos_trabalho:horario_update", args=[horario.pk]),
-            {"faixa": "07:20 até 13:50", "ativo": "on", "ordem": "9"},
+            {"horario_inicio": "07:20", "horario_fim": "13:50"},
         )
         self.assertIn("Horário atualizado.", self._mensagens(response))
 

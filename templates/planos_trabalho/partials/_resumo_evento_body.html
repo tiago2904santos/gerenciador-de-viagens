@@ -19,13 +19,13 @@
     {% with efetivo_titulo=ev.efetivo_total|stringformat:"s"|add:" servidor(es)" %}
       <c-v2.fact label="Efetivo" :value="efetivo_titulo" />
     {% endwith %}
-    <div class="fact-chips">
+    <div class="fact-chips plan-event-summary__effective-list">
       {% for it in ev.efetivo_itens %}
         {% with base_label=it.quantidade|stringformat:"s"|add:" · "|add:it.cargo %}
           {% if it.unidade %}
-            {% with item_label=base_label|add:" · "|add:it.unidade %}<c-v2.chip :label="item_label" tone="info" />{% endwith %}
+            {% with item_label=base_label|add:" · "|add:it.unidade %}<c-v2.chip :label="item_label" tone="info" extra_class="plan-event-summary__effective-chip" />{% endwith %}
           {% else %}
-            <c-v2.chip :label="base_label" tone="info" />
+            <c-v2.chip :label="base_label" tone="info" extra_class="plan-event-summary__effective-chip" />
           {% endif %}
         {% endwith %}
       {% empty %}
@@ -38,17 +38,18 @@
 <c-v2.form_block aria_label="Diárias e atividades do evento" extra_class="plan-event-summary__block">
   <c-slot name="body">
     <div class="fact-list">
-      <c-v2.fact label="Valor total" :value="ev.valor_total_display" :strong="True" note_label="Quantidade de diárias" :note="ev.diarias_composicao" />
+      <c-v2.fact label="Valor total" :value="ev.valor_total_display" :strong="True" extra_class="plan-event-summary__allowance-primary" />
+      <c-v2.fact label="Quantidade de diárias" :value="ev.diarias_composicao" :strong="True" extra_class="plan-event-summary__allowance-primary" />
       {% with atividades_titulo=ev.atividades_count|stringformat:"s"|add:" selecionada(s)" %}
         <c-v2.fact label="Atividades" :value="atividades_titulo" />
       {% endwith %}
     </div>
-    <div class="fact-chips">
+    <ul class="plan-event-summary__activity-list" aria-label="Atividades selecionadas">
       {% for nome in ev.atividades %}
-        <c-v2.chip :label="nome" />
+        <li>{{ nome }}</li>
       {% empty %}
-        <c-v2.chip label="Nenhuma atividade selecionada" />
+        <li>Nenhuma atividade selecionada</li>
       {% endfor %}
-    </div>
+    </ul>
   </c-slot>
 </c-v2.form_block>

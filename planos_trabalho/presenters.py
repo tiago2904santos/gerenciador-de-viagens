@@ -568,10 +568,11 @@ def apresentar_linha_lista_simples_programa(
 def apresentar_linha_lista_simples_horario(
     horario, *, edit_url="#", delete_url="#", delete_modal=False
 ):
-    return _linha_ordenavel(
-        horario,
-        horario.faixa,
-        edit_url=edit_url,
-        delete_url=delete_url,
-        delete_modal=delete_modal,
-    )
+    return {
+        "title": horario.faixa,
+        "badges": [],
+        "meta": [],
+        "edit_url": edit_url,
+        "delete_url": delete_url,
+        "delete_modal": delete_modal,
+    }

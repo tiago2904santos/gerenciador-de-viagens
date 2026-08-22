@@ -13,8 +13,23 @@
 >
   <c-slot name="meta">{{ row.meta_line }}</c-slot>
   <c-slot name="actions">
-    {% if row.pdf_url %}
-      <c-v2.icon_button icon="pdf" :href="row.pdf_url" target="_blank" aria_label="Abrir o PDF do termo" tooltip="Ver PDF" />
+    {% if row.visualizar_url or row.pdf_url or row.docx_url %}
+      {% with row_index|stringformat:"s" as row_index_text %}
+        {% with menu_id="evento-termo-document-menu-"|add:row_index_text %}
+          <c-v2.icon_button icon="more" :menu_id="menu_id" aria_label="Abrir menu de documentos do termo" tooltip="Documentos" />
+          <c-v2.menu :id="menu_id" extra_class="action-menu" :aria_label="row.title">
+            {% if row.visualizar_url %}
+              <c-v2.menu_item :href="row.visualizar_url" title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" icon_tone="view" :target_blank="True" />
+            {% endif %}
+            {% if row.pdf_url %}
+              <c-v2.menu_item :href="row.pdf_url" title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" icon_tone="pdf" :download="True" />
+            {% endif %}
+            {% if row.docx_url %}
+              <c-v2.menu_item :href="row.docx_url" title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" icon_tone="docx" :download="True" />
+            {% endif %}
+          </c-v2.menu>
+        {% endwith %}
+      {% endwith %}
     {% endif %}
     {% if row.anexar_assinado_url %}
       <c-v2.attach_signed_button

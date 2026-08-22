@@ -25,7 +25,13 @@ class TermoServidorPresenterTests(SimpleTestCase):
             termo,
             servidor,
             delete_url="/termos/12/excluir/",
+            visualizar_url="/termos/12/servidor/7/pdf-inline/",
+            pdf_url="/termos/12/servidor/7/pdf/",
+            docx_url="/termos/12/servidor/7/docx/",
         )
 
         self.assertEqual(row["delete_url"], "/termos/12/excluir/")
         self.assertTrue(row["delete_modal"])
+        self.assertEqual(row["visualizar_url"], "/termos/12/servidor/7/pdf-inline/")
+        self.assertEqual(row["pdf_url"], "/termos/12/servidor/7/pdf/")
+        self.assertEqual(row["docx_url"], "/termos/12/servidor/7/docx/")

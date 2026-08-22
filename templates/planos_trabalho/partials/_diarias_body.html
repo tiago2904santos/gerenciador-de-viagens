@@ -8,31 +8,30 @@
   reescrever o valor a cada mudança de data, hora ou efetivo; o valor por extenso
   vai na NOTA do fato, porque explica o número que acabou de ser lido.
 {% endcomment %}
-<div class="field-grid field-grid--cols-4">
-  <c-v2.date_picker
-    mode="range"
-    picker_id="pt-diarias-date-picker"
-    extra_class="field-grid__span-2"
-    :start_field="diarias_form.saida_sede_data"
-    :end_field="diarias_form.chegada_sede_data"
-    start_input_id="id_pt_saida_sede_data_display"
-    end_input_id="id_pt_chegada_sede_data_display"
-    placeholder_start="Data de saída da sede"
-    placeholder_end="Data de chegada na sede"
-    :show_summary="False"
-    aria_label="Deslocamento até a sede"
-  />
-  <c-v2.form_field :field="diarias_form.saida_sede_hora" label="Hora de saída" />
-  <c-v2.form_field :field="diarias_form.chegada_sede_hora" label="Hora de chegada" />
-</div>
-
 {% comment %}
-  O aviso pertence ao preenchimento do deslocamento, por isso aparece logo
-  abaixo de data e hora, antes do resumo financeiro que esses campos calculam.
+  O aviso antecede os controles aos quais se refere, para orientar o
+  preenchimento antes da leitura da linha de data e hora.
 {% endcomment %}
 {% with erros_do_calculo=diarias_resultado.erros|join:" " %}
   <c-v2.alert tone="warning" :message="erros_do_calculo" hook="data-pt-diarias-erros" />
 {% endwith %}
+
+<c-v2.date_picker
+  mode="range"
+  picker_id="pt-diarias-date-picker"
+  extra_class="date-picker--interleaved-range"
+  :start_field="diarias_form.saida_sede_data"
+  :end_field="diarias_form.chegada_sede_data"
+  :start_adjacent_field="diarias_form.saida_sede_hora"
+  :end_adjacent_field="diarias_form.chegada_sede_hora"
+  start_input_id="id_pt_saida_sede_data_display"
+  end_input_id="id_pt_chegada_sede_data_display"
+  placeholder_start="Data de saída da sede"
+  placeholder_end="Data de chegada na sede"
+  range_controls_template="planos_trabalho/partials/_diarias_range_controls.html"
+  :show_summary="False"
+  aria_label="Deslocamento até a sede"
+/>
 
 {% comment %}
   O resumo repete a composição V2 usada nos resumos do ofício e do roteiro:
@@ -54,7 +53,10 @@
         <c-slot name="body"><c-v2.fact label="Valor por servidor" :value="valor_unitario" :strong="True" value_hook="data-pt-resultado-unitario" note_label="Valor por extenso" :note="diarias_resultado.valor_unitario_extenso" note_hook="data-pt-resultado-unitario-extenso" /></c-slot>
       </c-v2.form_block>
       <c-v2.form_block aria_label="Quantidade de diárias e efetivo total">
-        <c-slot name="body"><c-v2.fact label="Quantidade de diárias" :value="diarias_resultado.composicao" value_hook="data-pt-resultado-composicao" note_label="Efetivo total" :note="efetivo_total" note_hook="data-pt-resultado-efetivo" /></c-slot>
+        <c-slot name="body">
+          <c-v2.fact label="Quantidade de diárias" :value="diarias_resultado.composicao" value_hook="data-pt-resultado-composicao" />
+          <c-v2.fact label="Efetivo total" :value="efetivo_total" value_hook="data-pt-resultado-efetivo" />
+        </c-slot>
       </c-v2.form_block>
     {% endwith %}
   {% else %}
@@ -74,7 +76,10 @@
       <c-slot name="body"><c-v2.fact label="Valor por servidor" value="—" :strong="True" value_hook="data-pt-resultado-unitario" note_label="Valor por extenso" note="—" note_hook="data-pt-resultado-unitario-extenso" /></c-slot>
     </c-v2.form_block>
     <c-v2.form_block aria_label="Quantidade de diárias e efetivo total">
-      <c-slot name="body"><c-v2.fact label="Quantidade de diárias" value="—" value_hook="data-pt-resultado-composicao" note_label="Efetivo total" note="—" note_hook="data-pt-resultado-efetivo" /></c-slot>
+      <c-slot name="body">
+        <c-v2.fact label="Quantidade de diárias" value="—" value_hook="data-pt-resultado-composicao" />
+        <c-v2.fact label="Efetivo total" value="—" value_hook="data-pt-resultado-efetivo" />
+      </c-slot>
     </c-v2.form_block>
   {% endif %}
 </div>

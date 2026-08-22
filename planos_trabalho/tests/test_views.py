@@ -1,5 +1,6 @@
 import json
 from datetime import date
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.db import connection
@@ -12,6 +13,7 @@ from cadastros.models import Unidade
 
 from planos_trabalho.forms import PlanoIdentificacaoForm
 from planos_trabalho.models import HorarioAtendimento
+from planos_trabalho.models import EventoPlano
 from planos_trabalho.models import PlanoDestino
 from planos_trabalho.models import PlanoTrabalho
 from planos_trabalho.models import ProgramaSolicitante
@@ -365,6 +367,32 @@ class PlanoWizardViewsTests(TestCase):
         self.assertEqual(destinos, ["MARINGÁ", "CURITIBA"])
         self.assertEqual(plano.destino_cidade, self.maringa)
 
+    def test_formulario_de_edicao_nao_duplica_copias_dos_destinos_do_evento(self):
+        plano = criar_plano_maringa(self.maringa)
+        evento = EventoPlano.objects.create(plano=plano, ordem=1)
+        for ordem, cidade in enumerate((self.maringa, self.curitiba), 1):
+            PlanoDestino.objects.create(
+                plano=plano,
+                evento=None,
+                estado=cidade.estado,
+                cidade=cidade,
+                ordem=ordem,
+            )
+            PlanoDestino.objects.create(
+                plano=plano,
+                evento=evento,
+                estado=cidade.estado,
+                cidade=cidade,
+                ordem=ordem,
+            )
+
+        form = PlanoIdentificacaoForm(instance=plano)
+
+        self.assertEqual(
+            [row["cidade_id"] for row in form.destination_rows],
+            [str(self.maringa.pk), str(self.curitiba.pk)],
+        )
+
     def test_autosave_identificacao(self):
         plano = criar_plano_maringa(self.maringa)
         url = reverse("planos_trabalho:identificacao_autosave", args=[plano.pk])
@@ -542,6 +570,51 @@ class PlanoWizardViewsTests(TestCase):
         self.assertEqual(data["composicao"], "4 x 100% + 1 x 15%")
         self.assertEqual(data["valor_total_display"], "7.234,68")
 
+    @patch("planos_trabalho.per_diem_views.calcular_diarias_combinadas")
+    @patch("planos_trabalho.services.calcular_diarias_evento")
+    def test_api_calcular_diarias_multi_expoe_total_combinado_no_contrato_comum(
+        self,
+        calcular_evento,
+        calcular_combinadas,
+    ):
+        plano = criar_plano_maringa(self.maringa, efetivo=6)
+        plano.is_multi_evento = True
+        plano.save(update_fields=["is_multi_evento", "updated_at"])
+        EventoPlano.objects.create(plano=plano, ordem=1)
+        resultado = {
+            "ok": True,
+            "composicao": "1 x 100% + 1 x 30%",
+            "valor_unitario_display": "372,60",
+            "valor_total_display": "2.235,60",
+            "valor_unitario_extenso": "trezentos e setenta e dois reais e sessenta centavos",
+            "valor_total_extenso": "dois mil duzentos e trinta e cinco reais e sessenta centavos",
+            "quantidade_servidores": 6,
+        }
+        calcular_combinadas.return_value = resultado
+        calcular_evento.return_value = resultado
+
+        response = self.client.post(
+            reverse("planos_trabalho:api_calcular_diarias", args=[plano.pk]),
+            data=json.dumps(
+                {
+                    "saida_sede_data": "2026-06-24",
+                    "saida_sede_hora": "07:00",
+                    "chegada_sede_data": "2026-06-28",
+                    "chegada_sede_hora": "14:00",
+                    "total_efetivo": 6,
+                }
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["ok"], data)
+        self.assertEqual(data["modo"], "multi")
+        self.assertEqual(data["composicao"], resultado["composicao"])
+        self.assertEqual(data["valor_total_display"], resultado["valor_total_display"])
+        self.assertEqual(data["quantidade_servidores"], 6)
+
     def test_baixar_docx_gera_documento_e_marca_gerado(self):
         plano = self._plano_completo()
         response = self.client.get(
@@ -626,14 +699,14 @@ class HorariosCrudTests(TestCase):
     def test_crud_horario(self):
         response = self.client.post(
             reverse("planos_trabalho:horario_create"),
-            {"faixa": "11:00 até 19:00", "ativo": "on", "ordem": "40"},
+            {"horario_inicio": "11:00", "horario_fim": "19:00"},
         )
         self.assertRedirects(response, reverse("planos_trabalho:horarios_index"))
         horario = HorarioAtendimento.objects.get(faixa="11:00 até 19:00")
 
         response = self.client.post(
             reverse("planos_trabalho:horario_update", args=[horario.pk]),
-            {"faixa": "11:30 até 19:30", "ativo": "on", "ordem": "45"},
+            {"horario_inicio": "11:30", "horario_fim": "19:30"},
         )
         self.assertRedirects(response, reverse("planos_trabalho:horarios_index"))
         horario.refresh_from_db()

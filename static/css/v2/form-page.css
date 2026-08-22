@@ -16,6 +16,15 @@
   min-width: 0;
 }
 
+/* A etapa de identificação envolve resumo(s) de eventos e o painel editável
+   numa raiz de dados própria. Essa camada também precisa declarar o ritmo da
+   página; sem ele, o último resumo encosta no formulário. */
+:is(html[data-theme]) .plan-identification-content {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+
 /* Header e faixa são uma peça só — a faixa já perde os cantos de cima quando
    encosta no header, e o vão da grade os separava de novo. Mesma regra da tela
    de lista, pelo mesmo motivo: forma e ritmo têm de dizer a mesma coisa. */

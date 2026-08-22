@@ -1,0 +1,49 @@
+{% cotton:vars picker_id trigger_aria_label trigger_label %}
+{% comment %}
+trecho_date_picker.html — o calendário dos trechos do roteiro.
+
+É o painel de `cotton/v2/date_picker.html`, sem uma linha de marcação própria:
+mesma navegação de mês, mesma faixa de dias da semana, mesma grade, mesmo
+rodapé. A marcação de calendário mora num lugar só no repositório, e
+`core/tests/test_global_date_picker.py` guarda essa regra — este componente é um
+PRESET, não uma segunda cópia do painel.
+
+Duas coisas, e só duas, o separam de um calendário comum:
+
+  1. a faixa de contexto no topo, que diz de qual deslocamento é a data que ele
+     está pedindo agora — "Trecho 1:" e, abaixo, "CURITIBA > ADRIANÓPOLIS";
+  2. a seleção é múltipla: em vez de uma data e fechar, ele aceita uma data por
+     deslocamento — os trechos na ordem, mais o retorno.
+
+O "Desfazer" do rodapé não é uma terceira diferença: ele existe porque a seleção
+é sequencial. Clicar de novo num dia não o retira, então sem ele o único conserto
+de uma data errada seria limpar as outras junto.
+
+Quem alimenta o contexto e o limite é o editor (`pages/roteiros/editor/index.js`),
+gravando `data-max-dates` e `data-route-steps` na raiz a cada recálculo dos
+trechos. Ao receber a última data o motor confirma sozinho, dispara
+`cv:multi-confirm` e fecha — por isso o rodapé não tem "Aplicar datas".
+
+Parâmetros:
+  picker_id            id da raiz; o painel vira `<picker_id>-panel` (padrão: "trecho-date-picker")
+  trigger_label        rótulo do botão (padrão: "Datas")
+  trigger_aria_label   rótulo acessível do botão
+{% endcomment %}
+{% comment %}
+  Os padrões são resolvidos AQUI, e não no `:atributo` da chamada: filtro dentro
+  de `:attr` do Cotton não é avaliado e chegaria vazio do outro lado.
+{% endcomment %}
+{% firstof picker_id "trecho-date-picker" as root_id %}
+{% firstof trigger_label "Datas" as botao_label %}
+{% firstof trigger_aria_label "Preencher as datas dos trechos" as botao_aria %}
+<c-v2.date_picker
+  mode="multi"
+  control_variant="action-button"
+  :picker_id="root_id"
+  :trigger_label="botao_label"
+  :trigger_aria_label="botao_aria"
+  :show_context="True"
+  :allow_repeat_dates="True"
+  :show_summary="False"
+  :show_confirm="False"
+/>

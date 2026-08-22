@@ -1,9 +1,9 @@
-<c-v2.quick_add_section title="Dados do horário" description="Faixa, disponibilidade e ordem">
+<c-v2.quick_add_section :split="True" title="Dados do horário" description="Início e fim da faixa de atendimento">
   <c-slot name="body">
-    <div class="field-grid field-grid--cols-3">
-      <c-v2.form_field :field="form.faixa" />
-      <c-v2.choice_card :field="form.ativo" hint="Disponível no select do plano">Ativo</c-v2.choice_card>
-      <c-v2.form_field :field="form.ordem" />
+    {{ form.faixa }}
+    <div class="field-grid field-grid--cols-2">
+      <c-v2.form_field :field="form.horario_inicio" />
+      <c-v2.form_field :field="form.horario_fim" />
     </div>
   </c-slot>
 </c-v2.quick_add_section>

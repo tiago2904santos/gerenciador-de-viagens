@@ -681,3 +681,49 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       quebrem dentro da coluna de rótulo sem serem encobertas pelos campos
 - [x] `NOVO-20260821-184602-bb173eae5eda` faz o programa solicitante ocupar a linha inteira
       e dividir o espaço somente quando “Outro programa” está visível
+- [x] `NOVO-20260821-184803-87fb50b59c55` remove a opção vazia dos dois campos de gênero dos
+      coordenadores, mantendo somente Masculino e Feminino
+- [x] `NOVO-20260821-185012-c1ceefb27deb` empilha o cabeçalho do período acima dos três
+      controles, impedindo qualquer sobreposição entre descrição, datas e horário
+- [x] `NOVO-20260821-185248-53505eda0221` remove Ativo e Ordem do cadastro e da lista de
+      horários, mantendo disponibilidade e ordenação como defaults internos
+- [x] `NOVO-20260821-185524-89c9f9fdbe36` divide a faixa em horários de início e fim e grava
+      automaticamente o texto normalizado `HH:MM até HH:MM`
+- [x] `NOVO-20260821-190509-229fe373a205` aplica ao bloco de horários a variação split do
+      componente quick-add, mantendo início e fim lado a lado
+- [x] `NOVO-20260821-190842-df4fc6ab111a` preserva o `next` seguro do catálogo de horários e
+      oferece no cabeçalho o retorno ao ponto do plano de trabalho em que o usuário parou
+- [x] `NOVO-20260821-191804-bfcebdc9a421` distribui data inicial, data final e horário de
+      atendimento em três colunas iguais no bloco de período do plano
+- [x] `NOVO-20260821-192302-b95f54c8eefd` posiciona o aviso de deslocamento antes da linha de
+      data e hora de saída e chegada da sede
+- [x] `NOVO-20260821-192718-a68ecef6b59c` ordena cronologicamente os controles como data e hora
+      de saída, seguidas por data e hora de chegada
+- [x] `NOVO-20260821-193517-51e8c572be7d` promove o efetivo total de nota secundária a fato com
+      a mesma hierarquia visual da composição de diárias
+- [x] `NOVO-20260821-193910-029f3196357b` iguala a grade de atividades dos presets à etapa 3,
+      com duas colunas e expansão do último item ímpar
+- [x] `NOVO-20260821-194504-6a949b7f1228` reserva metade da barra de atividades ao filtro e
+      distribui limpar seleção e preset na outra metade
+- [x] `NOVO-20260821-194915-bea97c3a58e2` posiciona “Limpar seleção” depois do preset, no
+      extremo direito da barra de atividades
+- [x] `NOVO-20260821-195235-958f77a411ce` limita a 250px os três blocos do resumo do evento e
+      preserva o conteúdo excedente com rolagem interna
+- [x] `NOVO-20260821-195748-fe022aab4552` compacta os itens do efetivo logo abaixo do total e
+      transforma as atividades em lista textual com rolagem própria
+- [x] `NOVO-20260821-200350-c6cc3c5f2c80` promove a quantidade de diárias a fato forte, com a
+      mesma hierarquia visual do valor total no resumo do evento
+- [x] `NOVO-20260821-201245-e319820f5796` separa os resumos do evento e o painel editável da
+      identificação com o espaçamento semântico da página
+- [x] `NOVO-20260821-201903-d584ac943fdb` posiciona o índice “Evento N de N” depois do título
+      do resumo e o apresenta como selo neutro, sem afetar cabeçalhos de página
+- [x] `NOVO-20260821-202516-5631c7923a1b` impede que as cópias persistidas de destinos do
+      evento sejam novamente renderizadas como linhas editáveis do scratchpad
+- [x] `NOVO-20260821-203231-ebe933fd22d4` unifica o contrato do cálculo ao vivo simples e
+      multi-evento, expondo o total combinado ao card da etapa 2
+- [x] `NOVO-20260822-175856-6da8424a906a` substitui a ação direta de PDF dos termos da etapa 5
+      por menu com visualização e downloads PDF e DOCX específicos da linha
+- [x] `NOVO-20260822-180639-e63d0af6f86a` reúne sem duplicidade os servidores de todos os
+      ofícios selecionados ao iniciar uma Ordem de Serviço pelo evento
+- [x] `NOVO-20260822-181021-f2584ce48015` preserva a casca e o padding do modal de downloads
+      quando o seletor é renderizado dentro de um formulário de edição

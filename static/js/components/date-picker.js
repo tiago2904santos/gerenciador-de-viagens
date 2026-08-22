@@ -291,7 +291,10 @@
 
       context.hidden = false;
       if (contextStep) {
-        contextStep.textContent = 'Trecho ' + currentStepNumber + ' de ' + totalSteps;
+        /* "Trecho 1:", e nao "Trecho 1 de 4": o total ja se le no calendario,
+         * pelas datas que voltam marcadas, e a faixa existe para dizer de QUEM
+         * e a data que ele esta pedindo agora. */
+        contextStep.textContent = 'Trecho ' + currentStepNumber + ':';
       }
       if (contextRoute) {
         contextRoute.textContent = currentStep.label || ((currentStep.from || '') + ' > ' + (currentStep.to || ''));
@@ -668,75 +671,68 @@
       var isInRange = mode === 'range' && selectedStart && selectedEnd &&
         !isBeforeDay(date, selectedStart) &&
         !isAfterDay(date, selectedEnd);
-      var isMultiRange = false;
-      var isMultiStart = false;
-      var isMultiMiddle = false;
-      var isMultiEnd = false;
-      var isMultiSingle = false;
-      if (mode === 'multi' && selectedDates.length) {
-        var multiStart = selectedDates[0];
-        var multiEnd = selectedDates[selectedDates.length - 1];
-        isMultiRange = !!multiStart && !!multiEnd && !isBeforeDay(date, multiStart) && !isAfterDay(date, multiEnd);
-        isMultiStart = isMultiRange && isSameDay(date, multiStart);
-        isMultiEnd = isMultiRange && isSameDay(date, multiEnd);
-        isMultiMiddle = isMultiRange && !isMultiStart && !isMultiEnd;
-        isMultiSingle = selectedDates.length === 1 && isMultiStart;
-      }
+
+      /* O modo multi veste as CLASSES DO INTERVALO — as mesmas do bate-volta.
+       * A viagem vai da primeira data escolhida ate a ultima, e e isso que a
+       * pilula desenha: pontas arredondadas e miolo cheio. Com uma data so, o
+       * intervalo ainda nao tem fim e a marca e o circulo — igual ao bate-volta
+       * logo depois do primeiro clique. Nao ha classe `--multi-*`: dois
+       * desenhos para a mesma ideia era o que fazia esta tela destoar. */
+      var multiStart = mode === 'multi' && selectedDates.length ? selectedDates[0] : null;
+      var multiEnd = mode === 'multi' && selectedDates.length > 1
+        ? selectedDates[selectedDates.length - 1]
+        : null;
+      var isMultiStart = !!multiStart && isSameDay(date, multiStart);
+      var isMultiEnd = !!multiEnd && isSameDay(date, multiEnd);
+      var isInMultiRange = !!multiStart && !!multiEnd &&
+        !isBeforeDay(date, multiStart) &&
+        !isAfterDay(date, multiEnd);
 
       button.type = 'button';
       button.className = 'date-picker__day';
       button.textContent = String(date.getDate());
       button.setAttribute('aria-label', dayAriaLabel);
-      button.setAttribute('aria-pressed', (isStart || isEnd || isSameDay(date, selectedSingle) || isMultiRange) ? 'true' : 'false');
+      button.setAttribute('aria-pressed', (isStart || isEnd || isSameDay(date, selectedSingle) || isMultiSel) ? 'true' : 'false');
       button.dataset.date = formatIsoDate(date);
       button.classList.toggle('date-picker__day--muted', !isCurrentMonth);
       button.classList.toggle('date-picker__day--today', isToday);
-      button.classList.toggle('date-picker__day--selected', mode !== 'multi' && (isStart || isEnd || isSameDay(date, selectedSingle)));
-      button.classList.toggle('date-picker__day--range', isInRange);
-      button.classList.toggle('date-picker__day--range-start', isStart);
-      button.classList.toggle('date-picker__day--range-end', isEnd);
-      button.classList.toggle('date-picker__day--multi-selected', isMultiRange);
-      button.classList.toggle('date-picker__day--multi-start', isMultiStart);
-      button.classList.toggle('date-picker__day--multi-middle', isMultiMiddle);
-      button.classList.toggle('date-picker__day--multi-end', isMultiEnd);
-      button.classList.toggle('date-picker__day--multi-single', isMultiSingle);
+      button.classList.toggle(
+        'date-picker__day--selected',
+        mode === 'multi'
+          ? (isMultiStart || isMultiEnd)
+          : (isStart || isEnd || isSameDay(date, selectedSingle))
+      );
+      button.classList.toggle(
+        'date-picker__day--range',
+        mode === 'multi' ? isInMultiRange : isInRange
+      );
+      button.classList.toggle(
+        'date-picker__day--range-start',
+        mode === 'multi' ? (isMultiStart && !!multiEnd) : isStart
+      );
+      button.classList.toggle(
+        'date-picker__day--range-end',
+        mode === 'multi' ? isMultiEnd : isEnd
+      );
 
-      if (mode === 'multi' && isMultiSel) {
-        // Uma mesma data pode atender mais de um trecho (chegar e seguir viagem no mesmo dia).
-        var multiStepIndexes = [];
-        for (var stepIndex = 0; stepIndex < selectedDates.length; stepIndex += 1) {
-          if (isSameDay(selectedDates[stepIndex], date)) {
-            multiStepIndexes.push(stepIndex);
-          }
-        }
-        /* O número aparece nos trechos DO MEIO. O primeiro e o último não
-         * precisam: um é o começo da viagem e o outro é a volta, e a posição
-         * deles na sequência já se lê pela própria data — o mais cedo e o mais
-         * tarde. Numerar os quatro polui o calendário com o que ele já mostra. */
-        var ultimoPasso = routeSteps.length - 1;
-        var temPassoDoMeio = multiStepIndexes.some(function (index) {
-          return index > 0 && index < ultimoPasso;
-        });
-        if (temPassoDoMeio) {
+      /* A data do MEIO nao tem forma propria: dentro da faixa ela e um dia
+       * pintado como qualquer outro, e a viagem some entre a primeira e a
+       * ultima. As pontas se leem pela capsula — uma abre a faixa, a outra
+       * fecha; as do meio precisam de um numero, senao a pergunta "onde caiu a
+       * segunda data?" nao tem resposta na tela. */
+      if (mode === 'multi' && selectedDates.length > 2) {
+        for (var si = 1; si < selectedDates.length - 1; si += 1) {
+          if (!isSameDay(selectedDates[si], date)) continue;
           var badge = document.createElement('span');
           badge.className = 'date-picker__day-badge';
-          /* UM número, o do primeiro trecho que a data atende. Com mais de um
-           * (a mesma data serve à chegada de um trecho e à saída do seguinte) o
-           * texto virava "1·2", a ficha esticava para a esquerda e cobria o
-           * número do dia — medido: 19px de largura numa célula de 42. Quem
-           * precisa da lista inteira tem o `title` e o `aria-label` logo abaixo,
-           * que já a trazem por extenso. */
-          badge.textContent = String(multiStepIndexes[0] + 1);
+          badge.textContent = String(si + 1);
           button.appendChild(badge);
-          var stepLabels = multiStepIndexes.map(function (index) {
-            return routeSteps[index] ? routeSteps[index].label : '';
-          }).filter(function (label) {
-            return !!label;
-          });
-          if (stepLabels.length) {
-            button.title = stepLabels.join(' | ');
-            button.setAttribute('aria-label', dayAriaLabel + ' - ' + stepLabels.join(' | '));
+          var passo = routeSteps[si];
+          if (passo && passo.label) {
+            button.title = passo.label;
+            button.setAttribute('aria-label', dayAriaLabel + ' - ' + passo.label);
           }
+          break;
         }
       }
 

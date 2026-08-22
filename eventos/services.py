@@ -306,8 +306,15 @@ def build_evento_document_seed(evento) -> dict:
         seed["oficio"] = oficio
         if not seed["motivo"]:
             seed["motivo"] = (oficio.motivo or "").strip()
-        seed["servidores"] = list(oficio.servidores.all())
-        seed["servidores_termo"] = list(oficio.servidores_termo_autorizacao.all())
+        servidores_por_id = {}
+        servidores_termo_por_id = {}
+        for oficio_selecionado in oficios:
+            for servidor in oficio_selecionado.servidores.all():
+                servidores_por_id.setdefault(servidor.pk, servidor)
+            for servidor in oficio_selecionado.servidores_termo_autorizacao.all():
+                servidores_termo_por_id.setdefault(servidor.pk, servidor)
+        seed["servidores"] = list(servidores_por_id.values())
+        seed["servidores_termo"] = list(servidores_termo_por_id.values())
         seed["viatura"] = oficio.viatura
         seed["motorista"] = oficio.motorista
         roteiro = oficio.roteiro

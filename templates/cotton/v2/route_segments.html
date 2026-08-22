@@ -37,21 +37,10 @@
           O calendário de preencher datas em sequência. Mora aqui e o JS o
           empresta ao card do trecho da vez — um só para a pilha inteira.
         {% endcomment %}
-        <c-v2.date_picker
-          mode="multi"
+        <c-v2.trecho_date_picker
           picker_id="trechos-date-picker"
-          button_label="Período"
+          trigger_label="Datas"
           trigger_aria_label="Preencher as datas de todos os trechos"
-          :show_summary="False"
-          :show_context="True"
-          {% comment %}
-            SEM botão de aplicar: o editor diz quantas datas a viagem tem
-            (`data-max-dates` = trechos + retorno) e o motor confirma e fecha
-            sozinho ao receber a última. Pedir mais um clique em "Aplicar" depois
-            da última data é um passo que não decide nada.
-          {% endcomment %}
-          :show_confirm="False"
-          :allow_repeat_dates="True"
         />
       </div>
 

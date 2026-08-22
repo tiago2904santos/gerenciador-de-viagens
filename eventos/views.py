@@ -190,8 +190,9 @@ def _apresentar_termos_rows(termos_qs):
             edit_url=reverse("termos:editar", args=[termo.pk]),
             delete_url=reverse("termos:excluir", args=[termo.pk]),
             delete_modal=True,
-            pdf_url=reverse("termos:baixar_termo_cadastro_pdf", args=[termo.pk]),
-            docx_url=reverse("termos:baixar_termo_cadastro_docx", args=[termo.pk]),
+            visualizar_url=reverse("termos:termo_cadastro_generico_pdf_inline", args=[termo.pk]),
+            pdf_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "pdf"]),
+            docx_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "docx"]),
             **termo_cadastro_assinado_info(termo, None),
         )
         for termo in termos_qs
@@ -229,7 +230,15 @@ def _termos_servidor_rows_do_evento(evento):
                     oficio=oficio_origem,
                     edit_url=reverse("termos:editar", args=[termo.pk]),
                     delete_url=reverse("termos:excluir", args=[termo.pk]),
-                    pdf_url=reverse("termos:termo_cadastro_servidor_pdf_inline", args=[termo.pk, servidor.pk]),
+                    visualizar_url=reverse(
+                        "termos:termo_cadastro_servidor_pdf_inline", args=[termo.pk, servidor.pk]
+                    ),
+                    pdf_url=reverse(
+                        "termos:baixar_termo_cadastro_servidor", args=[termo.pk, servidor.pk, "pdf"]
+                    ),
+                    docx_url=reverse(
+                        "termos:baixar_termo_cadastro_servidor", args=[termo.pk, servidor.pk, "docx"]
+                    ),
                     **termo_cadastro_assinado_info(termo, servidor.pk),
                 )
             )

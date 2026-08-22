@@ -285,51 +285,13 @@ html[data-theme="light"] {
   z-index: 2;
 }
 
-.date-picker__day:hover:not(.date-picker__day--selected):not(.date-picker__day--range):not(.date-picker__day--multi-selected) {
+.date-picker__day:hover:not(.date-picker__day--selected):not(.date-picker__day--range) {
   background-color: rgba(127, 127, 127, 0.1);
 }
 
 .date-picker__day--selected:hover,
-.date-picker__day--range:hover,
-.date-picker__day--multi-selected:hover {
+.date-picker__day--range:hover{
   background-color: transparent;
-}
-
-.date-picker__day--multi-selected {
-  overflow: visible;
-}
-
-.date-picker__day-badge {
-  align-items: center;
-  background: var(--color-white);
-  border: 1px solid var(--stepper-active-bg, var(--color-accent));
-  border-radius: 999px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.22);
-  color: var(--color-primary-strong);
-  display: inline-flex;
-  font-size: 9px;
-  font-weight: 800;
-  height: 16px;
-  justify-content: center;
-  line-height: 1;
-  min-width: 16px;
-  pointer-events: none;
-  position: absolute;
-  right: -3px;
-  top: -3px;
-  z-index: 4;
-}
-
-html[data-theme="dark"] .date-picker__day-badge {
-  background: var(--color-white);
-  border-color: var(--stepper-active-bg, var(--color-accent));
-  color: var(--stepper-active-bg, var(--color-accent));
-}
-
-html[data-theme="light"] .date-picker__day-badge {
-  background: var(--color-white);
-  border-color: #0b3a66;
-  color: #0b3a66;
 }
 
 .date-picker__day--muted {
@@ -368,93 +330,25 @@ html[data-theme="light"] .date-picker__day-badge {
 }
 
 .date-picker__day--today.date-picker__day--selected::after,
-.date-picker__day--today.date-picker__day--range::after,
-.date-picker__day--today.date-picker__day--multi-selected::after {
+.date-picker__day--today.date-picker__day--range::after{
   background: var(--date-picker-selected-color);
   box-shadow: 0 0 0 1px var(--date-picker-selected-halo);
 }
 
 .date-picker__day--selected,
 .date-picker__day--range-start,
-.date-picker__day--range-end,
-.date-picker__day--multi-selected {
+.date-picker__day--range-end{
   color: var(--date-picker-selected-color);
   z-index: 2;
 }
 
 .date-picker__day--selected::before,
 .date-picker__day--range-start::before,
-.date-picker__day--range-end::before,
-.date-picker__day--multi-single::before {
+.date-picker__day--range-end::before{
   background:
     linear-gradient(180deg, var(--date-picker-selected-bg-start) 0%, var(--date-picker-selected-bg-end) 100%);
   border: 1px solid var(--date-picker-selected-border);
   box-shadow: var(--date-picker-selected-shadow);
-}
-
-.date-picker__day--multi-selected:not(.date-picker__day--multi-single)::before {
-  background:
-    linear-gradient(180deg, var(--date-picker-selected-bg-start) 0%, var(--date-picker-selected-bg-end) 100%);
-  border-radius: 0;
-  box-shadow: none;
-  height: var(--date-picker-day-size);
-  width: var(--date-picker-day-size);
-}
-
-.date-picker__day--multi-start {
-  border-right-color: var(--date-picker-selected-border);
-  z-index: 2;
-}
-
-.date-picker__day--multi-selected.date-picker__day--multi-start::before,
-.date-picker__day--multi-single::before {
-  border-bottom-left-radius: var(--radius-pill);
-  border-top-left-radius: var(--radius-pill);
-}
-
-.date-picker__day--multi-middle {
-  border-left-color: var(--date-picker-selected-border);
-  border-radius: 0;
-  border-right-color: var(--date-picker-selected-border);
-  z-index: 2;
-}
-
-.date-picker__day--multi-end {
-  border-left-color: var(--date-picker-selected-border);
-  z-index: 2;
-}
-
-.date-picker__day--multi-selected.date-picker__day--multi-end::before,
-.date-picker__day--multi-single::before {
-  border-bottom-right-radius: var(--radius-pill);
-  border-top-right-radius: var(--radius-pill);
-}
-
-.date-picker__day--multi-selected:nth-child(7n)::before {
-  border-bottom-right-radius: var(--date-picker-week-edge-radius);
-  border-top-right-radius: var(--date-picker-week-edge-radius);
-}
-
-.date-picker__day--multi-selected:nth-child(7n + 1)::before {
-  border-bottom-left-radius: var(--date-picker-week-edge-radius);
-  border-top-left-radius: var(--date-picker-week-edge-radius);
-}
-
-.date-picker__day--multi-selected.date-picker__day--multi-start::before,
-.date-picker__day--multi-single::before {
-  border-bottom-left-radius: var(--radius-pill);
-  border-top-left-radius: var(--radius-pill);
-}
-
-.date-picker__day--multi-selected.date-picker__day--multi-end::before,
-.date-picker__day--multi-single::before {
-  border-bottom-right-radius: var(--radius-pill);
-  border-top-right-radius: var(--radius-pill);
-}
-
-.date-picker__day--multi-single {
-  border-radius: var(--radius-pill);
-  z-index: 2;
 }
 
 .date-picker__day--range {
@@ -473,44 +367,6 @@ html[data-theme="light"] .date-picker__day-badge {
   box-shadow: none;
   height: var(--date-picker-day-size);
   width: var(--date-picker-day-size);
-}
-
-html[data-theme="dark"] .date-picker .date-picker__day--multi-selected,
-html[data-theme="dark"] .date-picker .date-picker__day--multi-start,
-html[data-theme="dark"] .date-picker .date-picker__day--multi-middle,
-html[data-theme="dark"] .date-picker .date-picker__day--multi-end,
-html[data-theme="dark"] .date-picker .date-picker__day--multi-single,
-html[data-theme="light"] .date-picker .date-picker__day--multi-selected,
-html[data-theme="light"] .date-picker .date-picker__day--multi-start,
-html[data-theme="light"] .date-picker .date-picker__day--multi-middle,
-html[data-theme="light"] .date-picker .date-picker__day--multi-end,
-html[data-theme="light"] .date-picker .date-picker__day--multi-single {
-  background-color: transparent !important;
-  background-image: none !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  color: var(--date-picker-selected-color) !important;
-}
-
-html[data-theme="dark"] .date-picker .date-picker__day--multi-single::before,
-html[data-theme="light"] .date-picker .date-picker__day--multi-single::before {
-  background: var(--date-picker-selected-bg-start) !important;
-  border-color: transparent !important;
-  box-shadow: var(--date-picker-selected-shadow) !important;
-}
-
-html[data-theme="dark"] .date-picker .date-picker__day--multi-selected:hover,
-html[data-theme="dark"] .date-picker .date-picker__day--multi-start:hover,
-html[data-theme="dark"] .date-picker .date-picker__day--multi-middle:hover,
-html[data-theme="dark"] .date-picker .date-picker__day--multi-end:hover,
-html[data-theme="dark"] .date-picker .date-picker__day--multi-single:hover,
-html[data-theme="light"] .date-picker .date-picker__day--multi-selected:hover,
-html[data-theme="light"] .date-picker .date-picker__day--multi-start:hover,
-html[data-theme="light"] .date-picker .date-picker__day--multi-middle:hover,
-html[data-theme="light"] .date-picker .date-picker__day--multi-end:hover,
-html[data-theme="light"] .date-picker .date-picker__day--multi-single:hover {
-  filter: brightness(1.08);
-  z-index: 2;
 }
 
 .date-picker__day--range:nth-child(7n + 1)::before {
@@ -549,9 +405,6 @@ html[data-theme="light"] .date-picker .date-picker__day--multi-single:hover {
   gap: var(--space-2);
   justify-content: flex-end;
 }
-
-
-
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * VINDAS DAS FOLHAS DE TEMA E DO CASCO ANTIGO, em 2026-08-20.
@@ -602,7 +455,6 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   color: var(--color-text);
   box-shadow: var(--shadow-elevated);
 }
-
 
 /* ---- a pílula de período --------------------------------------------------
  *
@@ -717,6 +569,15 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   display: flex;
   gap: var(--gap);
   min-width: 0;
+}
+
+/* A faixa de deslocamento intercala data e hora de saída com data e hora de
+   chegada. É uma grade de quatro controles irmãos; a composição flexível do
+   intervalo comum agruparia primeiro as duas datas e comprimiria seus campos. */
+:is(html[data-theme]) .date-field.date-picker--interleaved-range .field-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
 }
 
 /* Âncora do posicionamento. Precisa valer também para `.cv-field`, que é o
@@ -1129,82 +990,26 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   box-shadow: none;
 }
 
-/* ---- seleção de VÁRIAS datas (o calendário dos trechos) ---------------------
+/* ---- o número da data do MEIO ----------------------------------------------
  *
- * Mesmo desenho do intervalo, com as classes que o `date-picker.js` usa no modo
- * `multi`: `--multi-selected` em todo dia escolhido, `--multi-single` no que
- * está isolado, e `--multi-start/-middle/-end` quando eles caem em sequência.
+ * Ficha redonda no canto superior direito do dia, com 2, 3, 4… — a posição
+ * daquela data na sequência de deslocamentos. Só as do meio a recebem: a
+ * primeira e a última já se leem pelas pontas da cápsula, e numerar as quatro
+ * enche o calendário de algo que a forma já diz.
  *
- * Sem estas regras o modo múltiplo ficava com a cápsula do legado — gradiente
- * mais escuro que o accent e número branco —, enquanto o intervalo ao lado, na
- * mesma tela, já era accent cheio. Duas seleções de datas com dois desenhos.
- */
-:is(html[data-theme]) .date-field__panel .date-picker__day--multi-selected::before {
-  background: var(--accent);
-  border: 0;
-  box-shadow: none;
-}
-
-:is(html[data-theme]) .date-field__panel .date-picker__day--multi-selected {
-  color: var(--text-on-brand);
-}
-
-:is(html[data-theme]) .date-field__panel .date-picker__day--multi-selected::after {
-  background: var(--text-on-brand);
-  box-shadow: none;
-}
-
-/* Data isolada é CÍRCULO; em sequência, a cápsula abre só para fora e o lado que
-   encosta na vizinha é reto — as três formas do intervalo, pelos mesmos motivos. */
-:is(html[data-theme]) .date-field__panel .date-picker__day--multi-single::before {
-  border-radius: var(--radius-pill);
-}
-
-:is(html[data-theme])
-  .date-field__panel
-  .date-picker__day--multi-start:not(.date-picker__day--multi-single)::before {
-  border-radius: var(--radius-pill) 0 0 var(--radius-pill);
-}
-
-:is(html[data-theme])
-  .date-field__panel
-  .date-picker__day--multi-end:not(.date-picker__day--multi-single)::before {
-  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
-}
-
-:is(html[data-theme]) .date-field__panel .date-picker__day--multi-middle::before {
-  border-radius: 0;
-}
-
-/* ---- o número da ordem no dia ----------------------------------------------
+ * Ficha NEUTRA: superfície do painel com o texto forte do tema. O número em
+ * accent sobre a cápsula accent era amarelo dentro de amarelo — duas vezes a
+ * mesma cor a três pixels de distância.
  *
- * Bolinha no canto superior direito do dia, com 1, 2, 3… — a posição daquela
- * data na sequência de trechos. Substitui a lista de trechos que ficava no topo
- * do painel: a informação é a mesma, e no próprio dia ela não empurra o
- * calendário para baixo.
+ * Fica DENTRO da cápsula, não sobre a borda: por fora, o disco na cor do painel
+ * abria um buraco no contorno e de longe parecia defeito na faixa, não número.
  *
- * A folha legada já a desenhava, mas com `--color-white`, `--color-primary-strong`
- * e uma sombra própria — três valores que o v2 não usa. Aqui ela é o inverso do
- * dia escolhido: fundo na superfície do painel, contorno e número no accent.
+ * `position` e `z-index` declarados aqui porque a folha legada que os dava
+ * (`fields/date-picker.css`) não entra no pacote desta tela — sem eles a ficha
+ * cai no fluxo e empurra o número do dia.
  */
 :is(html[data-theme]) .date-field__panel .date-picker__day-badge {
-  /* Ficha redonda DENTRO da cápsula, encostada no canto superior direito.
-   *
-   * Ela morava meio fora, sobre a borda, e o disco na cor do painel abria um
-   * buraco no contorno da cápsula — de longe parecia um defeito na faixa, não um
-   * número. Por dentro, a silhueta do dia continua inteira e a ficha lê como uma
-   * etiqueta colada nele.
-   *
-   * `position` e `z-index` declarados aqui porque a folha legada que os dava
-   * (`fields/date-picker.css`) não entra no pacote desta tela — sem eles a ficha
-   * cai no fluxo e empurra o número do dia.
-   */
   align-items: center;
-  /* Ficha NEUTRA: superfície do painel com o texto forte do tema. O número em
-     accent sobre a cápsula accent era amarelo dentro de amarelo — duas vezes a
-     mesma cor a três pixels de distância. Com o par superfície/texto, ela é
-     legível nos dois temas sem depender do accent, e o amarelo continua sendo só
-     da cápsula. */
   background: var(--surface-rail);
   border: 0;
   border-radius: var(--radius-pill);
@@ -1228,13 +1033,13 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   z-index: 4;
 }
 
-/* Dia ESCOLHIDO não apaga quando o calendário trava a escolha. No modo múltiplo
-   o motor desabilita os dias assim que o número de datas fecha (o roteiro pede
-   uma por trecho), e a regra geral de desabilitado derruba a opacidade para
-   0.35 — as datas já escolhidas ficavam lavadas, enquanto no bate-volta, que não
-   trava nada, a faixa continuava sólida. Duas telas com o mesmo estado pintadas
-   de dois jeitos. O que está escolhido é resultado, não controle indisponível. */
-:is(html[data-theme]) .date-field__panel .date-picker__day--multi-selected[disabled],
+/* Dia ESCOLHIDO não apaga quando o calendário trava a escolha. Na seleção de
+   várias datas o motor desabilita os dias assim que o número fecha (o roteiro
+   pede uma por deslocamento), e a regra geral de desabilitado derruba a
+   opacidade para 0.35 — as datas já escolhidas ficavam lavadas, enquanto no
+   bate-volta, que não trava nada, o intervalo continuava sólido. Duas telas com
+   o mesmo estado pintadas de dois jeitos. O que está escolhido é resultado, não
+   controle indisponível. */
 :is(html[data-theme]) .date-field__panel .date-picker__day--range[disabled],
 :is(html[data-theme]) .date-field__panel .date-picker__day--selected[disabled] {
   opacity: 1;
@@ -1247,29 +1052,19 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
  * parecia cortada a faca ao virar a linha, e a mesma seleção lia como dois
  * blocos sem relação.
  *
- * Vale para os três papéis: o miolo do intervalo (regra acima), o miolo da
- * seleção múltipla e as pontas que por acaso caem na parede — uma ponta na
- * borda fecha dos dois lados, porque não há vizinho para emendar.
+ * Vale para o miolo do intervalo (regra acima) e para as pontas que por acaso
+ * caem na parede — uma ponta na borda fecha dos dois lados, porque não há
+ * vizinho para emendar.
  */
 /* O arremate é `--radius-field`, o MESMO do miolo do intervalo (regra acima) —
    não a pílula. A pílula é a forma das PONTAS da seleção, e usá-la também na
    parede fazia cada semana parecer uma seleção fechada em si. */
-:is(html[data-theme]) .date-field__panel .date-picker__day--multi-middle:nth-child(7n)::before {
-  border-radius: 0 var(--radius-field) var(--radius-field) 0;
-}
-
-:is(html[data-theme]) .date-field__panel .date-picker__day--multi-middle:nth-child(7n + 1)::before {
-  border-radius: var(--radius-field) 0 0 var(--radius-field);
-}
 
 /* Uma PONTA que calha de cair na parede mantém a pílula do lado de fora e
    arremata com o canto de campo do lado que toca a parede. */
-:is(html[data-theme]) .date-field__panel .date-picker__day--multi-start:nth-child(7n)::before,
 :is(html[data-theme]) .date-field__panel .date-picker__day--range-start:nth-child(7n)::before {
   border-radius: var(--radius-pill) var(--radius-field) var(--radius-field) var(--radius-pill);
 }
-
-:is(html[data-theme]) .date-field__panel .date-picker__day--multi-end:nth-child(7n + 1)::before,
 :is(html[data-theme]) .date-field__panel .date-picker__day--range-end:nth-child(7n + 1)::before {
   border-radius: var(--radius-field) var(--radius-pill) var(--radius-pill) var(--radius-field);
 }

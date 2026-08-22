@@ -137,7 +137,47 @@ class WizardV2Tests(TestCase):
         )
         self.assertIn('class="record panel plan-event-summary"', html)
         self.assertIn("Nº 32/2026/ASCOM · ANTONINA/PR", html)
+        self.assertIn("Evento 1 de 1", html)
         self.assertEqual(html.count("plan-event-summary__block"), 3)
+
+        css = (ROOT / "static" / "css" / "v2" / "record.css").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            ".record.plan-event-summary .plan-event-summary__block {",
+            css,
+        )
+        self.assertIn("max-height: 250px;", css)
+        self.assertIn("overflow-y: auto;", css)
+        self.assertIn(
+            ".record.plan-event-summary .record__eyebrow {",
+            css,
+        )
+        self.assertIn("order: 2;", css)
+        self.assertIn("border-radius: var(--radius-pill);", css)
+        self.assertIn(
+            "background: color-mix(in srgb, var(--text-muted) 16%, transparent);",
+            css,
+        )
+        self.assertIn("plan-event-summary__effective-chip", corpo)
+        self.assertIn('class="plan-event-summary__activity-list"', corpo)
+        self.assertIn('aria-label="Atividades selecionadas"', html)
+        self.assertIn(".plan-event-summary__activity-list {", css)
+        self.assertIn("max-height: 112px;", css)
+        self.assertIn(
+            '<c-v2.fact label="Quantidade de diárias" :value="ev.diarias_composicao" :strong="True" extra_class="plan-event-summary__allowance-primary" />',
+            corpo,
+        )
+        self.assertNotIn('note_label="Quantidade de diárias"', corpo)
+        self.assertIn(
+            ".plan-event-summary__allowance-primary .fact__value {",
+            css,
+        )
+        self.assertIn("white-space: normal;", css)
+
+        resumo_execucao = html[html.index('aria-label="Diárias e atividades do evento"') :]
+        resumo_execucao = resumo_execucao[: resumo_execucao.index("</section>")]
+        self.assertGreaterEqual(resumo_execucao.count("fact__value--strong"), 2)
 
     # ---- etapa 1 ---------------------------------------------------------
 
@@ -160,6 +200,16 @@ class WizardV2Tests(TestCase):
         ):
             with self.subTest(campo=nome):
                 self.assertIn(nome, html)
+
+    def test_resumo_e_formulario_da_identificacao_respeitam_o_gap_da_pagina(self):
+        html = self._html("planos_trabalho:wizard_identificacao")
+        css = (ROOT / "static" / "css" / "v2" / "form-page.css").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn('class="plan-identification-content" data-pt-form', html)
+        self.assertIn(".plan-identification-content {", css)
+        self.assertIn("gap: var(--gap);", css)
 
     def test_os_ganchos_da_identificacao_continuam_na_tela_e_no_script(self):
         html = self._html("planos_trabalho:wizard_identificacao")
@@ -222,6 +272,16 @@ class WizardV2Tests(TestCase):
             html,
         )
 
+    def test_generos_nao_oferecem_opcao_vazia(self):
+        html = self._html("planos_trabalho:wizard_identificacao")
+
+        for field_id in ("id_coordenador_adm_genero", "id_coordenador_op_genero"):
+            inicio = html.index(f'id="{field_id}"')
+            select = html[html.rfind("<select", 0, inicio) : html.index("</select>", inicio)]
+            self.assertNotIn('<option value="">', select)
+            self.assertIn(">Masculino</option>", select)
+            self.assertIn(">Feminino</option>", select)
+
     def test_programa_solicitante_usa_form_block_split(self):
         html = self._html("planos_trabalho:wizard_identificacao")
         titulo = html.index('<h2 class="form-block__title">Programa solicitante</h2>')
@@ -247,13 +307,26 @@ class WizardV2Tests(TestCase):
             css,
         )
 
-    def test_periodo_do_evento_usa_form_block_split(self):
+    def test_periodo_do_evento_empilha_cabecalho_acima_dos_campos(self):
         html = self._html("planos_trabalho:wizard_identificacao")
         titulo = html.index('<h2 class="form-block__title">Período do evento</h2>')
         abertura = html.rfind("<section", 0, titulo)
         section = html[abertura : html.index(">", abertura) + 1]
 
-        self.assertIn("form-block--split", section)
+        self.assertNotIn("form-block--split", section)
+        self.assertLess(
+            html.index("Data inicial e final, e o horário de atendimento."),
+            html.index('id="pt-evento-date-picker"'),
+        )
+
+    def test_periodo_distribui_as_duas_datas_e_o_horario_em_tres_colunas_iguais(self):
+        html = self._html("planos_trabalho:wizard_identificacao")
+
+        self.assertIn('class="field-grid field-grid--cols-3"', html)
+        self.assertIn(
+            'class="date-picker date-field field-grid__span-2"',
+            html,
+        )
 
     def test_textos_da_identificacao_usam_o_textarea_global(self):
         html = self._html("planos_trabalho:wizard_identificacao")
@@ -318,14 +391,31 @@ class WizardV2Tests(TestCase):
         self.assertIn(".number-stepper", SCRIPT.read_text(encoding="utf-8"))
 
     def test_datas_e_horas_do_deslocamento_ocupam_a_mesma_linha(self):
-        fonte = (TEMPLATES / "partials" / "_diarias_body.html").read_text(encoding="utf-8")
+        fonte = (TEMPLATES / "partials" / "_diarias_range_controls.html").read_text(
+            encoding="utf-8"
+        )
+        css = (ROOT / "static" / "css" / "v2" / "date-picker.css").read_text(
+            encoding="utf-8"
+        )
 
         self.assertIn('class="field-grid field-grid--cols-4"', fonte)
-        self.assertIn('extra_class="field-grid__span-2"', fonte)
-        self.assertNotIn(
-            'class="field-grid field-grid--cols-2">\n  <c-v2.form_field :field="diarias_form.saida_sede_hora"',
-            fonte,
+        self.assertIn(
+            ".date-field.date-picker--interleaved-range .field-grid {",
+            css,
         )
+        self.assertIn("grid-template-columns: repeat(4, minmax(0, 1fr));", css)
+
+    def test_deslocamento_alterna_data_e_hora_de_saida_e_chegada(self):
+        html = self._html("planos_trabalho:wizard_efetivo_diarias")
+
+        controles = (
+            'id="id_pt_saida_sede_data_display"',
+            'name="saida_sede_hora"',
+            'id="id_pt_chegada_sede_data_display"',
+            'name="chegada_sede_hora"',
+        )
+        posicoes = [html.index(controle) for controle in controles]
+        self.assertEqual(posicoes, sorted(posicoes))
 
     def test_efetivo_usa_select_com_acao_e_input_globais(self):
         html = self._html("planos_trabalho:wizard_efetivo_diarias")
@@ -380,12 +470,27 @@ class WizardV2Tests(TestCase):
         self.assertIn("Quantidade de diárias", html)
         self.assertNotIn("Composição por servidor", html)
 
-    def test_o_aviso_das_diarias_fica_antes_do_resumo_financeiro(self):
+    def test_efetivo_total_tem_a_mesma_hierarquia_visual_da_composicao(self):
+        html = self._html("planos_trabalho:wizard_efetivo_diarias")
+
+        inicio = html.index('aria-label="Quantidade de diárias e efetivo total"')
+        fim = html.index("</section>", inicio)
+        painel = html[inicio:fim]
+        self.assertEqual(painel.count('class="fact__value'), 2)
+        self.assertIn('data-pt-resultado-composicao', painel)
+        self.assertIn('data-pt-resultado-efetivo', painel)
+        self.assertNotIn('class="fact__note"', painel)
+
+    def test_o_aviso_das_diarias_fica_antes_dos_campos_de_deslocamento(self):
         html = self._html("planos_trabalho:wizard_efetivo_diarias")
 
         self.assertLess(
             html.index("data-pt-diarias-erros"),
-            html.index("data-pt-diarias-resultado"),
+            html.index('id="pt-diarias-date-picker"'),
+        )
+        self.assertLess(
+            html.index("data-pt-diarias-erros"),
+            html.index('name="saida_sede_hora"'),
         )
 
     def test_a_nota_de_cada_fato_de_diarias_existe_mesmo_sem_calculo(self):
@@ -477,10 +582,23 @@ class WizardV2Tests(TestCase):
         fim = html.index("choice-grid__toolbar-end")
         self.assertLess(inicio, fim)
         self.assertLess(html.index('id="pt-atividade-search"', inicio), fim)
-        self.assertLess(html.index("data-pt-activity-clear", inicio), fim)
+        self.assertGreater(html.index("data-pt-activity-clear"), fim)
         self.assertIn('id="pt-atividade-preset"', html[fim:])
+        self.assertLess(
+            html.index('id="pt-atividade-preset"', fim),
+            html.index("data-pt-activity-clear", fim),
+        )
         self.assertIn("field-with-action", html[fim:])
         self.assertIn("Gerenciar presets", html[fim:])
+
+        css = (ROOT / "static" / "css" / "v2" / "choice-card.css").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "[data-pt-activity] .choice-grid__toolbar {",
+            css,
+        )
+        self.assertIn("grid-template-columns: repeat(2, minmax(0, 1fr));", css)
 
     def test_a_grade_de_atividades_tem_duas_colunas(self):
         html = self._html("planos_trabalho:wizard_atividades")

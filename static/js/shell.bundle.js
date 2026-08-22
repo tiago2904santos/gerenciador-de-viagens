@@ -318,7 +318,19 @@ document.documentElement.dataset.appReady = "true";
     if (typeof MutationObserver !== "function") return;
     observer = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
-        Array.prototype.forEach.call(mutation.removedNodes, destroy);
+        /* MOVER um nó também o lista em `removedNodes` — é assim que o DOM
+           descreve a saída do lugar antigo, e a chegada no novo vem como uma
+           segunda mutação. Desmontar nessa hora arranca os listeners de algo
+           que continua na tela: era o que acontecia com o calendário dos
+           trechos, que o editor tira do estacionamento e põe no cabeçalho do
+           primeiro trecho. Ele perdia o clique-fora e o reposicionamento na
+           rolagem, e não voltava — `initPicker` para na marca de já-montado.
+           `isConnected` separa os dois casos: removido de verdade sai do
+           documento; realocado, não. */
+        Array.prototype.forEach.call(mutation.removedNodes, function (node) {
+          if (node && node.isConnected) return;
+          destroy(node);
+        });
         Array.prototype.forEach.call(mutation.addedNodes, schedule);
       });
     });

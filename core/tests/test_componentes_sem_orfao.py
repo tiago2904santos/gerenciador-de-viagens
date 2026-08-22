@@ -386,7 +386,13 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # nenhuma tinha equivalente no v2 — o `fact` descreve um registro, não
         # uma contagem, e o `record` daria 68px de altura para mostrar o nome de
         # uma pasta.
-        self.assertEqual(len(self.components()), 84)
+        #
+        # 85 (2026-08-21): +1 para `v2/trecho_date_picker.html`, o calendário dos
+        # trechos do roteiro. Não é marcação nova — é um PRESET de
+        # `v2/date_picker.html` no modo multi, com a faixa de contexto ligada.
+        # Vale como componente porque o preset é o contrato: quem chama não
+        # decide sozinho o que "calendário de trecho" significa.
+        self.assertEqual(len(self.components()), 85)
 
     def test_fora_do_v2_so_restam_pecas_sem_equivalente(self):
         fora_do_v2 = {

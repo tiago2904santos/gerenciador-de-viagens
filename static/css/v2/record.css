@@ -184,6 +184,63 @@
   overflow: hidden;
 }
 
+/* Os três assuntos do resumo de evento comportam listas variáveis de efetivo
+   e atividades. O teto compacto do cartão comum (173px) corta esses dados;
+   nesta composição eles podem crescer até 250px e então rolam por dentro. */
+:is(html[data-theme]) .record.plan-event-summary .plan-event-summary__block {
+  max-height: 250px;
+}
+
+/* No resumo de um plano, "Evento N de N" qualifica o título, não o antecede.
+   Ele permanece dentro da linha de título (não no header da página) e usa a
+   mesma construção visual do selo neutro do sistema. */
+:is(html[data-theme]) .record.plan-event-summary .record__title {
+  order: 1;
+}
+
+:is(html[data-theme]) .record.plan-event-summary .record__eyebrow {
+  background: color-mix(in srgb, var(--text-muted) 16%, transparent);
+  border-radius: var(--radius-pill);
+  letter-spacing: normal;
+  order: 2;
+  padding: 3px 10px;
+}
+
+:is(html[data-theme]) .record.plan-event-summary .plan-event-summary__block > .form-block__body {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+:is(html[data-theme]) .plan-event-summary__effective-list {
+  gap: 4px;
+  margin-top: 2px;
+}
+
+:is(html[data-theme]) .plan-event-summary__effective-chip {
+  font-size: var(--text-size-micro);
+  padding: 2px 8px;
+}
+
+/* A composição tem a mesma hierarquia do valor financeiro. Como sua frase é
+   mais longa, ela quebra em vez de ser encolhida pelo ajuste de linha única. */
+:is(html[data-theme]) .plan-event-summary__allowance-primary .fact__value {
+  white-space: normal;
+}
+
+/* Atividades são uma sequência, não estados: uma lista textual compacta
+   mantém os nomes legíveis e rola sem levar os fatos financeiros junto. */
+:is(html[data-theme]) .plan-event-summary__activity-list {
+  color: var(--text-muted);
+  display: grid;
+  font-size: var(--text-size-eyebrow);
+  gap: 4px;
+  list-style-position: inside;
+  margin: var(--gap-tight) 0 0;
+  max-height: 112px;
+  overflow-y: auto;
+  padding: 0 var(--gap-tight) 0 0;
+}
+
 /* O bloco financeiro OBEDECE ao mesmo teto dos outros dois (2026-08-20).
  *
  * Tinha `max-height: none` para caber a composição integral das diárias, e com

@@ -222,21 +222,25 @@ def api_calcular_diarias(request, pk):
                     "erros": r.get("erros", []),
                 }
             )
+        combinada = {
+            "ok": resultado_combinado["ok"],
+            "composicao": resultado_combinado.get("composicao", ""),
+            "valor_unitario_display": resultado_combinado.get("valor_unitario_display", ""),
+            "valor_total_display": resultado_combinado.get("valor_total_display", ""),
+            "valor_unitario_extenso": resultado_combinado.get("valor_unitario_extenso", ""),
+            "valor_total_extenso": resultado_combinado.get("valor_total_extenso", ""),
+            "quantidade_servidores": resultado_combinado.get("quantidade_servidores", 0),
+            "erros": resultado_combinado.get("erros", []),
+        }
+        # O card ao vivo compartilha o mesmo contrato nos modos simples e
+        # multi. O detalhamento continua aninhado, mas o total combinado também
+        # precisa estar no topo para os consumidores comuns da etapa 2.
         return JsonResponse(
             {
-                "ok": resultado_combinado["ok"],
+                **combinada,
                 "modo": "multi",
                 "per_evento": per_evento,
-                "combinada": {
-                    "ok": resultado_combinado["ok"],
-                    "composicao": resultado_combinado.get("composicao", ""),
-                    "valor_unitario_display": resultado_combinado.get("valor_unitario_display", ""),
-                    "valor_total_display": resultado_combinado.get("valor_total_display", ""),
-                    "valor_unitario_extenso": resultado_combinado.get("valor_unitario_extenso", ""),
-                    "valor_total_extenso": resultado_combinado.get("valor_total_extenso", ""),
-                    "quantidade_servidores": resultado_combinado.get("quantidade_servidores", 0),
-                    "erros": resultado_combinado.get("erros", []),
-                },
+                "combinada": combinada,
             }
         )
 

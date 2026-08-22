@@ -11261,3 +11261,165 @@ A grade declarava sempre duas colunas, mesmo enquanto “Outro programa” estav
 select principal com apenas metade da largura útil. A grade identificada agora reduz-se a uma
 coluna quando o complemento está `hidden`; ao selecionar “Outro”, o JavaScript já existente revela
 o campo e a declaração original de duas colunas iguais volta a valer automaticamente.
+
+### NOVO-20260821-184803-87fb50b59c55 ✅ RESOLVIDO · `NOVO` Campos de gênero exibiam opção vazia “---------------” · HT · risco baixo
+
+Embora os dois campos tenham padrão Masculino e a limpeza do formulário também normalize vazio
+para esse valor, o `ModelForm` inseria automaticamente a escolha vazia porque os campos do modelo
+aceitam registros legados em branco. O formulário do wizard agora declara explicitamente somente
+as duas escolhas válidas, Masculino e Feminino, sem alterar o modelo nem exigir migração.
+
+### NOVO-20260821-185012-c1ceefb27deb ✅ RESOLVIDO · `NOVO` Descrição do período era coberta pelos três controles · UI · risco baixo
+
+Além da proteção global que permite quebra nas descrições split, este bloco usava a variação
+errada: `split` destina-se a um controle curto ao lado do rótulo, mas “Período do evento” contém
+duas datas e horário. O cabeçalho agora ocupa uma linha própria acima do corpo. Descrição e campos
+deixam de compartilhar o mesmo eixo horizontal, eliminando a possibilidade de sobreposição com
+texto maior, zoom ou diferentes larguras de tela.
+
+### NOVO-20260821-185248-53505eda0221 ✅ RESOLVIDO · `NOVO` Catálogo de horários expunha controles internos Ativo e Ordem · HT/BE · risco baixo
+
+O cadastro pedia ao usuário disponibilidade e posição numérica embora todo horário novo deva
+entrar disponível e a ordenação seja apenas um detalhe interno do catálogo. O formulário agora
+expõe somente a faixa; novas linhas recebem os defaults do modelo (`ativo=True`, `ordem=100`) e a
+edição preserva os valores existentes. A lista também deixa de imprimir número de ordem e selo de
+inatividade, removendo por completo esses conceitos dessa interface.
+
+### NOVO-20260821-185524-89c9f9fdbe36 ✅ RESOLVIDO · `NOVO` Faixa de atendimento exigia texto formatado manualmente · BE/HT · risco baixo
+
+O catálogo recebia toda a faixa em um campo textual, obrigando o usuário a conhecer e repetir o
+separador esperado. O formulário agora apresenta dois controles temporais nativos, “Horário de
+início” e “Horário de fim”, e monta antes da validação do modelo o valor canônico
+`HH:MM até HH:MM`. Na edição, faixas existentes nesse formato são decompostas novamente nos dois
+campos. O banco e os consumidores continuam recebendo a mesma representação textual.
+
+### NOVO-20260821-190509-229fe373a205 ✅ RESOLVIDO · `NOVO` Bloco de horários não declarava a variação split · HT · risco baixo
+
+Depois da separação da faixa em início e fim, a seção ainda usava a variação neutra do quick-add.
+Ela agora declara explicitamente `split`, seguindo o mesmo contrato dos demais cadastros rápidos;
+os dois campos temporais permanecem distribuídos em colunas iguais e a grade responsiva continua
+responsável pela quebra em telas menores.
+
+### NOVO-20260821-190842-df4fc6ab111a ✅ RESOLVIDO · `NOVO` Catálogo de horários descartava o retorno ao plano de trabalho · BE/HT · risco baixo
+
+Embora a tela fosse aberta pelo wizard com `?next=`, a configuração deste catálogo não
+habilitava o contrato comum de retorno e, por isso, o cabeçalho ficava sem a ação para voltar
+ao ponto em que o usuário parou. O catálogo agora valida e preserva o destino interno, exibe
+“Voltar ao plano de trabalho” e rejeita URLs externas, usando a lista de planos como fallback.
+
+### NOVO-20260821-191804-bfcebdc9a421 ✅ RESOLVIDO · `NOVO` Horário ocupava o dobro da largura de cada data no período · HT · risco baixo
+
+A grade externa dividia o bloco em duas metades: o calendário de intervalo ficava na primeira e
+repartia seu espaço entre as datas, enquanto o horário ocupava sozinho toda a segunda metade. O
+bloco agora declara três colunas iguais e o calendário atravessa exatamente as duas primeiras,
+deixando data inicial, data final e horário com a mesma largura visual.
+
+### NOVO-20260821-192302-b95f54c8eefd ✅ RESOLVIDO · `NOVO` Aviso de deslocamento aparecia depois dos campos que orientava · HT · risco baixo
+
+A mensagem que solicita data e hora de saída e chegada era renderizada abaixo da linha de
+controles, quando a orientação precisa ser lida antes do preenchimento. O mesmo alerta e seus
+ganchos de atualização agora aparecem imediatamente acima das datas e horas, ainda antes do
+resumo financeiro calculado.
+
+### NOVO-20260821-192718-a68ecef6b59c ✅ RESOLVIDO · `NOVO` Datas e horas de deslocamento não seguiam a ordem cronológica · HT · risco baixo
+
+O intervalo agrupava primeiro as duas datas e somente depois mostrava as duas horas, separando os
+pares que descrevem cada momento. A extensão de controles do calendário agora intercala os campos
+na ordem data de saída, hora de saída, data de chegada e hora de chegada, preservando um único
+painel de calendário, os campos reais do formulário e a sequência de teclado.
+
+### NOVO-20260821-193517-51e8c572be7d ✅ RESOLVIDO · `NOVO` Efetivo total era nota secundária no resumo de diárias · HT · risco baixo
+
+No terceiro cartão do resumo, a composição de diárias era um fato principal, mas a quantidade
+de servidores aparecia como nota pequena, apesar de as duas informações terem a mesma função de
+resumo quantitativo. “Efetivo total” agora é um segundo fato completo, com rótulo e valor na
+mesma hierarquia visual, preservando o gancho atualizado pelo cálculo automático.
+
+### NOVO-20260821-193910-029f3196357b ✅ RESOLVIDO · `NOVO` Atividades do preset divergiam da grade da etapa 3 · HT · risco baixo
+
+O cadastro de presets ativava a variação densa da grade de escolhas, exibindo até cinco cartões
+por linha e desabilitando o tratamento do último item ímpar. A lista agora usa a mesma variação
+regular da etapa 3: no máximo duas colunas, uma coluna em telas estreitas e o último cartão
+atravessando a linha inteira quando a quantidade for ímpar.
+
+### NOVO-20260821-194504-6a949b7f1228 ✅ RESOLVIDO · `NOVO` Filtro de atividades não ocupava metade da barra · UI/HT · risco baixo
+
+O filtro dividia o grupo esquerdo com “Limpar seleção”, enquanto o preset tinha um grupo
+separado de largura fixa; assim, os controles não formavam duas metades previsíveis. A busca agora
+ocupa sozinha a primeira metade, e limpar mais preset compartilham a segunda. Em telas estreitas,
+os dois grupos voltam a se empilhar em uma coluna.
+
+### NOVO-20260821-194915-bea97c3a58e2 ✅ RESOLVIDO · `NOVO` Limpar seleção não estava no extremo direito · HT · risco baixo
+
+Depois da divisão da barra em duas metades, o botão de limpeza aparecia antes do preset, no
+começo do grupo direito. A ordem dos controles foi invertida dentro desse grupo: o preset vem
+primeiro e “Limpar seleção” encerra a barra no lado direito.
+
+### NOVO-20260821-195235-958f77a411ce ✅ RESOLVIDO · `NOVO` Blocos do resumo do evento herdavam teto compacto de 173px · UI · risco baixo
+
+Coordenação, efetivo e diárias/atividades herdavam o limite genérico dos cartões de lista,
+ocultando conteúdo variável acima de 173px. Os três blocos específicos do resumo agora podem
+crescer até `250px`; ao ultrapassar esse teto, o corpo ganha rolagem vertical interna em vez de
+cortar informações ou desnivelar as colunas.
+
+### NOVO-20260821-195748-fe022aab4552 ✅ RESOLVIDO · `NOVO` Detalhes do efetivo e atividades competiam com os fatos principais · UI/HT · risco baixo
+
+As divisões do efetivo usavam etiquetas grandes e as atividades também eram etiquetas que
+expandiam o cartão inteiro. O detalhamento do efetivo agora usa etiquetas menores e com espaço
+mínimo logo abaixo do total de servidores. As atividades passaram a uma lista semântica textual,
+com altura limitada e rolagem própria, mantendo valor e diárias sempre visíveis.
+
+### NOVO-20260821-200350-c6cc3c5f2c80 ✅ RESOLVIDO · `NOVO` Composição de diárias era nota secundária no resumo do evento · HT · risco baixo
+
+Embora seja um dos totais centrais do evento, a composição aparecia como nota pequena do valor
+financeiro. “Quantidade de diárias” agora é um fato independente e forte, com a mesma classe de
+valor principal usada por “Valor total”; atividades permanecem depois dos dois totais e conservam
+sua lista rolável.
+
+### NOVO-20260821-201245-e319820f5796 ✅ RESOLVIDO · `NOVO` Resumo do evento encostava no painel de identificação · UI/HT · risco baixo
+
+A raiz interna da etapa agrupava resumos e formulário sem declarar layout nem espaçamento, mesmo
+estando dentro de uma página que usa ritmo de grade. O contêiner de identificação agora também é
+uma grade e aplica o `gap` semântico do sistema entre cada resumo, alerta e painel editável.
+
+### NOVO-20260821-201903-d584ac943fdb ✅ RESOLVIDO · `NOVO` Índice do evento parecia texto anterior ao título · UI/HT · risco baixo
+
+“Evento N de N” aparecia antes do título e com aparência de texto auxiliar. No card de resumo do
+plano, o índice agora vem imediatamente depois do título e recebe a forma do selo neutro do
+sistema. A regra é restrita ao card e não introduz selos em cabeçalhos de página.
+
+### NOVO-20260821-202516-5631c7923a1b ✅ RESOLVIDO · `NOVO` Destinos eram duplicados ao editar um evento · BE/HT · risco médio
+
+O formulário da etapa 1 hidratava todas as linhas `PlanoDestino` relacionadas ao plano: tanto o
+rascunho editável quanto as cópias persistidas pertencentes ao `EventoPlano`. Ao abrir a edição,
+cada destino aparecia duas vezes. A consulta agora carrega exclusivamente o scratchpad
+(`evento IS NULL`), preservando uma linha para cada destino real do evento.
+
+### NOVO-20260821-203231-ebe933fd22d4 ✅ RESOLVIDO · `NOVO` Cálculo ao vivo não atualizava o card em planos multi-evento · BE/JS · risco médio
+
+A API do modo simples devolvia os totais no nível principal, enquanto a do modo multi-evento os
+devolvia apenas em `combinada`. O consumidor comum da etapa 2 lia exclusivamente o nível principal
+e, portanto, mantinha os traços mesmo após datas, horas e efetivo válidos. O resultado combinado
+agora também cumpre o contrato comum no topo, preservando `combinada` e `per_evento` para os
+consumidores detalhados. O motor e suas regras financeiras não foram alterados.
+
+### NOVO-20260822-175856-6da8424a906a ✅ RESOLVIDO · `NOVO` Ação de documento do termo abria somente o PDF · HT/UI · risco baixo
+
+Na etapa 5 do evento, cada termo expunha uma ação direta de PDF e escondia as demais opções de
+documento. A ação agora abre um menu contextual com “Visualizar termo”, “Baixar PDF” e “Baixar
+DOCX”. Termos genéricos usam as rotas genéricas; termos de servidor usam as rotas individuais,
+evitando que uma ação gere ou abra o documento de outra linha.
+
+### NOVO-20260822-180639-e63d0af6f86a ✅ RESOLVIDO · `NOVO` Nova OS copiava servidores somente do primeiro ofício do evento · BE · risco médio
+
+O seed da nova Ordem de Serviço carregava todos os ofícios vinculados ao evento, mas preenchia a
+equipe apenas com os servidores do primeiro ofício da ordenação. A consolidação agora percorre
+todos os ofícios selecionados, reúne seus servidores e remove repetições pelo identificador do
+cadastro. O mesmo contrato foi aplicado aos servidores marcados para termo de autorização.
+
+### NOVO-20260822-181021-f2584ce48015 ✅ RESOLVIDO · `NOVO` Conteúdo do modal de downloads encostava nas bordas · HT/UI · risco baixo
+
+O seletor de downloads pode ser renderizado dentro de um formulário de edição, mas o modal criava
+outro formulário como casca. Por ser aninhamento inválido, o navegador descartava essa casca e,
+com ela, a classe responsável pelo padding. O modal agora usa a variação sem formulário próprio e
+fecha pelo gancho comum de overlay, preservando o recuo sem alterar o componente visual global.

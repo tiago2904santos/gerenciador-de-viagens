@@ -191,6 +191,9 @@ HORARIOS = CatalogConfig(
     ),
     rotulo=lambda horario: horario.faixa,
     paginar_por=20,
+    url_fallback_next="planos_trabalho:index",
+    back_label_com_next="Voltar",
+    back_label_sem_next="Voltar",
 )
 
 

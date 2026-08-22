@@ -32,7 +32,6 @@
             placeholder="Filtrar atividades por nome"
             aria_label="Filtrar atividades"
           />
-          <c-v2.button label="Limpar seleção" icon="x" hook="data-pt-activity-clear" />
         </div>
         <div class="choice-grid__toolbar-end">
           <c-v2.select_with_action
@@ -48,6 +47,7 @@
             action_tooltip="Gerenciar presets"
             :action_autosave="True"
           />
+          <c-v2.button label="Limpar seleção" icon="x" hook="data-pt-activity-clear" />
         </div>
       </c-slot>
       <c-slot name="body">
