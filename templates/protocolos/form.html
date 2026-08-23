@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
+{% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  {% comment %}
+    Novo protocolo — uma tela, dois caminhos (fatia 1, NOVO-20260823-014253):
+
+    1. PROTOCOLAR um ofício do sistema: cria o protocolo no eProtocolo (ou no
+       mock) a partir do documento, já enviando o PDF junto. O form posta em
+       `protocolos:vincular` — a escolha do ofício É a confirmação, e o select
+       (name="oficio") faz o papel do object_id no contrato daquela rota.
+    2. VINCULAR um protocolo que já existe lá fora (número digitado à mão).
+
+    São dois <form> separados de propósito: cada um tem seu botão e seu efeito,
+    e um POST nunca carrega campos do outro caminho.
+  {% endcomment %}
+  {% if eprotocolo_modo_demo %}
+    <c-v2.alert tone="info" message="Modo demonstração: o protocolo será criado com número simulado, sem chamada real ao eProtocolo." />
+  {% endif %}
+
+  <c-v2.panel title="{{ page_title }}" description="Protocole um ofício do sistema ou vincule um protocolo já existente no eProtocolo.">
+    <c-slot name="body">
+      <c-v2.form_block title="Protocolar ofício" description="Cria o protocolo a partir de um ofício do sistema, com o PDF enviado junto">
+        <c-slot name="body">
+          <form method="post" action="{{ protocolar_action }}">
+            {% csrf_token %}
+            <input type="hidden" name="content_type_id" value="{{ oficio_content_type_id }}">
+            <input type="hidden" name="enviar_documento" value="1">
+            <div class="field-grid field-grid--cols-2">
+              <c-v2.form_field :field="protocolar_form.oficio" />
+            </div>
+            <c-v2.button label="Protocolar ofício" variant="primary" type="submit" />
+          </form>
+        </c-slot>
+      </c-v2.form_block>
+
+      <c-v2.form_block title="Vincular protocolo existente" description="Registra aqui um protocolo que já existe no eProtocolo">
+        <c-slot name="body">
+          <form method="post" action="{{ form_action }}">
+            {% csrf_token %}
+            <div class="field-grid field-grid--cols-2">
+              <c-v2.form_field :field="form.numero" />
+              <c-v2.form_field :field="form.assunto" />
+              <c-v2.form_field :field="form.descricao" extra_class="field-grid__span-all" />
+            </div>
+            <c-v2.button label="Cadastrar protocolo" variant="primary" type="submit" />
+          </form>
+        </c-slot>
+      </c-v2.form_block>
+    </c-slot>
+  </c-v2.panel>
+{% endblock %}

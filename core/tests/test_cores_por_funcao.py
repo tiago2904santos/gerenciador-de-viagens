@@ -24,11 +24,11 @@ from django.test import SimpleTestCase
 RAIZ = Path(__file__).resolve().parents[2]
 TEMPLATES = RAIZ / "templates"
 
-# O vocabulário canônico. `edit` e `neutral` seguem o accent e são as duas
-# únicas que mudam com o tema — estão assim porque ainda não foram decididas,
-# não porque a regra abra exceção.
+# O vocabulário canônico. `edit` e `neutral` seguem o accent; `whatsapp` é um
+# tom de canal e permanece estável entre temas.
 TONS_VALIDOS = {
     "view", "pdf", "docx", "attach", "cancel", "amend", "delete", "edit", "neutral",
+    "whatsapp",
 }
 
 # Título do item → tom que ele DEVE usar, em qualquer tela.
@@ -101,6 +101,8 @@ class CorPorFuncaoTests(SimpleTestCase):
         bloco_escuro = tokens[tokens.index(abertura):]
         for nome in ("view", "pdf", "docx", "attach", "cancel", "amend", "delete"):
             self.assertNotIn(f"--action-{nome}:", bloco_escuro)
+        self.assertEqual(tokens.count("--channel-whatsapp:"), 1)
+        self.assertNotIn("--channel-whatsapp:", bloco_escuro)
 
     def test_excluir_pinta_rotulo_e_icone(self):
         """Vermelho no rótulo é do destrutivo; vermelho no ícone é do PDF.

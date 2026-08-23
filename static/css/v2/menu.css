@@ -216,6 +216,7 @@
 :is(html[data-theme]) .menu__icon[data-tone="delete"]  { --tom-acao: var(--action-delete); }
 :is(html[data-theme]) .menu__icon[data-tone="edit"]    { --tom-acao: var(--action-edit); }
 :is(html[data-theme]) .menu__icon[data-tone="neutral"] { --tom-acao: var(--action-neutral); }
+:is(html[data-theme]) .menu__icon[data-tone="whatsapp"] { --tom-acao: var(--channel-whatsapp); }
 
 /* Apelidos do vocabulário ANTIGO, que falava de estado ("late", "progress") onde
    queria dizer função. As chamadas foram migradas para os nomes acima; estes

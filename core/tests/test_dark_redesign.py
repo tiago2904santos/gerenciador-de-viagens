@@ -706,21 +706,35 @@ class DarkRedesignContractTests(SimpleTestCase):
         )
         self.assertFalse(obsolete_wizard.exists())
 
-    def test_protocolos_product_module_was_removed(self):
+    def test_protocolos_voltou_sem_os_templates_pre_redesign(self):
+        """O módulo foi RESTAURADO (NOVO-20260823-014253) — este contrato inverteu.
+
+        A versão anterior deste teste exigia o módulo ausente: era a lápide do
+        commit de remoção, que levou a integração eProtocolo inteira junto com o
+        redesign. A restauração é deliberada e fatiada; o que este teste guarda
+        agora é a parte da remoção que CONTINUA valendo — as telas pré-redesign
+        não voltam. Os templates de `templates/protocolos/` são os novos, do v2,
+        e a folha `protocolos-detail.css` segue morta.
+        """
         settings_source = (
             Path(settings.BASE_DIR) / "config" / "settings" / "base.py"
         ).read_text(encoding="utf-8")
         urls_source = (Path(settings.BASE_DIR) / "config" / "urls.py").read_text(encoding="utf-8")
-        navigation_source = (
-            Path(settings.BASE_DIR) / "core" / "navigation.py"
-        ).read_text(encoding="utf-8")
 
-        self.assertNotIn('"protocolos",', settings_source)
-        self.assertNotIn('include("protocolos.urls")', urls_source)
-        self.assertNotIn('"url_name": "protocolos:index"', navigation_source)
-        self.assertFalse(list((Path(settings.BASE_DIR) / "protocolos").rglob("*.py")))
-        self.assertFalse(list((Path(settings.BASE_DIR) / "integracoes" / "eprotocolo").rglob("*.py")))
-        self.assertFalse(list((Path(settings.BASE_DIR) / "templates" / "protocolos").rglob("*.html")))
+        self.assertIn('"protocolos",', settings_source)
+        self.assertIn('include("protocolos.urls")', urls_source)
+        self.assertTrue(list((Path(settings.BASE_DIR) / "protocolos").rglob("*.py")))
+        self.assertTrue(list((Path(settings.BASE_DIR) / "integracoes" / "eprotocolo").rglob("*.py")))
+
+        # O que não pode voltar: a UI antiga e sua folha própria.
+        self.assertFalse(
+            (Path(settings.BASE_DIR) / "static" / "css" / "protocolos-detail.css").exists()
+        )
+        for antigo in ("protocolo_list.html", "protocolo_detail.html", "protocolo_confirm.html"):
+            self.assertFalse(
+                (Path(settings.BASE_DIR) / "templates" / "protocolos" / antigo).exists(),
+                f"template pré-redesign voltou: {antigo}",
+            )
 
     def test_global_shell_has_accessible_mobile_navigation_contract(self):
         sidebar_template = (

@@ -216,11 +216,11 @@
   --action-cancel: var(--status-progress);  /* cancelar */
   --action-amend:  #9a76cb;                 /* retificar e complementar */
   --action-delete: var(--status-late);      /* excluir */
-  /* Editar e o que está fora do vocabulário (WhatsApp, copiar mensagem) seguem
-     o accent, como já seguiam. São as duas únicas que mudam com o tema, e estão
-     assim porque ainda não foram decididas — não porque a regra abre exceção. */
+  /* Editar e copiar mensagem seguem o accent. O WhatsApp usa um token de canal:
+     é identificação da integração, não estado nem ação genérica. */
   --action-edit:   var(--accent);
   --action-neutral: var(--accent);
+  --channel-whatsapp: var(--status-done);
 
 
   /* ---- forma ----------------------------------------------------------- */

@@ -781,3 +781,11 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       botão circular de ícone, preservando URL, acessibilidade e tooltip.
 - [x] `NOVO-20260822-214618-95d9e16cb2bf` coloca “Ofício assinado” antes de “Despacho assinado”
       no grupo compartilhado da etapa Documentos.
+- [x] `NOVO-20260822-215006-a796258d19d2` conclui a migração visual da troca de motorista e
+      viatura, com selects, inputs, aviso e grade de escolhas integralmente no contrato v2.
+- [x] `NOVO-20260822-220704-a4d5319fffdf` diferencia as ações de WhatsApp pelo token verde do
+      canal e mantém “Copiar mensagem” no tom neutro do menu.
+- [x] `NOVO-20260822-222226-f484de9b72e3` move o quick add dos modelos do RT para o rail da
+      lista, antes das abas e do bloco de registros, como nos catálogos normais.
+- [x] `NOVO-20260822-223340-d0f6b26e25e5` remove a caixa temática redundante dos modelos do RT
+      e apresenta o tópico ativo como uma lista simples canônica, inclusive no estado vazio.

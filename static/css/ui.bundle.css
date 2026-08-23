@@ -220,11 +220,11 @@
   --action-cancel: var(--status-progress);  /* cancelar */
   --action-amend:  #9a76cb;                 /* retificar e complementar */
   --action-delete: var(--status-late);      /* excluir */
-  /* Editar e o que está fora do vocabulário (WhatsApp, copiar mensagem) seguem
-     o accent, como já seguiam. São as duas únicas que mudam com o tema, e estão
-     assim porque ainda não foram decididas — não porque a regra abre exceção. */
+  /* Editar e copiar mensagem seguem o accent. O WhatsApp usa um token de canal:
+     é identificação da integração, não estado nem ação genérica. */
   --action-edit:   var(--accent);
   --action-neutral: var(--accent);
+  --channel-whatsapp: var(--status-done);
 
 
   /* ---- forma ----------------------------------------------------------- */
@@ -4254,6 +4254,7 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 :is(html[data-theme]) .menu__icon[data-tone="delete"]  { --tom-acao: var(--action-delete); }
 :is(html[data-theme]) .menu__icon[data-tone="edit"]    { --tom-acao: var(--action-edit); }
 :is(html[data-theme]) .menu__icon[data-tone="neutral"] { --tom-acao: var(--action-neutral); }
+:is(html[data-theme]) .menu__icon[data-tone="whatsapp"] { --tom-acao: var(--channel-whatsapp); }
 
 /* Apelidos do vocabulário ANTIGO, que falava de estado ("late", "progress") onde
    queria dizer função. As chamadas foram migradas para os nomes acima; estes

@@ -53,6 +53,28 @@ class ModelosDeTextoRTTests(TestCase):
         self.assertEqual(response.context["grupos"][0]["campo"], CAMPO)
         self.assertNotContains(response, "/prestacoes-contas/modelos-texto/novo/")
 
+    def test_quick_add_fica_no_rail_antes_das_abas_e_da_lista(self):
+        self._criar()
+        response = self.client.get(reverse("prestacoes_contas:modelos_index"))
+        html = response.content.decode()
+
+        rail = html.index('class="rail')
+        quick_add = html.index('class="quick-add__toggle"')
+        abas = html.index('class="list-page__tabs"')
+        lista = html.index('class="panel__body list-page__panel-rows"')
+
+        self.assertLess(rail, quick_add)
+        self.assertLess(quick_add, abas)
+        self.assertLess(abas, lista)
+
+    def test_topico_ativo_usa_lista_simples_sem_form_block_proprio(self):
+        self._criar()
+        response = self.client.get(reverse("prestacoes_contas:modelos_index"))
+
+        self.assertContains(response, 'class="panel__body list-page__panel-rows"')
+        self.assertNotContains(response, "modelos-grupo")
+        self.assertNotContains(response, 'class="record-list"')
+
     def test_toggle_abre_somente_a_lista_do_topico_selecionado(self):
         campo, label = ModeloTextoRelatorioTecnico.CAMPO_CHOICES[1]
         modelo_visivel = ModeloTextoRelatorioTecnico.objects.create(

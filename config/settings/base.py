@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "planos_trabalho",
     "ordens_servico",
     "integracoes.google_drive",
+    "protocolos",
     "prestacoes_contas",
 ]
 
@@ -360,4 +361,28 @@ CELERY_TASK_PUBLISH_RETRY = False
 CELERY_BROKER_TRANSPORT_OPTIONS = {
     "socket_connect_timeout": CELERY_BROKER_CONNECTION_TIMEOUT,
     "socket_timeout": CELERY_BROKER_CONNECTION_TIMEOUT,
+}
+
+EPROTOCOLO = {
+    "AMBIENTE": (os.getenv("EPROTOCOLO_AMBIENTE") or "mock").strip().lower(),
+    "BASE_URL": (os.getenv("EPROTOCOLO_BASE_URL") or "").strip(),
+    "TOKEN_URL": (os.getenv("EPROTOCOLO_TOKEN_URL") or "").strip(),
+    "CLIENT_ID": (os.getenv("EPROTOCOLO_CLIENT_ID") or "").strip(),
+    "CLIENT_SECRET": (os.getenv("EPROTOCOLO_CLIENT_SECRET") or "").strip(),
+    "CONSUMER_ID": (os.getenv("EPROTOCOLO_CONSUMER_ID") or "").strip(),
+    "TIMEOUT": int(os.getenv("EPROTOCOLO_TIMEOUT", "30") or "30"),
+    "VERIFY_SSL": _env_flag("EPROTOCOLO_VERIFY_SSL", "true"),
+    "REAL_READONLY": _env_flag("EPROTOCOLO_REAL_READONLY", "true"),
+    "REAL_MUTATIONS_ENABLED": _env_flag("EPROTOCOLO_REAL_MUTATIONS_ENABLED", "false"),
+    # Códigos institucionais padrão (não sensíveis) — usados pelos mappers
+    # quando o documento não traz a informação. Podem ficar vazios.
+    "COD_ORGAO_PADRAO": (os.getenv("EPROTOCOLO_COD_ORGAO_PADRAO") or "").strip(),
+    "NOME_ORGAO_PADRAO": (os.getenv("EPROTOCOLO_NOME_ORGAO_PADRAO") or "").strip(),
+    "COD_LOCAL_ORIGEM_PADRAO": (os.getenv("EPROTOCOLO_COD_LOCAL_ORIGEM_PADRAO") or "").strip(),
+    "COD_LOCAL_DESTINO_PADRAO": (os.getenv("EPROTOCOLO_COD_LOCAL_DESTINO_PADRAO") or "").strip(),
+    "COD_ASSUNTO_VIAGEM": (os.getenv("EPROTOCOLO_COD_ASSUNTO_VIAGEM") or "").strip(),
+    "COD_ESPECIE_OFICIO": (os.getenv("EPROTOCOLO_COD_ESPECIE_OFICIO") or "").strip(),
+    "COD_PALAVRA_CHAVE_VIAGEM": (os.getenv("EPROTOCOLO_COD_PALAVRA_CHAVE_VIAGEM") or "").strip(),
+    "COD_TIPO_TRAMITACAO_PADRAO": (os.getenv("EPROTOCOLO_COD_TIPO_TRAMITACAO_PADRAO") or "").strip(),
+    "CPF_USUARIO_SISTEMA": (os.getenv("EPROTOCOLO_CPF_USUARIO_SISTEMA") or "").strip(),
 }

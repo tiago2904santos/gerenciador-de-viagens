@@ -20,8 +20,8 @@ tela; o nome permanece no `aria_label` para identificar essa relação.
 {% endcomment %}
 {% for servidor in card.servidores %}
 <c-v2.menu id="diaria-wa-menu-{{ servidor.ps_pk }}" extra_class="action-menu" aria_label="Aviso de liberação de {{ servidor.name }}">
-  <c-v2.menu_button hook="data-diaria-wa-send" data-wa-app="normal" title="WhatsApp" description="Abrir no aplicativo pessoal" icon="whatsapp-modern" icon_tone="neutral" />
-  <c-v2.menu_button hook="data-diaria-wa-send" data-wa-app="business" title="WhatsApp Business" description="Abrir no aplicativo profissional" icon="whatsapp-business" icon_tone="neutral" />
+  <c-v2.menu_button hook="data-diaria-wa-send" data-wa-app="normal" title="WhatsApp" description="Abrir no aplicativo pessoal" icon="whatsapp-modern" icon_tone="whatsapp" />
+  <c-v2.menu_button hook="data-diaria-wa-send" data-wa-app="business" title="WhatsApp Business" description="Abrir no aplicativo profissional" icon="whatsapp-business" icon_tone="whatsapp" />
   <c-v2.menu_button hook="data-diaria-wa-copy" title="Copiar mensagem" description="Copiar o texto para a área de transferência" icon="copy-modern" icon_tone="neutral" />
 </c-v2.menu>
 {% endfor %}

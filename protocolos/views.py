@@ -1,27 +1,32 @@
-"""Views da Central de Protocolos.
+"""Views da Central de Protocolos — fachada fina.
 
-As views chamam APENAS ``protocolos.services`` / ``protocolos.selectors`` —
-nunca o client HTTP do eProtocolo diretamente. Feedback ao usuário sempre via
-``django.contrib.messages``.
+As views chamam APENAS ``forms``/``selectors``/``services``/``permissions`` —
+nunca o client HTTP do eProtocolo, e nunca um manager de modelo: a catraca de
+ORM em views (`core/tests/test_view_module_boundaries.py`) conta cada acesso,
+e a resolução de content type que morava aqui desceu para ``selectors``.
+Feedback ao usuário sempre via ``django.contrib.messages``.
+
+Fatia 1 da restauração (NOVO-20260823-014253): index, detalhe, criação (de
+ofício ou vínculo manual), envio de documento e sincronização. Assinatura,
+tramitação, conclusão e páginas de movimentações/logs voltam na fatia 2.
 """
 
 from __future__ import annotations
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.contenttypes.models import ContentType
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
-_login = login_required(login_url="core:login")
-
 from integracoes.eprotocolo import settings as epro_cfg
 from integracoes.eprotocolo.exceptions import EProtocoloError
 
 from . import forms, permissions, selectors, services
-from .models import Protocolo, ProtocoloDocumento
+from .models import Protocolo
+
+_login = login_required(login_url="core:login")
 
 
 # ---------------------------------------------------------------------------
@@ -34,69 +39,22 @@ def _contexto_integracao() -> dict:
         "eprotocolo_descricao": epro_cfg.descricao_ambiente(),
         "eprotocolo_modo_mock": modo_demo,
         "eprotocolo_modo_demo": modo_demo,
-        "eprotocolo_demo_label": "Modo demonstracao" if modo_demo else epro_cfg.descricao_ambiente(),
+        "eprotocolo_demo_label": "Modo demonstração" if modo_demo else epro_cfg.descricao_ambiente(),
         "eprotocolo_ambiente_label": "Treinamento" if modo_demo else epro_cfg.ambiente(),
     }
 
 
 def _avisar_modo(request):
+    """Um aviso por operação em ambiente não-real.
+
+    A versão original tinha um segundo `messages.warning` inalcançável depois
+    do `return` — resto de edição da fase demo, removido na restauração.
+    """
     if not epro_cfg.eprotocolo_esta_configurado():
         messages.warning(
             request,
-            "Operacao registrada em ambiente de treinamento/mock. Nenhuma chamada real foi feita.",
+            "Operação registrada em ambiente de treinamento/mock. Nenhuma chamada real foi feita.",
         )
-        return
-        messages.warning(
-            request,
-            "Integração eProtocolo em modo mock — nenhuma chamada real foi feita. "
-            "Configure as credenciais no .env para ativar o modo real.",
-        )
-
-
-def _protocolo_detail_page_steps(protocolo: Protocolo) -> list[dict]:
-    base_url = protocolo.get_detail_url()
-    return [
-        {
-            "url": f"{base_url}#resumo",
-            "state_class": "is-current",
-            "step_label": "Etapa 1",
-            "title": "Resumo",
-            "status": "Dados do processo",
-            "marker": "1",
-            "marker_aria_hidden": False,
-            "aria_current": "step",
-        },
-        {
-            "url": f"{base_url}#fluxo",
-            "state_class": "",
-            "step_label": "Etapa 2",
-            "title": "Fluxo",
-            "status": "Pendencias e tramites",
-            "marker": "2",
-            "marker_aria_hidden": False,
-            "aria_current": "",
-        },
-        {
-            "url": f"{base_url}#documentos",
-            "state_class": "",
-            "step_label": "Etapa 3",
-            "title": "Documentos",
-            "status": f"{protocolo.documentos.count()} registrado(s)",
-            "marker": "3",
-            "marker_aria_hidden": False,
-            "aria_current": "",
-        },
-        {
-            "url": f"{base_url}#logs",
-            "state_class": "",
-            "step_label": "Etapa 4",
-            "title": "Logs",
-            "status": "Auditoria",
-            "marker": "4",
-            "marker_aria_hidden": False,
-            "aria_current": "",
-        },
-    ]
 
 
 # ---------------------------------------------------------------------------
@@ -109,21 +67,19 @@ def index(request):
     busca = request.GET.get("q", "").strip()
     status = request.GET.get("status", "").strip()
     protocolos = selectors.listar_protocolos(busca=busca, status=status)
-    protocolos_resumo = {protocolo.pk: services.resumo_operacional(protocolo) for protocolo in protocolos}
 
     contexto = {
         "page_title": "Central de Protocolos",
         "protocolos": protocolos,
-        "protocolos_resumo": protocolos_resumo,
         "q": busca,
         "status": status,
         "status_options": selectors.status_local_options(),
-        "create_url": reverse("protocolos:novo"),
+        "create_url": reverse("protocolos:protocolo_create"),
         "search_clear_url": reverse("protocolos:index"),
-        "empty_message": "Nenhum protocolo encontrado.",
+        "has_filters": bool(busca or status),
         **_contexto_integracao(),
     }
-    return render(request, "protocolos/protocolo_list.html", contexto)
+    return render(request, "protocolos/index.html", contexto)
 
 
 # ---------------------------------------------------------------------------
@@ -145,81 +101,66 @@ def detail(request, pk):
         "pendencias": protocolo.pendencias.all(),
         "tramitacoes": protocolo.tramitacoes.all(),
         "movimentacoes": protocolo.movimentacoes.all(),
-        "logs": protocolo.logs.all()[:50],
-        "protocolo_page_steps": _protocolo_detail_page_steps(protocolo),
         **_contexto_integracao(),
     }
-    return render(request, "protocolos/protocolo_detail.html", contexto)
+    return render(request, "protocolos/detalhe.html", contexto)
 
 
 # ---------------------------------------------------------------------------
-# Criação manual
+# Criação — uma tela, dois caminhos: protocolar um ofício ou vincular número
 # ---------------------------------------------------------------------------
 @_login
-def novo(request):
+def protocolo_create(request):
     if not permissions.pode_criar_protocolo(request.user):
         messages.error(request, "Você não tem permissão para criar protocolos.")
         return redirect("protocolos:index")
 
-    if request.method == "POST":
-        form = forms.VinculoManualForm(request.POST)
-        if form.is_valid():
-            protocolo = services.vincular_protocolo_manual(
-                form.cleaned_data["numero"],
-                assunto=form.cleaned_data["assunto"],
-                descricao=form.cleaned_data["descricao"],
-            )
-            messages.success(request, "Protocolo cadastrado com sucesso.")
-            return redirect("protocolos:detail", pk=protocolo.pk)
-    else:
-        form = forms.VinculoManualForm()
+    form = forms.VinculoManualForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        protocolo = services.vincular_protocolo_manual(
+            form.cleaned_data["numero"],
+            assunto=form.cleaned_data["assunto"],
+            descricao=form.cleaned_data["descricao"],
+        )
+        messages.success(request, "Protocolo cadastrado com sucesso.")
+        return redirect("protocolos:detail", pk=protocolo.pk)
 
     contexto = {
         "page_title": "Novo protocolo",
         "form": form,
-        "form_action": reverse("protocolos:novo"),
-        "submit_label": "Cadastrar protocolo",
+        "form_action": reverse("protocolos:protocolo_create"),
+        "protocolar_form": forms.ProtocolarOficioForm(),
+        "protocolar_action": reverse("protocolos:vincular"),
+        "oficio_content_type_id": selectors.content_type_id_de_oficio(),
         **_contexto_integracao(),
     }
-    return render(request, "protocolos/protocolo_form.html", contexto)
+    return render(request, "protocolos/form.html", contexto)
 
 
 # ---------------------------------------------------------------------------
-# Criar a partir de documento interno (compact block → "Gerar protocolo")
+# Protocolar a partir de um documento interno
 # ---------------------------------------------------------------------------
 @_login
+@require_POST
 def vincular(request):
+    """POST-only: a tela de criação já É a confirmação.
+
+    A versão original tinha um GET de confirmação em página própria; no v2 a
+    confirmação é o próprio formulário — quem chega aqui já escolheu o ofício.
+    """
     if not permissions.pode_criar_protocolo(request.user):
         messages.error(request, "Você não tem permissão para gerar protocolos.")
         return redirect("protocolos:index")
 
-    if request.method == "GET":
-        content_type_id = request.GET.get("content_type_id")
-        object_id = request.GET.get("object_id")
-        documento = _resolver_documento(content_type_id, object_id)
-        if documento is None:
-            messages.error(request, "Documento de origem inválido.")
-            return redirect("protocolos:index")
-        contexto = {
-            "page_title": "Gerar protocolo",
-            "form_action": reverse("protocolos:vincular"),
-            "confirm_message": f"Gerar um protocolo no eProtocolo a partir de “{documento}”?",
-            "submit_label": "Gerar protocolo",
-            "cancel_url": reverse("protocolos:index"),
-            "hidden_fields": {
-                "content_type_id": content_type_id,
-                "object_id": object_id,
-                "enviar_documento": request.GET.get("enviar_documento", "1"),
-            },
-            **_contexto_integracao(),
-        }
-        return render(request, "protocolos/protocolo_confirm.html", contexto)
-
-    documento = _resolver_documento(request.POST.get("content_type_id"),
-                                    request.POST.get("object_id"))
+    # `object_id` é o contrato dos links vindos de outros documentos (fatia 3);
+    # `oficio` é o name do form da tela de criação. Os dois chegam aqui.
+    documento = selectors.origem_por_content_type(
+        request.POST.get("content_type_id"),
+        request.POST.get("object_id") or request.POST.get("oficio"),
+    )
     if documento is None:
         messages.error(request, "Documento de origem inválido.")
-        return redirect("protocolos:index")
+        return redirect("protocolos:protocolo_create")
 
     enviar_pdf = request.POST.get("enviar_documento") == "1"
     try:
@@ -236,7 +177,7 @@ def vincular(request):
                 )
     except EProtocoloError as exc:
         messages.error(request, getattr(exc, "mensagem_usuario", str(exc)))
-        return redirect("protocolos:index")
+        return redirect("protocolos:protocolo_create")
     return redirect("protocolos:detail", pk=protocolo.pk)
 
 
@@ -244,26 +185,17 @@ def vincular(request):
 # Atualizar / sincronizar
 # ---------------------------------------------------------------------------
 @_login
+@require_POST
 def atualizar(request, pk):
+    """POST-only: a confirmação é o modal do v2 na tela de detalhe."""
     protocolo = get_object_or_404(Protocolo, pk=pk)
-    if request.method == "GET":
-        contexto = {
-            "page_title": f"Atualizar situação — {protocolo.numero_display}",
-            "form_action": reverse("protocolos:atualizar", args=[pk]),
-            "confirm_message": "Sincronizar este protocolo com o eProtocolo agora?",
-            "submit_label": "Atualizar situação",
-            "cancel_url": reverse("protocolos:detail", args=[pk]),
-            "hidden_fields": {},
-            **_contexto_integracao(),
-        }
-        return render(request, "protocolos/protocolo_confirm.html", contexto)
     try:
         services.sincronizar_protocolo(protocolo)
         _avisar_modo(request)
         messages.success(
             request,
-            "Situacao atualizada em ambiente de treinamento."
-            if epro_cfg.em_modo_mock() else "Situacao do protocolo atualizada.",
+            "Situação atualizada em ambiente de treinamento."
+            if epro_cfg.em_modo_mock() else "Situação do protocolo atualizada.",
         )
     except EProtocoloError as exc:
         messages.error(request, getattr(exc, "mensagem_usuario", str(exc)))
@@ -280,200 +212,46 @@ def enviar_documento(request, pk):
         messages.error(request, "Você não tem permissão para enviar documentos.")
         return redirect("protocolos:detail", pk=pk)
 
-    if request.method == "POST":
-        form = forms.AnexarDocumentoForm(request.POST, request.FILES)
-        if form.is_valid():
-            try:
-                if form.cleaned_data.get("usar_documento_principal") and protocolo.origem_object is not None:
-                    doc = services.enviar_documento_principal(protocolo)
-                    if doc is None:
-                        messages.warning(request, "Não foi possível gerar o PDF do documento vinculado.")
-                    else:
-                        _avisar_modo(request)
-                        messages.success(
-                            request,
-                            "Documento enviado em modo simulado."
-                            if epro_cfg.em_modo_mock() else "Documento principal enviado.",
-                        )
+    form = forms.AnexarDocumentoForm(request.POST or None, request.FILES or None)
+    if request.method == "POST" and form.is_valid():
+        try:
+            if form.cleaned_data.get("usar_documento_principal") and protocolo.origem_object is not None:
+                doc = services.enviar_documento_principal(protocolo)
+                if doc is None:
+                    messages.warning(request, "Não foi possível gerar o PDF do documento vinculado.")
                 else:
-                    arquivo = form.cleaned_data["arquivo"]
-                    conteudo = arquivo.read()
-                    nome = form.cleaned_data.get("nome_arquivo") or arquivo.name
-                    services.anexar_documento(
-                        protocolo,
-                        tipo=form.cleaned_data["tipo_documento"],
-                        nome_arquivo=nome,
-                        conteudo=conteudo,
-                    )
                     _avisar_modo(request)
                     messages.success(
                         request,
                         "Documento enviado em modo simulado."
-                        if epro_cfg.em_modo_mock() else "Documento enviado e registrado.",
+                        if epro_cfg.em_modo_mock() else "Documento principal enviado.",
                     )
-                return redirect("protocolos:detail", pk=pk)
-            except EProtocoloError as exc:
-                messages.error(request, getattr(exc, "mensagem_usuario", str(exc)))
-    else:
-        form = forms.AnexarDocumentoForm()
+            else:
+                arquivo = form.cleaned_data["arquivo"]
+                conteudo = arquivo.read()
+                nome = form.cleaned_data.get("nome_arquivo") or arquivo.name
+                services.anexar_documento(
+                    protocolo,
+                    tipo=form.cleaned_data["tipo_documento"],
+                    nome_arquivo=nome,
+                    conteudo=conteudo,
+                )
+                _avisar_modo(request)
+                messages.success(
+                    request,
+                    "Documento enviado em modo simulado."
+                    if epro_cfg.em_modo_mock() else "Documento enviado e registrado.",
+                )
+            return redirect("protocolos:detail", pk=pk)
+        except EProtocoloError as exc:
+            messages.error(request, getattr(exc, "mensagem_usuario", str(exc)))
 
     contexto = {
         "page_title": f"Enviar documento — {protocolo.numero_display}",
         "protocolo": protocolo,
         "form": form,
         "form_action": reverse("protocolos:enviar_documento", args=[pk]),
-        "submit_label": "Enviar documento",
+        "voltar_url": reverse("protocolos:detail", args=[pk]),
         **_contexto_integracao(),
     }
-    return render(request, "protocolos/protocolo_form.html", contexto)
-
-
-# ---------------------------------------------------------------------------
-# Concluir cadastro
-# ---------------------------------------------------------------------------
-@_login
-@require_POST
-def concluir(request, pk):
-    protocolo = get_object_or_404(Protocolo, pk=pk)
-    try:
-        services.concluir_cadastro_eprotocolo(protocolo)
-        _avisar_modo(request)
-        messages.success(
-            request,
-            "Cadastro concluido em modo treinamento."
-            if epro_cfg.em_modo_mock() else "Cadastro do protocolo concluido.",
-        )
-    except EProtocoloError as exc:
-        messages.error(request, getattr(exc, "mensagem_usuario", str(exc)))
-    return redirect("protocolos:detail", pk=pk)
-
-
-# ---------------------------------------------------------------------------
-# Solicitar assinatura
-# ---------------------------------------------------------------------------
-@_login
-def solicitar_assinatura(request, pk):
-    protocolo = get_object_or_404(Protocolo, pk=pk)
-    if not permissions.pode_solicitar_assinatura(request.user):
-        messages.error(request, "Você não tem permissão para solicitar assinaturas.")
-        return redirect("protocolos:detail", pk=pk)
-
-    if request.method == "POST":
-        form = forms.SolicitarAssinaturaForm(request.POST, protocolo=protocolo)
-        if form.is_valid():
-            try:
-                services.solicitar_assinatura_documento(
-                    protocolo,
-                    documento=form.cleaned_data.get("documento"),
-                    cpf=form.cleaned_data["cpf"],
-                    nome=form.cleaned_data["nome"],
-                    observacao=form.cleaned_data.get("observacao", ""),
-                )
-                _avisar_modo(request)
-                messages.success(
-                    request,
-                    "Assinatura solicitada em modo treinamento."
-                    if epro_cfg.em_modo_mock() else "Solicitacao de assinatura registrada.",
-                )
-                return redirect("protocolos:detail", pk=pk)
-            except EProtocoloError as exc:
-                messages.error(request, getattr(exc, "mensagem_usuario", str(exc)))
-    else:
-        form = forms.SolicitarAssinaturaForm(protocolo=protocolo)
-
-    contexto = {
-        "page_title": f"Solicitar assinatura — {protocolo.numero_display}",
-        "protocolo": protocolo,
-        "form": form,
-        "form_action": reverse("protocolos:solicitar_assinatura", args=[pk]),
-        "submit_label": "Solicitar assinatura",
-        **_contexto_integracao(),
-    }
-    return render(request, "protocolos/protocolo_form.html", contexto)
-
-
-# ---------------------------------------------------------------------------
-# Tramitar
-# ---------------------------------------------------------------------------
-@_login
-def tramitar(request, pk):
-    protocolo = get_object_or_404(Protocolo, pk=pk)
-    if not permissions.pode_tramitar(request.user):
-        messages.error(request, "Você não tem permissão para tramitar protocolos.")
-        return redirect("protocolos:detail", pk=pk)
-
-    if request.method == "POST":
-        form = forms.TramitarForm(request.POST)
-        if form.is_valid():
-            try:
-                services.tramitar(
-                    protocolo,
-                    form.cleaned_data["cod_local_para"],
-                    cpf_destinatario=form.cleaned_data.get("cpf_destinatario"),
-                    parecer=form.cleaned_data.get("parecer"),
-                    nome_local_para=form.cleaned_data.get("nome_local_para", ""),
-                    nome_destinatario=form.cleaned_data.get("nome_destinatario", ""),
-                )
-                _avisar_modo(request)
-                messages.success(
-                    request,
-                    "Tramitacao simulada registrada."
-                    if epro_cfg.em_modo_mock() else "Protocolo tramitado.",
-                )
-                return redirect("protocolos:detail", pk=pk)
-            except EProtocoloError as exc:
-                messages.error(request, getattr(exc, "mensagem_usuario", str(exc)))
-    else:
-        form = forms.TramitarForm()
-
-    contexto = {
-        "page_title": f"Tramitar — {protocolo.numero_display}",
-        "protocolo": protocolo,
-        "form": form,
-        "form_action": reverse("protocolos:tramitar", args=[pk]),
-        "submit_label": "Tramitar protocolo",
-        **_contexto_integracao(),
-    }
-    return render(request, "protocolos/protocolo_form.html", contexto)
-
-
-# ---------------------------------------------------------------------------
-# Movimentações / Logs (páginas focadas)
-# ---------------------------------------------------------------------------
-@_login
-def movimentacoes(request, pk):
-    protocolo = get_object_or_404(Protocolo, pk=pk)
-    contexto = {
-        "page_title": f"Movimentações — {protocolo.numero_display}",
-        "protocolo": protocolo,
-        "movimentacoes": protocolo.movimentacoes.all(),
-        **_contexto_integracao(),
-    }
-    return render(request, "protocolos/protocolo_movimentacoes.html", contexto)
-
-
-@_login
-def logs(request, pk):
-    protocolo = get_object_or_404(Protocolo, pk=pk)
-    contexto = {
-        "page_title": f"Logs de integração — {protocolo.numero_display}",
-        "protocolo": protocolo,
-        "logs": protocolo.logs.all()[:200],
-        **_contexto_integracao(),
-    }
-    return render(request, "protocolos/protocolo_logs.html", contexto)
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-def _resolver_documento(content_type_id, object_id):
-    if not (content_type_id and object_id):
-        return None
-    try:
-        ct = ContentType.objects.get_for_id(int(content_type_id))
-        return ct.get_object_for_this_type(pk=int(object_id))
-    except (ContentType.DoesNotExist, ValueError, LookupError):
-        return None
-    except Exception:
-        return None
+    return render(request, "protocolos/enviar_documento.html", contexto)

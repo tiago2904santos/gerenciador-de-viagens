@@ -3,7 +3,12 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-  <c-v2.list_page :title="page_title" filter_mode="none">
+  <c-v2.list_page
+    :title="page_title"
+    filter_mode="none"
+    empty_title="Nenhum modelo cadastrado"
+    empty_message="Nenhum modelo cadastrado para este campo."
+  >
     {% if back_url %}
       <c-slot name="aside"><c-v2.button :href="back_url" :label="back_label" variant="secondary" icon="arrow-left" /></c-slot>
     {% endif %}
@@ -14,14 +19,34 @@
         <c-v2.input name="q" :value="q" placeholder="Buscar modelos de texto" aria_label="Buscar modelos de texto" icon="search" hook="data-server-filter-search" />
       </form>
     </c-slot>
+    <c-slot name="quick_add">
+      {% for grupo in grupos %}
+        <c-v2.quick_add
+          :action="grupo.quick_add_action"
+          :form="grupo.quick_add_form"
+          :panel_id="grupo.quick_add_panel_id"
+          submit_label="Salvar modelo"
+          toggle_label="Novo modelo"
+        >
+          <c-v2.quick_add_section :split="True" title="Dados do modelo" description="Nome e texto reutilizável">
+            <c-slot name="body">
+              <input type="hidden" name="quick_add_campo" value="{{ grupo.campo }}">
+              <input type="hidden" name="{{ grupo.quick_add_form.campo.html_name }}" value="{{ grupo.campo }}">
+              <div class="field-grid">
+                <c-v2.form_field :field="grupo.quick_add_form.nome" only />
+                <c-v2.form_field :field="grupo.quick_add_form.texto" only />
+              </div>
+            </c-slot>
+          </c-v2.quick_add_section>
+        </c-v2.quick_add>
+      {% endfor %}
+    </c-slot>
     <c-slot name="tabs">
       <c-v2.toggle :items="abas" aria_label="Tópicos dos modelos de texto" />
     </c-slot>
     <c-slot name="rows">
       {% for grupo in grupos %}
-        <c-v2.form_block :title="grupo.label" :element_id="grupo.section_id" extra_class="modelos-grupo">
-          <c-slot name="body">{% include "prestacoes_contas/partials/_modelos_grupo_body.html" with grupo=grupo only %}</c-slot>
-        </c-v2.form_block>
+        {% include "prestacoes_contas/partials/_modelos_grupo_body.html" with grupo=grupo only %}
       {% endfor %}
     </c-slot>
   </c-v2.list_page>

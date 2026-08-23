@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
+{% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  {% comment %}
+    Enviar documento ao protocolo (fatia 1, NOVO-20260823-014253).
+
+    Dois caminhos no MESMO form, como o `AnexarDocumentoForm` valida: ou o
+    upload de um PDF, ou a caixa "gerar o documento vinculado" — o serviço gera
+    o PDF do ofício de origem e envia. O checkbox é o widget do Django dentro de
+    um `c-v2.form_field`, sem cartão próprio: é uma opção do envio, não um modo
+    da tela.
+  {% endcomment %}
+  {% if eprotocolo_modo_demo %}
+    <c-v2.alert tone="info" message="Modo demonstração: o envio é simulado e registrado localmente, sem chamada real ao eProtocolo." />
+  {% endif %}
+
+  <c-v2.panel title="{{ page_title }}" description="O PDF entra no volume do protocolo e fica registrado com MD5 e tamanho.">
+    <c-slot name="body">
+      <form method="post" action="{{ form_action }}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="field-grid field-grid--cols-2">
+          <c-v2.form_field :field="form.tipo_documento" />
+          <c-v2.form_field :field="form.arquivo" />
+          <c-v2.form_field :field="form.nome_arquivo" />
+          <c-v2.form_field :field="form.usar_documento_principal" />
+        </div>
+        <c-v2.button label="Enviar documento" variant="primary" type="submit" />
+        <c-v2.button label="Voltar" variant="secondary" :href="voltar_url" />
+      </form>
+    </c-slot>
+  </c-v2.panel>
+{% endblock %}

@@ -11610,3 +11610,44 @@ enquanto as demais ações equivalentes usam botões circulares de ícone. A aç
 Na etapa Documentos, o arquivo principal do processo era apresentado depois do despacho dentro
 do grupo compartilhado. “Ofício assinado” agora é o primeiro item, seguido por “Despacho
 assinado”, sem alterar anexos, ações ou chaves de reabertura de cada documento.
+
+### NOVO-20260822-215006-a796258d19d2 ✅ RESOLVIDO · `NOVO` Troca de motorista e viatura ainda expunha controles legados · HT/PY/CSS · risco baixo
+
+Embora os modos de motorista e viatura já usassem cartões v2, os selects eram renderizados como
+controles nativos, os campos condicionais ainda emitiam `cv-field__control` e a orientação da tela
+era um texto de ajuda solto. Todos os selects e inputs agora passam pelos componentes v2, o aviso
+usa o alerta informativo do sistema e a terceira opção de uma grade Django ocupa a linha inteira.
+
+### NOVO-20260822-220704-a4d5319fffdf ✅ RESOLVIDO · `NOVO` Ações do WhatsApp usavam o tom neutro do menu · HT/CSS · risco baixo
+
+No aviso de liberação da prestação, WhatsApp e WhatsApp Business herdavam o accent reservado às
+ações neutras e ficavam visualmente iguais a “Copiar mensagem”. As duas integrações agora usam o
+token semântico do canal, mapeado ao verde já aprovado da paleta, enquanto a cópia permanece
+neutra.
+
+### NOVO-20260822-222226-f484de9b72e3 ✅ RESOLVIDO · `NOVO` Quick add dos modelos do RT ficava dentro do bloco da lista · HT · risco baixo
+
+O cadastro rápido do tópico ativo era renderizado no corpo do `form_block`, depois do estado vazio
+ou dos registros, e por isso parecia um rodapé da lista. O mesmo quick add agora ocupa o slot
+próprio do `list_page`, dentro do rail e antes das abas, seguindo a composição dos catálogos
+normais sem alterar formulário, validação ou retorno contextual.
+
+### NOVO-20260822-223340-d0f6b26e25e5 ✅ RESOLVIDO · `NOVO` Lista de modelos do RT tinha uma caixa temática adicional · HT · risco baixo
+
+O tópico ativo era repetido como título de um `form_block` em torno dos registros e, no estado
+vazio, ainda continha um segundo painel. A aba agora identifica sozinha o recorte ativo e os
+modelos são linhas diretas da lista simples canônica; quando não há itens, o próprio painel da
+lista apresenta seu estado vazio, sem caixas aninhadas.
+
+### NOVO-20260823-014253-b665b50f12cb · `NOVO` Integração eProtocolo foi apagada junto com o redesign e nunca voltou · BE/HT · risco médio
+
+O commit `26f0d31d` (17/07, redesign dark) removeu, além dos templates que mirava, o pacote
+`integracoes/eprotocolo` inteiro (client OAuth2/REST, mocks, mappers), o app `protocolos`
+(7 models, services, 12 management commands, ~1.040 linhas de teste) e todo o wiring —
+INSTALLED_APPS, urls, navegação, bloco `EPROTOCOLO` do settings e `.env.example`. O snapshot
+íntegro está em `6f5046c7`. Fatia 1 da correção: restaurar o backend byte a byte, reescrever
+`views.py`/`urls.py` como fachada sem ORM (catraca de `test_view_module_boundaries`) e
+reconstruir a Central de Protocolos no v2 (lista, detalhe, criar de ofício, vincular, enviar
+documento, sincronizar) — sem restaurar os templates pré-v2 nem `protocolos-detail.css`.
+Fatias 2 (assinatura/tramitação/conclusão + puxar assinado para a prestação) e 3 (costura
+automática com `Oficio.protocolo` + signals no padrão do Drive) registradas no plano.

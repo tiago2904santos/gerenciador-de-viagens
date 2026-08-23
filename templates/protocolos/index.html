@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  {% comment %}
+    Central de Protocolos no v2 (fatia 1 da restauração, NOVO-20260823-014253).
+
+    A tela antiga (pré-redesign) não voltou: este index nasce do gabarito de
+    `eventos/index.html` — `list_page` de cards, busca do servidor e filtro por
+    status. O banner de modo demonstração fica ACIMA da lista, e não por card:
+    o modo é do ambiente inteiro, não de um protocolo.
+  {% endcomment %}
+  {% if eprotocolo_modo_demo %}
+    <c-v2.alert tone="info" message="Modo demonstração: os protocolos abaixo são simulados e nenhuma chamada real ao eProtocolo é feita. Configure as credenciais no .env para ativar o modo real." />
+  {% endif %}
+
+  <c-v2.list_page
+    :title="page_title"
+    :cards="True"
+    filter_mode="none"
+    empty_message="Nenhum protocolo encontrado."
+    filter_empty_message="Nenhum protocolo encontrado com os filtros aplicados."
+    action_label="Novo protocolo"
+    :action_url="create_url"
+  >
+    <c-slot name="controls">
+      <form method="get" action="{{ request.path }}" class="rail__form" role="search" data-server-filter-form>
+        <c-v2.input
+          icon="search"
+          name="q"
+          :value="q"
+          placeholder="Buscar por número, assunto, local ou responsável…"
+          aria_label="Buscar protocolos"
+          hook="data-server-filter-search"
+        />
+        <c-v2.select
+          name="status"
+          :options="status_options"
+          placeholder="Filtrar por status"
+          aria_label="Filtrar protocolos por status"
+          hook="data-server-filter-control"
+        />
+        {% if has_filters %}<c-v2.button label="Limpar" icon="x" :href="search_clear_url" />{% endif %}
+      </form>
+    </c-slot>
+
+    <c-slot name="rows">
+      {% for protocolo in protocolos %}
+        {% include "protocolos/partials/protocolo_list_card.html" with protocolo=protocolo only %}
+      {% endfor %}
+    </c-slot>
+  </c-v2.list_page>
+{% endblock %}

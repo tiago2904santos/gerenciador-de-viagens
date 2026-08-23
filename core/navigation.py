@@ -23,11 +23,12 @@ NAVIGATION_ITEMS = [
         "id": "documentos-operacionais",
         "label": "Documentos",
         "icon": "document",
-        "active_when": ["oficios:", "termos:", "justificativas:"],
+        "active_when": ["oficios:", "termos:", "justificativas:", "protocolos:"],
         "children": [
             {"id": "oficios", "label": "Ofícios", "url_name": "oficios:index", "active_when": ["oficios:"]},
             {"id": "termos", "label": "Termos", "url_name": "termos:index", "active_when": ["termos:"]},
             {"id": "justificativas", "label": "Justificativas", "url_name": "justificativas:index", "active_when": ["justificativas:"]},
+            {"id": "protocolos", "label": "Protocolos", "url_name": "protocolos:index", "active_when": ["protocolos:"]},
         ],
     },
     {

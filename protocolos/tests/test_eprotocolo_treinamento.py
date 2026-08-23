@@ -28,6 +28,18 @@ from integracoes.eprotocolo.exceptions import (
 )
 
 from oficios.models import Oficio
+from usuarios.models import AreaTrabalho
+
+_AREA_SEQ = {"n": 0}
+
+
+def _area():
+    """`Oficio.area` virou obrigatório depois do snapshot; os testes originais
+    criavam ofícios sem área. Uma área nova por chamada evita colisão de sigla
+    entre testes que rodam no mesmo processo."""
+    _AREA_SEQ["n"] += 1
+    return AreaTrabalho.objects.create(nome=f"Área Teste {_AREA_SEQ['n']}", sigla=f"AT{_AREA_SEQ['n']}")
+
 
 
 CONFIG_TREINAMENTO = {
@@ -236,7 +248,7 @@ class ServicosReaisErrosTests(SimpleTestCase):
 # ---------------------------------------------------------------------------
 class MapperOficioValidadoTests(TestCase):
     def setUp(self):
-        self.oficio = Oficio.objects.create(numero=42, ano=2026, assunto="Viagem treino")
+        self.oficio = Oficio.objects.create(area=_area(), numero=42, ano=2026, assunto="Viagem treino")
 
     @override_settings(EPROTOCOLO=CONFIG_TREINAMENTO)
     def test_payload_valido_com_codigos(self):
@@ -252,7 +264,7 @@ class MapperOficioValidadoTests(TestCase):
 
     @override_settings(EPROTOCOLO=CONFIG_TREINAMENTO)
     def test_oficio_sem_numero_levanta_validation(self):
-        oficio = Oficio.objects.create(ano=2026, assunto="Sem número")
+        oficio = Oficio.objects.create(area=_area(), ano=2026, assunto="Sem número")
         with self.assertRaises(EProtocoloValidationError):
             mappers.mapear_oficio_para_payload_eprotocolo(oficio)
 
@@ -262,7 +274,7 @@ class MapperOficioValidadoTests(TestCase):
 # ---------------------------------------------------------------------------
 class HomologarCommandTests(TestCase):
     def setUp(self):
-        self.oficio = Oficio.objects.create(numero=7, ano=2026, assunto="Homolog")
+        self.oficio = Oficio.objects.create(area=_area(), numero=7, ano=2026, assunto="Homolog")
 
     @override_settings(EPROTOCOLO=CONFIG_TREINAMENTO)
     def test_dry_run_valida_sem_chamar_api(self):

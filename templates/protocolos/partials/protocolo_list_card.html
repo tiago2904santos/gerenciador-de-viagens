@@ -1,0 +1,22 @@
+{% comment %}
+  Card do protocolo — registro simples de uma linha, como o do termo.
+
+  O título é o NÚMERO (é assim que se procura um protocolo); o selo traz o
+  status local — `status_local_variant` vem do modelo e já fala a língua dos
+  tons do v2 (info/pending/warning/success/danger/muted). A meta diz de onde o
+  protocolo veio, onde está, com quem — e quantas pendências esperam ação.
+{% endcomment %}
+<c-v2.record
+  :title="protocolo.numero_display"
+  :search_text="protocolo.numero_display"
+  :status="protocolo.get_status_local_display"
+  :status_tone="protocolo.status_local_variant"
+>
+  <c-slot name="meta">
+    {{ protocolo.origem_label }}{% if protocolo.nome_local_atual %} · {{ protocolo.nome_local_atual }}{% endif %}{% if protocolo.nome_responsavel_atual %} · {{ protocolo.nome_responsavel_atual }}{% endif %}{% if protocolo.pendencias_abertas_count %} · {{ protocolo.pendencias_abertas_count }} pendência{{ protocolo.pendencias_abertas_count|pluralize }} aberta{{ protocolo.pendencias_abertas_count|pluralize }}{% endif %}{% if protocolo.modo_mock %} · simulado{% endif %}
+  </c-slot>
+
+  <c-slot name="actions">
+    <c-v2.icon_button icon="arrow-right" :href="protocolo.get_detail_url" aria_label="Abrir protocolo {{ protocolo.numero_display }}" tooltip="Abrir" />
+  </c-slot>
+</c-v2.record>

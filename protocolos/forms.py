@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from django import forms
 
+from core.forms.widgets import WidgetStyle, widget_attrs
 from core.utils.masks import normalize_protocolo, only_digits, validar_cpf_digitos
 
 
@@ -18,10 +19,15 @@ class VinculoManualForm(forms.Form):
     numero = forms.CharField(
         label="Número do protocolo", max_length=30, required=False,
         help_text="Ex.: 24.123.456-7. Pode ficar vazio se ainda não houver número.",
+        widget=forms.TextInput(attrs=widget_attrs(WidgetStyle.FORM_CONTROL)),
     )
-    assunto = forms.CharField(label="Assunto", max_length=255, required=False)
+    assunto = forms.CharField(
+        label="Assunto", max_length=255, required=False,
+        widget=forms.TextInput(attrs=widget_attrs(WidgetStyle.FORM_CONTROL)),
+    )
     descricao = forms.CharField(
-        label="Descrição", required=False, widget=forms.Textarea(attrs={"rows": 3}),
+        label="Descrição", required=False,
+        widget=forms.Textarea(attrs={"rows": 3, **widget_attrs(WidgetStyle.FORM_CONTROL)}),
     )
 
     def clean_numero(self):
@@ -39,13 +45,26 @@ class AnexarDocumentoForm(forms.Form):
         ("PLANO_TRABALHO", "Plano de Trabalho"),
         ("ORDEM_SERVICO", "Ordem de Serviço"),
     ]
-    tipo_documento = forms.ChoiceField(label="Tipo de documento", choices=TIPO_CHOICES)
-    arquivo = forms.FileField(label="Arquivo PDF")
+    tipo_documento = forms.ChoiceField(
+        label="Tipo de documento",
+        choices=TIPO_CHOICES,
+        widget=forms.Select(attrs=widget_attrs(WidgetStyle.FORM_SELECT)),
+    )
+    # `required=False` + `clean()`: com "usar documento principal" marcado o PDF é
+    # gerado pelo sistema e não há upload — o obrigatório incondicional do snapshot
+    # tornava esse caminho invalidável (bug latente restaurado corrigido).
+    arquivo = forms.FileField(label="Arquivo PDF", required=False)
     nome_arquivo = forms.CharField(label="Nome do arquivo", max_length=255, required=False)
     usar_documento_principal = forms.BooleanField(
         label="Gerar e enviar o documento vinculado automaticamente",
         required=False,
     )
+
+    def clean(self):
+        dados = super().clean()
+        if not dados.get("usar_documento_principal") and not dados.get("arquivo"):
+            self.add_error("arquivo", "Envie um PDF ou marque a geração automática do documento vinculado.")
+        return dados
 
     def clean_arquivo(self):
         arquivo = self.cleaned_data.get("arquivo")
@@ -122,3 +141,32 @@ class TramitarForm(forms.Form):
         if cpf and (len(cpf) != 11 or not validar_cpf_digitos(cpf)):
             raise forms.ValidationError("CPF inválido.")
         return cpf
+
+
+class ProtocolarOficioForm(forms.Form):
+    """Escolha do ofício a protocolar na Central.
+
+    `forms.Form` com o queryset injetado no `__init__` a partir do selector — o
+    recorte (ofícios sem protocolo, mais novos primeiro) é regra de leitura e
+    mora em `selectors.oficios_protocolaveis()`, não aqui.
+    """
+
+    oficio = forms.ModelChoiceField(
+        label="Ofício",
+        queryset=None,
+        required=True,
+        empty_label="Selecione o ofício",
+        help_text="Só aparecem ofícios que ainda não têm protocolo na Central.",
+        widget=forms.Select(attrs=widget_attrs(WidgetStyle.FORM_SELECT)),
+    )
+    enviar_documento = forms.BooleanField(
+        label="Enviar o PDF do ofício junto",
+        required=False,
+        initial=True,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from . import selectors
+
+        self.fields["oficio"].queryset = selectors.oficios_protocolaveis()

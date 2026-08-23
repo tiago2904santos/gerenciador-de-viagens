@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
+{% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  {% comment %}
+    Detalhe do protocolo — hub de LEITURA com duas ações (fatia 1,
+    NOVO-20260823-014253).
+
+    Painéis empilhados, sem stepper: protocolo não é fluxo com etapas do
+    usuário, é um processo que anda sozinho lá fora — esta tela conta onde ele
+    está. O wizard de 4 âncoras da tela antiga fingia um fluxo que não existia.
+
+    Os valores dos `fact` vão em atributo INTERPOLADO (`value="{{ … }}"`), não
+    em `:value` — filtro dentro de `:attr` do Cotton não é avaliado e chegaria
+    vazio do outro lado.
+  {% endcomment %}
+  {% if eprotocolo_modo_demo %}
+    <c-v2.alert tone="info" message="Modo demonstração: este protocolo é simulado e as ações não chamam o eProtocolo real." />
+  {% endif %}
+
+  <c-v2.panel title="{{ page_title }}" description="{{ protocolo.assunto_display }}">
+    <c-slot name="actions">
+      <c-v2.button label="Enviar documento" icon="document" :href="protocolo.get_enviar_documento_url" />
+      <form method="post" action="{{ protocolo.get_atualizar_url }}">
+        {% csrf_token %}
+        <c-v2.button label="Sincronizar" icon="sync" type="submit" variant="secondary" />
+      </form>
+    </c-slot>
+    <c-slot name="body">
+      <div class="field-grid field-grid--cols-4">
+        <c-v2.fact label="Número" value="{{ protocolo.numero_display }}" :strong="True" />
+        <c-v2.fact label="Status" value="{{ protocolo.get_status_local_display }}" />
+        <c-v2.fact label="Situação no eProtocolo" value="{{ protocolo.situacao_eprotocolo|default:'—' }}" />
+        <c-v2.fact label="Origem" value="{{ protocolo.origem_label }}" />
+        <c-v2.fact label="Órgão" value="{{ protocolo.nome_orgao|default:'—' }}" />
+        <c-v2.fact label="Local atual" value="{{ protocolo.nome_local_atual|default:'—' }}" />
+        <c-v2.fact label="Responsável atual" value="{{ protocolo.nome_responsavel_atual|default:'—' }}" />
+        <c-v2.fact label="Última sincronização" value="{% if protocolo.ultima_sincronizacao_em %}{{ protocolo.ultima_sincronizacao_em|date:'d/m/Y H:i' }}{% else %}nunca{% endif %}" />
+      </div>
+    </c-slot>
+  </c-v2.panel>
+
+  <c-v2.panel title="Documentos" description="PDFs registrados neste protocolo">
+    <c-slot name="body">
+      {% if documentos %}
+        {% for doc in documentos %}
+          <c-v2.record
+            title="{{ doc.nome_arquivo|default:'Documento' }}"
+            status="{{ doc.get_tipo_documento_display }}"
+            status_tone="info"
+            heading_level="3"
+          >
+            <c-slot name="meta">
+              {% if doc.codigo_documento_eprotocolo %}código {{ doc.codigo_documento_eprotocolo }} · {% endif %}{% if doc.tamanho_bytes %}{{ doc.tamanho_bytes|filesizeformat }} · {% endif %}{% if doc.assinado %}assinado{% else %}sem assinatura{% endif %}
+            </c-slot>
+          </c-v2.record>
+        {% endfor %}
+      {% else %}
+        <p class="field__help">Nenhum documento enviado ainda. Use “Enviar documento” acima.</p>
+      {% endif %}
+    </c-slot>
+  </c-v2.panel>
+
+  <c-v2.panel title="Fluxo" description="Pendências, assinaturas, tramitações e movimentações">
+    <c-slot name="body">
+      {% if pendencias %}
+        <h3 class="form-block__title">Pendências</h3>
+        {% for pendencia in pendencias %}
+          <c-v2.record title="{{ pendencia.tipo|default:'Pendência' }}" status="{{ pendencia.get_status_display }}" status_tone="pending" heading_level="4">
+            <c-slot name="meta">{% if pendencia.nome_destinatario %}{{ pendencia.nome_destinatario }} · {% endif %}código {{ pendencia.codigo_pendencia|default:"—" }}</c-slot>
+          </c-v2.record>
+        {% endfor %}
+      {% endif %}
+      {% if assinaturas %}
+        <h3 class="form-block__title">Assinaturas</h3>
+        {% for assinatura in assinaturas %}
+          <c-v2.record title="{{ assinatura.nome_assinante|default:'Assinante' }}" status="{{ assinatura.get_status_display }}" status_tone="info" heading_level="4">
+            <c-slot name="meta">CPF {{ assinatura.cpf_assinante_mascarado }}{% if assinatura.assinado_em %} · {{ assinatura.assinado_em|date:"d/m/Y H:i" }}{% endif %}</c-slot>
+          </c-v2.record>
+        {% endfor %}
+      {% endif %}
+      {% if tramitacoes %}
+        <h3 class="form-block__title">Tramitações</h3>
+        {% for tramitacao in tramitacoes %}
+          <c-v2.record title="{{ tramitacao.nome_local_para|default:'Tramitação' }}" heading_level="4">
+            <c-slot name="meta">de {{ tramitacao.nome_local_de|default:"—" }}{% if tramitacao.nome_destinatario %} · para {{ tramitacao.nome_destinatario }}{% endif %}{% if tramitacao.data_tramitacao %} · {{ tramitacao.data_tramitacao|date:"d/m/Y H:i" }}{% endif %}</c-slot>
+          </c-v2.record>
+        {% endfor %}
+      {% endif %}
+      {% if movimentacoes %}
+        <h3 class="form-block__title">Movimentações</h3>
+        {% for movimentacao in movimentacoes %}
+          <c-v2.record title="{{ movimentacao.descricao|default:'Movimentação' }}" heading_level="4">
+            <c-slot name="meta">{% if movimentacao.data_movimentacao %}{{ movimentacao.data_movimentacao|date:"d/m/Y H:i" }}{% endif %}</c-slot>
+          </c-v2.record>
+        {% endfor %}
+      {% endif %}
+      {% if not pendencias and not assinaturas and not tramitacoes and not movimentacoes %}
+        <p class="field__help">Nenhuma movimentação registrada. “Sincronizar” busca a situação mais recente.</p>
+      {% endif %}
+    </c-slot>
+  </c-v2.panel>
+{% endblock %}

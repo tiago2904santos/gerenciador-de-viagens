@@ -685,6 +685,8 @@ class PrestacaoAssinadoUploadTests(TestCase):
             self.assertNotContains(fragmento, "prestacao-docs-menu-")
             self.assertNotContains(fragmento, "data-attach-signed-trigger")
             self.assertContains(fragmento, "diaria-wa-menu-", count=1)
+            self.assertContains(fragmento, 'data-tone="whatsapp"', count=2)
+            self.assertContains(fragmento, 'data-tone="neutral"', count=1)
         # `H-03`: era medido pelo nome dos atributos ordinais
         # (`...-secondary-url`, `...-tertiary-option-label`). O contrato de
         # verdade é *quais* documentos a ação única do card oferece e com que

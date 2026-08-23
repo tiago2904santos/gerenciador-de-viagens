@@ -29,6 +29,8 @@ CAMPOS_INSTITUCIONAIS_OBRIGATORIOS = {
 }
 
 
+from core.errors import capture
+
 def _defaults_institucionais() -> dict:
     return {
         "codOrgao": cfg.get("COD_ORGAO_PADRAO", ""),
@@ -54,8 +56,8 @@ def _servidores_resumo(qs) -> list[dict]:
                 "nome": getattr(s, "nome", "") or str(s),
                 "cpf": getattr(s, "cpf", "") or "",
             })
-    except Exception:  # pragma: no cover - relação ausente/None
-        pass
+    except Exception as exc:  # relação ausente/None não pode derrubar o payload
+        capture(exc, "eprotocolo.mappers.servidores")
     return servidores
 
 
@@ -73,8 +75,8 @@ def mapear_oficio_para_protocolo(oficio) -> dict:
         try:
             for destino in roteiro.destinos.all():
                 destinos.append(str(destino))
-        except Exception:  # pragma: no cover
-            pass
+        except Exception as exc:  # roteiro sem destinos carregáveis não derruba o payload
+            capture(exc, "eprotocolo.mappers.destinos")
 
     payload = _defaults_institucionais()
     payload.update({

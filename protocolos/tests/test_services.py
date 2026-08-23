@@ -5,6 +5,7 @@ from __future__ import annotations
 from django.test import TestCase
 
 from oficios.models import Oficio
+from usuarios.models import AreaTrabalho
 from protocolos import services
 from protocolos.models import (
     Protocolo,
@@ -14,6 +15,17 @@ from protocolos.models import (
     ProtocoloTramitacao,
 )
 from protocolos.models import mascarar_cpf
+
+_AREA_SEQ = {"n": 0}
+
+
+def _area():
+    """`Oficio.area` virou obrigatório depois do snapshot; os testes originais
+    criavam ofícios sem área. Uma área nova por chamada evita colisão de sigla
+    entre testes que rodam no mesmo processo."""
+    _AREA_SEQ["n"] += 1
+    return AreaTrabalho.objects.create(nome=f"Área Teste {_AREA_SEQ['n']}", sigla=f"AT{_AREA_SEQ['n']}")
+
 
 
 class MascararCpfTests(TestCase):
@@ -26,7 +38,7 @@ class MascararCpfTests(TestCase):
 
 class CriacaoProtocoloTests(TestCase):
     def setUp(self):
-        self.oficio = Oficio.objects.create(numero=10, ano=2026, assunto="Viagem a Curitiba")
+        self.oficio = Oficio.objects.create(area=_area(), numero=10, ano=2026, assunto="Viagem a Curitiba")
 
     def test_criar_a_partir_de_documento_mock(self):
         protocolo = services.criar_protocolo_a_partir_de_documento(self.oficio)
