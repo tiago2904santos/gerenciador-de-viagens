@@ -206,6 +206,11 @@ class Oficio(TimeStampedModel, CancelavelModel):
             return f"{self.numero:02d}/{self.ano}"
         return "—"
 
+    @property
+    def protocolo_confirmado(self) -> bool:
+        """O eProtocolo completo é o gate para emitir o ofício."""
+        return bool(normalize_protocolo(self.protocolo or ""))
+
     @classmethod
     def get_next_available_numero(cls, ano: int | None = None, area=None) -> int:
         """Sugere o próximo número: reaproveita a menor lacuna liberada por exclusão
@@ -264,6 +269,11 @@ class Oficio(TimeStampedModel, CancelavelModel):
             else:
                 self.area = get_current_area()
         self.protocolo = normalize_protocolo(self.protocolo)
+        status_forcado = not self.protocolo_confirmado and self.status != self.STATUS_RASCUNHO
+        if status_forcado:
+            self.status = self.STATUS_RASCUNHO
+            if kwargs.get("update_fields") is not None:
+                kwargs["update_fields"] = set(kwargs["update_fields"]) | {"status"}
         self.assunto = normalize_spaces(self.assunto)
         self.motivo = normalize_spaces(self.motivo)
         self.custeio_observacao = normalize_spaces(self.custeio_observacao)

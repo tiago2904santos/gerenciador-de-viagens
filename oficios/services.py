@@ -705,8 +705,11 @@ def avaliar_oficio_dados_viajantes(oficio=None, form=None):
         values = {}
 
     pendencias = []
-    if not values.get("protocolo"):
+    protocolo = normalize_protocolo(values.get("protocolo") or "")
+    if not protocolo:
         pendencias.append("Informe o protocolo.")
+    elif len(protocolo) != 9:
+        pendencias.append("Informe um protocolo válido com 9 dígitos.")
     if not values.get("motivo"):
         pendencias.append("Informe o motivo.")
     if not values.get("custeio"):
@@ -842,6 +845,14 @@ def redirect_para_corrigir_documento_oficio(oficio):
 
 
 def gerar_resposta_documento_oficio(oficio, formato: DocumentoFormato):
+    avaliacao = validar_oficio_para_documento(oficio)
+    if avaliacao["pendencias"]:
+        from django.core.exceptions import ValidationError
+
+        raise ValidationError(
+            "O ofício não pode ser gerado enquanto houver pendências: "
+            + " ".join(avaliacao["pendencias"])
+        )
     with measure_step(
         "oficio_gerar_resposta_documento_oficio",
         {"oficio_id": oficio.pk, "formato": formato.value},

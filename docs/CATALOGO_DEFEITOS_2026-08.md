@@ -11697,3 +11697,19 @@ A página abria dizendo "A geração continua em segundo plano" e "o download co
 motivo só substituía o parágrafo segundos depois, pelo JS de espera. As duas cascas (a de página
 inteira e a embutida no `<iframe>`) ganharam o estado de erro: título próprio, o motivo do
 servidor e nenhum girador.
+
+### NOVO-20260824-154824-4da1c678b979 ✅ RESOLVIDO · `NOVO` Número da solicitação em Documentos ainda usava classes legadas · PY/QA · risco baixo
+
+A migração anterior cobria `PrestacaoServidorDocumentosForm`, mas a rota da etapa Documentos
+instancia `PrestacaoSolicitacaoForm`. Por isso, o componente v2 recebia um widget que ainda
+emitia `form-control cv-field__control`, mantendo a aparência legada na linha do servidor. O
+formulário realmente usado pela view agora emite somente `input__control`, e o teste de origem
+passou a verificar essa classe concreta para impedir a regressão.
+
+### NOVO-20260824-161320-71689d5c7db0 ✅ RESOLVIDO · `NOVO` Visualizadores da etapa Documentos permaneciam em `about:blank` · HT/JS/QA · risco baixo
+
+Os cinco cartões entregavam corretamente a URL privada do anexo em `data-src`, porém
+`prestacoes_contas/documentos_form.html` não carregava o motor de hidratação dos documentos
+inline. Abrir um `<details>` jamais promovia `data-src` para `src`, deixando o `iframe` vazio.
+A etapa agora inclui `oficios-documentos-inline.js`, como as demais telas que usam o mesmo
+componente, e o teste de origem exige essa dependência. Validado no navegador com um PDF real.

@@ -95,6 +95,7 @@ def servidores_removidos_da_equipe(prestacao):
 
 
 def _filter_servidores_by_area(queryset):
+    queryset = queryset.exclude(prestacao__oficio__protocolo="")
     area = get_current_area()
     if area is None:
         return queryset.filter(prestacao__area__isnull=True)

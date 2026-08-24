@@ -1,6 +1,10 @@
 {% extends "prestacoes_contas/flow_base.html" %}
 {% load static %}
 
+{% block extra_js %}
+  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}" defer></script>
+{% endblock %}
+
 {% block flow_body %}
   <form method="post"
         class="travel-document-wizard__form"

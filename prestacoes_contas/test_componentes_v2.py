@@ -23,6 +23,7 @@ from django.test import TestCase
 from prestacoes_contas.forms import DiarioBordoTrechoForm
 from prestacoes_contas.forms import DiarioMotoristaForm
 from prestacoes_contas.forms import PrestacaoServidorDocumentosForm
+from prestacoes_contas.forms import PrestacaoSolicitacaoForm
 
 
 ROOT = Path(settings.BASE_DIR)
@@ -91,11 +92,14 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
         self.assertIn('label="Ir para Documentos"', source)
 
     def test_documentos_da_prestacao_usam_componentes_globais_v2(self):
+        pagina = marcacao(PRESTACOES / "documentos_form.html")
         equipe = marcacao(PRESTACOES / "partials" / "_docs_equipe_body.html")
         documento = marcacao(PRESTACOES / "partials" / "_docs_attach_card.html")
         documentos_oficio = marcacao(PRESTACOES / "partials" / "_docs_despacho_body.html")
         form = PrestacaoServidorDocumentosForm()
+        solicitacao_form = PrestacaoSolicitacaoForm()
 
+        self.assertIn("js/pages/oficios-documentos-inline.js", pagina)
         self.assertIn("<c-v2.person_row", equipe)
         self.assertIn('<c-slot name="actions">', equipe)
         self.assertIn(":field=\"servidor.form.numero_solicitacao\"", equipe)
@@ -103,6 +107,10 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
         self.assertIn(':hide_label="True"', equipe)
         self.assertEqual(
             form.fields["numero_solicitacao"].widget.attrs["class"],
+            "input__control",
+        )
+        self.assertEqual(
+            solicitacao_form.fields["numero_solicitacao"].widget.attrs["class"],
             "input__control",
         )
         self.assertNotIn("oficio-documentos-traveller", equipe)
@@ -516,7 +524,11 @@ class ConferenciaDaTelaPublicaTests(TestCase):
             area=area, nome="ADEMAR SCHONS", cargo=cargo, cpf="12345678901"
         )
         oficio = Oficio.objects.create(
-            area=area, numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC
+            area=area,
+            numero=1,
+            ano=2026,
+            protocolo="123456789",
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
         )
         # A prestação e a linha do servidor nascem por sinal quando o ofício
         # ganha equipe — criá-las à mão bate na `unique` de `oficio_id`.

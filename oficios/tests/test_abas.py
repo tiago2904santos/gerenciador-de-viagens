@@ -33,7 +33,14 @@ class DocumentoAbasOficioTests(TestCase):
         if saida_offset is not None:
             saida = timezone.now() + timedelta(days=saida_offset)
             roteiro = Roteiro.objects.create(area=area_de_teste(), saida_dt=saida)
-        oficio = Oficio.objects.create(area=area_de_teste(), numero=numero, ano=2026, roteiro=roteiro, cancelado=cancelado)
+        oficio = Oficio.objects.create(
+            area=area_de_teste(),
+            numero=numero,
+            ano=2026,
+            protocolo=f"9000000{numero}",
+            roteiro=roteiro,
+            cancelado=cancelado,
+        )
         return oficio
 
     def _base_anotada(self, queryset):

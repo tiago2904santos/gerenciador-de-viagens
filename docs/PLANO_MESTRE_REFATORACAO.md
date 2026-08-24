@@ -789,3 +789,7 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       lista, antes das abas e do bloco de registros, como nos catálogos normais.
 - [x] `NOVO-20260822-223340-d0f6b26e25e5` remove a caixa temática redundante dos modelos do RT
       e apresenta o tópico ativo como uma lista simples canônica, inclusive no estado vazio.
+- [x] `NOVO-20260824-154824-4da1c678b979` migra o formulário realmente usado pela etapa
+      Documentos para `input__control` e cobre o contrato visual com teste de regressão.
+- [x] `NOVO-20260824-161320-71689d5c7db0` restaura a hidratação preguiçosa dos cinco
+      visualizadores da etapa Documentos e impede novos `iframe`s presos em `about:blank`.

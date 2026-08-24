@@ -23,7 +23,7 @@ def _sincronizar_prestacao_servidores(oficio):
     from .models import PrestacaoContas
     from .models import PrestacaoServidor
 
-    if oficio.cancelado:
+    if oficio.cancelado or not oficio.protocolo_confirmado:
         return
 
     # `BE-09`: `all_objects` — a prestação pertence à área do **ofício**, na linha

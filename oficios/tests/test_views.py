@@ -81,7 +81,13 @@ class OficioViewsTests(TestCase):
         card. O item que o dispara é que passou a vir de `oficios:card_menus`, e é
         lá que este teste foi conferir.
         """
-        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(
+            area=area_de_teste(),
+            numero=1,
+            ano=2026,
+            protocolo="123456789",
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
         # Ofício sem data de viagem cai na aba "Em andamento e realizados" (atuais).
         response = self.client.get(reverse("oficios:index") + "?aba=atuais")
         self.assertContains(response, "data-delete-confirm-modal")
@@ -166,7 +172,13 @@ class OficioViewsTests(TestCase):
         self.assertContains(response, "Rascunho")
 
     def test_lista_visualizar_documento_aponta_para_etapa_documentos(self):
-        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(
+            area=area_de_teste(),
+            numero=1,
+            ano=2026,
+            protocolo="123456789",
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
         oficio.servidores.add(self.servidor)
         response = self.client.get(reverse("oficios:index") + "?aba=atuais")
         menus = self.client.get(reverse("oficios:card_menus", args=[oficio.pk]))

@@ -371,17 +371,18 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
     except Exception as exc:
         capture(exc, "oficios.presenter.justificativa", oficio_id=oficio.pk)
 
+    status_efetivo = oficio.status if oficio.protocolo_confirmado else Oficio.STATUS_RASCUNHO
     if oficio.cancelado:
         status_chip_label = "Cancelado"
         status_chip_tone = "danger"
         status_variant = "cancelado"
     else:
-        status_chip_label = oficio.get_status_display()
+        status_chip_label = dict(Oficio.STATUS_CHOICES).get(status_efetivo, status_efetivo)
         status_chip_tone = (
-            "success" if oficio.status in {Oficio.STATUS_GERADO, Oficio.STATUS_FINALIZADO}
-            else ("muted" if oficio.status == Oficio.STATUS_ARQUIVADO else "warning")
+            "success" if status_efetivo in {Oficio.STATUS_GERADO, Oficio.STATUS_FINALIZADO}
+            else ("muted" if status_efetivo == Oficio.STATUS_ARQUIVADO else "warning")
         )
-        status_variant = oficio.status.lower() if oficio.status else "outro"
+        status_variant = status_efetivo.lower() if status_efetivo else "outro"
 
     data_criacao_display = ""
     if oficio.data_criacao:
@@ -417,14 +418,15 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
     # varrer a lista; o status do documento ("Finalizado", "Rascunho") só volta
     # ao selo quando não há temporal — ofício sem roteiro, ou cancelado, onde
     # contar dias não significa nada.
-    chip_label = temporal_label or status_chip_label
-    chip_tone_v2 = tom_de_chip_v2(temporal_tone if temporal_label else status_chip_tone)
+    temporal_aplicavel = temporal_label if oficio.protocolo_confirmado else ""
+    chip_label = temporal_aplicavel or status_chip_label
+    chip_tone_v2 = tom_de_chip_v2(temporal_tone if temporal_aplicavel else status_chip_tone)
     header_chips = [entity_cards.chip(status_chip_tone, status_chip_label)]
     if oficio.retificado_documento:
         header_chips.append(entity_cards.chip("warning", "Retificado"))
     elif oficio.complementar_documento:
         header_chips.append(entity_cards.chip("info", "Complementar"))
-    if temporal_label:
+    if temporal_aplicavel:
         header_chips.append(entity_cards.chip(temporal_tone, temporal_label))
     if oficio.cancelado:
         header_chips.append(entity_cards.chip("danger", "Cancelado"))
@@ -510,7 +512,7 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
                     trigger_aria=f"Abrir documentos do ofício {numero_display}",
                     src=menus_src,
                 )
-            ],
+            ] if oficio.protocolo_confirmado else [],
             danger_menus=[
                 entity_cards.menu(
                     f"oficio-action-menu-{oficio.pk}",

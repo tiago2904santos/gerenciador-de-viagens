@@ -534,7 +534,7 @@ class PrestacaoSolicitacaoForm(forms.ModelForm):
         widgets = {
             "numero_solicitacao": forms.TextInput(
                 attrs={
-                    **text_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL),
+                    **text_attrs(WidgetStyle.INPUT_V2),
                     "placeholder": "Número da solicitação",
                     "autocomplete": "off",
                 },
