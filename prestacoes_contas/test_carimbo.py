@@ -356,7 +356,6 @@ class FluxoDoUploadTests(PrestacaoFixturesMixin, TestCase):
         )
         anexo.carimbos.update(ajustado_manualmente=True, x=0.5, y=0.5)
 
-        cru = pdf_do_oficio([("Joao Da Silva", "")], com_numero=False)
         with mock.patch(
             "prestacoes_contas.services.gerar_oficio_prestacao_pdf",
             return_value=self.referencia,

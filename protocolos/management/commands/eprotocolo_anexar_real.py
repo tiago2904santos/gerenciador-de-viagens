@@ -31,7 +31,7 @@ class Command(BaseCommand):
         confirmado = confirmar_operacao_real(
             self.stdout,
             [
-                f"operacao: anexar_documento",
+                "operacao: anexar_documento",
                 f"protocolo: {numero}",
                 f"arquivo: {nome_arquivo}",
                 f"tamanho: {len(conteudo)} bytes",
