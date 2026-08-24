@@ -4,6 +4,7 @@ from pathlib import Path
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
@@ -269,6 +270,27 @@ def prestacao_servidor_arquivo_autosave(request, ps_pk):
     )
 
 
+def _upload_recusado(request, destino, mensagens):
+    """A recusa do upload, dita no idioma de quem perguntou.
+
+    `NOVO-20260824-133423-35fbd4d59a84`: o modal de anexar assinado envia por
+    `fetch` quando há mais de um documento na mesma janela, e `fetch` SEGUE o
+    redirect. A página de destino era renderizada dentro da resposta do XHR — e
+    renderizar consome as `messages`. Resultado medido: arquivo recusado (PDF
+    corrompido, extensão errada, limite de tamanho), redirect 302, `response.ok`
+    verdadeiro, `window.location.reload()` e uma tela idêntica à de antes, sem
+    anexo e sem uma palavra. O operador só via "não anexou".
+
+    Para o XHR a recusa vira 400 com o motivo no corpo; o caminho de formulário
+    comum continua sendo mensagem + redirect.
+    """
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return JsonResponse({"ok": False, "error": " ".join(mensagens)}, status=400)
+    for mensagem in mensagens:
+        messages.error(request, mensagem)
+    return redirect(destino)
+
+
 def _prestacao_assinado_upload(
     request,
     *,
@@ -282,8 +304,11 @@ def _prestacao_assinado_upload(
     destino = voltar_para(request, fallback_url)
     arquivo = request.FILES.get("arquivo")
     if not arquivo:
-        messages.error(request, "Selecione um arquivo PDF para anexar.")
-        return redirect(destino)
+        return _upload_recusado(
+            request,
+            destino,
+            ["Selecione um arquivo PDF para anexar."],
+        )
 
     nome_original = Path(getattr(arquivo, "name", "") or "").name
     # QA-04: a política central (tamanho, magic bytes, bomba de descompressão,
@@ -293,9 +318,7 @@ def _prestacao_assinado_upload(
     try:
         validate_private_document_upload(arquivo)
     except ValidationError as exc:
-        for mensagem in exc.messages:
-            messages.error(request, mensagem)
-        return redirect(destino)
+        return _upload_recusado(request, destino, list(exc.messages))
 
     # A validação vem antes da exclusão dos anteriores de propósito: recusar um
     # arquivo novo não pode custar o que já estava anexado.
@@ -311,6 +334,11 @@ def _prestacao_assinado_upload(
         pos_anexo(resultado.anexo)
     else:
         messages.success(request, "Documento assinado anexado.")
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        # Sem renderizar o destino, as `messages` sobrevivem na sessão e aparecem
+        # no recarregamento que o modal dispara — inclusive os avisos do carimbo,
+        # que o redirect seguido pelo `fetch` engolia junto com os erros.
+        return JsonResponse({"ok": True})
     return redirect(destino)
 
 

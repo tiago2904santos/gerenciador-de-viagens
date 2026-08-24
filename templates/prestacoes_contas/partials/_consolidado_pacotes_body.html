@@ -1,30 +1,69 @@
 {% for s in servidores %}
-  <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
-    <summary class="document-inline-card__header">
-      <span class="document-inline-card__title">
-        Pacote de {{ s.nome }}
-        {% if s.is_motorista %}
-          <c-v2.chip label="Motorista" tone="warning" size="compact" only />
-        {% endif %}
-      </span>
-      <span class="document-inline-card__header-end">
-        <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do pacote">
-          <c-v2.icon_button :href="s.preview_inline_url" action="preview" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" only />
-          <c-v2.icon_button :href="s.download_url" action="pdf" aria_label="Baixar pacote (PDF final)" tooltip="Baixar pacote (PDF final)" only />
+  {% comment %}
+    Sem pendência o card é o pacote: prévia embutida e as duas ações.
+
+    Com pendência ele é o aviso do que falta, e as ações não aparecem
+    (`NOVO-20260824-133423-10943c04a7c5`). Oferecer o download aqui levava a uma
+    página que dizia "a geração continua em segundo plano" para um arquivo que o
+    servidor já havia recusado — e o motivo (número da solicitação em branco,
+    despacho ou comprovante sem anexo) não chegava a esta tela.
+  {% endcomment %}
+  {% if s.pendencias %}
+    <div class="document-inline-card">
+      <div class="document-inline-card__header">
+        <span class="document-inline-card__title">
+          Pacote de {{ s.nome }}
+          {% if s.is_motorista %}
+            <c-v2.chip label="Motorista" tone="warning" size="compact" only />
+          {% endif %}
         </span>
-      </span>
-    </summary>
-    <div class="document-inline-card__body">
-      <div class="document-inline-viewer">
-        <iframe
-          class="document-inline-viewer__frame"
-          data-src="{{ s.preview_inline_url }}"
-          title="Pacote final — {{ s.nome }}"
-          loading="lazy"
-        ></iframe>
+      </div>
+      <div class="document-inline-card__body">
+        <c-v2.alert_list
+          tone="warning"
+          title="Falta para fechar o PDF final"
+          lead="O pacote reúne documentos que ainda não estão na prestação."
+          :items="s.pendencias"
+          only
+        />
+        <c-v2.button
+          label="Ir para Documentos"
+          variant="secondary"
+          icon="arrow-right"
+          :icon_after="True"
+          :href="s.documentos_url"
+          only
+        />
       </div>
     </div>
-  </details>
+  {% else %}
+    <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
+      <summary class="document-inline-card__header">
+        <span class="document-inline-card__title">
+          Pacote de {{ s.nome }}
+          {% if s.is_motorista %}
+            <c-v2.chip label="Motorista" tone="warning" size="compact" only />
+          {% endif %}
+        </span>
+        <span class="document-inline-card__header-end">
+          <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do pacote">
+            <c-v2.icon_button :href="s.preview_inline_url" action="preview" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" only />
+            <c-v2.icon_button :href="s.download_url" action="pdf" aria_label="Baixar pacote (PDF final)" tooltip="Baixar pacote (PDF final)" only />
+          </span>
+        </span>
+      </summary>
+      <div class="document-inline-card__body">
+        <div class="document-inline-viewer">
+          <iframe
+            class="document-inline-viewer__frame"
+            data-src="{{ s.preview_inline_url }}"
+            title="Pacote final — {{ s.nome }}"
+            loading="lazy"
+          ></iframe>
+        </div>
+      </div>
+    </details>
+  {% endif %}
 {% empty %}
   <p class="document-inline-empty">Nenhum servidor disponível para gerar o pacote final.</p>
 {% endfor %}

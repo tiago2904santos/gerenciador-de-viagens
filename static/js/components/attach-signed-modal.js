@@ -472,6 +472,27 @@
       }
 
       var enviados = 0;
+
+      /* O motivo da recusa vem do servidor, não do número do status.
+         `NOVO-20260824-133423-35fbd4d59a84`: a view agora responde
+         `{ok:false, error}` com 400 para o XHR, porque o 302 que ela devolvia
+         era seguido pelo `fetch` e a mensagem de erro morria na página que
+         ninguém via. "PDF corrompido" é acionável; "HTTP 400" não é. */
+      function recusaDoServidor(response, item) {
+        var corpo = typeof response.json === "function"
+          ? response.json().catch(function () { return {}; })
+          : Promise.resolve({});
+        return corpo.then(function (dados) {
+          var erro = new Error(
+            (dados && dados.error)
+            || "O servidor recusou " + (item.option_label || item.doc_label || "um arquivo")
+               + " (HTTP " + response.status + ")."
+          );
+          erro.paraUsuario = true;
+          throw erro;
+        });
+      }
+
       pendentes.reduce(function (promessa, item) {
         return promessa.then(function () {
           var payload = new FormData();
@@ -482,14 +503,7 @@
             form: form,
             body: payload,
           }).then(function (response) {
-            if (!response.ok) {
-              var erro = new Error(
-                "O servidor recusou " + (item.option_label || item.doc_label || "um arquivo")
-                + " (HTTP " + response.status + ")."
-              );
-              erro.paraUsuario = true;
-              throw erro;
-            }
+            if (!response.ok) return recusaDoServidor(response, item);
             enviados += 1;
             delete arquivosSelecionados[item.key];
             if (item.key === kindAtual) substituirArquivoDoPicker(null);

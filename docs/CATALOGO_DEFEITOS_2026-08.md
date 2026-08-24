@@ -11651,3 +11651,49 @@ reconstruir a Central de Protocolos no v2 (lista, detalhe, criar de ofício, vin
 documento, sincronizar) — sem restaurar os templates pré-v2 nem `protocolos-detail.css`.
 Fatias 2 (assinatura/tramitação/conclusão + puxar assinado para a prestação) e 3 (costura
 automática com `Oficio.protocolo` + signals no padrão do Drive) registradas no plano.
+
+### NOVO-20260824-133423-35fbd4d59a84 ✅ RESOLVIDO · `NOVO` Recusa do anexo assinado sumia em silêncio no caminho AJAX · BE/JS · risco médio
+
+O modal de anexar assinado envia por `fetch` quando o gatilho declara mais de um documento
+(menu do card e Etapa 3). A view respondia recusa com `messages.error` + redirect 302; o
+`fetch` SEGUE o redirect, a página de destino era renderizada dentro da resposta do XHR e
+renderizar consome as mensagens. O JS via `response.ok` verdadeiro, chamava
+`window.location.reload()` e a tela voltava idêntica: nenhum anexo, nenhum aviso. Qualquer
+recusa da política de upload (`core.uploads.validate_private_document_upload`: não é PDF,
+extensão fora da lista, limite de tamanho, antivírus) era invisível — e o único diagnóstico
+possível era "cliquei em anexar e não anexou". Medido em 24/08 com um arquivo não-PDF: 302
+seguido, `documentos_anexos` vazio, faixa de erro do modal em branco.
+
+Correção: `_prestacao_assinado_upload` responde `{"ok": false, "error": …}` com HTTP 400 quando
+a requisição traz `X-Requested-With: XMLHttpRequest`, e `{"ok": true}` no sucesso — sem renderizar
+o destino, as mensagens de sucesso e os avisos do carimbo sobrevivem na sessão e aparecem no
+recarregamento. `attach-signed-modal.js` passou a ler o motivo do corpo em vez de exibir só o
+número do status. Testes: `prestacoes_contas/test_anexo_assinado_recusa.py`.
+
+### NOVO-20260824-133423-dd2bc58e8a2b ✅ RESOLVIDO · `NOVO` `setBusy` do file-picker lia um `input` inexistente · JS · risco baixo
+
+`components/file-picker.js` duplicava, em `update` e em `setBusy`, o trecho que procura o botão
+de anexar fora do picker. Na cópia de `setBusy` a variável `input` nunca foi declarada: todo
+submit de picker com botão externo — o modal de anexar assinado é um — estourava
+`ReferenceError: input is not defined` e o picker nunca entrava em `is-busy`. Medido no
+navegador em 24/08, na Etapa 3. A busca virou `uploadButtonFor(picker, input)`, usada pelas duas.
+Testes: `static/js/components/file-picker.test.js`.
+
+### NOVO-20260824-133423-10943c04a7c5 ✅ RESOLVIDO · `NOVO` Etapa 4 não dizia o que falta para o PDF final · PY/HT · risco baixo
+
+`_servidor_consolidado_ctx` calculava `numero_ok` e nenhum template usava (grep: uma ocorrência,
+a própria atribuição). Sem número de solicitação, sem despacho assinado ou sem comprovante, o
+pacote é recusado pelo serviço — mas a tela oferecia "Baixar pacote (PDF final)" do mesmo jeito.
+`pendencias_consolidado(servidor_prestacao)` passou a ser a lista única cobrada pela geração e
+mostrada pela Etapa 4: com pendência o cartão vira o aviso do que falta, com atalho para a etapa
+Documentos, e as ações de download não aparecem. Testes:
+`prestacoes_contas/test_pdf_final_pendencias.py`.
+
+### NOVO-20260824-133423-ade2a3103cc3 ✅ RESOLVIDO · `NOVO` Tela de espera prometia arquivo de job já falhado · HT · risco baixo
+
+`enfileirar_documento` renderiza `documentos/geracao_aguarde.html` com HTTP 503 quando o job já
+está em erro — inclusive nas recusas por regra de negócio, que falham antes de existir arquivo.
+A página abria dizendo "A geração continua em segundo plano" e "o download começa sozinho", e o
+motivo só substituía o parágrafo segundos depois, pelo JS de espera. As duas cascas (a de página
+inteira e a embutida no `<iframe>`) ganharam o estado de erro: título próprio, o motivo do
+servidor e nenhum girador.

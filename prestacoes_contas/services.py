@@ -608,6 +608,45 @@ def gerar_oficio_prestacao_pdf(prestacao) -> bytes:
     return gerar_oficio_prestacao_documento(prestacao, DocumentoFormato.PDF)
 
 
+def pendencias_consolidado(servidor_prestacao) -> list[str]:
+    """O que ainda falta, na Etapa 3, para o PDF final deste servidor fechar.
+
+    São as três condições que `gerar_prestacao_consolidado_pdf` cobra e que não
+    têm substituto gerado pelo sistema: o número da solicitação, o despacho
+    assinado (do ofício, compartilhado) e o comprovante de saque deste servidor.
+    Ofício, RT e diário não entram porque, sem o assinado, o pacote usa a versão
+    que o próprio sistema gera.
+
+    Existe para a Etapa 4 poder DIZER o que falta antes de o operador clicar
+    (`NOVO-20260824-133423-10943c04a7c5`): a tela calculava `numero_ok`, não
+    usava em lugar nenhum, e o clique no download caía numa página de espera que
+    prometia um arquivo que nunca vinha.
+    """
+    prestacao = servidor_prestacao.prestacao
+    pendencias = []
+
+    if not str(servidor_prestacao.numero_solicitacao or "").strip():
+        pendencias.append(
+            "Informe o número da solicitação deste servidor na etapa Documentos.",
+        )
+
+    tem_despacho = prestacao.documentos_anexos.filter(
+        tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO,
+    ).exists() or bool(getattr(prestacao.despacho_assinado, "name", ""))
+    if not tem_despacho:
+        pendencias.append("Anexe o despacho assinado do ofício na etapa Documentos.")
+
+    tem_comprovante = servidor_prestacao.documentos_anexos.filter(
+        tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
+    ).exists()
+    if not tem_comprovante:
+        pendencias.append(
+            "Anexe o comprovante de saque/transferência deste servidor na etapa Documentos.",
+        )
+
+    return pendencias
+
+
 @track_document_generation("prestacao_gerar_consolidado_pdf")
 def gerar_prestacao_consolidado_pdf(servidor_prestacao) -> bytes:
     """Pacote final de um servidor: ofício + despacho (compartilhados) + RT do
@@ -618,8 +657,13 @@ def gerar_prestacao_consolidado_pdf(servidor_prestacao) -> bytes:
     a versão gerada/assinada eletronicamente pelo sistema."""
     prestacao = servidor_prestacao.prestacao
 
-    if not str(servidor_prestacao.numero_solicitacao or "").strip():
-        raise DocumentValidationError("Informe o número da solicitação antes de gerar o PDF final.")
+    # Uma lista só para as duas pontas: o que a Etapa 4 mostra é exatamente o que
+    # a geração cobra. Antes o número era conferido aqui e os anexos só estouravam
+    # lá dentro, com o texto de máquina do montador ("Anexe o arquivo: despacho
+    # assinado do ofício."), a três chamadas de distância.
+    pendencias = pendencias_consolidado(servidor_prestacao)
+    if pendencias:
+        raise DocumentValidationError(" ".join(pendencias))
 
     diario, _ = DiarioBordo.objects.get_or_create(prestacao=prestacao)
     sincronizar_trechos(diario)

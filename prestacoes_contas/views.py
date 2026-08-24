@@ -94,6 +94,7 @@ from .selectors import normalizar_aba
 from .selectors import normalizar_abas
 from .services import diaria_inicial_da_prestacao
 from .services import garantir_campos_padrao_relatorio_tecnico
+from .services import pendencias_consolidado
 from .solicitacao_services import ResultadoSolicitacao
 from .solicitacao_services import salvar_solicitacao_do_autosave
 from .solicitacao_services import salvar_solicitacoes_em_lote
@@ -259,6 +260,7 @@ __all__ = [
     "motorista_diario",
     "motorista_do_oficio",
     "normalizar_aba",
+    "pendencias_consolidado",
     "prestacao_arquivar",
     "prestacao_arquivo_autosave",
     "prestacao_despacho_assinado_anexar",
@@ -558,12 +560,20 @@ def prestacao_servidor_solicitacao_autosave(request, ps_pk):
 
 
 def _servidor_consolidado_ctx(request, ps):
+    # `pendencias` é a lista que o serviço da geração cobra. Quando ela não está
+    # vazia, o pacote NÃO é gerável — a tela mostra o que falta em vez de oferecer
+    # um download que termina numa página de espera eterna
+    # (`NOVO-20260824-133423-10943c04a7c5`).
+    pendencias = pendencias_consolidado(ps)
     return {
         "ps_pk": ps.pk,
         "nome": ps.servidor.nome,
         "is_motorista": ps.is_motorista,
         "numero_solicitacao": ps.numero_solicitacao,
         "numero_ok": bool((ps.numero_solicitacao or "").strip()),
+        "pendencias": pendencias,
+        "pode_gerar": not pendencias,
+        "documentos_url": reverse("prestacoes_contas:documentos_servidor", args=[ps.pk]),
         "assinatura_rt": _assinatura_rt_card(request, ps),
         "download_url": reverse("prestacoes_contas:consolidado_download", args=[ps.pk]),
         "preview_inline_url": reverse("prestacoes_contas:consolidado_download", args=[ps.pk]) + "?inline=1",
