@@ -11,7 +11,11 @@ from django.test import SimpleTestCase, TestCase, override_settings
 from integracoes.eprotocolo import services as epro
 from integracoes.eprotocolo import settings as cfg
 from integracoes.eprotocolo.client import EProtocoloClient, mascarar_dados
+from integracoes.eprotocolo.exceptions import EProtocoloAuthError
 from integracoes.eprotocolo.exceptions import EProtocoloConfigError
+from integracoes.eprotocolo.exceptions import EProtocoloNotFoundError
+from integracoes.eprotocolo.exceptions import EProtocoloTimeoutError
+from integracoes.eprotocolo.exceptions import EProtocoloValidationError
 from protocolos import services as proto_services
 from protocolos.models import Protocolo
 
@@ -215,23 +219,23 @@ class ErrosReaisTests(SimpleTestCase):
     def test_401(self):
         session = FakeSession([FakeResponse(401)])
         with _patch_client(session):
-            with self.assertRaises(Exception):
+            with self.assertRaises(EProtocoloAuthError):
                 epro.testar_conexao()
 
     def test_404(self):
         session = FakeSession([FakeResponse(404)])
         with _patch_client(session):
-            with self.assertRaises(Exception):
+            with self.assertRaises(EProtocoloNotFoundError):
                 epro.consultar_protocolo("24.1.1-1")
 
     def test_422(self):
         session = FakeSession([FakeResponse(422, {"erro": "payload"})])
         with _patch_client(session):
-            with self.assertRaises(Exception):
+            with self.assertRaises(EProtocoloValidationError):
                 epro.consultar_protocolo("24.1.1-1")
 
     def test_timeout(self):
         session = FakeSession(request_exc=requests.Timeout())
         with _patch_client(session):
-            with self.assertRaises(Exception):
+            with self.assertRaises(EProtocoloTimeoutError):
                 epro.consultar_protocolo("24.1.1-1")

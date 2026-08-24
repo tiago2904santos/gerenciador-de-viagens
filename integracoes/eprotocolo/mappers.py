@@ -15,6 +15,8 @@ Regras de robustez:
 
 from __future__ import annotations
 
+from core.errors import capture
+
 from . import settings as cfg
 from .exceptions import EProtocoloValidationError
 
@@ -28,8 +30,6 @@ CAMPOS_INSTITUCIONAIS_OBRIGATORIOS = {
     "codEspecie": "EPROTOCOLO_COD_ESPECIE_OFICIO",
 }
 
-
-from core.errors import capture
 
 def _defaults_institucionais() -> dict:
     return {
