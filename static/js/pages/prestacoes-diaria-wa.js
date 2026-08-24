@@ -8,13 +8,12 @@
   // .action-menu, que o CV.overlay move para <body> ao abrir — por
   // isso não dá pra usar closest() a partir do item para achar a linha do
   // servidor; volta-se ao botão-gatilho original (que continua no lugar)
-  // pelo id do menu.
+  // pelo id do menu. A volta é `CV.overlay.triggerForMenu`, do mesmo motor que
+  // fez o transplante.
   function diariaWaTrigger(el) {
     var menu = el.closest(".action-menu");
     if (!menu) return null;
-    return document.querySelector(
-      '[data-overlay-kind="menu"][data-overlay-target="' + menu.id + '"]'
-    );
+    return window.CV.overlay.triggerForMenu(menu);
   }
 
   function diariaDateText(value) {
@@ -27,6 +26,35 @@
     var month = String(today.getMonth() + 1).padStart(2, "0");
     var day = String(today.getDate()).padStart(2, "0");
     return today.getFullYear() + "-" + month + "-" + day;
+  }
+
+  // Parágrafo que pede os KM de cada trecho para preencher o diário de bordo.
+  // Só o motorista tem `data-wa-trechos` preenchido (o presenter decide), então
+  // aqui basta a lista estar vazia para o pedido não sair.
+  //
+  // Vai colado no aviso de liberação de propósito: é a mesma conversa, no mesmo
+  // momento, com a mesma pessoa — duas mensagens seriam dois cliques e duas
+  // chances de esquecer a segunda.
+  function diariaKmPedido(trigger, emoji, bullet) {
+    var rotas;
+    try {
+      rotas = JSON.parse(trigger.dataset.waTrechos || "[]");
+    } catch (_erro) {
+      return "";
+    }
+    if (!Array.isArray(rotas) || !rotas.length) return "";
+
+    var linhas = rotas.map(function (rota, indice) {
+      return (indice + 1) + ") *" + rota + "*\n" +
+        bullet + " KM inicial: \n" +
+        bullet + " KM final: \n" +
+        bullet + " Abasteceu neste trecho? (sim/não): ";
+    });
+
+    return emoji + " *DIÁRIO DE BORDO*\n" +
+      "Como você foi o motorista, preciso também dos dados do veículo para preencher o diário de bordo. " +
+      "Responda copiando a lista abaixo com os números do odômetro:\n\n" +
+      linhas.join("\n\n");
   }
 
   // Valida solicitação/período e monta a mensagem; retorna null (já focando o
@@ -77,6 +105,8 @@
     var EMOJI_AVISO = String.fromCharCode(0x26A0, 0xFE0F); // alerta
     var BULLET = String.fromCharCode(0x2022); // marcador de lista (evita colidir com o *negrito* do WhatsApp)
 
+    var EMOJI_DIARIO = String.fromCharCode(0xD83D, 0xDE97); // carro
+
     var oficioNum = trigger.dataset.waOficio || "";
     var unidade = (trigger.dataset.waUnidade || "").trim();
     var evento = trigger.dataset.waEvento || "";
@@ -92,6 +122,9 @@
       BULLET + " Data de liberação: *" + liberacaoTexto + "*\n" +
       EMOJI_PRAZO + " Prazo limite para saque: *" + prazoTexto + "* (PRAZO IMPRORROGÁVEL)\n" +
       EMOJI_AVISO + " Aviso importante: O saque das diárias não fica disponível no mesmo dia do desbloqueio do cartão. Programe-se com antecedência!";
+
+    var pedidoKm = diariaKmPedido(trigger, EMOJI_DIARIO, BULLET);
+    if (pedidoKm) msg += "\n\n" + pedidoKm;
 
     return { msg: msg, phone: (trigger.dataset.waPhone || "").replace(/\D/g, "") };
   }

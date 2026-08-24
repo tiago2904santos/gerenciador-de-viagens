@@ -77,7 +77,7 @@
           />
         </div>
 
-        <span class="sr-only" data-attach-signed-file-help>Selecione um único arquivo em formato PDF.</span>
+        <span class="sr-only" data-attach-signed-file-help>Selecione um ou mais arquivos em PDF, PNG ou JPEG.</span>
         {% comment %}
           `upload_label` vazio de propósito: o botão de anexar vai no RODAPÉ do
           diálogo, e dois elementos com `data-file-upload-button` fariam o motor
@@ -86,10 +86,9 @@
         <c-v2.file_picker
           field_id="id-attach-signed-arquivo"
           field_name="arquivo"
-          accept="application/pdf,.pdf"
-          :single="True"
+          accept="application/pdf,image/png,image/jpeg,image/*"
           :current_attachment="True"
-          action_label="Escolher PDF"
+          action_label="Escolher arquivos"
           empty_label="Nenhum documento escolhido"
         />
 
@@ -107,7 +106,7 @@
       `file-picker.js` quando há arquivo escolhido.
     {% endcomment %}
     <c-v2.button
-      label="Anexar PDF"
+      label="Anexar arquivos"
       variant="primary"
       icon="check"
       type="submit"

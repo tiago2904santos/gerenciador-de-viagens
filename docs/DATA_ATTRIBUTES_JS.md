@@ -7,7 +7,7 @@ que ele publica em `window.CV`. Não altera regra de negócio.
 
 Este documento cobre `static/js/core/`, `static/js/components/` e os motores de raiz — o código que
 qualquer tela pode acionar. **Não** indexa os atributos de uma página só (`static/js/pages/`): são
-**147** deles, cada um com um único consumidor, e a documentação certa para esses é o próprio
+**148** deles, cada um com um único consumidor, e a documentação certa para esses é o próprio
 módulo da página.
 
 A regra que decide: se o atributo aparece num motor compartilhado, ele está aqui. Isso é verificado
@@ -193,6 +193,10 @@ Checkbox renderizado como cartão clicável (`components/ui/forms/card_toggle.ht
 | `data-cancel-reason-modal`, `data-cancel-reason-form`, `data-cancel-reason-label` | modal de cancelamento com motivo |
 | `data-vincular-usuario-modal`, `data-vincular-usuario-form`, `data-vincular-usuario-label` | modal de vínculo de usuário |
 
+| API | Uso |
+|---|---|
+| `CV.overlay.triggerForMenu(menu)` | Do menu ABERTO de volta ao botão que o abriu. O menu é transplantado para o `<body>` e perde os ancestrais, então `closest()` a partir de um item não acha mais a linha do registro; quem precisa do contexto (de qual servidor é este menu?) volta por aqui |
+
 ## Date picker — `components/date-picker.js`
 
 Raiz: `data-cv-date-picker`. Idempotência e ciclo de vida por `registerEnhancer` (`JS-02`).
@@ -244,7 +248,7 @@ Raiz: `data-attach-signed-modal`, aberto por `data-attach-signed-trigger`.
 |---|---|
 | Fluxo | `data-attach-signed-form`, `data-attach-signed-next`, `data-attach-signed-cancel`, `data-attach-signed-error`, `data-attach-signed-reopen-key` |
 | Tipo | `data-attach-signed-kind`, `data-attach-signed-kind-selector`, `data-attach-signed-kind-options`, `data-attach-signed-kind-status` (✓ no botão do tipo que já tem arquivo), `data-attach-signed-label` |
-| Arquivo atual | `data-attach-signed-current`, `data-attach-signed-current-name`, `data-attach-signed-current-meta` (metadados do anexo exibido), `data-attach-signed-current-open`, `data-attach-signed-remove` |
+| Arquivos atuais | `data-attach-signed-current`, `data-attach-signed-current-name`, `data-attach-signed-current-meta` (metadados do anexo exibido), `data-attach-signed-current-open`, `data-attach-signed-current-list`, `data-attach-signed-current-template`, `data-attach-signed-list-name`, `data-attach-signed-list-open`, `data-attach-signed-placeholder-row`, `data-attach-signed-remove` |
 | Upload | `data-attach-signed-file-description`, `data-attach-signed-file-help`, `data-file-upload-button`, `data-file-picker-action-label` |
 
 ## Linhas de localidade — `components/location-rows.js`
@@ -270,6 +274,12 @@ Raiz: `data-location-rows`; a lista é `data-location-list` e o molde `data-loca
 | `data-document-generation-wait`, `data-document-generation-message` | `document-generation-wait.js` | Espera da geração assíncrona |
 | `data-document-number-field`, `data-document-number-input`, `data-document-number-value` | `document-number-field.js` | Campo composto número/ano |
 | `data-extra-download-url` | `extra-download.js` | Enfileira um segundo download junto do principal |
+
+| API | Uso |
+|---|---|
+| `CV.documentProgress.begin/finish/error` | Liga e desliga o estado de carregamento sem passar por um link |
+| `CV.documentFiles.fetchFile(url)` | Baixa o documento COMO DADO (`{blob, filename}`) em vez de salvar, passando pela mesma fila de geração assíncrona e pelos mesmos erros. É o que permite anexar um PDF à folha de compartilhamento (`pages/prestacoes-docs-wa.js`) |
+| `CV.documentFiles.save(blob, nome)` | Salva um blob já obtido — a queda de quem não tem Web Share de arquivo |
 
 ## Autosave — `autosave.js`
 

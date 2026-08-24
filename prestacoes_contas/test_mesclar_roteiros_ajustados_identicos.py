@@ -34,7 +34,9 @@ class MesclarRoteirosAjustadosIdenticosTests(TestCase):
 
     def test_dry_run_nao_altera_nada(self):
         original = self._roteiro_com_destino()
-        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, roteiro=original)
+        oficio = Oficio.objects.create(
+            area=area_de_teste(), numero=1, ano=2026, protocolo="123456781", roteiro=original
+        )
         copia = clonar_roteiro(original)
         oficio.servidores.add(self.servidor)
         pc = PrestacaoContas.objects.get(oficio=oficio)
@@ -49,7 +51,9 @@ class MesclarRoteirosAjustadosIdenticosTests(TestCase):
 
     def test_confirmar_descarta_copia_identica_e_apaga(self):
         original = self._roteiro_com_destino()
-        oficio = Oficio.objects.create(area=area_de_teste(), numero=2, ano=2026, roteiro=original)
+        oficio = Oficio.objects.create(
+            area=area_de_teste(), numero=2, ano=2026, protocolo="123456782", roteiro=original
+        )
         copia = clonar_roteiro(original)
         oficio.servidores.add(self.servidor)
         pc = PrestacaoContas.objects.get(oficio=oficio)
@@ -66,7 +70,9 @@ class MesclarRoteirosAjustadosIdenticosTests(TestCase):
 
     def test_nao_mexe_em_copia_divergente(self):
         original = self._roteiro_com_destino(observacoes="ORIGINAL")
-        oficio = Oficio.objects.create(area=area_de_teste(), numero=3, ano=2026, roteiro=original)
+        oficio = Oficio.objects.create(
+            area=area_de_teste(), numero=3, ano=2026, protocolo="123456783", roteiro=original
+        )
         copia = clonar_roteiro(original)
         copia.observacoes = "AJUSTADO"
         copia.save(update_fields=["observacoes"])
@@ -84,8 +90,12 @@ class MesclarRoteirosAjustadosIdenticosTests(TestCase):
 
     def test_nao_apaga_copia_ainda_referenciada_por_outra_prestacao(self):
         original = self._roteiro_com_destino()
-        oficio1 = Oficio.objects.create(area=area_de_teste(), numero=4, ano=2026, roteiro=original)
-        oficio2 = Oficio.objects.create(area=area_de_teste(), numero=5, ano=2026)
+        oficio1 = Oficio.objects.create(
+            area=area_de_teste(), numero=4, ano=2026, protocolo="123456784", roteiro=original
+        )
+        oficio2 = Oficio.objects.create(
+            area=area_de_teste(), numero=5, ano=2026, protocolo="123456785"
+        )
         copia = clonar_roteiro(original)
         oficio1.servidores.add(self.servidor)
         pc1 = PrestacaoContas.objects.get(oficio=oficio1)

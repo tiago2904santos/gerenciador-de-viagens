@@ -60,7 +60,9 @@ class ExcluirEventoTests(TestCase):
         outro_evento = Evento.objects.create(area=area_de_teste(), titulo="Outro evento")
         roteiro = Roteiro.objects.create(area=area_de_teste(), evento=self.evento)
         Oficio.objects.create(area=area_de_teste(), evento=self.evento, roteiro=roteiro)
-        oficio_outro_evento = Oficio.objects.create(area=area_de_teste(), evento=outro_evento)
+        oficio_outro_evento = Oficio.objects.create(
+            area=area_de_teste(), evento=outro_evento, protocolo="123456789"
+        )
         prestacao = PrestacaoContas.objects.get(oficio=oficio_outro_evento)
         prestacao.roteiro_ajustado = roteiro
         prestacao.save(update_fields=["roteiro_ajustado", "atualizado_em"])

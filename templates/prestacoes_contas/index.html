@@ -13,6 +13,11 @@
   {% endcomment %}
   <script src="{% static 'js/components/download-queue.js' %}" defer></script>
   <script src="{% static 'js/pages/prestacoes-diaria-wa.js' %}" defer></script>
+  {% comment %}
+    Envio de RT/diário com os PDFs anexados. Depende de `CV.documentFiles` e
+    `CV.overlay`, ambos no shell bundle, que já vem antes deste bloco.
+  {% endcomment %}
+  <script src="{% static 'js/pages/prestacoes-docs-wa.js' %}" defer></script>
 {% endblock %}
 
 {% block content %}

@@ -68,7 +68,13 @@ class EventoStatusCardTests(TestCase):
         evento = Evento.objects.create(area=area_de_teste(), titulo="Evento pronto com saída futura")
         saida = timezone.now() + timedelta(days=5)
         roteiro = Roteiro.objects.create(area=area_de_teste(), saida_dt=saida, evento=evento)
-        oficio = Oficio.objects.create(area=area_de_teste(), evento=evento, status=Oficio.STATUS_GERADO, assunto="x")
+        oficio = Oficio.objects.create(
+            area=area_de_teste(),
+            evento=evento,
+            protocolo="123456789",
+            status=Oficio.STATUS_GERADO,
+            assunto="x",
+        )
         oficio.roteiro = roteiro
         oficio.save(update_fields=["roteiro"])
         EventoAnexo.objects.create(
@@ -138,7 +144,13 @@ class EventoStatusCardTests(TestCase):
         evento = Evento.objects.create(area=area_de_teste(), titulo="Evento pronto com saída futura")
         saida = timezone.now() + timedelta(days=5)
         roteiro = Roteiro.objects.create(area=area_de_teste(), saida_dt=saida, evento=evento)
-        oficio = Oficio.objects.create(area=area_de_teste(), evento=evento, status=Oficio.STATUS_GERADO, assunto="x")
+        oficio = Oficio.objects.create(
+            area=area_de_teste(),
+            evento=evento,
+            protocolo="123456789",
+            status=Oficio.STATUS_GERADO,
+            assunto="x",
+        )
         oficio.roteiro = roteiro
         oficio.save(update_fields=["roteiro"])
         EventoAnexo.objects.create(

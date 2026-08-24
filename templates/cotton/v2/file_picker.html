@@ -66,7 +66,7 @@
       </label>
     </li>
 
-    <li class="file-picker__row">
+    <li class="file-picker__row" {% if current_attachment %}data-attach-signed-placeholder-row{% endif %}>
       <span class="file-picker__copy">
         <strong
           class="file-picker__name"
@@ -101,6 +101,26 @@
       {% endif %}
     </li>
   </ul>
+
+  {% if current_attachment %}
+    <ul class="file-picker__list" data-attach-signed-current-list hidden></ul>
+    <template data-attach-signed-current-template>
+      <li class="file-picker__row" data-attach-signed-current-row>
+        <span class="file-picker__copy">
+          <strong class="file-picker__name" data-attach-signed-list-name></strong>
+          <small class="file-picker__meta">Arquivo anexado</small>
+        </span>
+        <span class="file-picker__actions">
+          <a class="icon-button" target="_blank" rel="noopener noreferrer"
+             aria-label="Visualizar arquivo assinado" data-tooltip="Visualizar"
+             data-attach-signed-list-open>{% icone_svg "eye" %}</a>
+          <button type="button" class="icon-button" data-tone="late"
+                  aria-label="Remover arquivo assinado" data-tooltip="Remover"
+                  data-attach-signed-remove>{% icone_svg "trash" %}</button>
+        </span>
+      </li>
+    </template>
+  {% endif %}
 
   {% comment %}
     A lista dos arquivos escolhidos mora DENTRO do mesmo bloco, logo abaixo da

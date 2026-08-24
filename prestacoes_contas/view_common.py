@@ -22,11 +22,13 @@ def _area_related_queryset(queryset, area_field="prestacao__area"):
 
 
 def _prestacao_queryset():
-    return filter_queryset_by_area(PrestacaoContas.objects)
+    return filter_queryset_by_area(PrestacaoContas.objects).exclude(oficio__protocolo="")
 
 
 def _prestacao_servidor_queryset():
-    return _area_related_queryset(PrestacaoServidor.objects)
+    return _area_related_queryset(PrestacaoServidor.objects).exclude(
+        prestacao__oficio__protocolo=""
+    )
 
 
 def _relatorio_queryset():

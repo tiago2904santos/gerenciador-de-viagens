@@ -94,8 +94,14 @@
 
           <div class="person-row__actions">
             {% comment %}
-              Os seis `data-wa-*` são os campos da mensagem que
+              Os `data-wa-*` são os campos da mensagem que
               `prestacoes-diaria-wa.js` monta antes de abrir o WhatsApp.
+
+              `data-wa-trechos` é JSON e só vem preenchido para o motorista: é o
+              parágrafo que pede os KM de cada trecho para o diário de bordo.
+              Os `data-docs-*` são lidos por `prestacoes-docs-wa.js`, que anexa
+              os PDFs de RT e diário — o menu é o mesmo, e o overlay o leva para
+              o `<body>`, então tudo tem de estar aqui, no gatilho.
             {% endcomment %}
             <button
               type="button"
@@ -115,6 +121,9 @@
               data-wa-evento="{{ servidor.whatsapp_evento }}"
               data-wa-servidor="{{ servidor.name }}"
               data-wa-diaria="{{ servidor.whatsapp_diaria }}"
+              data-wa-trechos="{{ servidor.whatsapp_trechos }}"
+              data-docs-rt-url="{{ servidor.rt_download_url }}"
+              data-docs-db-url="{% if servidor.is_motorista %}{{ servidor.diario_pdf_url }}{% endif %}"
             >{% icone_svg "whatsapp-modern" %}</button>
           </div>
         </li>
@@ -178,8 +187,8 @@
       data-attach-signed-reopen-key="prestacao-documentos-{{ card.ps_pk }}"
       data-attach-signed-accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
       data-attach-signed-file-description="um arquivo em PDF, PNG ou JPEG"
-      data-attach-signed-file-help="Selecione um arquivo por tipo. As escolhas são mantidas ao trocar de aba."
-      data-attach-signed-choose-label="Escolher arquivo"
+      data-attach-signed-file-help="Selecione um ou mais arquivos por tipo. As escolhas são mantidas ao trocar de aba."
+      data-attach-signed-choose-label="Escolher arquivos"
       data-attach-signed-upload-label="Anexar arquivos"
       data-attach-signed-kinds="{{ card.attach_kinds_json }}"
     >{% icone_svg "sign" %}</button>

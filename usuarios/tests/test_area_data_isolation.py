@@ -242,7 +242,13 @@ class AreaDataIsolationTests(TestCase):
         self.assertEqual(plano.area, self.ascom)
 
     def test_prestacao_contas_de_outra_area_retorna_404(self):
-        oficio = Oficio.objects.create(area=self.dpcap, numero=21, ano=2026, assunto="Oficio DPCAP")
+        oficio = Oficio.objects.create(
+            area=self.dpcap,
+            numero=21,
+            ano=2026,
+            protocolo="123456789",
+            assunto="Oficio DPCAP",
+        )
         prestacao = PrestacaoContas.objects.get(oficio=oficio)
 
         response = self.client.get(reverse("prestacoes_contas:documentos", args=[prestacao.pk]))
@@ -250,7 +256,13 @@ class AreaDataIsolationTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_prestacao_contas_herda_area_do_oficio(self):
-        oficio = Oficio.objects.create(area=self.ascom, numero=22, ano=2026, assunto="Oficio ASCOM")
+        oficio = Oficio.objects.create(
+            area=self.ascom,
+            numero=22,
+            ano=2026,
+            protocolo="123456789",
+            assunto="Oficio ASCOM",
+        )
 
         prestacao = PrestacaoContas.objects.get(oficio=oficio)
 

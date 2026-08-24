@@ -260,7 +260,10 @@ class PrestacoesMenusTests(RedeDeMenusSobDemanda, TestCase):
             **extra,
         )
         oficio = Oficio.all_objects.create(
-            numero=1 if propria else 99, ano=2026, **extra
+            numero=1 if propria else 99,
+            ano=2026,
+            protocolo="123456789" if propria else "987654321",
+            **extra,
         )
         # A prestação nasce por sinal junto do ofício — criar outra estoura a
         # unicidade de `oficio_id`. Pega-se a que já existe.

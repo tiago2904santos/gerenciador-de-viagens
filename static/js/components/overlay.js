@@ -646,6 +646,12 @@
     focusableElements: focusableElements,
     init: init,
     openDialog: openDialog,
+    // Exportado porque o menu ABERTO já não está dentro do card: o overlay o
+    // move para o `<body>` e ele perde os ancestrais. Quem precisa do contexto
+    // do registro (de qual servidor é este menu?) tem de voltar ao gatilho, e
+    // essa volta é a mesma para todo domínio — `prestacoes-diaria-wa.js` e
+    // `prestacoes-docs-wa.js` tinham cada um a sua cópia.
+    triggerForMenu: triggerForMenu,
   };
 
   if (typeof window.CV.registerEnhancer === "function") {

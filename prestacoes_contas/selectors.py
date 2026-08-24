@@ -142,6 +142,12 @@ def get_servidor_prestacao_by_id(pk):
                 "prestacao__oficio__roteiro__destinos",
                 queryset=RoteiroDestino.objects.select_related("cidade", "estado").order_by("ordem"),
             ),
+            # O menu servido por aqui pergunta ao `pendencias_envio_rt_db` se o
+            # RT e o diário já estão preenchidos, e ele lê os dois
+            # (`NOVO-20260824-173723-37e9862b4c2a`).
+            "prestacao__relatorio_tecnico",
+            "prestacao__diario_bordo",
+            "prestacao__diario_bordo__trechos",
         )
     )
     return get_object_or_404(queryset, pk=pk)
@@ -198,6 +204,10 @@ def _base_servidores(
             "prestacao__documentos_anexos",
             "prestacao__relatorio_tecnico",
             "prestacao__diario_bordo",
+            # `NOVO-20260824-173723-37e9862b4c2a`: `pendencias_envio_rt_db` conta
+            # trechos sem KM/abastecimento para dizer se o RT e o diário já podem
+            # ser mandados. Sem isto é uma consulta por card de motorista.
+            "prestacao__diario_bordo__trechos",
         )
         .filter(prestacao__oficio__cancelado=False)
         .order_by(*order_fields)

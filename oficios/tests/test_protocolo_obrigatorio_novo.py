@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
@@ -6,6 +5,7 @@ from cadastros.models import Cargo
 from cadastros.models import Servidor
 from core.testing import area_de_teste
 from core.testing import com_request
+from documentos.services.exceptions import DocumentValidationError
 from oficios.models import Oficio
 from oficios.presenters import apresentar_oficio_card
 from oficios.services import DocumentoFormato
@@ -13,6 +13,8 @@ from oficios.services import avaliar_oficio_dados_viajantes
 from oficios.services import gerar_resposta_documento_oficio
 from prestacoes_contas.models import PrestacaoContas
 from prestacoes_contas.selectors import listar_prestacoes
+from prestacoes_contas.view_common import _prestacao_queryset
+from prestacoes_contas.view_common import _prestacao_servidor_queryset
 from roteiros.models import Roteiro
 
 
@@ -91,7 +93,7 @@ class ProtocoloObrigatorioOficioTests(TestCase):
             ano=2026,
         )
 
-        with self.assertRaisesMessage(ValidationError, "O ofício não pode ser gerado"):
+        with self.assertRaisesMessage(DocumentValidationError, "O ofício não pode ser gerado"):
             gerar_resposta_documento_oficio(oficio, DocumentoFormato.PDF)
 
     def test_prestacao_legada_some_da_lista_quando_protocolo_e_removido(self):
@@ -103,9 +105,14 @@ class ProtocoloObrigatorioOficioTests(TestCase):
         )
         oficio.servidores.add(self.servidor)
         prestacao = PrestacaoContas.all_objects.get(oficio=oficio)
+        servidor_prestacao = prestacao.servidores_prestacao.get(servidor=self.servidor)
 
         oficio.protocolo = ""
         oficio.save(update_fields=["protocolo"])
 
         self.assertTrue(PrestacaoContas.all_objects.filter(pk=prestacao.pk).exists())
         self.assertFalse(listar_prestacoes().filter(prestacao=prestacao).exists())
+        self.assertFalse(_prestacao_queryset().filter(pk=prestacao.pk).exists())
+        self.assertFalse(
+            _prestacao_servidor_queryset().filter(pk=servidor_prestacao.pk).exists()
+        )

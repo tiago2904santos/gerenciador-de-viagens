@@ -1,0 +1,540 @@
+{
+  "schema": "tela-campos-acoes-v1",
+  "regra": "Somente rótulos, controles e ações próprios do estado; navegação global, cabeçalhos de tabela e nomes técnicos não entram.",
+  "telas": {
+    "TELA-001": {
+      "slug": "dashboard",
+      "tipo": "painel",
+      "labels": ["Módulos", "Ofícios", "Termos", "Justificativas", "Eventos", "Roteiros", "Planos de Trabalho", "Ordens de Serviço", "Prestações de Contas", "Protocolos"],
+      "actions": ["Abrir Ofícios", "Abrir Termos", "Abrir Justificativas", "Abrir Eventos", "Abrir Roteiros", "Abrir Planos de Trabalho", "Abrir Ordens de Serviço", "Abrir Prestações de Contas", "Abrir Protocolos"]
+    },
+    "TELA-002": {
+      "slug": "dashboard-claro",
+      "tipo": "painel — estado de tema",
+      "labels": ["Módulos", "Ofícios", "Termos", "Justificativas", "Eventos", "Roteiros", "Planos de Trabalho", "Ordens de Serviço", "Prestações de Contas", "Protocolos"],
+      "actions": ["Abrir Ofícios", "Abrir Termos", "Abrir Justificativas", "Abrir Eventos", "Abrir Roteiros", "Abrir Planos de Trabalho", "Abrir Ordens de Serviço", "Abrir Prestações de Contas", "Abrir Protocolos"]
+    },
+    "TELA-003": {
+      "slug": "login",
+      "tipo": "formulário de acesso",
+      "labels": ["Usuário", "Senha"],
+      "actions": ["Entrar"]
+    },
+    "TELA-004": {
+      "slug": "perfil",
+      "tipo": "formulário e configuração pessoal",
+      "labels": ["Nome", "Sobrenome", "E-mail institucional", "Senha antiga", "Nova senha", "Confirmação", "Áreas de trabalho", "Google Drive", "Nome da nova pasta"],
+      "actions": ["Salvar alterações", "Alterar senha", "Conectar conta Google", "Trocar conta", "Desconectar", "Ver no Drive", "Voltar", "Criar nova pasta aqui", "Criar pasta", "Usar esta pasta como destino", "Ver prévia", "Reorganizar tudo no Drive", "Tentar novamente agora"]
+    },
+    "TELA-005": {
+      "slug": "cadastros-hub",
+      "tipo": "painel de navegação",
+      "labels": ["Servidores", "Cargos", "Viaturas", "Combustíveis", "Unidades", "Estados", "Cidades", "Tipos de evento", "Configurações"],
+      "actions": ["Abrir Servidores", "Abrir Cargos", "Abrir Viaturas", "Abrir Combustíveis", "Abrir Unidades", "Abrir Estados", "Abrir Cidades", "Abrir Tipos de evento", "Abrir Configurações"]
+    },
+    "TELA-006": {
+      "slug": "cargo-editar",
+      "tipo": "formulário de edição",
+      "labels": ["Cargo", "Cargo padrão"],
+      "actions": ["Voltar", "Salvar"]
+    },
+    "TELA-007": {
+      "slug": "cargo-novo",
+      "tipo": "formulário de criação",
+      "labels": ["Cargo", "Cargo padrão"],
+      "actions": ["Voltar", "Salvar"]
+    },
+    "TELA-008": {
+      "slug": "cargos-lista",
+      "tipo": "lista de catálogo",
+      "labels": ["Buscar cargos"],
+      "actions": ["Novo cargo", "Limpar busca", "Editar", "Definir como padrão", "Excluir"]
+    },
+    "TELA-009": {
+      "slug": "cidades-lista",
+      "tipo": "lista de catálogo",
+      "labels": ["Buscar cidades", "Estado"],
+      "actions": ["Nova cidade", "Limpar busca", "Exportar CSV", "Editar", "Excluir"]
+    },
+    "TELA-010": {
+      "slug": "combustiveis-lista",
+      "tipo": "lista de catálogo",
+      "labels": ["Buscar combustíveis"],
+      "actions": ["Novo combustível", "Limpar busca", "Editar", "Definir como padrão", "Excluir"]
+    },
+    "TELA-011": {
+      "slug": "combustivel-editar",
+      "tipo": "formulário de edição",
+      "labels": ["Combustível", "Combustível padrão"],
+      "actions": ["Voltar", "Salvar"]
+    },
+    "TELA-012": {
+      "slug": "combustivel-novo",
+      "tipo": "formulário de criação",
+      "labels": ["Combustível", "Combustível padrão"],
+      "actions": ["Voltar", "Salvar"]
+    },
+    "TELA-013": {
+      "slug": "estados-lista",
+      "tipo": "lista de catálogo com inclusão rápida",
+      "labels": ["Buscar estados", "Nome", "Sigla", "Código IBGE"],
+      "actions": ["Novo estado", "Salvar", "Cancelar", "Limpar busca", "Editar", "Excluir"]
+    },
+    "TELA-014": {
+      "slug": "servidor-editar",
+      "tipo": "formulário de edição",
+      "labels": ["Nome", "Cargo", "CPF", "RG", "Telefone", "Unidade"],
+      "actions": ["Gerenciar cargos", "Gerenciar unidades", "Voltar", "Salvar"]
+    },
+    "TELA-015": {
+      "slug": "servidor-novo",
+      "tipo": "formulário de criação",
+      "labels": ["Nome", "Cargo", "CPF", "RG", "Telefone", "Unidade"],
+      "actions": ["Gerenciar cargos", "Gerenciar unidades", "Voltar", "Salvar"]
+    },
+    "TELA-016": {
+      "slug": "servidores-lista",
+      "tipo": "lista",
+      "labels": ["Buscar servidores", "Filtrar por cargo"],
+      "actions": ["Novo servidor", "Limpar filtros", "Editar", "Excluir"]
+    },
+    "TELA-017": {
+      "slug": "tipos-evento",
+      "tipo": "lista de catálogo com inclusão rápida",
+      "labels": ["Buscar tipos de evento", "Nome"],
+      "actions": ["Novo tipo de evento", "Salvar", "Cancelar", "Limpar busca", "Editar", "Excluir"]
+    },
+    "TELA-018": {
+      "slug": "unidade-editar",
+      "tipo": "formulário de edição",
+      "labels": ["Nome", "Sigla", "Servidores"],
+      "actions": ["Voltar", "Salvar"]
+    },
+    "TELA-019": {
+      "slug": "unidade-nova",
+      "tipo": "formulário de criação",
+      "labels": ["Nome", "Sigla", "Servidores"],
+      "actions": ["Voltar", "Salvar"]
+    },
+    "TELA-020": {
+      "slug": "unidades-lista",
+      "tipo": "lista de catálogo",
+      "labels": ["Buscar unidades"],
+      "actions": ["Nova unidade", "Limpar busca", "Editar", "Excluir"]
+    },
+    "TELA-021": {
+      "slug": "viatura-editar",
+      "tipo": "formulário de edição",
+      "labels": ["Placa", "Modelo", "Tipo", "Combustível", "Unidade (opcional)", "Motoristas"],
+      "actions": ["Gerenciar combustíveis", "Gerenciar unidades", "Gerenciar servidores", "Voltar", "Salvar"]
+    },
+    "TELA-022": {
+      "slug": "viatura-nova",
+      "tipo": "formulário de criação",
+      "labels": ["Placa", "Modelo", "Tipo", "Combustível", "Unidade (opcional)", "Motoristas"],
+      "actions": ["Gerenciar combustíveis", "Gerenciar unidades", "Gerenciar servidores", "Voltar", "Salvar"]
+    },
+    "TELA-023": {
+      "slug": "viaturas-lista",
+      "tipo": "lista",
+      "labels": ["Buscar viaturas", "Filtrar por unidade ou combustível"],
+      "actions": ["Nova viatura", "Limpar filtros", "Editar", "Excluir"]
+    },
+    "TELA-024": {
+      "slug": "eventos-detalhe",
+      "tipo": "detalhe guiado — dados do evento",
+      "labels": ["Tipo do evento", "Modelo de motivo", "Motivo", "Data do evento", "Destinos", "Documentos vinculados"],
+      "actions": ["Gerenciar tipos de evento", "Gerenciar modelos de motivo", "Adicionar destino", "Remover destino", "Reordenar destinos", "Vincular ou desvincular documento", "Voltar à lista", "Salvar e avançar", "Reativar evento"]
+    },
+    "TELA-025": {
+      "slug": "eventos-editar",
+      "tipo": "formulário de edição administrativa",
+      "labels": ["Título", "Descrição/objetivo", "Status", "Unidade responsável", "Responsável", "UF do destino", "Cidade do destino", "Data de início", "Data de fim", "Horário de início", "Horário de fim", "Pasta do evento no Google Drive"],
+      "actions": ["Cancelar", "Abrir painel", "Salvar evento"]
+    },
+    "TELA-026": {
+      "slug": "eventos-etapa-1",
+      "tipo": "wizard — etapa 1 Dados do evento",
+      "labels": ["Tipo do evento", "Modelo de motivo", "Motivo", "Data do evento", "Destinos", "Documentos vinculados"],
+      "actions": ["Gerenciar tipos de evento", "Gerenciar modelos de motivo", "Adicionar destino", "Remover destino", "Reordenar destinos", "Vincular ou desvincular documento", "Voltar à lista", "Salvar e avançar"]
+    },
+    "TELA-027": {
+      "slug": "eventos-etapa-2",
+      "tipo": "wizard — etapa 2 Roteiros",
+      "labels": ["Roteiros vinculados"],
+      "actions": ["Abrir roteiro", "Editar roteiro", "Visualizar documento", "Baixar PDF", "Baixar DOCX", "Novo roteiro", "Voltar para lista"]
+    },
+    "TELA-028": {
+      "slug": "eventos-etapa-3",
+      "tipo": "wizard — etapa 3 Ofícios e justificativas",
+      "labels": ["Ofícios vinculados", "Justificativas vinculadas"],
+      "actions": ["Abrir ofício", "Editar ofício", "Visualizar ofício", "Baixar PDF", "Baixar DOCX", "Anexar documento assinado", "Novo ofício", "Voltar para lista"]
+    },
+    "TELA-029": {
+      "slug": "eventos-etapa-4",
+      "tipo": "wizard — etapa 4 Documentos e planejamento",
+      "labels": ["Documentos de solicitação", "Planejamento e autorização"],
+      "actions": ["Anexar documento", "Escolher arquivos", "Anexar documentos", "Abrir documento", "Remover documento", "Novo", "Ordem de Serviço", "Plano de Trabalho", "Voltar para lista"]
+    },
+    "TELA-030": {
+      "slug": "eventos-etapa-5",
+      "tipo": "wizard — etapa 5 Termos",
+      "labels": ["Termos vinculados"],
+      "actions": ["Visualizar termo", "Baixar PDF", "Baixar DOCX", "Anexar documento assinado", "Editar termo", "Excluir termo", "Novo termo", "Voltar para lista"]
+    },
+    "TELA-031": {
+      "slug": "eventos-lista",
+      "tipo": "lista",
+      "labels": ["Buscar eventos", "Filtrar por situação"],
+      "actions": ["Novo evento", "Limpar filtros", "Abrir painel", "Editar evento", "Gerenciar evento", "Cancelar", "Reativar", "Excluir"]
+    },
+    "TELA-032": {
+      "slug": "eventos-novo-form",
+      "tipo": "formulário de criação administrativa",
+      "labels": ["Título", "Descrição/objetivo", "Status", "Unidade responsável", "Responsável", "UF do destino", "Cidade do destino", "Data de início", "Data de fim", "Horário de início", "Horário de fim", "Pasta do evento no Google Drive"],
+      "actions": ["Cancelar", "Salvar evento"]
+    },
+    "TELA-033": {
+      "slug": "roteiros-editar",
+      "tipo": "editor de roteiro",
+      "labels": ["Origem", "Usar evento existente", "Criar roteiro próprio", "Estado sede", "Cidade sede", "Destinos", "Data de saída", "Hora de saída", "Data de chegada", "Hora de chegada", "Retorno", "Com bate-volta diário", "Observações", "Distância ajustada manualmente (km)", "Duração ajustada manualmente (min)", "Justificativa do ajuste manual"],
+      "actions": ["Selecionar evento", "Adicionar destino", "Remover destino", "Reordenar destinos", "Calcular rota", "Aplicar data aos trechos", "Diminuir horário", "Aumentar horário", "Ativar ou desativar bate-volta", "Voltar", "Salvar roteiro"]
+    },
+    "TELA-034": {
+      "slug": "roteiros-lista",
+      "tipo": "lista",
+      "labels": ["Buscar roteiros", "Filtrar por situação"],
+      "actions": ["Novo roteiro", "Limpar filtros", "Editar", "Excluir"]
+    },
+    "TELA-035": {
+      "slug": "roteiros-novo",
+      "tipo": "editor de roteiro",
+      "labels": ["Origem", "Usar evento existente", "Criar roteiro próprio", "Estado sede", "Cidade sede", "Destinos", "Data de saída", "Hora de saída", "Data de chegada", "Hora de chegada", "Retorno", "Com bate-volta diário", "Observações", "Distância ajustada manualmente (km)", "Duração ajustada manualmente (min)", "Justificativa do ajuste manual"],
+      "actions": ["Selecionar evento", "Adicionar destino", "Remover destino", "Reordenar destinos", "Calcular rota", "Aplicar data aos trechos", "Diminuir horário", "Aumentar horário", "Ativar ou desativar bate-volta", "Voltar", "Salvar roteiro"]
+    },
+    "TELA-036": {
+      "slug": "oficios-custeio-outra-instituicao",
+      "tipo": "wizard — estado condicional de Dados e viajantes",
+      "labels": ["Nº do Ofício", "Protocolo", "Custeio", "Nome da Instituição", "Modelo de motivo", "Motivo", "Viajantes", "Motorista"],
+      "actions": ["Gerenciar modelos de motivo", "Novo viajante", "Voltar à lista", "Avançar"]
+    },
+    "TELA-037": {
+      "slug": "oficios-detalhe",
+      "tipo": "wizard — estado atual Dados e viajantes",
+      "labels": ["Nº do Ofício", "Protocolo", "Custeio", "Modelo de motivo", "Motivo", "Viajantes", "Motorista"],
+      "actions": ["Gerenciar modelos de motivo", "Novo viajante", "Voltar à lista", "Avançar"]
+    },
+    "TELA-038": {
+      "slug": "oficios-editar",
+      "tipo": "wizard — edição em Dados e viajantes",
+      "labels": ["Nº do Ofício", "Protocolo", "Custeio", "Modelo de motivo", "Motivo", "Viajantes", "Motorista"],
+      "actions": ["Gerenciar modelos de motivo", "Novo viajante", "Voltar à lista", "Avançar"]
+    },
+    "TELA-039": {
+      "slug": "oficios-lista",
+      "tipo": "lista",
+      "labels": ["Buscar ofícios", "Filtrar por situação", "Ordenar", "Viagem — de", "Viagem — até", "Criação — de", "Criação — até"],
+      "actions": ["Novo ofício", "Limpar filtros", "Abrir", "Editar ou continuar", "Visualizar documento", "Baixar", "Anexar ou gerenciar assinado", "Retificar", "Marcar complementar", "Cancelar", "Excluir"]
+    },
+    "TELA-040": {
+      "slug": "oficios-lista-claro",
+      "tipo": "lista — estado de tema",
+      "labels": ["Buscar ofícios", "Filtrar por situação", "Ordenar", "Viagem — de", "Viagem — até", "Criação — de", "Criação — até"],
+      "actions": ["Novo ofício", "Limpar filtros", "Abrir", "Editar ou continuar", "Visualizar documento", "Baixar", "Anexar ou gerenciar assinado", "Retificar", "Marcar complementar", "Cancelar", "Excluir"]
+    },
+    "TELA-041": {
+      "slug": "oficios-modelos-motivo-editar",
+      "tipo": "formulário de edição de catálogo",
+      "labels": ["Nome", "Texto", "Modelo padrão"],
+      "actions": ["Voltar", "Salvar"]
+    },
+    "TELA-042": {
+      "slug": "oficios-modelos-motivo-lista",
+      "tipo": "lista de catálogo",
+      "labels": ["Buscar modelos de motivo"],
+      "actions": ["Novo modelo", "Limpar busca", "Editar", "Definir como padrão", "Excluir"]
+    },
+    "TELA-043": {
+      "slug": "oficios-modelos-motivo-novo",
+      "tipo": "formulário de criação de catálogo",
+      "labels": ["Nome", "Texto", "Modelo padrão"],
+      "actions": ["Voltar", "Salvar"]
+    },
+    "TELA-044": {
+      "slug": "oficios-motorista-manual",
+      "tipo": "wizard — estado condicional de Transporte",
+      "labels": ["Buscar viatura", "Modelo", "Combustível", "Tipo", "Porte/transporte de armas", "Motorista", "Motorista não cadastrado", "Nome", "CPF", "Ofício de referência", "Protocolo de referência", "É o único policial civil no veículo?"],
+      "actions": ["Nova viatura", "Usar motorista cadastrado", "Voltar à lista", "Voltar", "Avançar"]
+    },
+    "TELA-045": {
+      "slug": "oficios-wizard-dados-viajantes",
+      "tipo": "wizard — etapa Dados e viajantes",
+      "labels": ["Nº do Ofício", "Protocolo", "Custeio", "Modelo de motivo", "Motivo", "Viajantes", "Motorista"],
+      "actions": ["Gerenciar modelos de motivo", "Novo viajante", "Voltar à lista", "Avançar"]
+    },
+    "TELA-046": {
+      "slug": "oficios-wizard-documentos",
+      "tipo": "wizard — etapa Documentos",
+      "labels": ["Ofício", "Termos de autorização", "Justificativa", "Ordem de serviço", "Situação dos documentos"],
+      "actions": ["Voltar", "Salvar rascunho e voltar à lista", "Finalizar Ofício", "Abrir prévia", "Fechar prévia", "Visualizar", "Baixar PDF", "Baixar DOCX", "Anexar ou gerenciar assinado", "Abrir todos os termos"]
+    },
+    "TELA-047": {
+      "slug": "oficios-wizard-justificativa",
+      "tipo": "wizard — etapa Justificativa",
+      "labels": ["Modelo", "Justificativa"],
+      "actions": ["Gerenciar modelos", "Voltar à lista", "Voltar", "Avançar"]
+    },
+    "TELA-048": {
+      "slug": "oficios-wizard-resumo",
+      "tipo": "wizard — alias da etapa Documentos",
+      "labels": ["Resumo do ofício", "Equipe", "Transporte", "Roteiro e diárias", "Justificativa", "Documentos e conferência", "Situação dos documentos"],
+      "actions": ["Voltar à lista", "Voltar", "Salvar rascunho", "Finalizar Ofício", "Abrir prévia", "Fechar prévia", "Visualizar", "Baixar PDF", "Baixar DOCX", "Anexar ou gerenciar assinado", "Abrir todos os termos"]
+    },
+    "TELA-049": {
+      "slug": "oficios-wizard-roteiro",
+      "tipo": "wizard — etapa Roteiro e diárias",
+      "labels": ["Origem", "Usar evento existente", "Criar roteiro próprio", "Estado sede", "Cidade sede", "Destinos", "Data de saída", "Hora de saída", "Data de chegada", "Hora de chegada", "Retorno", "Com bate-volta diário", "Diárias calculadas"],
+      "actions": ["Selecionar evento", "Adicionar destino", "Remover destino", "Reordenar destinos", "Calcular rota", "Aplicar data aos trechos", "Ativar ou desativar bate-volta", "Voltar à lista", "Voltar", "Avançar"]
+    },
+    "TELA-050": {
+      "slug": "oficios-wizard-transporte",
+      "tipo": "wizard — etapa Transporte",
+      "labels": ["Buscar viatura", "Modelo", "Combustível", "Tipo", "Porte/transporte de armas", "Motorista", "Motorista não cadastrado", "É o único policial civil no veículo?"],
+      "actions": ["Nova viatura", "Usar motorista manual", "Voltar à lista", "Voltar", "Avançar"]
+    },
+    "TELA-051": {
+      "slug": "justificativas-editar",
+      "tipo": "lista de modelos — redirecionamento legado de edição",
+      "labels": ["Buscar modelos de justificativa"],
+      "actions": ["Novo modelo", "Editar", "Definir como padrão", "Excluir", "Voltar à justificativa"]
+    },
+    "TELA-052": {
+      "slug": "justificativas-lista",
+      "tipo": "lista",
+      "labels": ["Buscar justificativas"],
+      "actions": ["Cadastrar justificativa", "Limpar busca", "Editar", "Baixar PDF", "Baixar DOCX", "Excluir"]
+    },
+    "TELA-053": {
+      "slug": "justificativas-modelos",
+      "tipo": "lista de catálogo com inclusão rápida",
+      "labels": ["Buscar modelos de justificativa", "Nome", "Texto", "Modelo padrão"],
+      "actions": ["Novo modelo", "Salvar", "Cancelar", "Limpar busca", "Editar", "Definir como padrão", "Excluir"]
+    },
+    "TELA-054": {
+      "slug": "justificativas-novo",
+      "tipo": "lista de modelos — redirecionamento legado de criação",
+      "labels": ["Buscar modelos de justificativa"],
+      "actions": ["Novo modelo", "Editar", "Definir como padrão", "Excluir", "Voltar à justificativa"]
+    },
+    "TELA-055": {
+      "slug": "termo-editar",
+      "tipo": "formulário de edição",
+      "labels": ["Ofício vinculado", "Data de ida", "Data de volta", "Estado", "Cidade", "Destinos extras", "Servidores", "Viatura"],
+      "actions": ["Novo viajante", "Nova viatura", "Adicionar destino", "Remover destino", "Reordenar destinos", "Voltar", "Salvar termo", "Visualizar", "Baixar PDF", "Baixar DOCX"]
+    },
+    "TELA-056": {
+      "slug": "termo-novo",
+      "tipo": "formulário de criação",
+      "labels": ["Ofício vinculado", "Data de ida", "Data de volta", "Estado", "Cidade", "Destinos extras", "Servidores", "Viatura"],
+      "actions": ["Novo viajante", "Nova viatura", "Adicionar destino", "Remover destino", "Reordenar destinos", "Voltar", "Salvar termo"]
+    },
+    "TELA-057": {
+      "slug": "termos-lista",
+      "tipo": "lista",
+      "labels": ["Buscar termos", "Filtrar por situação"],
+      "actions": ["Novo termo", "Limpar filtros", "Editar", "Visualizar", "Baixar", "Anexar ou gerenciar assinado", "Excluir"]
+    },
+    "TELA-058": {
+      "slug": "termos-preview-oficio",
+      "tipo": "prévia e seleção de downloads",
+      "labels": ["Documento", "Origem", "Formato", "Saída"],
+      "actions": ["Voltar", "Visualizar termo", "Selecionar documento", "Original do sistema", "Documento assinado", "PDF", "DOCX", "Separados", "Um arquivo", "Baixar", "Fechar"]
+    },
+    "TELA-059": {
+      "slug": "planos-atividades",
+      "tipo": "wizard — etapa Atividades",
+      "labels": ["Filtrar atividades", "Preset de atividades", "Atividades", "Metas", "Recursos", "Selecionar todas"],
+      "actions": ["Gerenciar atividades", "Gerenciar presets", "Selecionar todas", "Limpar seleção", "Voltar", "Salvar e avançar"]
+    },
+    "TELA-060": {
+      "slug": "planos-atividades-catalogo",
+      "tipo": "lista de catálogo com inclusão rápida",
+      "labels": ["Buscar atividades", "Atividade", "Recursos necessários", "Metas"],
+      "actions": ["Nova atividade", "Salvar", "Cancelar", "Limpar busca", "Editar", "Excluir"]
+    },
+    "TELA-061": {
+      "slug": "planos-documentos",
+      "tipo": "wizard — etapa Documentos",
+      "labels": ["Eventos do plano", "Plano de trabalho", "Situação do documento", "Pendências"],
+      "actions": ["Adicionar evento ao plano", "Editar evento", "Remover evento", "Voltar", "Salvar rascunho", "Finalizar plano", "Visualizar PDF", "Baixar PDF", "Baixar DOCX", "Anexar ou gerenciar assinado"]
+    },
+    "TELA-062": {
+      "slug": "planos-efetivo-diarias",
+      "tipo": "wizard — etapa Efetivo e diárias",
+      "labels": ["Unidade", "Cargo", "Quantidade", "Data de saída da sede", "Hora de saída da sede", "Data de chegada à sede", "Hora de chegada à sede", "Valor total do plano", "Valor por servidor", "Quantidade de diárias", "Efetivo total"],
+      "actions": ["Adicionar efetivo", "Remover efetivo", "Diminuir quantidade", "Aumentar quantidade", "Voltar", "Salvar e avançar"]
+    },
+    "TELA-063": {
+      "slug": "planos-horarios",
+      "tipo": "lista de catálogo com inclusão rápida",
+      "labels": ["Buscar horários", "Horário de início", "Horário de fim"],
+      "actions": ["Novo horário", "Salvar", "Cancelar", "Limpar busca", "Editar", "Excluir"]
+    },
+    "TELA-064": {
+      "slug": "planos-identificacao",
+      "tipo": "wizard — etapa Identificação",
+      "labels": ["Programa", "Outro programa", "Data de início", "Data de fim", "Horário de atendimento", "Estado", "Cidade", "Destinos extras", "Coordenador administrativo", "Cargo", "Gênero", "Coordenador operacional", "Breve contextualização", "Coordenação do evento", "Considerações finais"],
+      "actions": ["Gerenciar programas", "Gerenciar horários", "Gerenciar cargos", "Adicionar destino", "Remover destino", "Reordenar destinos", "Voltar à lista salvando rascunho", "Salvar e avançar"]
+    },
+    "TELA-065": {
+      "slug": "planos-presets",
+      "tipo": "lista de catálogo com inclusão rápida",
+      "labels": ["Buscar presets", "Nome", "Atividades"],
+      "actions": ["Novo preset", "Salvar", "Cancelar", "Limpar busca", "Editar", "Excluir"]
+    },
+    "TELA-066": {
+      "slug": "planos-programas",
+      "tipo": "lista de catálogo com inclusão rápida",
+      "labels": ["Buscar programas", "Nome", "Ativo", "Ordem"],
+      "actions": ["Novo programa", "Salvar", "Cancelar", "Limpar busca", "Editar", "Excluir"]
+    },
+    "TELA-067": {
+      "slug": "planos-trabalho-lista",
+      "tipo": "lista",
+      "labels": ["Buscar planos de trabalho", "Filtrar por situação", "Ordenar", "Viagem — de", "Viagem — até"],
+      "actions": ["Novo plano de trabalho", "Limpar filtros", "Editar ou continuar", "Visualizar", "Baixar", "Anexar ou gerenciar assinado", "Excluir"]
+    },
+    "TELA-068": {
+      "slug": "ordens-servico-lista",
+      "tipo": "lista",
+      "labels": ["Buscar ordens de serviço", "Filtrar por situação", "Ordenar", "Viagem — de", "Viagem — até"],
+      "actions": ["Nova ordem de serviço", "Limpar filtros", "Editar", "Visualizar", "Baixar PDF", "Baixar DOCX", "Anexar ou gerenciar assinado", "Excluir"]
+    },
+    "TELA-069": {
+      "slug": "os-editar",
+      "tipo": "formulário de edição",
+      "labels": ["Ofícios vinculados", "Tipo de necessidade", "Modelo de motivo", "Motivo", "Data de início", "Data de fim", "Estado", "Cidade", "Destinos extras", "Servidores", "Função", "Número"],
+      "actions": ["Gerenciar modelos de motivo", "Adicionar destino", "Remover destino", "Reordenar destinos", "Voltar", "Salvar ordem de serviço", "Visualizar", "Baixar PDF", "Baixar DOCX"]
+    },
+    "TELA-070": {
+      "slug": "os-nova",
+      "tipo": "formulário de criação",
+      "labels": ["Ofícios vinculados", "Tipo de necessidade", "Modelo de motivo", "Motivo", "Data de início", "Data de fim", "Estado", "Cidade", "Destinos extras", "Servidores", "Função", "Número"],
+      "actions": ["Gerenciar modelos de motivo", "Adicionar destino", "Remover destino", "Reordenar destinos", "Voltar", "Salvar ordem de serviço"]
+    },
+    "TELA-071": {
+      "slug": "prestacao-consolidado",
+      "tipo": "consolidado de leitura e download",
+      "labels": ["Documentos por servidor", "Relatório técnico", "Diário de bordo", "Comprovantes", "Situação do pacote"],
+      "actions": ["Voltar", "Visualizar documento", "Baixar por servidor", "Baixar compilado"]
+    },
+    "TELA-072": {
+      "slug": "prestacao-diario",
+      "tipo": "formulário de diário de bordo",
+      "labels": ["Origem", "Destino", "Data e hora", "KM inicial", "KM final", "Necessidade de abastecimento", "Motorista", "Viatura"],
+      "actions": ["Trocar motorista", "Editar trechos", "Definir roteiro", "Visualizar PDF", "Baixar PDF", "Baixar XLSX", "Voltar ao relatório técnico", "Salvar e avançar"]
+    },
+    "TELA-073": {
+      "slug": "prestacao-documentos",
+      "tipo": "formulário de documentos e uploads",
+      "labels": ["Número da solicitação", "Despacho assinado", "Comprovantes", "Relatório técnico assinado", "Diário assinado"],
+      "actions": ["Escolher arquivos", "Pré-visualizar seleção", "Remover seleção", "Anexar", "Abrir arquivo", "Remover arquivo", "Ajustar posição do carimbo", "Finalizar ou arquivar prestação", "Ir ao Consolidado"]
+    },
+    "TELA-074": {
+      "slug": "prestacao-editar-roteiro",
+      "tipo": "editor de roteiro da prestação",
+      "labels": ["Origem", "Estado sede", "Cidade sede", "Destinos", "Data de saída", "Hora de saída", "Data de chegada", "Hora de chegada", "Retorno", "Com bate-volta diário"],
+      "actions": ["Adicionar destino", "Remover destino", "Reordenar destinos", "Calcular rota", "Aplicar data aos trechos", "Ativar ou desativar bate-volta", "Cancelar", "Salvar roteiro"]
+    },
+    "TELA-075": {
+      "slug": "prestacao-modelos-texto",
+      "tipo": "lista de modelos de texto",
+      "labels": ["Buscar modelos de texto", "Campo", "Nome", "Texto", "Modelo padrão"],
+      "actions": ["Novo modelo", "Salvar", "Cancelar", "Limpar busca", "Editar", "Definir como padrão", "Excluir", "Voltar"]
+    },
+    "TELA-076": {
+      "slug": "prestacao-motorista",
+      "tipo": "formulário condicional de motorista e viatura",
+      "labels": ["Motorista", "Do ofício", "Servidor", "Outro ofício", "Servidor deste ofício", "Nome do motorista", "CPF", "Ofício do motorista", "Protocolo do motorista", "Ofício de origem", "Viatura", "Cadastro", "Manual", "Modelo", "Placa", "Tipo", "Combustível"],
+      "actions": ["Cancelar", "Salvar alterações"]
+    },
+    "TELA-077": {
+      "slug": "prestacao-rt",
+      "tipo": "formulário de relatório técnico",
+      "labels": ["Diária", "Translado", "Translado - outro", "Combustível", "Combustível - outro", "Passagem", "Passagem - outro", "Descrição do evento", "Modelo de descrição do evento", "Objetivo da participação", "Modelo de objetivo da participação", "Conclusão", "Modelo de conclusão", "Medidas a serem adotadas pelo órgão", "Modelo de medidas a serem adotadas pelo órgão", "Informações complementares", "Modelo de informações complementares", "Número da solicitação"],
+      "actions": ["Gerenciar modelos de texto", "Visualizar PDF", "Baixar PDF", "Salvar e avançar"]
+    },
+    "TELA-078": {
+      "slug": "prestacoes-contas-lista",
+      "tipo": "lista operacional",
+      "labels": ["Buscar prestações de contas", "Filtrar por situação", "Ordenar"],
+      "actions": ["Limpar filtros", "Abrir prestação", "Continuar relatório técnico", "Abrir diário de bordo", "Abrir documentos", "Abrir consolidado", "Baixar", "Finalizar ou arquivar"]
+    },
+    "TELA-079": {
+      "slug": "protocolos-detalhe",
+      "tipo": "detalhe",
+      "labels": ["Número", "Status", "Situação externa", "Origem", "Órgão", "Local", "Responsável", "Última sincronização", "Documentos", "Pendências", "Assinaturas", "Tramitações", "Movimentações"],
+      "actions": ["Enviar documento", "Sincronizar", "Abrir documento", "Voltar"]
+    },
+    "TELA-080": {
+      "slug": "protocolos-enviar",
+      "tipo": "formulário de upload",
+      "labels": ["Tipo de documento", "Arquivo PDF", "Nome do arquivo", "Gerar e enviar o documento vinculado automaticamente"],
+      "actions": ["Escolher arquivo", "Enviar documento", "Voltar"]
+    },
+    "TELA-081": {
+      "slug": "protocolos-lista",
+      "tipo": "lista",
+      "labels": ["Buscar protocolos", "Status"],
+      "actions": ["Novo protocolo", "Limpar filtros", "Abrir detalhe"]
+    },
+    "TELA-082": {
+      "slug": "protocolos-novo",
+      "tipo": "formulário com dois caminhos",
+      "labels": ["Ofício", "Número do protocolo", "Assunto", "Descrição"],
+      "actions": ["Protocolar ofício", "Cadastrar protocolo", "Voltar"]
+    },
+    "TELA-083": {
+      "slug": "documentos-nucleo",
+      "tipo": "painel de navegação documental",
+      "labels": ["Ofícios", "Termos", "Justificativas", "Planos de Trabalho", "Ordens de Serviço", "Prestações de Contas", "Protocolos"],
+      "actions": ["Abrir Ofícios", "Abrir Termos", "Abrir Justificativas", "Abrir Planos de Trabalho", "Abrir Ordens de Serviço", "Abrir Prestações de Contas", "Abrir Protocolos"]
+    },
+    "TELA-084": {
+      "slug": "area-editar",
+      "tipo": "formulário de edição",
+      "labels": ["Nome da área", "Sigla"],
+      "actions": ["Voltar", "Salvar"]
+    },
+    "TELA-085": {
+      "slug": "areas-lista",
+      "tipo": "lista de administração",
+      "labels": ["Buscar áreas", "Nome da área", "Sigla", "Usuário", "Perfil na área"],
+      "actions": ["Nova área", "Salvar", "Cancelar", "Limpar busca", "Editar", "Vincular usuário", "Desvincular usuário", "Excluir"]
+    },
+    "TELA-086": {
+      "slug": "configuracao",
+      "tipo": "configuração — aba Instituição",
+      "labels": ["Unidade", "CEP", "Logradouro", "Número", "Bairro", "Cidade", "UF", "Telefone", "Ramal (opcional)", "E-mail"],
+      "actions": ["Consultar CEP", "Voltar", "Salvar", "Abrir aba Ofício", "Abrir aba Roteiros"]
+    },
+    "TELA-087": {
+      "slug": "configuracao-oficio",
+      "tipo": "configuração — aba Ofício",
+      "labels": ["Assinante padrão — Ofício", "Assinante padrão — Justificativa", "Assinante padrão — Plano de trabalho", "Assinante padrão — Ordem de serviço", "Destinatário do ofício", "Cargo", "Unidade lotada"],
+      "actions": ["Selecionar ou limpar assinante", "Selecionar destinatário", "Voltar", "Salvar", "Abrir aba Instituição", "Abrir aba Roteiros"]
+    },
+    "TELA-088": {
+      "slug": "configuracao-roteiros",
+      "tipo": "configuração — aba Roteiros e diárias",
+      "labels": ["Faixa", "Vigente a partir de", "Diária de 24 horas", "15%", "30%"],
+      "actions": ["Adicionar valor de diária", "Editar valor", "Excluir valor", "Voltar", "Salvar", "Abrir aba Instituição", "Abrir aba Ofício"]
+    },
+    "TELA-089": {
+      "slug": "usuarios-lista",
+      "tipo": "lista de administração com inclusão rápida",
+      "labels": ["Buscar usuários", "Nome de usuário", "E-mail institucional", "Nome completo", "Senha", "Confirmação", "Área de trabalho", "Perfil na área"],
+      "actions": ["Novo usuário", "Salvar", "Cancelar", "Limpar busca", "Editar", "Vincular usuário", "Desvincular usuário", "Excluir"]
+    }
+  }
+}

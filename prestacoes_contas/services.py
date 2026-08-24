@@ -7,6 +7,7 @@ from datetime import timedelta
 from pathlib import Path
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.utils import timezone
 
@@ -642,6 +643,74 @@ def pendencias_consolidado(servidor_prestacao) -> list[str]:
     if not tem_comprovante:
         pendencias.append(
             "Anexe o comprovante de saque/transferência deste servidor na etapa Documentos.",
+        )
+
+    return pendencias
+
+
+def pendencias_envio_rt_db(servidor_prestacao) -> list[str]:
+    """O que ainda falta para mandar RT e diário em PDF ao servidor por WhatsApp.
+
+    Serve à ação "enviar os documentos assim que estiverem preenchidos"
+    (`NOVO-20260824-173723-37e9862b4c2a`). O critério é o do documento que sai,
+    não o do banco: os campos são todos `blank=True`, então nada impede gerar um
+    RT com os três blocos de texto vazios — o PDF sai, em branco, e é isso que
+    chegaria ao servidor para assinar.
+
+    O diário só entra na conta do motorista, porque só ele o assina; para os
+    demais o envio é do RT sozinho. `abastecimento` é `null=True`, e nulo aqui
+    significa "ninguém respondeu ainda", não "não abasteceu" — por isso conta
+    como pendência, e é justamente o dado que a mensagem de KM foi pedir.
+    """
+    prestacao = servidor_prestacao.prestacao
+    pendencias = []
+
+    try:
+        rt = prestacao.relatorio_tecnico
+    except ObjectDoesNotExist:
+        rt = None
+
+    faltando_rt = [
+        rotulo
+        for campo, rotulo in (
+            ("motivo", "descrição do evento"),
+            ("atividade", "objetivo da participação"),
+            ("conclusao", "conclusão"),
+        )
+        if rt is None or not str(getattr(rt, campo, "") or "").strip()
+    ]
+    if faltando_rt:
+        pendencias.append(
+            "Preencha no Relatório Técnico: " + ", ".join(faltando_rt) + ".",
+        )
+
+    if not servidor_prestacao.is_motorista:
+        return pendencias
+
+    try:
+        diario = prestacao.diario_bordo
+    except ObjectDoesNotExist:
+        diario = None
+
+    if diario is None:
+        pendencias.append("Abra o Diário de Bordo para gerá-lo a partir do roteiro.")
+        return pendencias
+
+    trechos = list(diario.trechos.all())
+    if not trechos:
+        pendencias.append("O Diário de Bordo está sem trechos.")
+        return pendencias
+
+    sem_km = [t for t in trechos if t.km_inicial is None or t.km_final is None]
+    if sem_km:
+        pendencias.append(
+            f"Informe o KM inicial e final de {len(sem_km)} trecho(s) do Diário de Bordo.",
+        )
+    sem_abastecimento = [t for t in trechos if t.abastecimento is None]
+    if sem_abastecimento:
+        pendencias.append(
+            f"Responda se houve abastecimento em {len(sem_abastecimento)} "
+            "trecho(s) do Diário de Bordo.",
         )
 
     return pendencias

@@ -45,6 +45,7 @@ class ResultadoAnexo:
     """O que a operação gravou. A view traduz isto em `messages` ou em JSON."""
 
     anexo: PrestacaoDocumentoAnexo | None = None
+    anexos: tuple[PrestacaoDocumentoAnexo, ...] = ()
     substituidos: int = 0
 
 
@@ -108,6 +109,41 @@ def substituir_anexo_assinado(
     else:
         marcar_servidores_pendentes(prestacao)
     return ResultadoAnexo(anexo=anexo, substituidos=substituidos)
+
+
+@transaction.atomic
+def adicionar_anexos_assinados(
+    prestacao,
+    *,
+    tipo,
+    arquivos,
+    servidor_prestacao=None,
+) -> ResultadoAnexo:
+    """Acrescenta todos os arquivos escolhidos sem apagar a lista existente.
+
+    ``NOVO-20260824-190347-271fdb6ec194``: o modal é uma coleção de anexos,
+    não um campo de substituição. A lista de pares ``(arquivo, nome_original)``
+    entra numa única transação para que uma falha de banco não deixe apenas uma
+    parte da seleção salva.
+    """
+    criados = tuple(
+        PrestacaoDocumentoAnexo.objects.create(
+            prestacao=prestacao,
+            servidor_prestacao=servidor_prestacao,
+            tipo=tipo,
+            arquivo=arquivo,
+            nome_original=nome_original,
+        )
+        for arquivo, nome_original in arquivos
+    )
+    if servidor_prestacao is not None:
+        marcar_servidor_em_preenchimento(servidor_prestacao)
+    else:
+        marcar_servidores_pendentes(prestacao)
+    return ResultadoAnexo(
+        anexo=criados[-1] if criados else None,
+        anexos=criados,
+    )
 
 
 @transaction.atomic

@@ -11713,3 +11713,64 @@ Os cinco cartões entregavam corretamente a URL privada do anexo em `data-src`, 
 inline. Abrir um `<details>` jamais promovia `data-src` para `src`, deixando o `iframe` vazio.
 A etapa agora inclui `oficios-documentos-inline.js`, como as demais telas que usam o mesmo
 componente, e o teste de origem exige essa dependência. Validado no navegador com um PDF real.
+
+### NOVO-20260824-171506-f3e537697e71 ✅ RESOLVIDO · `NOVO` Ofício sem protocolo saía do rascunho e criava prestação de contas · BE/QA · risco alto
+
+O protocolo não era um gate central: o modelo aceitava qualquer status, o sinal criava a
+prestação ao adicionar servidores e a lista oferecia ações documentais mesmo com o campo vazio.
+Assim, um ofício sem eProtocolo podia aparentar estar em andamento, entrar no fluxo de prestação
+e alcançar geradores por chamadas diretas. A regra agora é aplicada no modelo, no sincronizador,
+nos seletores e no serviço documental: protocolo ausente força `RASCUNHO`, não cria nem expõe
+prestação, oculta as ações de documento e impede a geração no servidor. As massas antigas que
+representavam ofícios emitidos passaram a declarar protocolo explicitamente. Testes:
+`oficios/tests/test_protocolo_obrigatorio_novo.py`.
+
+### NOVO-20260824-173723-37e9862b4c2a ✅ RESOLVIDO · `NOVO` Coleta de KM e entrega de RT/diário ficavam fora do sistema · PY/HT/JS · risco baixo
+
+Duas etapas da prestação não tinham lugar na tela e eram feitas à mão, fora do sistema. A
+primeira: o KM de cada trecho do diário de bordo só existe no odômetro, e pedi-lo ao motorista
+era uma mensagem digitada do zero, sem os trechos à vista — o aviso de liberação de diárias já
+ia para a mesma pessoa, no mesmo momento, e não levava o pedido junto. A segunda: entregar o RT
+e o diário preenchidos ao signatário só era possível pelo link de assinatura eletrônica; quem
+preferisse mandar o arquivo baixava os PDFs e anexava por fora, sem nada indicando se os
+documentos já estavam preenchidos.
+
+O aviso de liberação do motorista passa a levar um segundo bloco listando os trechos do roteiro,
+com KM inicial, KM final e abastecimento em cada um — na ordem em que `sincronizar_trechos` cria
+as linhas do diário, para a resposta chegar na ordem do preenchimento. Só o motorista o recebe.
+
+O mesmo menu ganhou o envio dos documentos. `pendencias_envio_rt_db` é o gate: os campos do RT
+são todos `blank=True`, então nada no banco impedia gerar e mandar um relatório em branco. Com
+pendência o item aparece desabilitado dizendo o que falta, em vez de sumir. O diário só entra na
+conta de quem o assina.
+
+Os PDFs vão anexados de verdade pela Web Share API — um link de WhatsApp carrega só texto, não
+existe parâmetro de anexo. Onde a API não existe (parte dos desktops), a queda baixa os arquivos,
+abre a conversa e AVISA que o anexo ficou por conta do operador: em silêncio, a mensagem sairia
+sem documento nenhum. `document-download.js` passou a publicar `CV.documentFiles`, que baixa o
+documento como dado pela mesma fila de geração assíncrona do download normal, e `overlay.js`
+passou a exportar `triggerForMenu`, que já existia em duas cópias privadas.
+
+Testes: `prestacoes_contas/test_envio_docs_wa.py`. Verificado no navegador com dados reais
+(ofício 157/2026): mensagem de KM montada com os dois trechos e item de envio desabilitado
+listando as pendências do registro.
+
+### NOVO-20260824-183926-6f29061f01d0 ✅ RESOLVIDO · `NOVO` Excluir anexo fechava o modal antes da substituição · JS/QA · risco baixo
+
+O modal de documentos assinados recarregava toda a página depois de excluir um anexo. A
+exclusão funcionava, mas o diálogo era destruído e o usuário precisava localizar novamente a
+prestação e a aba antes de escolher o arquivo substituto. O componente agora limpa localmente o
+documento persistido, atualiza o payload do gatilho e mantém o modal aberto no mesmo tipo, com o
+seletor pronto para a substituição. Teste: `static/js/components/attach-signed-modal.test.js`.
+
+### NOVO-20260824-190347-271fdb6ec194 ✅ RESOLVIDO · `NOVO` Modal limitava cada tipo de documento a um único anexo · BE/JS/UI · risco médio
+
+O seletor do modal aceitava somente um arquivo e o JavaScript conservava apenas `files[0]` em
+cada aba. Mesmo enviando um segundo arquivo, o serviço apagava todas as linhas anteriores do
+mesmo tipo antes da gravação. Agora cada aba mantém uma lista de arquivos, aceita seleção
+múltipla e envia a coleção em uma única requisição. O backend valida o lote inteiro antes de
+gravar e acrescenta todos os anexos em uma transação, preservando os já existentes. Os anexos
+persistidos são devolvidos no payload como lista e cada linha mantém visualização e exclusão
+próprias. Testes: `prestacoes_contas/test_upload_validacao.py`,
+`prestacoes_contas/test_anexos_transacao_be14.py`, `prestacoes_contas/tests.py` e
+`static/js/components/attach-signed-modal.test.js`.

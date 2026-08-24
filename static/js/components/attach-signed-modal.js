@@ -2,7 +2,6 @@
   "use strict";
 
   var activeTrigger = null;
-  var currentRemoveUrl = "";
   var BOUND = "data-attach-signed-bound";
   /* JS-02 — uma entrada por modal vivo: { root, desmontar }. */
   var instancias = [];
@@ -61,6 +60,9 @@
     var currentName = modal.querySelector("[data-attach-signed-current-name]");
     var currentMeta = modal.querySelector("[data-attach-signed-current-meta]");
     var currentOpen = modal.querySelector("[data-attach-signed-current-open]");
+    var currentList = modal.querySelector("[data-attach-signed-current-list]");
+    var currentTemplate = modal.querySelector("[data-attach-signed-current-template]");
+    var placeholderRow = modal.querySelector("[data-attach-signed-placeholder-row]");
     var kindSelector = modal.querySelector("[data-attach-signed-kind-selector]");
     var kindOptions = modal.querySelector("[data-attach-signed-kind-options]");
     var fileDescription = modal.querySelector("[data-attach-signed-file-description]");
@@ -104,7 +106,7 @@
 
     function arquivosPendentes() {
       return kindsAtivos.filter(function (item) {
-        return !!arquivosSelecionados[item.key];
+        return !!(arquivosSelecionados[item.key] && arquivosSelecionados[item.key].length);
       });
     }
 
@@ -121,7 +123,9 @@
         kindOptions.querySelectorAll("[data-attach-signed-kind]"),
         function (button) {
           var kind = button.getAttribute("data-attach-signed-kind");
-          var temArquivo = !!arquivosSelecionados[kind];
+          var temArquivo = !!(
+            arquivosSelecionados[kind] && arquivosSelecionados[kind].length
+          );
           var status = button.querySelector("[data-attach-signed-kind-status]");
           button.classList.toggle("has-file", temArquivo);
           if (status) status.hidden = !temArquivo;
@@ -129,11 +133,11 @@
       );
     }
 
-    function substituirArquivoDoPicker(file) {
+    function substituirArquivosDoPicker(files) {
       if (!fileInput) return;
       trocaProgramatica = true;
       if (window.CV.filePicker && window.CV.filePicker.replaceFiles) {
-        window.CV.filePicker.replaceFiles(fileInput, file ? [file] : [], true);
+        window.CV.filePicker.replaceFiles(fileInput, files || [], true);
       } else {
         fileInput.value = "";
         fileInput.dispatchEvent(new Event("change", { bubbles: true }));
@@ -142,15 +146,15 @@
     }
 
     function clearSelectedFile() {
-      substituirArquivoDoPicker(null);
+      substituirArquivosDoPicker([]);
     }
 
     function guardarSelecaoAtual() {
       if (!kindAtual || !fileInput) return;
-      var arquivo = fileInput.files && fileInput.files.length
-        ? fileInput.files[0]
-        : null;
-      if (arquivo) arquivosSelecionados[kindAtual] = arquivo;
+      var arquivos = fileInput.files
+        ? Array.prototype.slice.call(fileInput.files)
+        : [];
+      if (arquivos.length) arquivosSelecionados[kindAtual] = arquivos;
       else delete arquivosSelecionados[kindAtual];
       atualizarBotoesDeTipo();
       atualizarAcaoDeUpload();
@@ -161,12 +165,20 @@
         return item.key === kind;
       })[0];
       if (!achado) return null;
+      var atuais = Array.isArray(achado.current_attachments)
+        ? achado.current_attachments
+        : [];
+      if (!atuais.length && achado.current_name) {
+        atuais = [{
+          name: achado.current_name,
+          view_url: achado.current_view_url || "",
+          remove_url: achado.current_remove_url || "",
+        }];
+      }
       return {
         url: achado.url || "",
         label: achado.doc_label || "este documento",
-        currentName: achado.current_name || "",
-        currentViewUrl: achado.current_view_url || "",
-        currentRemoveUrl: achado.current_remove_url || "",
+        currentAttachments: atuais,
       };
     }
 
@@ -185,25 +197,45 @@
        escolher uma substituição, o `file-picker.js` passa a controlar o nome e
        estas ações somem; ao limpar a seleção, o anexo atual volta para a mesma
        linha, sem criar um segundo card abaixo do campo. */
+    function renderizarAnexosPersistidos() {
+      if (!currentList || !currentTemplate) return;
+      currentList.innerHTML = "";
+      var atuais = documentoAtual ? documentoAtual.currentAttachments : [];
+      atuais.forEach(function (anexo) {
+        var row = currentTemplate.content.firstElementChild.cloneNode(true);
+        var name = row.querySelector("[data-attach-signed-list-name]");
+        var open = row.querySelector("[data-attach-signed-list-open]");
+        var remove = row.querySelector("[data-attach-signed-remove]");
+        if (name) name.textContent = anexo.name || "Documento anexado";
+        if (open) open.setAttribute("href", anexo.view_url || "#");
+        if (remove) remove.setAttribute(
+          "data-attach-signed-remove-url",
+          anexo.remove_url || ""
+        );
+        currentList.appendChild(row);
+      });
+      currentList.hidden = !atuais.length;
+    }
+
     function sincronizarDocumentoAtual() {
       if (!currentName) return;
       var temSelecao = !!(
         fileInput && fileInput.files && fileInput.files.length
       );
-      var temAtual = !!(documentoAtual && documentoAtual.currentName);
+      var temAtual = !!(
+        documentoAtual && documentoAtual.currentAttachments.length
+      );
       var mostrarAtual = temAtual && !temSelecao;
 
       if (!temSelecao) {
-        currentName.textContent = temAtual
-          ? documentoAtual.currentName
-          : currentName.getAttribute("data-default-label") || "Nenhum arquivo selecionado";
-        currentName.classList.toggle(
-          "prestacao-file-picker__value--selected",
-          temAtual
-        );
+        currentName.textContent = currentName.getAttribute("data-default-label")
+          || "Nenhum arquivo selecionado";
+        currentName.classList.remove("prestacao-file-picker__value--selected");
       }
-      if (currentBlock) currentBlock.hidden = !mostrarAtual;
-      if (currentMeta) currentMeta.hidden = !mostrarAtual;
+      if (placeholderRow) placeholderRow.hidden = mostrarAtual;
+      if (currentBlock) currentBlock.hidden = true;
+      if (currentMeta) currentMeta.hidden = true;
+      renderizarAnexosPersistidos();
     }
 
     function selectDocument(kind, preserveCurrentFile) {
@@ -215,9 +247,8 @@
       if (label) label.textContent = data.label;
       kindAtual = kind;
       documentoAtual = data;
-      currentRemoveUrl = data.currentRemoveUrl;
-      if (currentOpen) currentOpen.setAttribute("href", data.currentViewUrl || "#");
-      substituirArquivoDoPicker(arquivosSelecionados[kind] || null);
+      if (currentOpen) currentOpen.setAttribute("href", "#");
+      substituirArquivosDoPicker(arquivosSelecionados[kind] || []);
       sincronizarDocumentoAtual();
       updateReturnUrl(kind);
 
@@ -269,7 +300,6 @@
       window.CV.overlay.closeDialog(modal);
       activeTrigger = null;
       documentoAtual = null;
-      currentRemoveUrl = "";
       kindAtual = "";
       arquivosSelecionados = Object.create(null);
       clearSelectedFile();
@@ -348,10 +378,54 @@
       });
     }
 
-    function removeCurrentSigned() {
-      if (!currentRemoveUrl || !form) return;
+    function limparDocumentoPersistidoAtual(removeUrl) {
+      var itemAtual = kindsAtivos.filter(function (item) {
+        return item.key === kindAtual;
+      })[0];
+      if (itemAtual) {
+        itemAtual.current_attachments = (itemAtual.current_attachments || []).filter(
+          function (anexo) { return anexo.remove_url !== removeUrl; }
+        );
+        var ultimo = itemAtual.current_attachments[itemAtual.current_attachments.length - 1];
+        itemAtual.current_name = ultimo ? ultimo.name : "";
+        itemAtual.current_view_url = ultimo ? ultimo.view_url : "";
+        itemAtual.current_remove_url = ultimo ? ultimo.remove_url : "";
+      }
+
+      if (documentoAtual) {
+        documentoAtual.currentAttachments = documentoAtual.currentAttachments.filter(
+          function (anexo) { return anexo.remove_url !== removeUrl; }
+        );
+      }
+      if (currentOpen) currentOpen.setAttribute("href", "#");
+
+      /* NOVO-20260824-183926-6f29061f01d0 — sem recarregar a página, o
+         gatilho também precisa esquecer o anexo removido. Assim fechar e abrir
+         novamente o mesmo modal não ressuscita o nome e as ações antigas. */
+      if (activeTrigger) {
+        if (activeTrigger.hasAttribute("data-attach-signed-kinds")) {
+          activeTrigger.setAttribute(
+            "data-attach-signed-kinds",
+            JSON.stringify(kindsAtivos)
+          );
+        } else {
+          activeTrigger.setAttribute("data-attach-signed-current-name", "");
+          activeTrigger.setAttribute("data-attach-signed-current-view-url", "");
+          activeTrigger.setAttribute("data-attach-signed-current-remove-url", "");
+        }
+      }
+
+      sincronizarDocumentoAtual();
+      atualizarAcaoDeUpload();
+    }
+
+    function removeCurrentSigned(removeButton) {
+      var removeUrl = removeButton
+        ? removeButton.getAttribute("data-attach-signed-remove-url") || ""
+        : "";
+      if (!removeUrl || !form) return;
       limparErro();
-      window.CV.http.request(currentRemoveUrl, {
+      window.CV.http.request(removeUrl, {
         method: "POST",
         form: form,
       }).then(function (response) {
@@ -375,7 +449,10 @@
           recusa.paraUsuario = true;
           throw recusa;
         }
-        window.location.reload();
+        /* A exclusão é parte da troca de arquivo. Recarregar fechava o modal e
+           obrigava o usuário a reencontrar a prestação e o tipo do documento.
+           Atualizamos somente o estado persistido e mantemos o picker aberto. */
+        limparDocumentoPersistidoAtual(removeUrl);
       }).catch(function (error) {
         /* E sem `.catch` a falha de rede não removia, não recarregava e não
            avisava: o clique simplesmente não fazia nada. */
@@ -411,9 +488,10 @@
         return;
       }
 
-      if (!modal.hidden && event.target.closest("[data-attach-signed-remove]")) {
+      var removeButton = event.target.closest("[data-attach-signed-remove]");
+      if (!modal.hidden && removeButton) {
         event.preventDefault();
-        removeCurrentSigned();
+        removeCurrentSigned(removeButton);
         return;
       }
 
@@ -472,6 +550,9 @@
       }
 
       var enviados = 0;
+      var totalArquivos = pendentes.reduce(function (total, item) {
+        return total + arquivosSelecionados[item.key].length;
+      }, 0);
 
       /* O motivo da recusa vem do servidor, não do número do status.
          `NOVO-20260824-133423-35fbd4d59a84`: a view agora responde
@@ -496,7 +577,9 @@
       pendentes.reduce(function (promessa, item) {
         return promessa.then(function () {
           var payload = new FormData();
-          payload.append("arquivo", arquivosSelecionados[item.key]);
+          arquivosSelecionados[item.key].forEach(function (arquivo) {
+            payload.append("arquivo", arquivo);
+          });
           if (nextInput && nextInput.value) payload.append("next", nextInput.value);
           return window.CV.http.request(item.url, {
             method: "POST",
@@ -504,9 +587,9 @@
             body: payload,
           }).then(function (response) {
             if (!response.ok) return recusaDoServidor(response, item);
-            enviados += 1;
+            enviados += arquivosSelecionados[item.key].length;
             delete arquivosSelecionados[item.key];
-            if (item.key === kindAtual) substituirArquivoDoPicker(null);
+            if (item.key === kindAtual) substituirArquivosDoPicker([]);
             atualizarBotoesDeTipo();
           });
         });
@@ -523,7 +606,7 @@
           );
         }
         var prefixo = enviados
-          ? enviados + " de " + pendentes.length + " arquivo(s) foram anexados. "
+          ? enviados + " de " + totalArquivos + " arquivo(s) foram anexados. "
           : "";
         mostrarErro(
           prefixo + (error && error.paraUsuario

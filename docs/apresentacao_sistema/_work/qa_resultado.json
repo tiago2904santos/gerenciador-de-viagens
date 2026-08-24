@@ -1,0 +1,19 @@
+{
+  "pptx": {
+    "slides": 1193,
+    "out_of_bounds": [],
+    "empty_textboxes": [],
+    "min_explicit_font_pt": 8.0
+  },
+  "ppt_pdf_pages": 1193,
+  "manual_pdf_pages": 315,
+  "rendered_slides": 1193,
+  "stale_ignored_slide_renders": 0,
+  "slide_contact_sheets": 75,
+  "manual_contact_sheets": 16,
+  "sizes": {
+    "Apresentacao_Completa_Sistema.pptx": 6238503,
+    "Apresentacao_Completa_Sistema.pdf": 11183035,
+    "Manual_Funcional_Completo.pdf": 7308582
+  }
+}

@@ -59,6 +59,26 @@ class UploadAssinadoValidacaoTests(PrestacaoFixturesMixin, TestCase):
             1,
         )
 
+    def test_varios_arquivos_do_mesmo_tipo_sao_salvos_na_mesma_acao(self):
+        response = self.client.post(
+            reverse(
+                "prestacoes_contas:prestacao_despacho_assinado_anexar",
+                args=[self.fixture.prestacao.pk],
+            ),
+            {"arquivo": [arquivo("parte-1.pdf"), arquivo("parte-2.pdf")]},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            list(
+                PrestacaoDocumentoAnexo.objects.filter(
+                    prestacao=self.fixture.prestacao,
+                    tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO,
+                ).values_list("nome_original", flat=True)
+            ),
+            ["parte-1.pdf", "parte-2.pdf"],
+        )
+
     def test_extensao_pdf_com_conteudo_que_nao_e_pdf_e_recusada(self):
         response = self._anexar_despacho(arquivo(conteudo=NAO_E_PDF))
 

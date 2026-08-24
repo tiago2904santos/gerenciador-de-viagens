@@ -1,0 +1,497 @@
+[
+  {
+    "slug": "eventos-etapa-1",
+    "path": "/eventos/1/guiado/etapa-1/",
+    "status": "ok",
+    "dialogs": 3,
+    "fields": 32,
+    "forms": 5,
+    "h1": [
+      "OPERACAO INSTITUCIONAL DEMONSTRATIVA"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nOPERACAO INSTITUCIONAL DEMONSTRATIVA\nVoltar para lista\n1\nDados do evento\nAtual\nRoteiros\nConcluída\nOfícios / Justificat",
+    "title": "OPERACAO INSTITUCIONAL DEMONSTRATIVA",
+    "url": "/eventos/1/guiado/etapa-1/",
+    "bytes": 108240
+  },
+  {
+    "slug": "eventos-etapa-2",
+    "path": "/eventos/1/guiado/etapa-2/",
+    "status": "ok",
+    "dialogs": 3,
+    "fields": 7,
+    "forms": 4,
+    "h1": [
+      "OPERACAO INSTITUCIONAL DEMONSTRATIVA"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nOPERACAO INSTITUCIONAL DEMONSTRATIVA\nVoltar para lista\nDados do evento\nConcluída\n2\nRoteiros\nAtual\nOfícios / Justificat",
+    "title": "OPERACAO INSTITUCIONAL DEMONSTRATIVA",
+    "url": "/eventos/1/guiado/etapa-2/",
+    "bytes": 45789
+  },
+  {
+    "slug": "eventos-etapa-3",
+    "path": "/eventos/1/guiado/etapa-3/",
+    "status": "ok",
+    "dialogs": 3,
+    "fields": 8,
+    "forms": 5,
+    "h1": [
+      "OPERACAO INSTITUCIONAL DEMONSTRATIVA"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nOPERACAO INSTITUCIONAL DEMONSTRATIVA\nVoltar para lista\nDados do evento\nConcluída\nRoteiros\nConcluída\n3\nOfícios / Justif",
+    "title": "OPERACAO INSTITUCIONAL DEMONSTRATIVA",
+    "url": "/eventos/1/guiado/etapa-3/",
+    "bytes": 70726
+  },
+  {
+    "slug": "eventos-etapa-4",
+    "path": "/eventos/1/guiado/etapa-4/",
+    "status": "ok",
+    "dialogs": 3,
+    "fields": 7,
+    "forms": 4,
+    "h1": [
+      "OPERACAO INSTITUCIONAL DEMONSTRATIVA"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nOPERACAO INSTITUCIONAL DEMONSTRATIVA\nVoltar para lista\nDados do evento\nConcluída\nRoteiros\nConcluída\nOfícios / Justific",
+    "title": "OPERACAO INSTITUCIONAL DEMONSTRATIVA",
+    "url": "/eventos/1/guiado/etapa-4/",
+    "bytes": 62633
+  },
+  {
+    "slug": "eventos-etapa-5",
+    "path": "/eventos/1/guiado/etapa-5/",
+    "status": "ok",
+    "dialogs": 3,
+    "fields": 7,
+    "forms": 4,
+    "h1": [
+      "OPERACAO INSTITUCIONAL DEMONSTRATIVA"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nOPERACAO INSTITUCIONAL DEMONSTRATIVA\nVoltar para lista\nDados do evento\nConcluída\nRoteiros\nConcluída\nOfícios / Justific",
+    "title": "OPERACAO INSTITUCIONAL DEMONSTRATIVA",
+    "url": "/eventos/1/guiado/etapa-5/",
+    "bytes": 46521
+  },
+  {
+    "slug": "eventos-editar",
+    "path": "/eventos/1/editar/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 16,
+    "forms": 2,
+    "h1": [
+      "Editar Evento"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nEditar Evento\n\nIdentificação, destino, período e documentos do evento.\n\nCancelar\nAbrir painel do evento\nInformações do",
+    "title": "Editar Evento",
+    "url": "/eventos/1/editar/",
+    "bytes": 108188
+  },
+  {
+    "slug": "tipos-evento",
+    "path": "/eventos/tipos/",
+    "status": "ok",
+    "dialogs": 1,
+    "fields": 5,
+    "forms": 4,
+    "h1": [
+      "Tipos de evento"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nTipos de evento\n+\nCadastrar tipo\nNenhum registro cadastrado\n\nNenhum tipo de evento cadastrado ainda.\n\nVoltar aos event",
+    "title": "Tipos de evento",
+    "url": "/eventos/tipos/",
+    "bytes": 38757
+  },
+  {
+    "slug": "planos-novo",
+    "path": "/planos-trabalho/novo/",
+    "status": "ok",
+    "dialogs": 1,
+    "fields": 9,
+    "forms": 4,
+    "h1": [
+      "Planos de Trabalho"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nPlanos de Trabalho\nFiltrar por situação\nNúmero: maior\nPeríodo\n01/2026/ASCOM · LONDRINA/PR · 14/09/2026 a 15/09/2026\nGe",
+    "title": "Planos de Trabalho",
+    "url": "/planos-trabalho/",
+    "bytes": 41709
+  },
+  {
+    "slug": "planos-identificacao",
+    "path": "/planos-trabalho/1/identificacao/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 31,
+    "forms": 2,
+    "h1": [
+      "Identificação e atuação"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nIdentificação e atuação\nDados do evento\n1\nIdentificação e atuação\nConcluída\nEfetivo e diárias\nConcluída\nAtividades, me",
+    "title": "Plano de Trabalho",
+    "url": "/planos-trabalho/1/identificacao/",
+    "bytes": 218119
+  },
+  {
+    "slug": "planos-efetivo-diarias",
+    "path": "/planos-trabalho/1/efetivo-diarias/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 19,
+    "forms": 2,
+    "h1": [
+      "Efetivo e diárias"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nEfetivo e diárias\nDados do evento\nIdentificação e atuação\nConcluída\n2\nEfetivo e diárias\nConcluída\nAtividades, metas e ",
+    "title": "Plano de Trabalho",
+    "url": "/planos-trabalho/1/efetivo-diarias/",
+    "bytes": 84595
+  },
+  {
+    "slug": "planos-atividades",
+    "path": "/planos-trabalho/1/atividades/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 5,
+    "forms": 2,
+    "h1": [
+      "Atividades, metas e recursos"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nAtividades, metas e recursos\nDados do evento\nIdentificação e atuação\nConcluída\nEfetivo e diárias\nConcluída\n3\nAtividade",
+    "title": "Plano de Trabalho",
+    "url": "/planos-trabalho/1/atividades/",
+    "bytes": 72427
+  },
+  {
+    "slug": "planos-documentos",
+    "path": "/planos-trabalho/1/documentos/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 2,
+    "forms": 2,
+    "h1": [
+      "Resumo e documentos"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nResumo e documentos\nDados do evento\nIdentificação e atuação\nConcluída\nEfetivo e diárias\nConcluída\nAtividades, metas e ",
+    "title": "Plano de Trabalho",
+    "url": "/planos-trabalho/1/documentos/",
+    "bytes": 61540
+  },
+  {
+    "slug": "planos-programas",
+    "path": "/planos-trabalho/programas/",
+    "status": "ok",
+    "dialogs": 1,
+    "fields": 7,
+    "forms": 4,
+    "h1": [
+      "Programas solicitantes"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nProgramas solicitantes\n+\nNovo programa\nPCPR NA COMUNIDADE\n\n10\n\nVoltar",
+    "title": "Programas solicitantes",
+    "url": "/planos-trabalho/programas/",
+    "bytes": 36290
+  },
+  {
+    "slug": "planos-horarios",
+    "path": "/planos-trabalho/horarios/",
+    "status": "ok",
+    "dialogs": 1,
+    "fields": 7,
+    "forms": 4,
+    "h1": [
+      "Horários de atendimento"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nHorários de atendimento\n+\nNovo horário\n08:00 ate 12:00\nVoltar",
+    "title": "Horários de atendimento",
+    "url": "/planos-trabalho/horarios/",
+    "bytes": 35785
+  },
+  {
+    "slug": "planos-atividades-catalogo",
+    "path": "/planos-trabalho/atividades/",
+    "status": "ok",
+    "dialogs": 1,
+    "fields": 7,
+    "forms": 4,
+    "h1": [
+      "Gerenciamento de atividades"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nGerenciamento de atividades\n+\nNova atividade\nConfeccao da Carteira de Identidade Nacional\n\nKit biometrico, notebook, i",
+    "title": "Gerenciamento de atividades",
+    "url": "/planos-trabalho/atividades/",
+    "bytes": 42452
+  },
+  {
+    "slug": "planos-presets",
+    "path": "/planos-trabalho/presets/",
+    "status": "ok",
+    "dialogs": 1,
+    "fields": 6,
+    "forms": 4,
+    "h1": [
+      "Gerenciamento de presets"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nGerenciamento de presets\n+\nNovo modelo\nATIVIDADES DEMONSTRATIVAS 1\nPadrão\n\n1 · Confeccao da Carteira de Identidade Nac",
+    "title": "Gerenciamento de presets",
+    "url": "/planos-trabalho/presets/",
+    "bytes": 38997
+  },
+  {
+    "slug": "os-nova",
+    "path": "/ordens-servico/nova/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 21,
+    "forms": 2,
+    "h1": [
+      "Nova Ordem de Serviço"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nNova Ordem de Serviço\n\nVincule ofícios ou preencha os dados abaixo.\n\nVoltar a lista\nDados da ordem de serviço\n\nOfícios",
+    "title": "Nova Ordem de Serviço",
+    "url": "/ordens-servico/nova/",
+    "bytes": 132966
+  },
+  {
+    "slug": "os-editar",
+    "path": "/ordens-servico/1/editar/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 21,
+    "forms": 2,
+    "h1": [
+      "Editar OS 001/2026"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nEditar OS 001/2026\n\nAltere os dados e salve para gerar o documento de novo.\n\nDados do evento\nDados da ordem de serviço",
+    "title": "Editar OS 001/2026",
+    "url": "/ordens-servico/1/editar/",
+    "bytes": 137726
+  },
+  {
+    "slug": "protocolos-lista",
+    "path": "/protocolos/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 3,
+    "forms": 2,
+    "h1": [
+      "Central de Protocolos"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\n\nModo demonstração: os protocolos abaixo são simulados e nenhuma chamada real ao eProtocolo é feita. Configure as cred",
+    "title": "Central de Protocolos",
+    "url": "/protocolos/",
+    "bytes": 64930
+  },
+  {
+    "slug": "protocolos-novo",
+    "path": "/protocolos/novo/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 9,
+    "forms": 3,
+    "h1": [],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\n\nModo demonstração: o protocolo será criado com número simulado, sem chamada real ao eProtocolo.\n\nNovo protocolo\n\nProt",
+    "title": "Novo protocolo",
+    "url": "/protocolos/novo/",
+    "bytes": 53367
+  },
+  {
+    "slug": "protocolos-vincular",
+    "path": "/protocolos/vincular/",
+    "status": "erro",
+    "error": "Error: Browser Use cannot open http://127.0.0.1:8016/protocolos/vincular/ in tab 1. Browser reported: net::ERR_HTTP_RESPONSE_CODE_FAILURE",
+    "url": "http://127.0.0.1:8016/protocolos/novo/"
+  },
+  {
+    "slug": "protocolos-detalhe",
+    "path": "/protocolos/1/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 2,
+    "forms": 2,
+    "h1": [],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\n\nModo demonstração: este protocolo é simulado e as ações não chamam o eProtocolo real.\n\nProtocolo 2026.000001-DEMO\n\nVi",
+    "title": "Protocolo 2026.000001-DEMO",
+    "url": "/protocolos/1/",
+    "bytes": 62248
+  },
+  {
+    "slug": "protocolos-enviar",
+    "path": "/protocolos/1/enviar-documento/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 6,
+    "forms": 2,
+    "h1": [],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\n\nModo demonstração: o envio é simulado e registrado localmente, sem chamada real ao eProtocolo.\n\nEnviar documento — 20",
+    "title": "Enviar documento — 2026.000001-DEMO",
+    "url": "/protocolos/1/enviar-documento/",
+    "bytes": 45615
+  },
+  {
+    "slug": "prestacao-documentos",
+    "path": "/prestacoes-contas/servidor-prestacao/1/documentos/",
+    "status": "ok",
+    "dialogs": 1,
+    "fields": 6,
+    "forms": 3,
+    "h1": [
+      "Documentos — MARIANA LOPES FERREIRA"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nDocumentos — MARIANA LOPES FERREIRA\nVoltar à lista\nRelatório Técnico\nConcluído\nDiário de Bordo\nConcluído\n3\nDocumentos\n",
+    "title": "Documentos — MARIANA LOPES FERREIRA",
+    "url": "/prestacoes-contas/servidor-prestacao/1/documentos/",
+    "bytes": 93781
+  },
+  {
+    "slug": "prestacao-rt",
+    "path": "/prestacoes-contas/servidor-prestacao/1/rt/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 19,
+    "forms": 2,
+    "h1": [
+      "Relatório Técnico — MARIANA LOPES FERREIRA"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nRelatório Técnico — MARIANA LOPES FERREIRA\nVoltar à lista\n1\nRelatório Técnico\nEm edição\n2\nDiário de Bordo\nA seguir\n3\nD",
+    "title": "Relatório Técnico — MARIANA LOPES FERREIRA",
+    "url": "/prestacoes-contas/servidor-prestacao/1/rt/",
+    "bytes": 165944
+  },
+  {
+    "slug": "prestacao-diario",
+    "path": "/prestacoes-contas/servidor-prestacao/1/diario/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 16,
+    "forms": 2,
+    "h1": [
+      "Diário de Bordo — MARIANA LOPES FERREIRA"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nDiário de Bordo — MARIANA LOPES FERREIRA\nVoltar à lista\nRelatório Técnico\nConcluído\n2\nDiário de Bordo\nEm edição\n3\nDocu",
+    "title": "Diário de Bordo — MARIANA LOPES FERREIRA",
+    "url": "/prestacoes-contas/servidor-prestacao/1/diario/",
+    "bytes": 109508
+  },
+  {
+    "slug": "prestacao-consolidado",
+    "path": "/prestacoes-contas/servidor-prestacao/1/consolidado/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 1,
+    "forms": 1,
+    "h1": [
+      "PDF Final — MARIANA LOPES FERREIRA"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nPDF Final — MARIANA LOPES FERREIRA\nVoltar à lista\nRelatório Técnico\nConcluído\nDiário de Bordo\nConcluído\nDocumentos\nCon",
+    "title": "PDF Final — MARIANA LOPES FERREIRA",
+    "url": "/prestacoes-contas/servidor-prestacao/1/consolidado/",
+    "bytes": 85188
+  },
+  {
+    "slug": "prestacao-downloads",
+    "path": "/prestacoes-contas/servidor-prestacao/1/downloads/",
+    "status": "erro",
+    "error": "Error: Browser Use cannot open http://127.0.0.1:8016/prestacoes-contas/servidor-prestacao/1/downloads/ in tab 1. Browser reported: net::ERR_BLOCKED_BY_CLIENT",
+    "url": "http://127.0.0.1:8016/prestacoes-contas/servidor-prestacao/1/consolidado/"
+  },
+  {
+    "slug": "prestacao-motorista",
+    "path": "/prestacoes-contas/servidor-prestacao/1/diario/motorista/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 18,
+    "forms": 2,
+    "h1": [
+      "Trocar motorista / viatura"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nTrocar motorista / viatura\nVoltar ao diário\nRelatório Técnico\nConcluído\n2\nDiário de Bordo\nEm edição\n3\nDocumentos\nA seg",
+    "title": "Trocar motorista / viatura",
+    "url": "/prestacoes-contas/servidor-prestacao/1/diario/motorista/",
+    "bytes": 66332
+  },
+  {
+    "slug": "prestacao-editar-roteiro",
+    "path": "/prestacoes-contas/servidor-prestacao/1/diario/editar-roteiro/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 80,
+    "forms": 2,
+    "h1": [
+      "Editar roteiro"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nEditar roteiro\n\nSede, destinos, trechos, retorno e diárias na mesma tela.\n\nVoltar\nRoteiro e diárias\n\nOrigem, percurso,",
+    "title": "Editar roteiro",
+    "url": "/roteiros/6/editar/",
+    "bytes": 213225
+  },
+  {
+    "slug": "prestacao-modelos-texto",
+    "path": "/prestacoes-contas/modelos-texto/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 8,
+    "forms": 3,
+    "h1": [
+      "Modelos de texto do RT"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nModelos de texto do RT\n+\nNovo modelo\nDescrição do evento\nObjetivo da participação\nConclusão\nMedidas a serem adotadas p",
+    "title": "Modelos de texto do RT",
+    "url": "/prestacoes-contas/modelos-texto/",
+    "bytes": 42675
+  },
+  {
+    "slug": "termo-novo",
+    "path": "/termos/novo/",
+    "status": "ok",
+    "dialogs": 0,
+    "fields": 16,
+    "forms": 2,
+    "h1": [
+      "Novo termo de autorização"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nNovo termo de autorização\n\nVincule um ofício ou preencha os dados abaixo.\n\nVoltar a lista\nDados do termo\n\nOfício, even",
+    "title": "Cadastro de termo",
+    "url": "/termos/novo/",
+    "bytes": 101086
+  },
+  {
+    "slug": "termo-editar",
+    "path": "/termos/1/editar/",
+    "status": "ok",
+    "dialogs": 1,
+    "fields": 22,
+    "forms": 2,
+    "h1": [
+      "Editar termo de autorização"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nEditar termo de autorização\n\nAltere os dados e salve para gerar os documentos de novo.\n\nDados do evento\nDados do termo",
+    "title": "Cadastro de termo",
+    "url": "/termos/1/editar/",
+    "bytes": 131129
+  },
+  {
+    "slug": "termo-downloads",
+    "path": "/termos/1/downloads/",
+    "status": "erro",
+    "error": "Error: Browser Use cannot open http://127.0.0.1:8016/termos/1/downloads/ in tab 1. Browser reported: net::ERR_BLOCKED_BY_CLIENT",
+    "url": "http://127.0.0.1:8016/termos/1/editar/"
+  },
+  {
+    "slug": "justificativas-modelos",
+    "path": "/justificativas/modelos/",
+    "status": "ok",
+    "dialogs": 1,
+    "fields": 6,
+    "forms": 4,
+    "h1": [
+      "Modelos de justificativa"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nModelos de justificativa\n+\nNovo modelo\nPRAZO EXTERNO\nPadrão\n\nA demanda decorre de agenda definida por orgao parceiro, ",
+    "title": "Modelos de justificativa",
+    "url": "/justificativas/modelos/",
+    "bytes": 40962
+  }
+]

@@ -1,0 +1,13 @@
+documentacao.sqlite3
+media_documentacao/
+static_documentacao/
+referencias_render/
+imagens_otimizadas/
+slides_renderizados/
+manual_renderizado/
+qa_slides/
+qa_manual/
+Manual_Funcional_Completo.docx
+server.log
+server.err.log
+server.pid

@@ -1,7 +1,7 @@
 """Remover documento assinado falhava em silêncio — e pior, mentia (NOVO-23).
 
 `attach-signed-modal.js` faz a única chamada AJAX deste modal:
-`CV.http.request(currentRemoveUrl, { method: 'POST' }).then(reload)`. Eram dois
+`CV.http.request(currentRemoveUrl, { method: 'POST' })`. Eram dois
 buracos no mesmo lugar:
 
 1. **Sem `.catch`.** Falha de rede não removia, não recarregava e não avisava —
@@ -17,8 +17,9 @@ buracos no mesmo lugar:
 O segundo é o grave: silêncio é ruim, mas confirmar uma remoção que não
 aconteceu é pior — é o tipo de coisa que só aparece numa auditoria de documento.
 
-A view (`documentos:artefato_assinado_remover`) responde com redirect, então
-`response.ok` só é falso quando algo deu errado de verdade.
+A view responde JSON ao autosave, então `response.ok` só é falso quando algo
+deu errado de verdade. No sucesso, o componente atualiza o modal localmente:
+recarregar a página fecharia o diálogo antes de o usuário anexar o substituto.
 
 O teste é estático porque o projeto não roda JavaScript no CI (`JS-03`). Ele não
 substitui a reprodução no navegador — guarda o padrão que a reprodução provou
@@ -76,12 +77,12 @@ class RemoverAssinadoNaoMenteTests(SimpleTestCase):
             "remoção tivesse dado certo",
         )
         self.assertIn("new Error(", corpo)
-        # O throw precisa vir ANTES do reload, senão a página recarrega assim mesmo.
+        # O throw precisa vir ANTES da limpeza, senão um erro apagaria o anexo da UI.
         self.assertRegex(corpo, r"\bthrow\s+\w+;")
         self.assertLess(
             re.search(r"\bthrow\s+\w+;", corpo).start(),
-            corpo.index("window.location.reload()"),
-            "o `throw` tem que barrar o reload, não vir depois dele",
+            corpo.index("limparDocumentoPersistidoAtual(removeUrl)"),
+            "o `throw` tem que barrar a limpeza local, não vir depois dela",
         )
 
     def test_falha_de_rede_avisa_na_tela_e_no_log(self):
@@ -134,11 +135,17 @@ class RemoverAssinadoNaoMenteTests(SimpleTestCase):
 class RemocaoContinuaAcontecendoTests(SimpleTestCase):
     """A rede que impede 'consertar' o defeito desligando a remoção."""
 
-    def test_o_post_e_o_reload_seguem_no_lugar(self):
+    def test_o_post_segue_e_o_modal_e_atualizado_sem_reload(self):
         corpo = _corpo_de("removeCurrentSigned")
-        self.assertIn("window.CV.http.request(currentRemoveUrl", corpo)
+        self.assertIn("window.CV.http.request(removeUrl", corpo)
         self.assertIn('method: "POST"', corpo)
-        self.assertIn("window.location.reload()", corpo)
+        self.assertIn("limparDocumentoPersistidoAtual(removeUrl)", corpo)
+        self.assertNotIn("window.location.reload()", corpo)
+
+        limpeza = _corpo_de("limparDocumentoPersistidoAtual")
+        self.assertIn("itemAtual.current_attachments", limpeza)
+        self.assertIn("anexo.remove_url !== removeUrl", limpeza)
+        self.assertIn('data-attach-signed-kinds', limpeza)
 
 
 class AnexoAtualIntegradoAoPickerTests(SimpleTestCase):
@@ -148,21 +155,22 @@ class AnexoAtualIntegradoAoPickerTests(SimpleTestCase):
         self.assertIn(':current_attachment="True"', modal)
         self.assertNotIn('class="person-list attach-signed__current"', modal)
 
-    def test_acoes_do_anexo_atual_moram_na_linha_principal_do_picker(self):
+    def test_acoes_dos_anexos_atuais_moram_na_lista_do_picker(self):
         picker = FILE_PICKER.read_text(encoding="utf-8")
-        inicio_linha = picker.index('<li class="file-picker__row">')
-        fim_linha = picker.index("</li>", inicio_linha)
-        linha = picker[inicio_linha:fim_linha]
 
-        self.assertIn("data-file-picker-name", linha)
-        self.assertIn("data-attach-signed-current-name", linha)
-        self.assertIn("data-attach-signed-current", linha)
-        self.assertIn("data-attach-signed-current-open", linha)
-        self.assertIn("data-attach-signed-remove", linha)
+        self.assertIn("data-file-picker-name", picker)
+        self.assertIn("data-attach-signed-current-list", picker)
+        self.assertIn("data-attach-signed-current-template", picker)
+        self.assertIn("data-attach-signed-list-open", picker)
+        self.assertIn("data-attach-signed-remove", picker)
 
-    def test_selecao_nova_oculta_temporariamente_as_acoes_do_anexo_atual(self):
+    def test_selecao_nova_preserva_a_lista_dos_anexos_atuais(self):
         corpo = _corpo_de("sincronizarDocumentoAtual")
 
         self.assertIn("fileInput.files.length", corpo)
-        self.assertIn("currentBlock.hidden = !mostrarAtual", corpo)
-        self.assertIn("currentMeta.hidden = !mostrarAtual", corpo)
+        self.assertIn("placeholderRow.hidden = mostrarAtual", corpo)
+        self.assertIn("renderizarAnexosPersistidos()", corpo)
+
+        renderizacao = _corpo_de("renderizarAnexosPersistidos")
+        self.assertIn("documentoAtual.currentAttachments", renderizacao)
+        self.assertIn("currentList.hidden = !atuais.length", renderizacao)

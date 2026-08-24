@@ -34,7 +34,9 @@ class DiagnosticarRoteirosAjustadosTests(TestCase):
 
     def test_copia_identica_e_marcada_como_segura(self):
         original = self._roteiro_com_destino()
-        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, roteiro=original)
+        oficio = Oficio.objects.create(
+            area=area_de_teste(), numero=1, ano=2026, protocolo="123456781", roteiro=original
+        )
         copia = clonar_roteiro(original)
         oficio.servidores.add(self.servidor)
         prestacao = PrestacaoContas.objects.get(oficio=oficio)
@@ -48,7 +50,9 @@ class DiagnosticarRoteirosAjustadosTests(TestCase):
 
     def test_copia_alterada_e_marcada_como_divergente(self):
         original = self._roteiro_com_destino(observacoes="ORIGINAL")
-        oficio = Oficio.objects.create(area=area_de_teste(), numero=2, ano=2026, roteiro=original)
+        oficio = Oficio.objects.create(
+            area=area_de_teste(), numero=2, ano=2026, protocolo="123456782", roteiro=original
+        )
         copia = clonar_roteiro(original)
         copia.observacoes = "AJUSTADO"
         copia.save(update_fields=["observacoes"])

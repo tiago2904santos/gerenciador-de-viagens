@@ -472,7 +472,7 @@ class PrestacaoAssinadoUploadTests(TestCase):
         self.ps_motorista = self.prestacao.servidores_prestacao.get(servidor=self.motorista)
         self.ps_servidor = self.prestacao.servidores_prestacao.get(servidor=self.servidor)
 
-    def test_anexa_e_substitui_despacho_assinado(self):
+    def test_anexa_varios_despachos_assinados_sem_substituir(self):
         url = reverse(
             "prestacoes_contas:prestacao_despacho_assinado_anexar",
             args=[self.prestacao.pk],
@@ -497,8 +497,11 @@ class PrestacaoAssinadoUploadTests(TestCase):
                 servidor_prestacao=None,
                 tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO,
             )
-            self.assertEqual(anexos.count(), 1)
-            self.assertEqual(anexos.get().nome_original, "despacho-2.pdf")
+            self.assertEqual(anexos.count(), 2)
+            self.assertEqual(
+                list(anexos.values_list("nome_original", flat=True)),
+                ["despacho-1.pdf", "despacho-2.pdf"],
+            )
 
     def test_diario_assinado_pode_ser_anexado_por_qualquer_servidor_e_e_compartilhado(self):
         tipo = PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO
@@ -537,8 +540,11 @@ class PrestacaoAssinadoUploadTests(TestCase):
                 servidor_prestacao=None,
                 tipo=tipo,
             )
-            self.assertEqual(anexos.count(), 1)
-            self.assertEqual(anexos.get().nome_original, "diario-motorista.pdf")
+            self.assertEqual(anexos.count(), 2)
+            self.assertEqual(
+                list(anexos.values_list("nome_original", flat=True)),
+                ["diario-servidor.pdf", "diario-motorista.pdf"],
+            )
 
             # O que importa é o compartilhamento: os DOIS cards do ofício
             # anunciam o mesmo diário assinado. Antes isso era medido pelo nome
@@ -554,8 +560,11 @@ class PrestacaoAssinadoUploadTests(TestCase):
             ]
             self.assertEqual(len(diarios), 2)
             self.assertEqual(
-                [k["current_name"] for k in diarios],
-                ["diario-motorista.pdf", "diario-motorista.pdf"],
+                [[a["name"] for a in k["current_attachments"]] for k in diarios],
+                [
+                    ["diario-servidor.pdf", "diario-motorista.pdf"],
+                    ["diario-servidor.pdf", "diario-motorista.pdf"],
+                ],
             )
 
     def test_rejeita_formato_de_documento_nao_suportado(self):
@@ -686,7 +695,7 @@ class PrestacaoAssinadoUploadTests(TestCase):
             self.assertNotContains(fragmento, "data-attach-signed-trigger")
             self.assertContains(fragmento, "diaria-wa-menu-", count=1)
             self.assertContains(fragmento, 'data-tone="whatsapp"', count=2)
-            self.assertContains(fragmento, 'data-tone="neutral"', count=1)
+            self.assertContains(fragmento, 'data-tone="neutral"', count=2)
         # `H-03`: era medido pelo nome dos atributos ordinais
         # (`...-secondary-url`, `...-tertiary-option-label`). O contrato de
         # verdade é *quais* documentos a ação única do card oferece e com que
@@ -706,10 +715,11 @@ class PrestacaoAssinadoUploadTests(TestCase):
             )
             self.assertEqual(len({kind["url"] for kind in payload}), 5)
         self.assertContains(response, "data-attach-signed-kinds", count=2)
-        self.assertContains(response, "Anexar arquivos", count=2)
+        # Dois gatilhos dos cards e uma ação no rodapé do modal compartilhado.
+        self.assertContains(response, "Anexar arquivos", count=3)
         self.assertContains(
             response,
-            "As escolhas são mantidas ao trocar de aba.",
+            "Selecione um ou mais arquivos por tipo. As escolhas são mantidas ao trocar de aba.",
             count=2,
         )
         self.assertContains(response, "data-attach-signed-kind-selector", count=1)

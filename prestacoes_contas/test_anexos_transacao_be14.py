@@ -51,7 +51,7 @@ def arquivo(nome="assinado.pdf", conteudo=PDF):
 
 
 class UploadDeAssinadoNaoPodeDestruirOAnteriorTests(PrestacaoFixturesMixin, TestCase):
-    """Substituir um documento assinado não pode custar o que já estava lá."""
+    """Acrescentar documentos assinados não pode custar o que já estava lá."""
 
     def setUp(self):
         super().setUp()
@@ -74,7 +74,7 @@ class UploadDeAssinadoNaoPodeDestruirOAnteriorTests(PrestacaoFixturesMixin, Test
             {"arquivo": arquivo("despacho-novo.pdf")},
         )
 
-    def test_substituicao_bem_sucedida_troca_o_anexo(self):
+    def test_upload_bem_sucedido_acrescenta_o_anexo(self):
         caminho_antigo = Path(self.anterior.arquivo.path)
         self.assertTrue(caminho_antigo.exists())
 
@@ -83,8 +83,11 @@ class UploadDeAssinadoNaoPodeDestruirOAnteriorTests(PrestacaoFixturesMixin, Test
         restantes = PrestacaoDocumentoAnexo.objects.filter(
             prestacao=self.prestacao, tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO
         )
-        self.assertEqual(restantes.count(), 1)
-        self.assertEqual(restantes.first().nome_original, "despacho-novo.pdf")
+        self.assertEqual(restantes.count(), 2)
+        self.assertEqual(
+            list(restantes.values_list("nome_original", flat=True)),
+            ["despacho-antigo.pdf", "despacho-novo.pdf"],
+        )
 
     def test_falha_ao_criar_o_novo_nao_pode_destruir_o_anterior(self):
         """**Perda de dado, e reprova hoje.**

@@ -28,6 +28,7 @@ from documentos.services.document_cache import build_document_cache_key
 from documentos.services.document_cache import build_template_cache_signature
 from documentos.services.document_cache import get_cached_document_artifact
 from documentos.services.document_cache import read_artifact_file_bytes
+from documentos.services.exceptions import DocumentValidationError
 from documentos.services.facade import build_default_facade
 from documentos.services.pdf_engine import resolve_pdf_engine
 from documentos.services.persistence import persist_geracao
@@ -847,9 +848,7 @@ def redirect_para_corrigir_documento_oficio(oficio):
 def gerar_resposta_documento_oficio(oficio, formato: DocumentoFormato):
     avaliacao = validar_oficio_para_documento(oficio)
     if avaliacao["pendencias"]:
-        from django.core.exceptions import ValidationError
-
-        raise ValidationError(
+        raise DocumentValidationError(
             "O ofício não pode ser gerado enquanto houver pendências: "
             + " ".join(avaliacao["pendencias"])
         )

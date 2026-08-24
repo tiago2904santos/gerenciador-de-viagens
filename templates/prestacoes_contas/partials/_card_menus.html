@@ -1,9 +1,10 @@
 {% comment %}
 Corpo do menu de um card de prestação, servido por `prestacoes_contas:card_menus` (PF-04).
 
-O fragmento contém somente o aviso de liberação por WhatsApp. Os documentos
-assinados são gerenciados pela ação consolidada do rodapé do card; não existe
-mais um segundo botão de documentos na linha do servidor.
+O fragmento contém o aviso de liberação por WhatsApp e o envio de RT/diário em
+PDF pela mesma conversa. Os documentos ASSINADOS continuam sendo gerenciados
+pela ação consolidada do rodapé do card; não existe mais um segundo botão de
+documentos na linha do servidor.
 
 O card traz um servidor só (`"servidores": [servidor]` no presenter), mas o laço
 fica: é ele que dá nome ao `id` do menu.
@@ -23,5 +24,34 @@ tela; o nome permanece no `aria_label` para identificar essa relação.
   <c-v2.menu_button hook="data-diaria-wa-send" data-wa-app="normal" title="WhatsApp" description="Abrir no aplicativo pessoal" icon="whatsapp-modern" icon_tone="whatsapp" />
   <c-v2.menu_button hook="data-diaria-wa-send" data-wa-app="business" title="WhatsApp Business" description="Abrir no aplicativo profissional" icon="whatsapp-business" icon_tone="whatsapp" />
   <c-v2.menu_button hook="data-diaria-wa-copy" title="Copiar mensagem" description="Copiar o texto para a área de transferência" icon="copy-modern" icon_tone="neutral" />
+  {% comment %}
+    `NOVO-20260824-173723-37e9862b4c2a` — envio dos documentos prontos.
+
+    Item separado do aviso de liberação porque o momento é outro: o aviso sai
+    quando a diária é liberada, este sai quando RT e diário já estão
+    preenchidos. O gate é do servidor (`envio_docs_ok`), calculado por
+    `pendencias_envio_rt_db` a cada abertura do menu — o menu é servido sob
+    demanda, então o estado nunca fica velho na tela.
+
+    Desabilitado ele CONTINUA visível e diz o que falta: item que some é item
+    que o operador procura sem achar.
+  {% endcomment %}
+  {% if servidor.envio_docs_ok %}
+    <c-v2.menu_button
+      hook="data-docs-wa-send"
+      title="{% if servidor.is_motorista %}Enviar RT e Diário de Bordo{% else %}Enviar Relatório Técnico{% endif %}"
+      description="Anexar o PDF e abrir o WhatsApp"
+      icon="whatsapp-modern"
+      icon_tone="whatsapp"
+    />
+  {% else %}
+    <c-v2.menu_button
+      title="{% if servidor.is_motorista %}Enviar RT e Diário de Bordo{% else %}Enviar Relatório Técnico{% endif %}"
+      description="{{ servidor.envio_docs_motivo }}"
+      icon="whatsapp-modern"
+      icon_tone="neutral"
+      aria-disabled="true"
+    />
+  {% endif %}
 </c-v2.menu>
 {% endfor %}

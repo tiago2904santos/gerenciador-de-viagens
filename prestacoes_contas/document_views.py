@@ -18,7 +18,7 @@ from .forms import PrestacaoDespachoForm, PrestacaoServidorDocumentosForm, Prest
 from .models import PrestacaoDocumentoAnexo
 from .presenters import _anexo_assinado_info
 from .anexo_services import excluir_anexo
-from .anexo_services import substituir_anexo_assinado
+from .anexo_services import adicionar_anexos_assinados
 from .carimbo_services import anexo_do_oficio_assinado
 from .carimbo_services import caixas_para_ajuste
 from .carimbo_services import preparar_e_carimbar
@@ -297,43 +297,50 @@ def _prestacao_assinado_upload(
     prestacao,
     tipo,
     servidor_prestacao=None,
-    substituir_todos_do_tipo=False,
     pos_anexo=None,
 ):
     fallback_url = reverse("prestacoes_contas:index")
     destino = voltar_para(request, fallback_url)
-    arquivo = request.FILES.get("arquivo")
-    if not arquivo:
+    arquivos = request.FILES.getlist("arquivo")
+    if not arquivos:
         return _upload_recusado(
             request,
             destino,
             ["Selecione um arquivo PDF para anexar."],
         )
 
-    nome_original = Path(getattr(arquivo, "name", "") or "").name
     # QA-04: a política central (tamanho, magic bytes, bomba de descompressão,
     # antivírus) precisa rodar antes de qualquer escrita. Conferir só o sufixo
     # aceitava arquivo que mente sobre o próprio conteúdo — e ele ainda era
     # sincronizado com o Google Drive depois.
-    try:
-        validate_private_document_upload(arquivo)
-    except ValidationError as exc:
-        return _upload_recusado(request, destino, list(exc.messages))
+    recebidos = []
+    for arquivo in arquivos:
+        nome_original = Path(getattr(arquivo, "name", "") or "").name
+        try:
+            validate_private_document_upload(arquivo)
+        except ValidationError as exc:
+            return _upload_recusado(request, destino, list(exc.messages))
+        recebidos.append((arquivo, nome_original))
 
-    # A validação vem antes da exclusão dos anteriores de propósito: recusar um
-    # arquivo novo não pode custar o que já estava anexado.
-    resultado = substituir_anexo_assinado(
+    # A validação do lote inteiro vem antes da gravação: recusar um dos arquivos
+    # não pode deixar somente parte da seleção anexada.
+    resultado = adicionar_anexos_assinados(
         prestacao,
         tipo=tipo,
-        arquivo=arquivo,
-        nome_original=nome_original,
+        arquivos=recebidos,
         servidor_prestacao=servidor_prestacao,
-        substituir_todos_do_tipo=substituir_todos_do_tipo,
     )
-    if pos_anexo is not None and resultado.anexo is not None:
-        pos_anexo(resultado.anexo)
+    if pos_anexo is not None:
+        for anexo in resultado.anexos:
+            pos_anexo(anexo)
     else:
-        messages.success(request, "Documento assinado anexado.")
+        quantidade = len(resultado.anexos)
+        messages.success(
+            request,
+            "Documento assinado anexado."
+            if quantidade == 1
+            else f"{quantidade} documentos assinados anexados.",
+        )
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         # Sem renderizar o destino, as `messages` sobrevivem na sessão e aparecem
         # no recarregamento que o modal dispara — inclusive os avisos do carimbo,
@@ -442,7 +449,6 @@ def prestacao_servidor_assinado_anexar(request, ps_pk, tipo):
         prestacao=servidor_prestacao.prestacao,
         servidor_prestacao=None if diario_compartilhado else servidor_prestacao,
         tipo=tipo,
-        substituir_todos_do_tipo=diario_compartilhado,
     )
 
 

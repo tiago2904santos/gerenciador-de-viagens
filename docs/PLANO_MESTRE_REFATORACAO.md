@@ -793,3 +793,9 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       Documentos para `input__control` e cobre o contrato visual com teste de regressão.
 - [x] `NOVO-20260824-161320-71689d5c7db0` restaura a hidratação preguiçosa dos cinco
       visualizadores da etapa Documentos e impede novos `iframe`s presos em `about:blank`.
+- [x] `NOVO-20260824-171506-f3e537697e71` torna o protocolo gate central do ofício: sua
+      ausência força rascunho e bloqueia tanto documentos quanto prestação de contas.
+- [x] `NOVO-20260824-183926-6f29061f01d0` mantém o modal de anexos aberto após excluir um
+      documento e deixa o mesmo tipo pronto para receber o arquivo substituto.
+- [x] `NOVO-20260824-190347-271fdb6ec194` converte cada tipo do modal em uma lista de anexos,
+      com seleção múltipla, persistência em lote e ações independentes por arquivo.

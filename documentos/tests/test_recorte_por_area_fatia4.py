@@ -51,7 +51,11 @@ class RecorteChegaNosQuatroModelosTests(TestCase):
                 # `prestacoes_contas/signals.py` cria a prestação no `post_save`
                 # do ofício; criar outra aqui estoura o `unique` de `oficio_id`.
                 oficio = Oficio.objects.create(
-                    area=area, numero=next(contador) + 1, ano=2026, assunto="X",
+                    area=area,
+                    numero=next(contador) + 1,
+                    ano=2026,
+                    protocolo="123456789",
+                    assunto="X",
                 )
                 return PrestacaoContas.all_objects.get(oficio=oficio)
 
@@ -244,7 +248,13 @@ class PrestacaoNasceNaAreaDoOficioTests(TestCase):
         with sem_request():
             # O `post_save` do ofício já cria a prestação; é justamente ela que o
             # `get_or_create` da segunda chamada precisa encontrar.
-            oficio = Oficio.objects.create(area=self.outra, numero=6, ano=2026, assunto="X")
+            oficio = Oficio.objects.create(
+                area=self.outra,
+                numero=6,
+                ano=2026,
+                protocolo="123456789",
+                assunto="X",
+            )
 
         with com_request(self.area):
             _sincronizar_prestacao_servidores(oficio)

@@ -46,8 +46,18 @@ function montarModal() {
           <span data-file-picker-action-label></span>
           <span data-attach-signed-current-name data-default-label="Nenhum arquivo selecionado"></span>
           <small data-attach-signed-current-meta hidden></small>
-          <span data-attach-signed-current hidden></span>
+          <span data-attach-signed-current hidden>
+            <button type="button" data-attach-signed-remove>Excluir</button>
+          </span>
           <a data-attach-signed-current-open></a>
+          <ul data-attach-signed-current-list hidden></ul>
+          <template data-attach-signed-current-template>
+            <li data-attach-signed-current-row>
+              <strong data-attach-signed-list-name></strong>
+              <a data-attach-signed-list-open></a>
+              <button type="button" data-attach-signed-remove>Excluir</button>
+            </li>
+          </template>
         </div>
         <p data-attach-signed-error hidden></p>
         <button type="submit" data-file-upload-button disabled></button>
@@ -56,7 +66,20 @@ function montarModal() {
 
   const kinds = [
     { key: "oficio", option_label: "Ofício assinado", doc_label: "o ofício", url: "/oficio/" },
-    { key: "despacho", option_label: "Despacho", doc_label: "o despacho", url: "/despacho/" },
+    {
+      key: "despacho",
+      option_label: "Despacho",
+      doc_label: "o despacho",
+      url: "/despacho/",
+      current_name: "despacho-assinado.pdf",
+      current_view_url: "/despacho/abrir/",
+      current_remove_url: "/despacho/excluir/",
+      current_attachments: [{
+        name: "despacho-assinado.pdf",
+        view_url: "/despacho/abrir/",
+        remove_url: "/despacho/excluir/",
+      }],
+    },
     { key: "relatorio", option_label: "Relatório técnico", doc_label: "o relatório", url: "/relatorio/" },
   ];
   const trigger = document.querySelector("#abrir");
@@ -65,16 +88,16 @@ function montarModal() {
   return { trigger, kinds };
 }
 
-function selecionarArquivo(nome) {
+function selecionarArquivos(...nomes) {
   const picker = document.querySelector("[data-file-picker]");
   const input = picker.querySelector('input[type="file"]');
-  const file = new File([nome], nome, { type: "application/pdf" });
-  replaceFiles(input, [file], false);
+  const files = nomes.map((nome) => new File([nome], nome, { type: "application/pdf" }));
+  replaceFiles(input, files, false);
   picker.dispatchEvent(new CustomEvent("cv:file-picker:change", {
     bubbles: true,
-    detail: { files: [file], input },
+    detail: { files, input },
   }));
-  return file;
+  return files;
 }
 
 describe("modal de anexos assinados", () => {
@@ -86,16 +109,16 @@ describe("modal de anexos assinados", () => {
     window.CV.documentProgress.begin.mockClear();
   });
 
-  it("mantém um arquivo por aba e envia todas as escolhas em uma única ação", async () => {
+  it("mantém vários arquivos por aba e envia todas as escolhas em uma única ação", async () => {
     const { trigger } = montarModal();
     registration[1](document);
     trigger.click();
 
-    selecionarArquivo("oficio.pdf");
+    selecionarArquivos("oficio.pdf", "oficio-anexo.png");
     document.querySelector('[data-attach-signed-kind="despacho"]').click();
-    selecionarArquivo("despacho.pdf");
+    selecionarArquivos("despacho.pdf");
     document.querySelector('[data-attach-signed-kind="relatorio"]').click();
-    selecionarArquivo("relatorio.pdf");
+    selecionarArquivos("relatorio.pdf");
 
     expect(
       Array.from(document.querySelectorAll("[data-attach-signed-kind-status]"))
@@ -118,14 +141,18 @@ describe("modal de anexos assinados", () => {
       "/despacho/",
       "/relatorio/",
     ]);
-    expect(httpRequest.mock.calls.map((call) => call[1].body.get("arquivo").name)).toEqual([
+    expect(httpRequest.mock.calls.map((call) => call[1].body.getAll("arquivo").map((f) => f.name))).toEqual([
+      ["oficio.pdf", "oficio-anexo.png"],
+      ["despacho.pdf"],
+      ["relatorio.pdf"],
+    ]);
+    expect(httpRequest.mock.calls[0][1].body.getAll("arquivo").map((f) => f.name)).toEqual([
       "oficio.pdf",
-      "despacho.pdf",
-      "relatorio.pdf",
+      "oficio-anexo.png",
     ]);
     await vi.waitFor(() => {
       expect(document.querySelector("[data-attach-signed-error]").textContent).toContain(
-        "2 de 3 arquivo(s) foram anexados"
+        "3 de 4 arquivo(s) foram anexados"
       );
     });
   });
@@ -135,9 +162,9 @@ describe("modal de anexos assinados", () => {
     registration[1](document);
     trigger.click();
 
-    selecionarArquivo("oficio.pdf");
+    selecionarArquivos("oficio.pdf");
     document.querySelector('[data-attach-signed-kind="despacho"]').click();
-    selecionarArquivo("despacho.pdf");
+    selecionarArquivos("despacho.pdf");
 
     httpRequest.mockResolvedValueOnce({
       ok: false,
@@ -168,12 +195,42 @@ describe("modal de anexos assinados", () => {
     registration[1](document);
     trigger.click();
 
-    selecionarArquivo("oficio.pdf");
+    selecionarArquivos("oficio.pdf", "oficio-2.pdf");
     document.querySelector('[data-attach-signed-kind="despacho"]').click();
-    selecionarArquivo("despacho.pdf");
+    selecionarArquivos("despacho.pdf");
     document.querySelector('[data-attach-signed-kind="oficio"]').click();
 
-    expect(document.querySelector('input[type="file"]').files[0].name).toBe("oficio.pdf");
+    expect(Array.from(document.querySelector('input[type="file"]').files).map((f) => f.name))
+      .toEqual(["oficio.pdf", "oficio-2.pdf"]);
     expect(document.querySelector("[data-file-upload-button]").disabled).toBe(false);
+  });
+
+  it("mantém o modal aberto e pronto para substituir o anexo excluído", async () => {
+    const { trigger } = montarModal();
+    registration[1](document);
+    trigger.click();
+    document.querySelector('[data-attach-signed-kind="despacho"]').click();
+
+    expect(document.querySelector("[data-attach-signed-list-name]").textContent)
+      .toBe("despacho-assinado.pdf");
+    expect(document.querySelector("[data-attach-signed-current-list]").hidden).toBe(false);
+    httpRequest.mockResolvedValueOnce({ ok: true, status: 200 });
+
+    document.querySelector("[data-attach-signed-current-list] [data-attach-signed-remove]").click();
+
+    await vi.waitFor(() => expect(httpRequest).toHaveBeenCalledTimes(1));
+    expect(document.querySelector("[data-attach-signed-modal]").hidden).toBe(false);
+    expect(document.querySelector("[data-attach-signed-current-name]").textContent)
+      .toBe("Nenhum arquivo selecionado");
+    expect(document.querySelector("[data-attach-signed-current-list]").hidden).toBe(true);
+    expect(document.querySelector("[data-file-upload-button]").disabled).toBe(true);
+
+    const tiposAtualizados = JSON.parse(
+      trigger.getAttribute("data-attach-signed-kinds")
+    );
+    const despacho = tiposAtualizados.find((item) => item.key === "despacho");
+    expect(despacho.current_name).toBe("");
+    expect(despacho.current_remove_url).toBe("");
+    expect(despacho.current_attachments).toEqual([]);
   });
 });

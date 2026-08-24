@@ -21,6 +21,7 @@ from oficios.presenters import (
 
 from .forms import PrestacaoSolicitacaoForm
 from .services import diaria_recebida_display
+from .services import pendencias_envio_rt_db
 from .models import PrestacaoDocumentoAnexo
 
 
@@ -37,10 +38,22 @@ def _anexo_assinado_info(anexos, *, tipo, anexar_url, prestacao_pk, ajustar_url=
     solicitação, e é dele o botão de reposicionar. Vazio nos demais, e o cartão não
     mostra o botão — despacho e comprovante não têm o que ajustar.
     """
-    atual = next(
-        (anexo for anexo in reversed(list(anexos)) if anexo.tipo == tipo),
-        None,
-    )
+    atuais = [anexo for anexo in anexos if anexo.tipo == tipo]
+    atual = atuais[-1] if atuais else None
+    itens = [
+        {
+            "name": anexo.nome_original or anexo.arquivo.name.rsplit("/", 1)[-1],
+            "view_url": reverse(
+                "prestacoes_contas:prestacao_documento_conteudo",
+                args=[prestacao_pk, anexo.pk],
+            ),
+            "remove_url": reverse(
+                "prestacoes_contas:prestacao_documento_delete",
+                args=[prestacao_pk, anexo.pk],
+            ),
+        }
+        for anexo in atuais
+    ]
     if atual is None:
         return {
             "assinado": False,
@@ -49,6 +62,7 @@ def _anexo_assinado_info(anexos, *, tipo, anexar_url, prestacao_pk, ajustar_url=
             "view_url": "",
             "remover_url": "",
             "ajustar_url": "",
+            "attachments": [],
         }
     return {
         "assinado": True,
@@ -63,6 +77,7 @@ def _anexo_assinado_info(anexos, *, tipo, anexar_url, prestacao_pk, ajustar_url=
             args=[prestacao_pk, atual.pk],
         ),
         "ajustar_url": ajustar_url,
+        "attachments": itens,
     }
 
 
@@ -93,6 +108,7 @@ def kinds_de_anexo_assinado(documentos):
             "current_name": info["nome_original"],
             "current_view_url": info["view_url"],
             "current_remove_url": info["remover_url"],
+            "current_attachments": info.get("attachments", []),
         }
         for key, option_label, doc_label, info in documentos
         if info and info.get("anexar_url")
@@ -262,6 +278,29 @@ def apresentar_prestacao_servidor_card(
     servidor["whatsapp_evento"] = evento_wa_display
     servidor["whatsapp_diaria"] = servidor.pop("whatsapp_diaria_override") or valor_diarias_display
 
+    # `NOVO-20260824-173723-37e9862b4c2a`: o aviso de liberação do MOTORISTA leva
+    # junto o pedido dos KM, porque é a mesma conversa e é ele quem lê o
+    # odômetro. A lista vai na ordem dos trechos do roteiro, que é a mesma que
+    # `sincronizar_trechos` dá às linhas do diário — assim a resposta chega na
+    # ordem em que o diário vai ser preenchido.
+    #
+    # JSON, e não um texto com separador: rota é livre e já contém "→", vírgula
+    # e barra. `ensure_ascii=False` mantém o "→" legível no atributo; o escape do
+    # template cuida das aspas e o `dataset` as devolve inteiras.
+    servidor["whatsapp_trechos"] = (
+        json.dumps([t["rota"] for t in trechos_display], ensure_ascii=False)
+        if servidor["is_motorista"]
+        else ""
+    )
+
+    # O envio de RT/diário só abre quando o documento tem conteúdo — ver
+    # `pendencias_envio_rt_db`. A lista vai junto para o menu poder DIZER o que
+    # falta, em vez de exibir um item morto.
+    pendencias_envio = pendencias_envio_rt_db(ps)
+    servidor["envio_docs_pendencias"] = pendencias_envio
+    servidor["envio_docs_ok"] = not pendencias_envio
+    servidor["envio_docs_motivo"] = " ".join(pendencias_envio)
+
     rt = None
     try:
         rt = prestacao.relatorio_tecnico
@@ -350,7 +389,7 @@ def apresentar_prestacao_servidor_card(
         # A ação única do card reúne documentos compartilhados pelo ofício e
         # documentos próprios deste servidor, na ordem exibida pelo modal.
         "attach_kinds_json": json.dumps(attach_kinds, ensure_ascii=False),
-        "tem_documento_assinado": any(kind["current_name"] for kind in attach_kinds),
+        "tem_documento_assinado": any(kind["current_attachments"] for kind in attach_kinds),
         "protocolo_display": protocolo_display,
         "destino_display": destino_display,
         "data_evento_display": data_evento_display,

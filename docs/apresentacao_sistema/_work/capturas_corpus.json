@@ -1,0 +1,647 @@
+[
+  {
+    "slug": "login",
+    "path": "/login/",
+    "status": "ok",
+    "buttons": 11,
+    "fields": 1,
+    "forms": 1,
+    "h1": [
+      "Início"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nInício\n\nEscolha um módulo para começar.\n\nMódulos\nOF\nDOCUMENTOS\nOfícios\n\nEmissão e acompanhamento dos documentos oficiais de viagem.\n\nAbrir Ofícios\nTA\nDOCUMENTOS\nTermos\n\nGeração e acompanhamento de termos vinculados aos ofícios.\n\nAbrir Termos\nJT\nTEXTOS FORMAIS\nJustific",
+    "title": "Central de Viagens 3",
+    "url": "/",
+    "bytes": 48486
+  },
+  {
+    "slug": "dashboard",
+    "path": "/",
+    "status": "ok",
+    "buttons": 11,
+    "fields": 1,
+    "forms": 1,
+    "h1": [
+      "Início"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nInício\n\nEscolha um módulo para começar.\n\nMódulos\nOF\nDOCUMENTOS\nOfícios\n\nEmissão e acompanhamento dos documentos oficiais de viagem.\n\nAbrir Ofícios\nTA\nDOCUMENTOS\nTermos\n\nGeração e acompanhamento de termos vinculados aos ofícios.\n\nAbrir Termos\nJT\nTEXTOS FORMAIS\nJustific",
+    "title": "Central de Viagens 3",
+    "url": "/",
+    "bytes": 48486
+  },
+  {
+    "slug": "oficios-lista",
+    "path": "/oficios/",
+    "status": "ok",
+    "buttons": 120,
+    "fields": 15,
+    "forms": 6,
+    "h1": [
+      "Ofícios"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nOfícios\nFiltrar por situação\nNúmero: maior\nViagem\nCriação\nNº 01/2026 · Protocolo 221000002026\n\n07/09 a 08/09/2026 · LONDRINA/PR\n\nfaltam 14 dias\nMF\nMARIANA LOPES FERREIRA\nMotorista\nDELEGADO DE POLICIA · DAC/CTBA\nPLACA\nBCD1E23\nMODELO\nTOYOTA COROLLA XEI\nCURITIBA/PR → LON",
+    "title": "Ofícios",
+    "url": "/oficios/",
+    "bytes": 68462
+  },
+  {
+    "slug": "oficios-novo",
+    "path": "/oficios/novo/",
+    "status": "ok",
+    "buttons": 34,
+    "fields": 15,
+    "forms": 6,
+    "h1": [
+      "Ofícios"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nOfícios\nQue vão acontecer (1)\nEm andamento e realizados (0)\nFinalizados (0)\nCancelados (0)\nNúmero: maior\nNúmero: menor\nCriação: mais recente\nCriação: mais antiga\nViagem: mais próxima\nViagem: mais distante\nViagem\nCriação\nNº 01/2026 · Protocolo 221000002026\n\n07/09 a 08/",
+    "title": "Ofícios",
+    "url": "/oficios/",
+    "bytes": 73677
+  },
+  {
+    "slug": "oficios-detalhe",
+    "path": "/oficios/1/",
+    "status": "ok",
+    "buttons": 25,
+    "fields": 22,
+    "forms": 2,
+    "h1": [
+      "Cadastro de ofício"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nCadastro de ofício\nVoltar à lista\n1\nDados e viajantes\nIncompleta\n2\nRoteiro e diárias\nNão iniciada\nJustificativa\nConcluída\n4\nDocumentos\nNão iniciada\nInformações da viagem\n\nIdentificação, finalidade, equipe e transporte.\n\nIdentificação\n\nNúmero, protocolo e custeio\n\nN° d",
+    "title": "Cadastro de ofício",
+    "url": "/oficios/1/dados-viajantes/",
+    "bytes": 100711
+  },
+  {
+    "slug": "oficios-editar",
+    "path": "/oficios/1/editar/",
+    "status": "ok",
+    "buttons": 25,
+    "fields": 22,
+    "forms": 2,
+    "h1": [
+      "Cadastro de ofício"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nCadastro de ofício\nVoltar à lista\n1\nDados e viajantes\nIncompleta\n2\nRoteiro e diárias\nNão iniciada\nJustificativa\nConcluída\n4\nDocumentos\nNão iniciada\nInformações da viagem\n\nIdentificação, finalidade, equipe e transporte.\n\nIdentificação\n\nNúmero, protocolo e custeio\n\nN° d",
+    "title": "Cadastro de ofício",
+    "url": "/oficios/1/dados-viajantes/",
+    "bytes": 100711
+  },
+  {
+    "slug": "oficios-wizard-dados-viajantes",
+    "path": "/oficios/1/dados-viajantes/",
+    "status": "ok",
+    "buttons": 25,
+    "fields": 22,
+    "forms": 2,
+    "h1": [
+      "Cadastro de ofício"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nCadastro de ofício\nVoltar à lista\n1\nDados e viajantes\nIncompleta\n2\nRoteiro e diárias\nNão iniciada\nJustificativa\nConcluída\n4\nDocumentos\nNão iniciada\nInformações da viagem\n\nIdentificação, finalidade, equipe e transporte.\n\nIdentificação\n\nNúmero, protocolo e custeio\n\nN° d",
+    "title": "Cadastro de ofício",
+    "url": "/oficios/1/dados-viajantes/",
+    "bytes": 100686
+  },
+  {
+    "slug": "oficios-wizard-transporte",
+    "path": "/oficios/1/transporte/",
+    "status": "ok",
+    "buttons": 16,
+    "fields": 9,
+    "forms": 2,
+    "h1": [
+      "Cadastro de ofício"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nCadastro de ofício\nVoltar à lista\n1\nDados e viajantes\nIncompleta\n2\nRoteiro e diárias\nNão iniciada\nJustificativa\nConcluída\n4\nDocumentos\nNão iniciada\nMotorista\n\nEscolha um servidor cadastrado ou use o modo manual quando o motorista for externo à equipe.\n\nUsar motorista ",
+    "title": "Cadastro de ofício",
+    "url": "/oficios/1/transporte/",
+    "bytes": 53289
+  },
+  {
+    "slug": "oficios-wizard-roteiro",
+    "path": "/oficios/1/roteiro/",
+    "status": "ok",
+    "buttons": 310,
+    "fields": 80,
+    "forms": 2,
+    "h1": [
+      "Cadastro de ofício"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nCadastro de ofício\nVoltar à lista\n1\nDados e viajantes\nIncompleta\n2\nRoteiro e diárias\nConcluída\nJustificativa\nConcluída\n4\nDocumentos\nNão iniciada\nRoteiro e diárias\n\nOrigem, percurso, deslocamentos e cálculo financeiro.\n\nOrigem e destinos\n\nUse um roteiro salvo ou defina",
+    "title": "Cadastro de ofício",
+    "url": "/oficios/1/roteiro/",
+    "bytes": 193723
+  },
+  {
+    "slug": "oficios-wizard-justificativa",
+    "path": "/oficios/1/justificativa/",
+    "status": "ok",
+    "buttons": 14,
+    "fields": 4,
+    "forms": 2,
+    "h1": [
+      "Cadastro de ofício"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nCadastro de ofício\nVoltar à lista\n1\nDados e viajantes\nIncompleta\nRoteiro e diárias\nConcluída\n3\nJustificativa\nConcluída\n4\nDocumentos\nNão iniciada\nJustificativa\n\nUse um modelo ou escreva o texto que fundamenta a necessidade da viagem.\n\nModelo\nPRAZO EXTERNO\nJustificativa",
+    "title": "Cadastro de ofício",
+    "url": "/oficios/1/justificativa/",
+    "bytes": 49934
+  },
+  {
+    "slug": "oficios-wizard-resumo",
+    "path": "/oficios/1/resumo/",
+    "status": "ok",
+    "buttons": 19,
+    "fields": 5,
+    "forms": 3,
+    "h1": [
+      "Cadastro de ofício"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nCadastro de ofício\nVoltar à lista\n1\nDados e viajantes\nIncompleta\nRoteiro e diárias\nConcluída\nJustificativa\nConcluída\n4\nDocumentos\nIncompleta\nPendências encontradas\n\nCorrija os itens abaixo antes de finalizar o ofício ou gerar DOCX/PDF.\n\nInforme um protocolo válido com",
+    "title": "Cadastro de ofício",
+    "url": "/oficios/1/resumo/",
+    "bytes": 146913
+  },
+  {
+    "slug": "oficios-wizard-documentos",
+    "path": "/oficios/1/documentos/",
+    "status": "ok",
+    "buttons": 19,
+    "fields": 5,
+    "forms": 3,
+    "h1": [
+      "Cadastro de ofício"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nCadastro de ofício\nVoltar à lista\n1\nDados e viajantes\nIncompleta\nRoteiro e diárias\nConcluída\nJustificativa\nConcluída\n4\nDocumentos\nIncompleta\nPendências encontradas\n\nCorrija os itens abaixo antes de finalizar o ofício ou gerar DOCX/PDF.\n\nInforme um protocolo válido com",
+    "title": "Cadastro de ofício",
+    "url": "/oficios/1/documentos/",
+    "bytes": 146913
+  },
+  {
+    "slug": "eventos-lista",
+    "path": "/eventos/",
+    "status": "ok",
+    "buttons": 23,
+    "fields": 11,
+    "forms": 7,
+    "h1": [
+      "Eventos"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nEventos\nFiltrar por situação\nNenhum registro cadastrado\n\nNenhum evento encontrado.\n\nNovo evento",
+    "title": "Eventos",
+    "url": "/eventos/",
+    "bytes": 37442
+  },
+  {
+    "slug": "oficios-modelos-motivo-lista",
+    "path": "/oficios/modelos-motivo/",
+    "status": "ok",
+    "buttons": 16,
+    "fields": 6,
+    "forms": 4,
+    "h1": [
+      "Modelos de motivo"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nModelos de motivo\n+\nNovo modelo\nAUTORIZACAO PARA DESLOCAMENTO\nPadrão\n\nSolicita-se autorizacao para deslocamento de equipe em acao institucional.\n\nVoltar ao ofício",
+    "title": "Modelos de motivo",
+    "url": "/oficios/modelos-motivo/",
+    "bytes": 40315
+  },
+  {
+    "slug": "oficios-modelos-motivo-novo",
+    "path": "/oficios/modelos-motivo/novo/",
+    "status": "ok",
+    "buttons": 16,
+    "fields": 6,
+    "forms": 4,
+    "h1": [
+      "Modelos de motivo"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nModelos de motivo\n+\nNovo modelo\nAUTORIZACAO PARA DESLOCAMENTO\nPadrão\n\nSolicita-se autorizacao para deslocamento de equipe em acao institucional.\n\nVoltar ao ofício",
+    "title": "Modelos de motivo",
+    "url": "/oficios/modelos-motivo/novo/",
+    "bytes": 40315
+  },
+  {
+    "slug": "oficios-modelos-motivo-editar",
+    "path": "/oficios/modelos-motivo/1/editar/",
+    "status": "ok",
+    "buttons": 16,
+    "fields": 6,
+    "forms": 4,
+    "h1": [
+      "Modelos de motivo"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nModelos de motivo\n+\nNovo modelo\nAUTORIZACAO PARA DESLOCAMENTO\nPadrão\n\nSolicita-se autorizacao para deslocamento de equipe em acao institucional.\n\nVoltar ao ofício",
+    "title": "Modelos de motivo",
+    "url": "/oficios/modelos-motivo/",
+    "bytes": 40315
+  },
+  {
+    "slug": "roteiros-lista",
+    "path": "/roteiros/",
+    "status": "ok",
+    "buttons": 15,
+    "fields": 4,
+    "forms": 3,
+    "h1": [
+      "Roteiros"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nRoteiros\nFiltrar por situação\nROTEIRO\nCURITIBA/PR → LONDRINA/PR\nfaltam 14 dias\n\n07/09/2026 04:30 a 08/09/2026 20:50 · 1 trecho · R$ 420,00\n\nNovo roteiro",
+    "title": "Roteiros",
+    "url": "/roteiros/",
+    "bytes": 38064
+  },
+  {
+    "slug": "roteiros-novo",
+    "path": "/roteiros/novo/",
+    "status": "ok",
+    "buttons": 212,
+    "fields": 53,
+    "forms": 2,
+    "h1": [
+      "Novo roteiro"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nNovo roteiro\n\nSede, destinos, trechos, retorno e diárias na mesma tela.\n\nVoltar para lista\nRoteiro e diárias\n\nOrigem, percurso, deslocamentos e cálculo financeiro.\n\nOrigem e destinos\n\nUse um roteiro salvo ou defina a sede e os destinos.\n\nRoteiro salvo\nRoteiro novo\nSed",
+    "title": "Novo roteiro",
+    "url": "/roteiros/novo/",
+    "bytes": 170129
+  },
+  {
+    "slug": "prestacoes-contas-lista",
+    "path": "/prestacoes-contas/",
+    "status": "ok",
+    "buttons": 70,
+    "fields": 21,
+    "forms": 6,
+    "h1": [
+      "Prestações de Contas"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nPrestações de Contas\nFiltrar por situação\n01/2026 · 221000002026 · LONDRINA/PR · 07/09 a 08/09/2026\nPendente\nPeríodo\nMARIANA LOPES FERREIRA\nMotorista\nDELEGADO DE POLICIA · DAC/CTBA\nPLACA\nBCD1E23\nMODELO\nTOYOTA COROLLA XEI\nCURITIBA/PR → LONDRINA/PR\n07/09/2026 04:30 → 07",
+    "title": "Prestações de Contas",
+    "url": "/prestacoes-contas/",
+    "bytes": 62154
+  },
+  {
+    "slug": "roteiros-editar",
+    "path": "/roteiros/1/editar/",
+    "status": "ok",
+    "buttons": 309,
+    "fields": 80,
+    "forms": 2,
+    "h1": [
+      "Editar roteiro"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nEditar roteiro\n\nSede, destinos, trechos, retorno e diárias na mesma tela.\n\nVoltar para lista\nRoteiro e diárias\n\nOrigem, percurso, deslocamentos e cálculo financeiro.\n\nOrigem e destinos\n\nUse um roteiro salvo ou defina a sede e os destinos.\n\nSede\n\nUnidade de origem da v",
+    "title": "Editar roteiro",
+    "url": "/roteiros/1/editar/",
+    "bytes": 213049
+  },
+  {
+    "slug": "termos-lista",
+    "path": "/termos/",
+    "status": "ok",
+    "buttons": 23,
+    "fields": 14,
+    "forms": 4,
+    "h1": [
+      "Termos de Autorização"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nTermos de Autorização\nFiltrar por situação\nLONDRINA/PR · 07/09/2026 a 08/09/2026\nVai acontecer\n\nOfício: 01/2026 · MARIANA LOPES FERREIRA · BCD1E23 TOYOTA COROLLA XEI\n\nNovo termo",
+    "title": "Termos de Autorização",
+    "url": "/termos/",
+    "bytes": 41467
+  },
+  {
+    "slug": "termos-preview-oficio",
+    "path": "/termos/oficio/1/preview/",
+    "status": "ok",
+    "buttons": 11,
+    "fields": 1,
+    "forms": 1,
+    "h1": [
+      "Preview termo - Oficio 01/2026"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nPreview termo - Oficio 01/2026\nVoltar ao ofício\nPré-visualização\n\nServidores com Termo de Autorização\n\nMARIANA LOPES FERREIRA\nVer JSON",
+    "title": "Preview termo - Oficio 01/2026",
+    "url": "/termos/oficio/1/preview/",
+    "bytes": 34866
+  },
+  {
+    "slug": "justificativas-lista",
+    "path": "/justificativas/",
+    "status": "ok",
+    "buttons": 16,
+    "fields": 8,
+    "forms": 4,
+    "h1": [
+      "Justificativas"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nJustificativas\n+\nCadastrar justificativa\nJT\nOficio 01/2026\n\nPRAZO EXTERNO · A demanda decorre de agenda definida por orgao parceiro, com prazo operacional restrito. · 24/08/2026 14:51",
+    "title": "Justificativas",
+    "url": "/justificativas/",
+    "bytes": 38914
+  },
+  {
+    "slug": "justificativas-novo",
+    "path": "/justificativas/novo/",
+    "status": "ok",
+    "buttons": 16,
+    "fields": 6,
+    "forms": 4,
+    "h1": [
+      "Modelos de justificativa"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nModelos de justificativa\n+\nNovo modelo\nPRAZO EXTERNO\nPadrão\n\nA demanda decorre de agenda definida por orgao parceiro, com prazo operacional restrito.\n\nVoltar à justificativa",
+    "title": "Modelos de justificativa",
+    "url": "/justificativas/modelos/",
+    "bytes": 40962
+  },
+  {
+    "slug": "justificativas-editar",
+    "path": "/justificativas/1/editar/",
+    "status": "ok",
+    "buttons": 16,
+    "fields": 6,
+    "forms": 4,
+    "h1": [
+      "Modelos de justificativa"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nModelos de justificativa\n+\nNovo modelo\nPRAZO EXTERNO\nPadrão\n\nA demanda decorre de agenda definida por orgao parceiro, com prazo operacional restrito.\n\nVoltar à justificativa",
+    "title": "Modelos de justificativa",
+    "url": "/justificativas/modelos/",
+    "bytes": 40962
+  },
+  {
+    "slug": "planos-trabalho-lista",
+    "path": "/planos-trabalho/",
+    "status": "ok",
+    "buttons": 65,
+    "fields": 9,
+    "forms": 4,
+    "h1": [
+      "Planos de Trabalho"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nPlanos de Trabalho\nFiltrar por situação\nNúmero: maior\nPeríodo\n01/2026/ASCOM · LONDRINA/PR · 14/09/2026 a 15/09/2026\nGerado\n\n1 evento · Coord.: MARIANA LOPES FERREIRA · 1 no efetivo\n\nNovo plano",
+    "title": "Planos de Trabalho",
+    "url": "/planos-trabalho/",
+    "bytes": 41709
+  },
+  {
+    "slug": "ordens-servico-lista",
+    "path": "/ordens-servico/",
+    "status": "ok",
+    "buttons": 68,
+    "fields": 11,
+    "forms": 4,
+    "h1": [
+      "Ordens de Serviço"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nDocumentos\nExecução e prestação\nUI Lab\nAdministração\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nOrdens de Serviço\nFiltrar por situação\nNúmero: maior\nPeríodo\nOS 001/2026 · LONDRINA (PR) · 09/09 a 10/09\nfaltam 16 dias\n\n09/09 a 10/09 · LONDRINA (PR)\n\nNova OS",
+    "title": "Ordens de Serviço",
+    "url": "/ordens-servico/",
+    "bytes": 40912
+  },
+  {
+    "slug": "configuracao",
+    "path": "/cadastros/configuracao/",
+    "status": "ok",
+    "buttons": 13,
+    "fields": 15,
+    "forms": 2,
+    "h1": [
+      "Instituição"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nEventos\nRoteiros\nPlanos de Trabalho\nOrdens de Serviço\nDocumentos\nOfícios\nTermos\nJustificativas\nProtocolos\nExecução e prestação\nPrestações de Contas\nUI Lab\nComponentes v2\nAdministração\nServidores\nCargos\nViaturas\nCombustíveis\nUnidades\nConfigurações\nUsuários\nÁreas\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nInstituição\nInstituição\nOfício\nRoteiros\nDados da unidade e ",
+    "title": "Instituição",
+    "url": "/cadastros/configuracao/",
+    "bytes": 67139
+  },
+  {
+    "slug": "servidores-lista",
+    "path": "/cadastros/servidores/",
+    "status": "ok",
+    "buttons": 15,
+    "fields": 4,
+    "forms": 3,
+    "h1": [
+      "Servidores"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nEventos\nRoteiros\nPlanos de Trabalho\nOrdens de Serviço\nDocumentos\nOfícios\nTermos\nJustificativas\nProtocolos\nExecução e prestação\nPrestações de Contas\nUI Lab\nComponentes v2\nAdministração\nServidores\nCargos\nViaturas\nCombustíveis\nUnidades\nConfigurações\nUsuários\nÁreas\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nServidores\nTodos (1)\nMF\nMARIANA LOPES FERREIRA\n\nDELEGADO DE",
+    "title": "Servidores",
+    "url": "/cadastros/servidores/",
+    "bytes": 44968
+  },
+  {
+    "slug": "servidor-novo",
+    "path": "/cadastros/servidores/novo/",
+    "status": "ok",
+    "buttons": 14,
+    "fields": 10,
+    "forms": 2,
+    "h1": [
+      "Novo servidor"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nEventos\nRoteiros\nPlanos de Trabalho\nOrdens de Serviço\nDocumentos\nOfícios\nTermos\nJustificativas\nProtocolos\nExecução e prestação\nPrestações de Contas\nUI Lab\nComponentes v2\nAdministração\nServidores\nCargos\nViaturas\nCombustíveis\nUnidades\nConfigurações\nUsuários\nÁreas\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nNovo servidor\n\nSó o nome é obrigatório; demais campos podem",
+    "title": "Novo servidor",
+    "url": "/cadastros/servidores/novo/",
+    "bytes": 59001
+  },
+  {
+    "slug": "servidor-editar",
+    "path": "/cadastros/servidores/1/editar/",
+    "status": "ok",
+    "buttons": 14,
+    "fields": 9,
+    "forms": 2,
+    "h1": [
+      "Editar servidor"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nEventos\nRoteiros\nPlanos de Trabalho\nOrdens de Serviço\nDocumentos\nOfícios\nTermos\nJustificativas\nProtocolos\nExecução e prestação\nPrestações de Contas\nUI Lab\nComponentes v2\nAdministração\nServidores\nCargos\nViaturas\nCombustíveis\nUnidades\nConfigurações\nUsuários\nÁreas\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nEditar servidor\n\nAtualize os dados do servidor; campos pend",
+    "title": "Editar servidor",
+    "url": "/cadastros/servidores/1/editar/",
+    "bytes": 61500
+  },
+  {
+    "slug": "viaturas-lista",
+    "path": "/cadastros/viaturas/",
+    "status": "ok",
+    "buttons": 15,
+    "fields": 4,
+    "forms": 3,
+    "h1": [
+      "Viaturas"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nEventos\nRoteiros\nPlanos de Trabalho\nOrdens de Serviço\nDocumentos\nOfícios\nTermos\nJustificativas\nProtocolos\nExecução e prestação\nPrestações de Contas\nUI Lab\nComponentes v2\nAdministração\nServidores\nCargos\nViaturas\nCombustíveis\nUnidades\nConfigurações\nUsuários\nÁreas\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nViaturas\nTodos (1)\nTX\nTOYOTA COROLLA XEI — BCD1E23\n\nBCD1E23",
+    "title": "Viaturas",
+    "url": "/cadastros/viaturas/",
+    "bytes": 44608
+  },
+  {
+    "slug": "viatura-nova",
+    "path": "/cadastros/viaturas/nova/",
+    "status": "ok",
+    "buttons": 16,
+    "fields": 11,
+    "forms": 2,
+    "h1": [
+      "Nova viatura"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nEventos\nRoteiros\nPlanos de Trabalho\nOrdens de Serviço\nDocumentos\nOfícios\nTermos\nJustificativas\nProtocolos\nExecução e prestação\nPrestações de Contas\nUI Lab\nComponentes v2\nAdministração\nServidores\nCargos\nViaturas\nCombustíveis\nUnidades\nConfigurações\nUsuários\nÁreas\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nNova viatura\n\nSó a placa é obrigatória; demais campos podem",
+    "title": "Nova viatura",
+    "url": "/cadastros/viaturas/nova/",
+    "bytes": 64492
+  },
+  {
+    "slug": "viatura-editar",
+    "path": "/cadastros/viaturas/1/editar/",
+    "status": "ok",
+    "buttons": 17,
+    "fields": 10,
+    "forms": 2,
+    "h1": [
+      "Editar viatura"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nEventos\nRoteiros\nPlanos de Trabalho\nOrdens de Serviço\nDocumentos\nOfícios\nTermos\nJustificativas\nProtocolos\nExecução e prestação\nPrestações de Contas\nUI Lab\nComponentes v2\nAdministração\nServidores\nCargos\nViaturas\nCombustíveis\nUnidades\nConfigurações\nUsuários\nÁreas\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nEditar viatura\n\nAtualize os dados da viatura; campos penden",
+    "title": "Editar viatura",
+    "url": "/cadastros/viaturas/1/editar/",
+    "bytes": 68632
+  },
+  {
+    "slug": "unidades-lista",
+    "path": "/cadastros/unidades/",
+    "status": "ok",
+    "buttons": 16,
+    "fields": 6,
+    "forms": 4,
+    "h1": [
+      "Unidades"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nEventos\nRoteiros\nPlanos de Trabalho\nOrdens de Serviço\nDocumentos\nOfícios\nTermos\nJustificativas\nProtocolos\nExecução e prestação\nPrestações de Contas\nUI Lab\nComponentes v2\nAdministração\nServidores\nCargos\nViaturas\nCombustíveis\nUnidades\nConfigurações\nUsuários\nÁreas\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nUnidades\n+\nCadastrar unidade\nDA\nDELEGACIA DE ATENDIMENTO AO",
+    "title": "Unidades",
+    "url": "/cadastros/unidades/",
+    "bytes": 43026
+  },
+  {
+    "slug": "unidade-nova",
+    "path": "/cadastros/unidades/nova/",
+    "status": "ok",
+    "buttons": 16,
+    "fields": 6,
+    "forms": 4,
+    "h1": [
+      "Unidades"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nEventos\nRoteiros\nPlanos de Trabalho\nOrdens de Serviço\nDocumentos\nOfícios\nTermos\nJustificativas\nProtocolos\nExecução e prestação\nPrestações de Contas\nUI Lab\nComponentes v2\nAdministração\nServidores\nCargos\nViaturas\nCombustíveis\nUnidades\nConfigurações\nUsuários\nÁreas\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nUnidades\n+\nCadastrar unidade\nDA\nDELEGACIA DE ATENDIMENTO AO",
+    "title": "Unidades",
+    "url": "/cadastros/unidades/nova/",
+    "bytes": 43026
+  },
+  {
+    "slug": "unidade-editar",
+    "path": "/cadastros/unidades/1/editar/",
+    "status": "ok",
+    "buttons": 16,
+    "fields": 6,
+    "forms": 4,
+    "h1": [
+      "Unidades"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nEventos\nRoteiros\nPlanos de Trabalho\nOrdens de Serviço\nDocumentos\nOfícios\nTermos\nJustificativas\nProtocolos\nExecução e prestação\nPrestações de Contas\nUI Lab\nComponentes v2\nAdministração\nServidores\nCargos\nViaturas\nCombustíveis\nUnidades\nConfigurações\nUsuários\nÁreas\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nUnidades\n+\nCadastrar unidade\nDA\nDELEGACIA DE ATENDIMENTO AO",
+    "title": "Unidades",
+    "url": "/cadastros/unidades/",
+    "bytes": 43026
+  },
+  {
+    "slug": "cargos-lista",
+    "path": "/cadastros/cargos/",
+    "status": "ok",
+    "buttons": 16,
+    "fields": 5,
+    "forms": 4,
+    "h1": [
+      "Cargos"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nEventos\nRoteiros\nPlanos de Trabalho\nOrdens de Serviço\nDocumentos\nOfícios\nTermos\nJustificativas\nProtocolos\nExecução e prestação\nPrestações de Contas\nUI Lab\nComponentes v2\nAdministração\nServidores\nCargos\nViaturas\nCombustíveis\nUnidades\nConfigurações\nUsuários\nÁreas\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nCargos\n+\nCadastrar cargo\nDP\nDELEGADO DE POLICIA\nPadrão",
+    "title": "Cargos",
+    "url": "/cadastros/cargos/",
+    "bytes": 40939
+  },
+  {
+    "slug": "cargo-novo",
+    "path": "/cadastros/cargos/novo/",
+    "status": "ok",
+    "buttons": 16,
+    "fields": 5,
+    "forms": 4,
+    "h1": [
+      "Cargos"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nEventos\nRoteiros\nPlanos de Trabalho\nOrdens de Serviço\nDocumentos\nOfícios\nTermos\nJustificativas\nProtocolos\nExecução e prestação\nPrestações de Contas\nUI Lab\nComponentes v2\nAdministração\nServidores\nCargos\nViaturas\nCombustíveis\nUnidades\nConfigurações\nUsuários\nÁreas\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nCargos\n+\nCadastrar cargo\nDP\nDELEGADO DE POLICIA\nPadrão",
+    "title": "Cargos",
+    "url": "/cadastros/cargos/novo/",
+    "bytes": 40939
+  },
+  {
+    "slug": "cargo-editar",
+    "path": "/cadastros/cargos/1/editar/",
+    "status": "ok",
+    "buttons": 16,
+    "fields": 5,
+    "forms": 4,
+    "h1": [
+      "Cargos"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nEventos\nRoteiros\nPlanos de Trabalho\nOrdens de Serviço\nDocumentos\nOfícios\nTermos\nJustificativas\nProtocolos\nExecução e prestação\nPrestações de Contas\nUI Lab\nComponentes v2\nAdministração\nServidores\nCargos\nViaturas\nCombustíveis\nUnidades\nConfigurações\nUsuários\nÁreas\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nCargos\n+\nCadastrar cargo\nDP\nDELEGADO DE POLICIA\nPadrão",
+    "title": "Cargos",
+    "url": "/cadastros/cargos/",
+    "bytes": 40939
+  },
+  {
+    "slug": "combustiveis-lista",
+    "path": "/cadastros/combustiveis/",
+    "status": "ok",
+    "buttons": 17,
+    "fields": 6,
+    "forms": 5,
+    "h1": [
+      "Combustíveis"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nEventos\nRoteiros\nPlanos de Trabalho\nOrdens de Serviço\nDocumentos\nOfícios\nTermos\nJustificativas\nProtocolos\nExecução e prestação\nPrestações de Contas\nUI Lab\nComponentes v2\nAdministração\nServidores\nCargos\nViaturas\nCombustíveis\nUnidades\nConfigurações\nUsuários\nÁreas\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nCombustíveis\n+\nCadastrar combustível\nCT\nGASOLINA",
+    "title": "Combustíveis",
+    "url": "/cadastros/combustiveis/",
+    "bytes": 41643
+  },
+  {
+    "slug": "combustivel-novo",
+    "path": "/cadastros/combustiveis/novo/",
+    "status": "ok",
+    "buttons": 17,
+    "fields": 6,
+    "forms": 5,
+    "h1": [
+      "Combustíveis"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nEventos\nRoteiros\nPlanos de Trabalho\nOrdens de Serviço\nDocumentos\nOfícios\nTermos\nJustificativas\nProtocolos\nExecução e prestação\nPrestações de Contas\nUI Lab\nComponentes v2\nAdministração\nServidores\nCargos\nViaturas\nCombustíveis\nUnidades\nConfigurações\nUsuários\nÁreas\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nCombustíveis\n+\nCadastrar combustível\nCT\nGASOLINA",
+    "title": "Combustíveis",
+    "url": "/cadastros/combustiveis/novo/",
+    "bytes": 41643
+  },
+  {
+    "slug": "combustivel-editar",
+    "path": "/cadastros/combustiveis/1/editar/",
+    "status": "ok",
+    "buttons": 17,
+    "fields": 6,
+    "forms": 5,
+    "h1": [
+      "Combustíveis"
+    ],
+    "text": "Pular para o conteúdo principal\nCV\nCentral de Viagens 3\nDashboard\nPlanejamento\nEventos\nRoteiros\nPlanos de Trabalho\nOrdens de Serviço\nDocumentos\nOfícios\nTermos\nJustificativas\nProtocolos\nExecução e prestação\nPrestações de Contas\nUI Lab\nComponentes v2\nAdministração\nServidores\nCargos\nViaturas\nCombustíveis\nUnidades\nConfigurações\nUsuários\nÁreas\nCONECTADO COMO\nmanual_demo\nDEMO-1\nPerfil\nSair\nTEMA\nEscuro\nContraste reforçado\nClaro\nContraste suave\nCombustíveis\n+\nCadastrar combustível\nCT\nGASOLINA",
+    "title": "Combustíveis",
+    "url": "/cadastros/combustiveis/",
+    "bytes": 41643
+  }
+]

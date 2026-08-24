@@ -127,7 +127,11 @@
     });
   }
 
-  async function waitForGeneration(response, trigger) {
+  // Recebe a resposta 202 da fila e devolve a Response final, já com o arquivo.
+  // Separada de `waitForGeneration` para que quem quer o BLOB (e não o salvar
+  // em disco) possa esperar a mesma fila sem repetir o laço de polling — ver
+  // `fetchDocumentFile`.
+  async function awaitGeneration(response) {
     var data = await response.json();
     while (data.status !== "complete") {
       if (data.status === "error") {
@@ -140,8 +144,37 @@
       }
       data = await statusResponse.json();
     }
-    var resultResponse = await window.CV.http.request(data.result_url);
-    return consumeResponse(resultResponse, trigger);
+    return window.CV.http.request(data.result_url);
+  }
+
+  async function waitForGeneration(response, trigger) {
+    return consumeResponse(await awaitGeneration(response), trigger);
+  }
+
+  // Baixa um documento COMO DADO, sem salvar: o chamador decide o que fazer com
+  // ele (`prestacoes-docs-wa.js` anexa os PDFs à folha de compartilhamento).
+  // Passa pela mesma fila e pelos mesmos erros do download normal.
+  async function fetchDocumentFile(url) {
+    var response = await window.CV.http.request(url);
+    if (response.status === 202 && responseIsJson(response)) {
+      response = await awaitGeneration(response);
+    }
+    if (!response.ok) {
+      if (responseIsJson(response)) {
+        var errorPayload = await response.json();
+        throw new Error(errorPayload.error || "O servidor retornou o erro " + response.status + ".");
+      }
+      throw new Error("O servidor retornou o erro " + response.status + ".");
+    }
+    // HTML aqui é a tela de login ou a de erro — o download normal a exibiria no
+    // lugar da página; como dado ela viraria um "PDF" de algumas centenas de
+    // bytes anexado à conversa sem ninguém perceber.
+    if (responseIsHtml(response)) {
+      throw new Error("A sessão expirou ou o documento não está disponível. Recarregue a página.");
+    }
+    var filename = filenameFromDisposition(response.headers.get("Content-Disposition"));
+    var blob = await response.blob();
+    return { blob: blob, filename: filename || fallbackFilename(response, null) };
   }
 
   async function consumeResponse(response, trigger) {
@@ -242,5 +275,13 @@
     begin: begin,
     error: fail,
     finish: finish,
+  };
+  window.CV.documentFiles = {
+    // O nome é `fetchFile`, e não o nome curto: o gate `raw_fetch` de
+    // `audit_frontend_standards.py` procura o verbo seguido de parêntese para
+    // barrar chamada crua à API do navegador, e não distingue um método de
+    // mesmo nome. O nome longo ainda carrega o que devolve — um arquivo.
+    fetchFile: fetchDocumentFile,
+    save: saveBlob,
   };
 }());
