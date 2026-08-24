@@ -1,0 +1,391 @@
+[24/Aug/2026 14:49:55] "GET /login/ HTTP/1.1" 200 20382
+[24/Aug/2026 14:49:55] "GET /login/ HTTP/1.1" 200 20382
+[24/Aug/2026 14:50:16] "GET /login/ HTTP/1.1" 200 20382
+[24/Aug/2026 14:50:17] "GET /static/js/core/theme-shared.js HTTP/1.1" 200 1643
+[24/Aug/2026 14:50:17] "GET /static/js/core/theme-init.js HTTP/1.1" 200 251
+[24/Aug/2026 14:50:17] "GET /static/css/base/fonts.css HTTP/1.1" 200 3490
+[24/Aug/2026 14:50:17] "GET /static/css/v2/auth.css HTTP/1.1" 200 8857
+[24/Aug/2026 14:50:17] "GET /static/css/ui.bundle.css HTTP/1.1" 200 564473
+[24/Aug/2026 14:50:17] "GET /static/vendor/fonts/inter/inter-latin-wght-normal.woff2 HTTP/1.1" 200 48256
+Not Found: /favicon.ico
+[24/Aug/2026 14:50:17] "GET /favicon.ico HTTP/1.1" 404 6666
+[24/Aug/2026 14:50:24] "POST /login/ HTTP/1.1" 302 0
+[24/Aug/2026 14:50:24] "GET / HTTP/1.1" 200 41378
+[24/Aug/2026 14:50:24] "GET /static/css/profiles/dashboard.css HTTP/1.1" 200 59456
+[24/Aug/2026 14:50:24] "GET /static/js/shell.bundle.js HTTP/1.1" 200 128555
+[24/Aug/2026 14:51:24] "GET /login/ HTTP/1.1" 302 0
+[24/Aug/2026 14:51:24] "GET / HTTP/1.1" 200 41378
+[24/Aug/2026 14:51:24] "GET /static/css/ui.bundle.css HTTP/1.1" 304 0
+[24/Aug/2026 14:51:24] "GET /static/css/profiles/dashboard.css HTTP/1.1" 304 0
+[24/Aug/2026 14:51:24] "GET /static/js/shell.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 14:51:26] "GET / HTTP/1.1" 200 41378
+[24/Aug/2026 14:51:29] "GET /oficios/ HTTP/1.1" 200 61538
+[24/Aug/2026 14:51:29] "GET /static/css/profiles/entity-lists.css HTTP/1.1" 200 62390
+[24/Aug/2026 14:51:30] "GET /static/js/components/attach-signed-modal.js HTTP/1.1" 200 22853
+[24/Aug/2026 14:51:30] "GET /static/js/components/file-picker.js HTTP/1.1" 200 11617
+[24/Aug/2026 14:51:30] "GET /static/js/form-components.bundle.js HTTP/1.1" 200 149842
+[24/Aug/2026 14:51:33] "GET /oficios/novo/ HTTP/1.1" 302 0
+[24/Aug/2026 14:51:33] "GET /oficios/ HTTP/1.1" 200 61538
+[24/Aug/2026 14:51:37] "GET /oficios/1/ HTTP/1.1" 302 0
+[24/Aug/2026 14:51:39] "GET /oficios/1/dados-viajantes/ HTTP/1.1" 200 55269
+[24/Aug/2026 14:51:40] "GET /static/css/profiles/oficio-core.css HTTP/1.1" 200 63949
+[24/Aug/2026 14:51:40] "GET /static/css/ui.bundle.css HTTP/1.1" 304 0
+[24/Aug/2026 14:51:40] "GET /static/js/pages/oficios-dados-viajantes.js HTTP/1.1" 200 3059
+[24/Aug/2026 14:51:40] "GET /static/js/shell.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 14:51:40] "GET /static/js/pages/oficios-wizard-driver-state.js HTTP/1.1" 200 9752
+[24/Aug/2026 14:51:40] "GET /static/js/pages/oficios-transporte.js HTTP/1.1" 200 20663
+[24/Aug/2026 14:51:40] "GET /static/js/pages/oficios-viatura-sugestoes.js HTTP/1.1" 200 11522
+[24/Aug/2026 14:51:40] "GET /static/js/components/wizard-sticky-header.js HTTP/1.1" 200 4586
+[24/Aug/2026 14:51:41] "GET /oficios/1/editar/ HTTP/1.1" 302 0
+[24/Aug/2026 14:51:42] "GET /oficios/1/dados-viajantes/ HTTP/1.1" 200 55269
+[24/Aug/2026 14:51:43] "GET /oficios/1/dados-viajantes/ HTTP/1.1" 200 55269
+[24/Aug/2026 14:51:44] "GET /oficios/1/transporte/ HTTP/1.1" 200 47667
+[24/Aug/2026 14:51:45] "GET /static/css/profiles/oficio-transport.css HTTP/1.1" 200 62912
+[24/Aug/2026 14:51:45] "GET /static/js/components/document-number-field.js HTTP/1.1" 200 2628
+[24/Aug/2026 14:51:47] "GET /oficios/1/roteiro/ HTTP/1.1" 200 81838
+[24/Aug/2026 14:51:47] "GET /static/vendor/leaflet/leaflet.css HTTP/1.1" 200 14806
+[24/Aug/2026 14:51:47] "GET /static/css/profiles/oficio-route.css HTTP/1.1" 200 63811
+[24/Aug/2026 14:51:47] "GET /static/vendor/leaflet/leaflet.js HTTP/1.1" 200 147843
+[24/Aug/2026 14:51:47] "GET /static/js/pages/roteiros-wizard.js HTTP/1.1" 200 12177
+[24/Aug/2026 14:51:47] "GET /static/js/pages/roteiros.js HTTP/1.1" 200 354
+[24/Aug/2026 14:51:47] "GET /static/js/pages/roteiros-map.js HTTP/1.1" 200 25966
+[24/Aug/2026 14:51:47] "GET /static/js/form-components.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 14:51:47] "GET /static/js/pages/roteiros/editor/source-toggle.js HTTP/1.1" 200 1621
+[24/Aug/2026 14:51:47] "GET /static/js/pages/roteiros/editor/index.js HTTP/1.1" 200 87470
+[24/Aug/2026 14:51:47] "GET /static/js/pages/roteiros/editor/trechos.js HTTP/1.1" 200 11624
+[24/Aug/2026 14:51:47] "GET /static/js/pages/roteiros/editor/mapa.js HTTP/1.1" 200 619
+[24/Aug/2026 14:51:47] "GET /roteiros/api/cidades/1/ HTTP/1.1" 200 156
+[24/Aug/2026 14:51:50] "POST /roteiros/calcular-diarias/ HTTP/1.1" 200 701
+[24/Aug/2026 14:51:50] "GET /oficios/1/justificativa/ HTTP/1.1" 200 44436
+[24/Aug/2026 14:51:50] "GET /static/css/profiles/oficio-justification.css HTTP/1.1" 200 62943
+[24/Aug/2026 14:51:50] "GET /static/js/pages/oficios-justificativa-wizard.js HTTP/1.1" 200 2970
+[24/Aug/2026 14:51:52] "GET /oficios/1/resumo/ HTTP/1.1" 200 59736
+[24/Aug/2026 14:51:52] "GET /static/css/profiles/oficio-documents.css HTTP/1.1" 200 62793
+[24/Aug/2026 14:51:52] "GET /static/js/pages/oficios-documentos-inline.js HTTP/1.1" 200 5529
+[24/Aug/2026 14:51:55] "GET /oficios/1/documentos/ HTTP/1.1" 200 59736
+[24/Aug/2026 14:51:58] "GET /eventos/ HTTP/1.1" 200 51579
+[24/Aug/2026 14:51:58] "GET /static/css/ui.bundle.css HTTP/1.1" 304 0
+[24/Aug/2026 14:51:58] "GET /static/css/profiles/eventos-list.css HTTP/1.1" 200 60311
+[24/Aug/2026 14:51:58] "GET /static/js/shell.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 14:51:59] "GET /oficios/modelos-motivo/ HTTP/1.1" 200 44212
+[24/Aug/2026 14:51:59] "GET /static/css/profiles/catalog-lists.css HTTP/1.1" 200 64681
+[24/Aug/2026 14:52:00] "GET /oficios/modelos-motivo/novo/ HTTP/1.1" 200 44215
+[24/Aug/2026 14:52:00] "GET /static/css/profiles/model-forms.css HTTP/1.1" 200 64681
+[24/Aug/2026 14:52:01] "GET /oficios/modelos-motivo/1/editar/ HTTP/1.1" 302 0
+[24/Aug/2026 14:52:01] "GET /oficios/modelos-motivo/ HTTP/1.1" 200 44212
+[24/Aug/2026 14:52:02] "GET /roteiros/ HTTP/1.1" 200 42996
+[24/Aug/2026 14:52:02] "GET /static/css/profiles/entity-lists.css HTTP/1.1" 304 0
+[24/Aug/2026 14:52:04] "GET /roteiros/novo/ HTTP/1.1" 200 78825
+[24/Aug/2026 14:52:04] "GET /static/css/profiles/roteiro-form.css HTTP/1.1" 200 63102
+[24/Aug/2026 14:52:05] "GET /static/js/form-components.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 14:52:06] "GET /roteiros/api/cidades/1/ HTTP/1.1" 200 156
+[24/Aug/2026 14:52:07] "GET /prestacoes-contas/ HTTP/1.1" 200 61685
+[24/Aug/2026 14:52:07] "GET /static/js/pages/prestacoes-docs-wa.js HTTP/1.1" 200 4976
+[24/Aug/2026 14:52:07] "GET /static/js/components/download-queue.js HTTP/1.1" 200 13413
+[24/Aug/2026 14:52:07] "GET /static/js/pages/prestacoes-diaria-wa.js HTTP/1.1" 200 8049
+[24/Aug/2026 14:52:10] "GET /roteiros/1/editar/ HTTP/1.1" 200 79724
+[24/Aug/2026 14:52:10] "GET /roteiros/api/cidades/1/ HTTP/1.1" 200 156
+[24/Aug/2026 14:52:12] "POST /roteiros/calcular-diarias/ HTTP/1.1" 200 701
+[24/Aug/2026 14:52:12] "GET /termos/ HTTP/1.1" 200 53916
+[24/Aug/2026 14:52:13] "GET /termos/oficio/1/preview/ HTTP/1.1" 200 39243
+[24/Aug/2026 14:52:13] "GET /static/css/profiles/termo-preview.css HTTP/1.1" 200 59608
+[24/Aug/2026 14:52:15] "GET /justificativas/ HTTP/1.1" 200 46538
+[24/Aug/2026 14:52:15] "GET /static/css/pages/justificativas.css HTTP/1.1" 200 8189
+[24/Aug/2026 14:52:15] "GET /static/css/profiles/justificativas-list.css HTTP/1.1" 200 66353
+[24/Aug/2026 14:52:15] "GET /static/js/pages/justificativas-index.js HTTP/1.1" 200 7532
+[24/Aug/2026 14:52:16] "GET /justificativas/novo/ HTTP/1.1" 302 0
+[24/Aug/2026 14:52:16] "GET /justificativas/modelos/ HTTP/1.1" 200 44219
+[24/Aug/2026 14:52:17] "GET /justificativas/1/editar/ HTTP/1.1" 302 0
+[24/Aug/2026 14:52:17] "GET /justificativas/modelos/ HTTP/1.1" 200 44219
+[24/Aug/2026 14:52:17] "GET /static/css/ui.bundle.css HTTP/1.1" 304 0
+[24/Aug/2026 14:52:17] "GET /static/js/shell.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 14:52:19] "GET /planos-trabalho/ HTTP/1.1" 200 46806
+[24/Aug/2026 14:52:20] "GET /ordens-servico/ HTTP/1.1" 200 53024
+[24/Aug/2026 14:52:20] "GET /static/css/profiles/entity-lists.css HTTP/1.1" 304 0
+[24/Aug/2026 14:52:21] "GET /cadastros/configuracao/ HTTP/1.1" 200 44736
+[24/Aug/2026 14:52:21] "GET /static/css/profiles/admin-form.css HTTP/1.1" 200 61714
+[24/Aug/2026 14:52:21] "GET /static/js/pages/configuracoes.js HTTP/1.1" 200 5229
+[24/Aug/2026 14:52:23] "GET /cadastros/servidores/ HTTP/1.1" 200 42690
+[24/Aug/2026 14:52:23] "GET /static/css/profiles/catalog-lists.css HTTP/1.1" 304 0
+[24/Aug/2026 14:52:24] "GET /cadastros/servidores/novo/ HTTP/1.1" 200 44389
+[24/Aug/2026 14:52:24] "GET /static/js/pages/servidores-form.js HTTP/1.1" 200 3375
+[24/Aug/2026 14:52:25] "GET /cadastros/servidores/1/editar/ HTTP/1.1" 200 44449
+[24/Aug/2026 14:52:25] "GET /static/js/form-components.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 14:52:27] "GET /cadastros/viaturas/ HTTP/1.1" 200 42828
+[24/Aug/2026 14:52:28] "GET /cadastros/viaturas/nova/ HTTP/1.1" 200 46259
+[24/Aug/2026 14:52:28] "GET /static/js/pages/viaturas-form.js HTTP/1.1" 200 4033
+[24/Aug/2026 14:52:29] "GET /cadastros/viaturas/1/editar/ HTTP/1.1" 200 46279
+[24/Aug/2026 14:52:30] "GET /cadastros/unidades/ HTTP/1.1" 200 43501
+[24/Aug/2026 14:52:31] "GET /cadastros/unidades/nova/ HTTP/1.1" 200 43504
+[24/Aug/2026 14:52:31] "GET /static/css/profiles/model-forms.css HTTP/1.1" 304 0
+[24/Aug/2026 14:52:32] "GET /cadastros/unidades/1/editar/ HTTP/1.1" 302 0
+[24/Aug/2026 14:52:33] "GET /cadastros/unidades/ HTTP/1.1" 200 43501
+[24/Aug/2026 14:52:34] "GET /cadastros/cargos/ HTTP/1.1" 200 43146
+[24/Aug/2026 14:52:36] "GET /cadastros/cargos/novo/ HTTP/1.1" 200 43149
+[24/Aug/2026 14:52:38] "GET /cadastros/cargos/1/editar/ HTTP/1.1" 302 0
+[24/Aug/2026 14:52:38] "GET /cadastros/cargos/ HTTP/1.1" 200 43146
+[24/Aug/2026 14:52:38] "GET /static/css/ui.bundle.css HTTP/1.1" 304 0
+[24/Aug/2026 14:52:38] "GET /static/js/shell.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 14:52:39] "GET /cadastros/combustiveis/ HTTP/1.1" 200 43607
+[24/Aug/2026 14:52:40] "GET /cadastros/combustiveis/novo/ HTTP/1.1" 200 43610
+[24/Aug/2026 14:52:41] "GET /cadastros/combustiveis/1/editar/ HTTP/1.1" 302 0
+[24/Aug/2026 14:52:41] "GET /cadastros/combustiveis/ HTTP/1.1" 200 43607
+[24/Aug/2026 14:53:46] "GET / HTTP/1.1" 200 41378
+[24/Aug/2026 14:53:47] "GET /static/css/profiles/dashboard.css HTTP/1.1" 304 0
+[24/Aug/2026 14:53:47] "GET /static/css/ui.bundle.css HTTP/1.1" 304 0
+[24/Aug/2026 14:53:47] "GET /static/js/shell.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 14:54:08] "GET /oficios/ HTTP/1.1" 200 61538
+[24/Aug/2026 14:54:08] "GET /static/css/profiles/entity-lists.css HTTP/1.1" 304 0
+[24/Aug/2026 14:54:08] "GET /static/js/form-components.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 14:54:19] "GET /oficios/1/dados-viajantes/ HTTP/1.1" 200 55269
+[24/Aug/2026 14:54:19] "GET /static/css/profiles/oficio-core.css HTTP/1.1" 304 0
+[24/Aug/2026 14:54:19] "GET /static/css/ui.bundle.css HTTP/1.1" 304 0
+[24/Aug/2026 14:54:19] "GET /static/js/shell.bundle.js HTTP/1.1" 304 0
+Bad Request: /oficios/1/dados-viajantes/autosave/
+[24/Aug/2026 14:54:54] "POST /oficios/1/dados-viajantes/autosave/ HTTP/1.1" 400 168
+[24/Aug/2026 14:55:01] "GET /oficios/1/transporte/ HTTP/1.1" 200 47667
+Bad Request: /oficios/1/dados-viajantes/autosave/
+[24/Aug/2026 14:55:01] "POST /oficios/1/dados-viajantes/autosave/ HTTP/1.1" 400 168
+[24/Aug/2026 14:55:01] "GET /static/css/profiles/oficio-transport.css HTTP/1.1" 304 0
+[24/Aug/2026 14:55:01] "GET /static/css/ui.bundle.css HTTP/1.1" 304 0
+[24/Aug/2026 14:55:01] "GET /static/js/shell.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 14:55:01] "GET /static/js/form-components.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 14:55:08] "POST /oficios/1/transporte/autosave/ HTTP/1.1" 200 157
+C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\.venv\Lib\site-packages\django\template\defaulttags.py:87: UserWarning: A {% csrf_token %} was used in a template, but the context did not provide the value.  This is usually caused by not using RequestContext.
+  warnings.warn(
+[24/Aug/2026 14:57:46] "GET /perfil/ HTTP/1.1" 200 47678
+[24/Aug/2026 14:57:46] "GET /static/css/ui.bundle.css HTTP/1.1" 304 0
+[24/Aug/2026 14:57:46] "GET /static/css/shell.bundle.css HTTP/1.1" 200 58653
+[24/Aug/2026 14:57:46] "GET /static/js/shell.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 14:57:46] "GET /static/js/pages/gdrive-config.js HTTP/1.1" 200 19598
+[24/Aug/2026 14:57:46] "GET /static/css/base/tokens.css HTTP/1.1" 200 31160
+[24/Aug/2026 14:57:46] "GET /static/css/fields/forms.css HTTP/1.1" 200 5800
+[24/Aug/2026 14:57:46] "GET /static/css/base/base.css HTTP/1.1" 200 10427
+[24/Aug/2026 14:57:51] "GET /cadastros/ HTTP/1.1" 200 45019
+[24/Aug/2026 14:57:53] "GET /cadastros/estados/ HTTP/1.1" 200 49269
+[24/Aug/2026 14:57:54] "GET /cadastros/cidades/ HTTP/1.1" 200 45671
+[24/Aug/2026 14:57:54] "GET /cadastros/configuracao/oficio/ HTTP/1.1" 200 47459
+[24/Aug/2026 14:57:54] "GET /static/css/shell.form-components.bundle.css HTTP/1.1" 200 61087
+[24/Aug/2026 14:57:54] "GET /static/js/form-components.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 14:57:55] "GET /cadastros/configuracao/roteiros/ HTTP/1.1" 200 46153
+[24/Aug/2026 14:57:55] "GET /static/js/components/diaria-derivados.js HTTP/1.1" 200 2386
+[24/Aug/2026 14:57:56] "GET /usuarios/ HTTP/1.1" 200 51294
+[24/Aug/2026 14:57:57] "GET /static/js/pages/usuarios-admin.js HTTP/1.1" 200 6376
+[24/Aug/2026 14:57:57] "GET /usuarios/areas/ HTTP/1.1" 200 49483
+[24/Aug/2026 14:57:58] "GET /usuarios/areas/1/ HTTP/1.1" 200 49038
+[24/Aug/2026 14:57:58] "GET /static/css/pages/usuarios.css HTTP/1.1" 200 8083
+[24/Aug/2026 14:57:59] "GET /static/js/pages/usuarios-area-form.js HTTP/1.1" 200 3739
+[24/Aug/2026 14:58:00] "GET /documentos/ HTTP/1.1" 200 37890
+[24/Aug/2026 14:58:01] "GET /eventos/novo/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:01] "GET /eventos/ HTTP/1.1" 200 58943
+[24/Aug/2026 14:58:01] "GET /static/css/profiles/eventos-list.css HTTP/1.1" 304 0
+[24/Aug/2026 14:58:03] "GET /eventos/1/ HTTP/1.1" 200 77026
+[24/Aug/2026 14:58:03] "GET /static/js/pages/eventos-detalhe.js HTTP/1.1" 200 17113
+[24/Aug/2026 14:58:03] "GET /roteiros/api/cidades/1/ HTTP/1.1" 200 156
+[24/Aug/2026 14:58:04] "GET /eventos/1/guiado/etapa-1/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:04] "GET /login/?next=/eventos/1/guiado/etapa-1/ HTTP/1.1" 200 20450
+[24/Aug/2026 14:58:05] "GET /eventos/1/guiado/etapa-2/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:05] "GET /login/?next=/eventos/1/guiado/etapa-2/ HTTP/1.1" 200 20450
+[24/Aug/2026 14:58:05] "GET /eventos/1/guiado/etapa-3/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:05] "GET /login/?next=/eventos/1/guiado/etapa-3/ HTTP/1.1" 200 20450
+[24/Aug/2026 14:58:06] "GET /eventos/1/guiado/etapa-4/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:06] "GET /login/?next=/eventos/1/guiado/etapa-4/ HTTP/1.1" 200 20450
+[24/Aug/2026 14:58:06] "GET /eventos/1/guiado/etapa-5/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:06] "GET /login/?next=/eventos/1/guiado/etapa-5/ HTTP/1.1" 200 20450
+[24/Aug/2026 14:58:07] "GET /eventos/1/editar/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:07] "GET /login/?next=/eventos/1/editar/ HTTP/1.1" 200 20442
+[24/Aug/2026 14:58:07] "GET /eventos/tipos/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:07] "GET /login/?next=/eventos/tipos/ HTTP/1.1" 200 20439
+[24/Aug/2026 14:58:08] "GET /planos-trabalho/novo/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:08] "GET /login/?next=/planos-trabalho/novo/ HTTP/1.1" 200 20446
+[24/Aug/2026 14:58:08] "GET /planos-trabalho/1/identificacao/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:08] "GET /login/?next=/planos-trabalho/1/identificacao/ HTTP/1.1" 200 20457
+[24/Aug/2026 14:58:09] "GET /planos-trabalho/1/efetivo-diarias/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:09] "GET /login/?next=/planos-trabalho/1/efetivo-diarias/ HTTP/1.1" 200 20459
+[24/Aug/2026 14:58:09] "GET /planos-trabalho/1/atividades/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:09] "GET /login/?next=/planos-trabalho/1/atividades/ HTTP/1.1" 200 20454
+[24/Aug/2026 14:58:10] "GET /planos-trabalho/1/documentos/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:10] "GET /login/?next=/planos-trabalho/1/documentos/ HTTP/1.1" 200 20454
+[24/Aug/2026 14:58:10] "GET /planos-trabalho/programas/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:10] "GET /login/?next=/planos-trabalho/programas/ HTTP/1.1" 200 20451
+[24/Aug/2026 14:58:11] "GET /planos-trabalho/horarios/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:11] "GET /login/?next=/planos-trabalho/horarios/ HTTP/1.1" 200 20450
+[24/Aug/2026 14:58:12] "GET /planos-trabalho/atividades/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:12] "GET /login/?next=/planos-trabalho/atividades/ HTTP/1.1" 200 20452
+[24/Aug/2026 14:58:12] "GET /planos-trabalho/presets/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:12] "GET /login/?next=/planos-trabalho/presets/ HTTP/1.1" 200 20449
+[24/Aug/2026 14:58:13] "GET /ordens-servico/nova/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:13] "GET /login/?next=/ordens-servico/nova/ HTTP/1.1" 200 20445
+[24/Aug/2026 14:58:13] "GET /ordens-servico/1/editar/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:13] "GET /login/?next=/ordens-servico/1/editar/ HTTP/1.1" 200 20449
+[24/Aug/2026 14:58:14] "GET /protocolos/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:14] "GET /login/?next=/protocolos/ HTTP/1.1" 200 20436
+[24/Aug/2026 14:58:14] "GET /protocolos/novo/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:14] "GET /login/?next=/protocolos/novo/ HTTP/1.1" 200 20441
+[24/Aug/2026 14:58:15] "GET /protocolos/vincular/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:15] "GET /login/?next=/protocolos/vincular/ HTTP/1.1" 200 20445
+[24/Aug/2026 14:58:15] "GET /protocolos/1/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:15] "GET /login/?next=/protocolos/1/ HTTP/1.1" 200 20438
+[24/Aug/2026 14:58:16] "GET /protocolos/1/enviar-documento/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:16] "GET /login/?next=/protocolos/1/enviar-documento/ HTTP/1.1" 200 20455
+[24/Aug/2026 14:58:17] "GET /prestacoes-contas/servidor-prestacao/1/documentos/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:17] "GET /login/?next=/prestacoes-contas/servidor-prestacao/1/documentos/ HTTP/1.1" 200 20475
+[24/Aug/2026 14:58:17] "GET /prestacoes-contas/servidor-prestacao/1/rt/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:17] "GET /login/?next=/prestacoes-contas/servidor-prestacao/1/rt/ HTTP/1.1" 200 20467
+[24/Aug/2026 14:58:18] "GET /prestacoes-contas/servidor-prestacao/1/diario/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:18] "GET /login/?next=/prestacoes-contas/servidor-prestacao/1/diario/ HTTP/1.1" 200 20471
+[24/Aug/2026 14:58:18] "GET /prestacoes-contas/servidor-prestacao/1/consolidado/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:18] "GET /login/?next=/prestacoes-contas/servidor-prestacao/1/consolidado/ HTTP/1.1" 200 20476
+[24/Aug/2026 14:58:19] "GET /prestacoes-contas/servidor-prestacao/1/downloads/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:19] "GET /login/?next=/prestacoes-contas/servidor-prestacao/1/downloads/ HTTP/1.1" 200 20474
+[24/Aug/2026 14:58:19] "GET /prestacoes-contas/servidor-prestacao/1/diario/motorista/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:19] "GET /login/?next=/prestacoes-contas/servidor-prestacao/1/diario/motorista/ HTTP/1.1" 200 20481
+[24/Aug/2026 14:58:20] "GET /prestacoes-contas/servidor-prestacao/1/diario/editar-roteiro/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:20] "GET /login/?next=/prestacoes-contas/servidor-prestacao/1/diario/editar-roteiro/ HTTP/1.1" 200 20486
+[24/Aug/2026 14:58:20] "GET /prestacoes-contas/modelos-texto/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:20] "GET /login/?next=/prestacoes-contas/modelos-texto/ HTTP/1.1" 200 20457
+[24/Aug/2026 14:58:20] "GET /termos/novo/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:20] "GET /login/?next=/termos/novo/ HTTP/1.1" 200 20437
+[24/Aug/2026 14:58:21] "GET /termos/1/editar/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:21] "GET /login/?next=/termos/1/editar/ HTTP/1.1" 200 20441
+[24/Aug/2026 14:58:21] "GET /termos/1/downloads/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:21] "GET /login/?next=/termos/1/downloads/ HTTP/1.1" 200 20444
+[24/Aug/2026 14:58:22] "GET /justificativas/modelos/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:22] "GET /login/?next=/justificativas/modelos/ HTTP/1.1" 200 20448
+Forbidden (CSRF token from POST incorrect.): /login/
+[24/Aug/2026 14:58:42] "POST /login/ HTTP/1.1" 403 2504
+[24/Aug/2026 14:58:57] "GET /login/ HTTP/1.1" 200 20382
+[24/Aug/2026 14:58:57] "GET /static/css/ui.bundle.css HTTP/1.1" 304 0
+[24/Aug/2026 14:58:58] "POST /login/ HTTP/1.1" 302 0
+[24/Aug/2026 14:58:58] "GET / HTTP/1.1" 200 41378
+[24/Aug/2026 14:58:58] "GET /static/css/profiles/dashboard.css HTTP/1.1" 304 0
+[24/Aug/2026 14:58:58] "GET /static/js/shell.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 14:59:15] "GET /eventos/1/guiado/etapa-1/ HTTP/1.1" 200 77064
+[24/Aug/2026 14:59:15] "GET /static/js/form-components.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 14:59:15] "GET /static/css/shell.form-components.bundle.css HTTP/1.1" 304 0
+[24/Aug/2026 14:59:15] "GET /roteiros/api/cidades/1/ HTTP/1.1" 200 156
+[24/Aug/2026 14:59:16] "GET /eventos/1/guiado/etapa-2/ HTTP/1.1" 200 53756
+[24/Aug/2026 14:59:17] "GET /eventos/1/guiado/etapa-3/ HTTP/1.1" 200 58752
+[24/Aug/2026 14:59:18] "GET /eventos/1/guiado/etapa-4/ HTTP/1.1" 200 60279
+[24/Aug/2026 14:59:19] "GET /eventos/1/guiado/etapa-5/ HTTP/1.1" 200 56436
+[24/Aug/2026 14:59:20] "GET /eventos/1/editar/ HTTP/1.1" 200 49115
+[24/Aug/2026 14:59:21] "GET /eventos/tipos/ HTTP/1.1" 200 41753
+[24/Aug/2026 14:59:21] "GET /static/css/shell.bundle.css HTTP/1.1" 304 0
+[24/Aug/2026 14:59:21] "GET /planos-trabalho/novo/ HTTP/1.1" 302 0
+[24/Aug/2026 14:59:21] "GET /planos-trabalho/ HTTP/1.1" 200 46806
+[24/Aug/2026 14:59:21] "GET /static/css/profiles/entity-lists.css HTTP/1.1" 304 0
+[24/Aug/2026 14:59:22] "GET /planos-trabalho/1/identificacao/ HTTP/1.1" 200 73813
+[24/Aug/2026 14:59:22] "GET /static/js/pages/planos-trabalho-wizard.js HTTP/1.1" 200 36413
+[24/Aug/2026 14:59:23] "GET /roteiros/api/cidades/1/ HTTP/1.1" 200 156
+[24/Aug/2026 14:59:24] "GET /planos-trabalho/1/efetivo-diarias/ HTTP/1.1" 200 58028
+[24/Aug/2026 14:59:25] "GET /planos-trabalho/1/atividades/ HTTP/1.1" 200 49022
+[24/Aug/2026 14:59:26] "GET /planos-trabalho/1/documentos/ HTTP/1.1" 200 45256
+[24/Aug/2026 14:59:27] "GET /planos-trabalho/programas/ HTTP/1.1" 200 43949
+[24/Aug/2026 14:59:28] "GET /planos-trabalho/horarios/ HTTP/1.1" 200 43669
+[24/Aug/2026 14:59:29,128] - Broken pipe from ('127.0.0.1', 61105)
+[24/Aug/2026 14:59:29] "GET /planos-trabalho/atividades/ HTTP/1.1" 200 44474
+[24/Aug/2026 14:59:30] "GET /planos-trabalho/presets/ HTTP/1.1" 200 44651
+[24/Aug/2026 14:59:31] "GET /ordens-servico/nova/ HTTP/1.1" 200 60232
+[24/Aug/2026 14:59:31] "GET /static/css/pages/ordens-servico.css HTTP/1.1" 200 2839
+[24/Aug/2026 14:59:31] "GET /static/js/pages/ordens-servico-form.js HTTP/1.1" 200 31605
+[24/Aug/2026 14:59:31] "GET /roteiros/api/cidades/1/ HTTP/1.1" 200 156
+[24/Aug/2026 14:59:31] "GET /ordens-servico/api/oficios/?q= HTTP/1.1" 200 1344
+[24/Aug/2026 14:59:32] "GET /ordens-servico/1/editar/ HTTP/1.1" 200 61976
+[24/Aug/2026 14:59:32] "GET /roteiros/api/cidades/1/ HTTP/1.1" 200 156
+[24/Aug/2026 14:59:32] "GET /ordens-servico/api/oficios/?q= HTTP/1.1" 200 1344
+[24/Aug/2026 14:59:33] "GET /protocolos/ HTTP/1.1" 200 45507
+[24/Aug/2026 14:59:34] "GET /protocolos/novo/ HTTP/1.1" 200 41911
+Method Not Allowed (GET): /protocolos/vincular/
+[24/Aug/2026 14:59:35] "GET /protocolos/vincular/ HTTP/1.1" 405 0
+[24/Aug/2026 14:59:35] "GET /protocolos/1/ HTTP/1.1" 200 42378
+[24/Aug/2026 14:59:37] "GET /protocolos/1/enviar-documento/ HTTP/1.1" 200 40549
+[24/Aug/2026 14:59:38] "GET /prestacoes-contas/servidor-prestacao/1/documentos/ HTTP/1.1" 200 60182
+[24/Aug/2026 14:59:38] "GET /static/css/pages/prestacoes_contas.css HTTP/1.1" 200 9339
+[24/Aug/2026 14:59:40] "GET /prestacoes-contas/servidor-prestacao/1/rt/ HTTP/1.1" 200 63002
+[24/Aug/2026 14:59:40] "GET /static/js/pages/prestacoes-contas-rt.js HTTP/1.1" 200 1986
+[24/Aug/2026 14:59:43] "GET /prestacoes-contas/servidor-prestacao/1/diario/ HTTP/1.1" 200 53317
+[24/Aug/2026 14:59:45] "GET /prestacoes-contas/servidor-prestacao/1/consolidado/ HTTP/1.1" 200 47024
+[24/Aug/2026 14:59:49] "GET /prestacoes-contas/servidor-prestacao/1/downloads/ HTTP/1.1" 200 877
+[24/Aug/2026 14:59:50] "GET /prestacoes-contas/servidor-prestacao/1/diario/motorista/ HTTP/1.1" 200 50631
+[24/Aug/2026 14:59:50] "GET /static/js/pages/diario-motorista.js HTTP/1.1" 200 3318
+[24/Aug/2026 14:59:51] "GET /prestacoes-contas/servidor-prestacao/1/diario/editar-roteiro/ HTTP/1.1" 302 0
+[24/Aug/2026 14:59:52] "GET /roteiros/6/editar/?next=%2Fprestacoes-contas%2Fservidor-prestacao%2F1%2Fdiario%2F HTTP/1.1" 200 82543
+[24/Aug/2026 14:59:52] "GET /static/css/profiles/roteiro-form.css HTTP/1.1" 304 0
+[24/Aug/2026 14:59:53] "GET /roteiros/api/cidades/1/ HTTP/1.1" 200 156
+[24/Aug/2026 14:59:55] "GET /prestacoes-contas/modelos-texto/ HTTP/1.1" 200 41964
+[24/Aug/2026 14:59:56,021] - Broken pipe from ('127.0.0.1', 59035)
+[24/Aug/2026 14:59:57] "GET /termos/novo/ HTTP/1.1" 200 56317
+[24/Aug/2026 14:59:57] "GET /static/js/pages/termos-form.js HTTP/1.1" 200 14102
+[24/Aug/2026 14:59:57] "GET /roteiros/api/cidades/1/ HTTP/1.1" 200 156
+[24/Aug/2026 14:59:57] "GET /termos/api/oficios/?q= HTTP/1.1" 200 1227
+[24/Aug/2026 14:59:58] "GET /termos/1/editar/ HTTP/1.1" 200 63216
+[24/Aug/2026 14:59:58] "GET /static/css/ui.bundle.css HTTP/1.1" 304 0
+[24/Aug/2026 14:59:58] "GET /roteiros/api/cidades/1/ HTTP/1.1" 200 156
+[24/Aug/2026 14:59:59] "GET /termos/api/oficios/?q= HTTP/1.1" 200 1227
+[24/Aug/2026 14:59:59] "GET /termos/1/downloads/ HTTP/1.1" 200 674
+[24/Aug/2026 15:00:00] "GET /justificativas/modelos/ HTTP/1.1" 200 44219
+[24/Aug/2026 15:00:00] "GET /static/css/profiles/model-forms.css HTTP/1.1" 304 0
+[24/Aug/2026 15:00:00] "GET /static/js/shell.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 15:01:55] "GET /eventos/ HTTP/1.1" 200 58943
+[24/Aug/2026 15:01:55] "GET /static/css/profiles/eventos-list.css HTTP/1.1" 304 0
+[24/Aug/2026 15:01:55] "GET /static/css/ui.bundle.css HTTP/1.1" 304 0
+[24/Aug/2026 15:01:55] "GET /static/js/shell.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 15:01:55] "GET /static/js/form-components.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 15:02:04] "POST /eventos/novo/ HTTP/1.1" 302 0
+[24/Aug/2026 15:02:04] "GET /eventos/2/guiado/etapa-1/ HTTP/1.1" 200 74247
+[24/Aug/2026 15:02:04] "GET /static/css/shell.form-components.bundle.css HTTP/1.1" 304 0
+[24/Aug/2026 15:02:04] "GET /roteiros/api/cidades/1/ HTTP/1.1" 200 156
+[24/Aug/2026 15:03:16] "GET /perfil/ HTTP/1.1" 302 0
+[24/Aug/2026 15:03:16] "GET /login/?next=/perfil/ HTTP/1.1" 200 20432
+[24/Aug/2026 15:03:16] "GET /static/css/ui.bundle.css HTTP/1.1" 304 0
+[24/Aug/2026 15:03:16] "GET /login/ HTTP/1.1" 200 20382
+[24/Aug/2026 15:03:19] "POST /login/ HTTP/1.1" 302 0
+[24/Aug/2026 15:03:19] "GET / HTTP/1.1" 200 41378
+[24/Aug/2026 15:03:19] "GET /static/css/profiles/dashboard.css HTTP/1.1" 304 0
+[24/Aug/2026 15:03:19] "GET /static/js/shell.bundle.js HTTP/1.1" 304 0
+[24/Aug/2026 15:03:20] "GET /perfil/ HTTP/1.1" 200 47678
+[24/Aug/2026 15:03:20] "GET /static/css/shell.bundle.css HTTP/1.1" 304 0
+Internal Server Error: /prestacoes-contas/assinar/5MN5YRf5BjqLLDwEOiVZ4paMkvFyvuv-/
+Traceback (most recent call last):
+  File "C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\core\db_fields.py", line 35, in to_python
+    return self._cipher().decrypt(token).decode("utf-8")
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\.venv\Lib\site-packages\cryptography\fernet.py", line 206, in decrypt
+    raise InvalidToken
+cryptography.fernet.InvalidToken
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\prestacoes_contas\assinatura_views.py", line 127, in publico_landing
+    docs = documentos_do_link(token)
+  File "C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\prestacoes_contas\assinatura_services.py", line 158, in documentos_do_link
+    docs = list(
+        AssinaturaDocumento.objects.select_related(
+            "prestacao__oficio", "servidor_prestacao__servidor", "signer"
+        ).filter(link_token_hash=token_hash)
+    )
+  File "C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\.venv\Lib\site-packages\django\db\models\query.py", line 386, in __iter__
+    self._fetch_all()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\.venv\Lib\site-packages\django\db\models\query.py", line 1954, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\.venv\Lib\site-packages\django\db\models\query.py", line 125, in __iter__
+    for row in compiler.results_iter(results):
+               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1541, in apply_converters
+    value = converter(value, expression, connection)
+  File "C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\core\db_fields.py", line 28, in from_db_value
+    return self.to_python(value)
+           ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\core\db_fields.py", line 37, in to_python
+    raise ImproperlyConfigured(
+        f"Não foi possível descriptografar {self.model._meta.label}.{self.name}.",
+    ) from exc
+django.core.exceptions.ImproperlyConfigured: Não foi possível descriptografar prestacoes_contas.AssinaturaDocumento.link_token.
+[24/Aug/2026 15:04:25] "GET /prestacoes-contas/assinar/5MN5YRf5BjqLLDwEOiVZ4paMkvFyvuv-/ HTTP/1.1" 500 145467
