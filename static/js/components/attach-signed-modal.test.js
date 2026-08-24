@@ -130,6 +130,39 @@ describe("modal de anexos assinados", () => {
     });
   });
 
+  it("mostra o motivo que o servidor deu para recusar o arquivo", async () => {
+    const { trigger } = montarModal();
+    registration[1](document);
+    trigger.click();
+
+    selecionarArquivo("oficio.pdf");
+    document.querySelector('[data-attach-signed-kind="despacho"]').click();
+    selecionarArquivo("despacho.pdf");
+
+    httpRequest.mockResolvedValueOnce({
+      ok: false,
+      status: 400,
+      json: () => Promise.resolve({
+        ok: false,
+        error: "O conteúdo não corresponde a um PDF válido.",
+      }),
+    });
+
+    document.querySelector("[data-attach-signed-form]").dispatchEvent(
+      new Event("submit", { bubbles: true, cancelable: true })
+    );
+
+    await vi.waitFor(() => {
+      expect(document.querySelector("[data-attach-signed-error]").textContent).toContain(
+        "O conteúdo não corresponde a um PDF válido."
+      );
+    });
+    // O número do status não substitui o motivo: era só isso que a faixa dizia.
+    expect(document.querySelector("[data-attach-signed-error]").textContent).not.toContain(
+      "HTTP 400"
+    );
+  });
+
   it("restaura no seletor o arquivo da aba ao voltar para ela", () => {
     const { trigger } = montarModal();
     registration[1](document);

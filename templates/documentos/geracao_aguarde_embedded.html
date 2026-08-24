@@ -25,22 +25,38 @@
 </head>
 <body class="document-loading document-loading--embedded">
   <c-v2.sprite />
-  <main
-    class="document-loading__panel"
-    data-document-generation-wait
-    data-status-url="{{ geracao.status_url }}"
-  >
-    <span class="document-loading__mark" aria-hidden="true">
-      {% icone_svg "document" %}
-    </span>
-    <span class="document-loading__spinner" aria-hidden="true"></span>
-    <p class="document-loading__eyebrow">Documento em preparação</p>
-    <h1 class="document-loading__title">Gerando a prévia do plano</h1>
-    <p class="document-loading__detail" data-document-generation-message>
-      Aguarde um instante. O documento será exibido aqui automaticamente.
-    </p>
-  </main>
-  <script src="{% static 'js/core/http.js' %}" defer></script>
-  <script src="{% static 'js/components/document-generation-wait.js' %}" defer></script>
+  {% comment %}
+    Job já falhado não é espera (`NOVO-20260824-133423-ade2a3103cc3`): sem o
+    desvio, o quadro mostrava girador e "aguarde um instante" para uma geração
+    que o servidor recusou antes de começar.
+  {% endcomment %}
+  {% if geracao.error %}
+    <main class="document-loading__panel">
+      <span class="document-loading__mark" aria-hidden="true">
+        {% icone_svg "document" %}
+      </span>
+      <p class="document-loading__eyebrow">Documento não gerado</p>
+      <h1 class="document-loading__title">Não foi possível gerar a prévia</h1>
+      <p class="document-loading__detail">{{ geracao.error }}</p>
+    </main>
+  {% else %}
+    <main
+      class="document-loading__panel"
+      data-document-generation-wait
+      data-status-url="{{ geracao.status_url }}"
+    >
+      <span class="document-loading__mark" aria-hidden="true">
+        {% icone_svg "document" %}
+      </span>
+      <span class="document-loading__spinner" aria-hidden="true"></span>
+      <p class="document-loading__eyebrow">Documento em preparação</p>
+      <h1 class="document-loading__title">Gerando a prévia do plano</h1>
+      <p class="document-loading__detail" data-document-generation-message>
+        Aguarde um instante. O documento será exibido aqui automaticamente.
+      </p>
+    </main>
+    <script src="{% static 'js/core/http.js' %}" defer></script>
+    <script src="{% static 'js/components/document-generation-wait.js' %}" defer></script>
+  {% endif %}
 </body>
 </html>

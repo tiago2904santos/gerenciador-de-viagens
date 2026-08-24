@@ -97,28 +97,36 @@
     dropdown.hidden = false;
   }
 
+  /* O botão de anexar pode morar FORA do picker — no rodapé de um diálogo, por
+     exemplo — e aí ele se liga ao formulário por `form="<id>"`. Procurar só
+     dentro do picker fazia o botão nunca habilitar: o JS não o encontrava e
+     ninguém acusava, porque botão nulo é caminho válido aqui.
+
+     A busca vive numa função só porque a cópia em `setBusy` lia um `input` que
+     não existia naquele escopo: todo submit de picker com botão externo — o
+     modal de anexar assinado é um — quebrava com `ReferenceError` no meio do
+     envio (`NOVO-20260824-133423-dd2bc58e8a2b`). */
+  function uploadButtonFor(picker, input) {
+    var botao = picker.querySelector("[data-file-upload-button]");
+    if (botao) return botao;
+    var formulario = input && input.form;
+    if (!formulario) return null;
+    return (
+      formulario.querySelector("[data-file-upload-button]") ||
+      (formulario.id
+        ? document.querySelector(
+            '[data-file-upload-button][form="' + formulario.id + '"]'
+          )
+        : null)
+    );
+  }
+
   function update(picker) {
     var input = inputFor(picker);
     if (!input) return;
     var files = input.files ? Array.prototype.slice.call(input.files) : [];
     var nameTarget = picker.querySelector("[data-file-picker-name]");
-    /* O botão de anexar pode morar FORA do picker — no rodapé de um diálogo, por
-       exemplo — e aí ele se liga ao formulário por `form="<id>"`. Procurar só
-       dentro do picker fazia o botão nunca habilitar: o JS não o encontrava e
-       ninguém acusava, porque `uploadButton` nulo é caminho válido aqui. */
-    var uploadButton = picker.querySelector("[data-file-upload-button]");
-    if (!uploadButton) {
-      var formulario = input.form;
-      if (formulario) {
-        uploadButton =
-          formulario.querySelector("[data-file-upload-button]") ||
-          (formulario.id
-            ? document.querySelector(
-                '[data-file-upload-button][form="' + formulario.id + '"]'
-              )
-            : null);
-      }
-    }
+    var uploadButton = uploadButtonFor(picker, input);
     var status = picker.querySelector("[data-file-picker-status]");
     var hasFiles = files.length > 0;
 
@@ -188,26 +196,14 @@
       ? target
       : target && target.closest ? target.closest("[data-file-picker]") : null;
     if (!picker) return;
-    /* O botão de anexar pode morar FORA do picker — no rodapé de um diálogo, por
-       exemplo — e aí ele se liga ao formulário por `form="<id>"`. Procurar só
-       dentro do picker fazia o botão nunca habilitar: o JS não o encontrava e
-       ninguém acusava, porque `uploadButton` nulo é caminho válido aqui. */
-    var uploadButton = picker.querySelector("[data-file-upload-button]");
-    if (!uploadButton) {
-      var formulario = input.form;
-      if (formulario) {
-        uploadButton =
-          formulario.querySelector("[data-file-upload-button]") ||
-          (formulario.id
-            ? document.querySelector(
-                '[data-file-upload-button][form="' + formulario.id + '"]'
-              )
-            : null);
-      }
-    }
+    var input = inputFor(picker);
+    var uploadButton = uploadButtonFor(picker, input);
     picker.classList.toggle("is-busy", Boolean(busy));
     picker.setAttribute("aria-busy", busy ? "true" : "false");
-    if (uploadButton) uploadButton.disabled = Boolean(busy) || !inputFor(picker).files.length;
+    if (uploadButton) {
+      uploadButton.disabled =
+        Boolean(busy) || !(input && input.files && input.files.length);
+    }
   }
 
   function initPicker(picker) {

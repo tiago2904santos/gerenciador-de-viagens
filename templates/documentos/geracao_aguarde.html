@@ -10,29 +10,53 @@
   O invólucro existe por causa dos dois ganchos: `document-generation-wait.js`
   lê a URL de status do MESMO elemento em que acha o gancho, e atributo com
   VALOR não passa pelo `data_hook` do painel (sai escapado).
+
+  Dois estados, não um (`NOVO-20260824-133423-ade2a3103cc3`): quando o job JÁ
+  falhou — e ele falha antes de existir arquivo, por regra de negócio, como o
+  PDF final sem número de solicitação — esta página abria mesmo assim dizendo
+  "a geração continua em segundo plano" e "o download começa sozinho", com HTTP
+  503. Prometia um arquivo que ninguém estava gerando; o motivo só aparecia
+  segundos depois, trocado no meio do parágrafo pelo JS de espera.
 {% endcomment %}
 
 {% block content %}
   <div class="list-page">
-    <div data-document-generation-wait data-status-url="{{ geracao.status_url }}">
+    {% if geracao.error %}
       <c-v2.panel
-        title="Preparando documento"
-        description="A geração continua em segundo plano. Esta página abrirá o arquivo assim que ele estiver pronto."
+        title="Não foi possível gerar o documento"
+        description="Nada foi gerado. Resolva o que falta e peça o documento de novo."
       >
         <c-slot name="body">
-          <p class="field__help" data-document-generation-message>
-            Assim que o arquivo ficar pronto, o download começa sozinho.
-          </p>
+          <c-v2.alert tone="error" message="{{ geracao.error }}" only />
         </c-slot>
         <c-slot name="footer">
           {% url 'documentos:index' as documentos_url %}
           <c-v2.button label="Voltar" variant="secondary" icon="arrow-left" :href="documentos_url" />
         </c-slot>
       </c-v2.panel>
-    </div>
+    {% else %}
+      <div data-document-generation-wait data-status-url="{{ geracao.status_url }}">
+        <c-v2.panel
+          title="Preparando documento"
+          description="A geração continua em segundo plano. Esta página abrirá o arquivo assim que ele estiver pronto."
+        >
+          <c-slot name="body">
+            <p class="field__help" data-document-generation-message>
+              Assim que o arquivo ficar pronto, o download começa sozinho.
+            </p>
+          </c-slot>
+          <c-slot name="footer">
+            {% url 'documentos:index' as documentos_url %}
+            <c-v2.button label="Voltar" variant="secondary" icon="arrow-left" :href="documentos_url" />
+          </c-slot>
+        </c-v2.panel>
+      </div>
+    {% endif %}
   </div>
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/components/document-generation-wait.js' %}" defer></script>
+  {% if not geracao.error %}
+    <script src="{% static 'js/components/document-generation-wait.js' %}" defer></script>
+  {% endif %}
 {% endblock %}
