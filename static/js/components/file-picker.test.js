@@ -40,16 +40,38 @@ function montar() {
     </form>
     <button type="submit" form="form-anexo" data-file-upload-button disabled>Anexar PDF</button>`;
   init(document);
+  const input = document.querySelector("#arquivo");
+  ligarValueAosArquivos(input);
   return {
     form: document.querySelector("#form-anexo"),
-    input: document.querySelector("#arquivo"),
+    input,
     botao: document.querySelector("[data-file-upload-button]"),
   };
 }
 
+function definirArquivos(input, files) {
+  Object.defineProperty(input, "files", { configurable: true, value: files });
+}
+
+/* No navegador, `input.value = ""` esvazia `input.files` — é assim que
+   `replaceFiles` limpa a seleção. O jsdom não liga as duas coisas, e sem esta
+   ponte o teste de limpar mediria uma seleção que continuava lá. */
+function ligarValueAosArquivos(input) {
+  let valor = "";
+  Object.defineProperty(input, "value", {
+    configurable: true,
+    get: () => valor,
+    set: (novo) => {
+      valor = novo;
+      if (!novo) definirArquivos(input, []);
+    },
+  });
+  definirArquivos(input, []);
+}
+
 function escolher(input, nome) {
   const file = new File([nome], nome, { type: "application/pdf" });
-  Object.defineProperty(input, "files", { configurable: true, value: [file] });
+  definirArquivos(input, [file]);
   input.dispatchEvent(new Event("change", { bubbles: true }));
   return file;
 }
