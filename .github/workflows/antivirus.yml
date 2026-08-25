@@ -1,0 +1,103 @@
+name: Antivirus da VPS (ClamAV)
+
+# A política central de upload (core/uploads.py) é fail-closed: sem antivírus
+# respondendo, nenhum anexo privado entra. Em produção o flag
+# PRIVATE_UPLOAD_REQUIRE_ANTIVIRUS vale `true` por default (config/settings/prod.py),
+# mas a instalação do ClamAV era passo manual do DEPLOY_VPS.md e nunca rodou nesta
+# máquina — todo upload assinado morria em "O serviço antivírus está indisponível".
+# Este workflow existe para que esse passo deixe de depender de alguém lembrar.
+
+on:
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: "checar = só relatório (não muda nada) | instalar = instala e liga o clamd"
+        type: choice
+        options:
+          - checar
+          - instalar
+        default: checar
+
+concurrency:
+  group: antivirus-producao
+  cancel-in-progress: false
+
+jobs:
+  antivirus:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checar viabilidade (somente leitura)
+        if: ${{ inputs.modo == 'checar' }}
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -uo pipefail
+            echo "=== Memória ==="
+            free -m
+            echo "=== Swap ==="
+            swapon --show || echo "sem swap"
+            echo "=== Disco ==="
+            df -h / | tail -1
+            echo "=== ClamAV instalado? ==="
+            command -v clamdscan || echo "clamdscan AUSENTE"
+            command -v clamscan  || echo "clamscan AUSENTE"
+            command -v freshclam || echo "freshclam AUSENTE"
+            systemctl is-active clamav-daemon 2>/dev/null || echo "clamav-daemon nao ativo"
+            ls -l /var/lib/clamav/ 2>/dev/null || echo "sem base de assinaturas"
+            echo "=== FIM ==="
+
+      - name: Instalar e ligar o ClamAV
+        if: ${{ inputs.modo == 'instalar' }}
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 25m
+          script: |
+            set -Eeuo pipefail
+
+            echo "=== Instalando pacotes ==="
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update -qq
+            apt-get install -y clamav-daemon clamav-freshclam
+
+            # O clamd não sobe sem base de assinaturas, e o freshclam em modo
+            # daemon compete pelo lock com a execução manual. Para o serviço,
+            # baixa uma vez em primeiro plano, religa o serviço.
+            echo "=== Baixando assinaturas (freshclam) ==="
+            systemctl stop clamav-freshclam || true
+            freshclam --stdout || echo "freshclam retornou ${?} (pode ser 'up to date')"
+            systemctl enable --now clamav-freshclam
+
+            echo "=== Subindo o clamd ==="
+            systemctl enable --now clamav-daemon
+            for i in $(seq 1 60); do
+              if clamdscan --version >/dev/null 2>&1; then break; fi
+              sleep 5
+            done
+            clamdscan --version
+            systemctl is-active clamav-daemon
+
+            # Reproduz EXATAMENTE o que o Django faz: um NamedTemporaryFile em
+            # /tmp, criado com modo 0600 pelo usuário do gunicorn. O clamd roda
+            # como usuário `clamav` e, sem --fdpass, não consegue ler esse
+            # arquivo — devolve 2 e o upload falha com outra mensagem. Este teste
+            # é o que diz se precisamos de --fdpass.
+            echo "=== Teste no mesmo formato do Django (arquivo 0600 em /tmp) ==="
+            TMP=$(mktemp /tmp/av-test-XXXXXX.pdf)
+            chmod 600 "$TMP"
+            printf '%%PDF-1.4\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%%%EOF\n' > "$TMP"
+            set +e
+            clamdscan --no-summary "$TMP"; echo "clamdscan sem flags -> exit=$?"
+            clamdscan --fdpass --no-summary "$TMP"; echo "clamdscan --fdpass  -> exit=$?"
+            set -e
+            rm -f "$TMP"
+
+            echo "=== Memória depois do clamd ==="
+            free -m
+            echo "=== FIM ==="
