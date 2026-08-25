@@ -15,6 +15,8 @@ from __future__ import annotations
 from django.db.models import OuterRef
 from django.db.models import Prefetch
 from django.db.models import Q
+from django.db.models import Max
+from django.db.models import Min
 from django.shortcuts import get_object_or_404
 
 from cadastros.models import Cargo
@@ -24,6 +26,7 @@ from core.normalizers import remove_accents
 from core.tenancy import filter_queryset_by_area
 from core.tenancy import get_current_area
 from prestacoes_contas.models import PrestacaoServidor
+from oficios.models import Oficio
 
 from .models import AtividadePlanoTrabalho
 from .models import EventoPlano
@@ -145,6 +148,36 @@ def get_plano_by_id(pk) -> PlanoTrabalho:
 
 def get_evento_do_plano_by_id(plano, pk):
     return get_object_or_404(EventoPlano, pk=pk, plano=plano)
+
+
+def obter_intervalo_dos_oficios_do_evento(plano):
+    """Devolve o deslocamento externo coberto pelos ofícios ativos do evento.
+
+    Um evento pode reunir mais de um ofício. Para o plano, o intervalo relevante
+    começa na primeira saída da sede e termina na última chegada de retorno. A
+    área é explícita porque selectors também podem ser chamados fora de request.
+    """
+    if not plano.evento_id:
+        return None
+
+    intervalo = (
+        Oficio.objects.filter(
+            area=plano.area,
+            evento_id=plano.evento_id,
+            cancelado=False,
+            roteiro__isnull=False,
+            roteiro__cancelado=False,
+        )
+        .aggregate(
+            saida=Min("roteiro__saida_dt"),
+            chegada=Max("roteiro__retorno_chegada_dt"),
+        )
+    )
+    if not intervalo["saida"] or not intervalo["chegada"]:
+        return None
+    if intervalo["chegada"] <= intervalo["saida"]:
+        return None
+    return intervalo
 
 
 def cargo_pertence_a_area(pk) -> bool:

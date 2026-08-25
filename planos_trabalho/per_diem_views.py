@@ -19,6 +19,7 @@ from .forms import EfetivoPlanoFormSet
 from .forms import PlanoDiariasForm
 from .models import PlanoTrabalho
 from .selectors import get_evento_do_plano_by_id
+from .selectors import obter_intervalo_dos_oficios_do_evento
 from .services import calcular_diarias_combinadas
 from .services import calcular_diarias_plano
 from .services import adicionar_evento_ao_plano
@@ -138,8 +139,43 @@ def _diarias_display_values(form):
     }
 
 
+def _aplicar_sugestao_de_deslocamento_do_evento(plano):
+    """Completa apenas lacunas em memória; persistência continua no POST/autosave."""
+    campos = (
+        "saida_sede_data",
+        "saida_sede_hora",
+        "chegada_sede_data",
+        "chegada_sede_hora",
+    )
+    if all(getattr(plano, campo) is not None for campo in campos):
+        return
+
+    intervalo = obter_intervalo_dos_oficios_do_evento(plano)
+    if not intervalo:
+        return
+
+    saida = intervalo["saida"]
+    chegada = intervalo["chegada"]
+    if timezone.is_aware(saida):
+        saida = timezone.localtime(saida)
+    if timezone.is_aware(chegada):
+        chegada = timezone.localtime(chegada)
+
+    sugestoes = {
+        "saida_sede_data": saida.date(),
+        "saida_sede_hora": saida.time().replace(tzinfo=None),
+        "chegada_sede_data": chegada.date(),
+        "chegada_sede_hora": chegada.time().replace(tzinfo=None),
+    }
+    for campo, valor in sugestoes.items():
+        if getattr(plano, campo) is None:
+            setattr(plano, campo, valor)
+
+
 def wizard_efetivo_diarias(request, pk):
     plano = _get_plano(pk)
+    if request.method == "GET":
+        _aplicar_sugestao_de_deslocamento_do_evento(plano)
     formset = EfetivoPlanoFormSet(request.POST or None, instance=plano, prefix="efetivo")
     diarias_form = PlanoDiariasForm(request.POST or None, instance=plano)
     if request.method == "POST":

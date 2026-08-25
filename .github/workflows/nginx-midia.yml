@@ -1,0 +1,44 @@
+name: Nginx da midia privada
+
+# A VPS roda a config anterior a auditoria de 2026-07-27: sem
+# `location /_protected_media/` (todo arquivo privado da 404, porque o
+# X-Accel-Redirect do Django nao encontra destino) e com `/media/` servido
+# publicamente (qualquer um com a URL baixa documento privado sem login).
+# O DEPLOY_VPS.md ja documenta a config correta; isto a aplica.
+
+on:
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: "mostrar = so exibe a config | aplicar = corrige | reverter = volta o backup mais recente"
+        type: choice
+        options:
+          - mostrar
+          - aplicar
+          - reverter
+        default: mostrar
+
+concurrency:
+  group: nginx-producao
+  cancel-in-progress: false
+
+jobs:
+  nginx:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mostrar a config atual
+        if: ${{ inputs.modo == 'mostrar' }}
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -uo pipefail
+            echo "=== sites-enabled ==="
+            ls -l /etc/nginx/sites-enabled/
+            echo "=== conteudo (host mascarado pelo Actions) ==="
+            cat -n /etc/nginx/sites-enabled/gerenciador-viagens
+            echo "=== backups existentes ==="
+            ls -l /etc/nginx/sites-available/*.bak-* 2>/dev/null || echo "nenhum backup"
+            echo "=== FIM ==="

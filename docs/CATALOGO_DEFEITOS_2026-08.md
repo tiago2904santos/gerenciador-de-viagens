@@ -11786,3 +11786,17 @@ contínuo: ~1/6 do tempo de viagem, piso de 15 min acima de 30 min, mesmos patam
 Contratos em `roteiros.tests.test_routing` (ETA calibrado contra os pares medidos, ausência de
 salto no tempo adicional, bate-volta sem divergência, multidestino sem igualação indevida) e
 `roteiros.tests.test_trecho_route_service`.
+
+### NOVO-20260825-134715-fb0414c466e5 ✅ RESOLVIDO · `NOVO` Plano repetia manualmente o deslocamento já cadastrado no ofício do evento · BE · risco baixo
+
+Na etapa Efetivo e diárias, os quatro campos de saída e chegada na sede abrem vazios mesmo quando
+o plano está vinculado a um evento cujo ofício já possui roteiro completo. A pessoa precisa copiar
+novamente `Roteiro.saida_dt` e `Roteiro.retorno_chegada_dt`, criando duas fontes divergentes para o
+mesmo deslocamento. A correção deve sugerir esses quatro valores somente quando ainda não houver
+valor próprio no plano, sem persistir durante o GET e sem impedir ajuste manual.
+
+O selector agora consolida somente ofícios e roteiros ativos da mesma área: a primeira
+`Roteiro.saida_dt` e a última `Roteiro.retorno_chegada_dt` formam o intervalo do evento. No GET da
+etapa, cada componente ausente é completado apenas no objeto em memória; valores já salvos vencem,
+o POST/autosave continua sendo o único escritor e os campos permanecem editáveis. Dois testes de
+request cobrem o preenchimento sem persistência e a precedência dos valores próprios do plano.

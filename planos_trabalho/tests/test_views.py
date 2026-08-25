@@ -1,5 +1,6 @@
 import json
 from datetime import date
+from datetime import datetime
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
@@ -7,9 +8,12 @@ from django.db import connection
 from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
+from django.utils import timezone
 
 from cadastros.models import Cargo
 from cadastros.models import Unidade
+from eventos.models import Evento
+from oficios.models import Oficio
 
 from planos_trabalho.forms import PlanoIdentificacaoForm
 from planos_trabalho.models import HorarioAtendimento
@@ -17,6 +21,7 @@ from planos_trabalho.models import EventoPlano
 from planos_trabalho.models import PlanoDestino
 from planos_trabalho.models import PlanoTrabalho
 from planos_trabalho.models import ProgramaSolicitante
+from roteiros.models import Roteiro
 from core.testing import area_de_teste
 from core.testing import vincular_area
 
@@ -98,6 +103,71 @@ class PlanoWizardViewsTests(TestCase):
         ):
             response = self.client.get(reverse(name, args=[plano.pk]))
             self.assertEqual(response.status_code, 200, msg=name)
+
+    def test_efetivo_diarias_prefill_deslocamento_do_oficio_do_evento(self):
+        plano = criar_plano_maringa(self.maringa)
+        plano.saida_sede_data = None
+        plano.saida_sede_hora = None
+        plano.chegada_sede_data = None
+        plano.chegada_sede_hora = None
+        evento = Evento.objects.create(area=area_de_teste(), titulo="Evento do plano")
+        plano.evento = evento
+        plano.save()
+        roteiro = Roteiro.objects.create(
+            area=area_de_teste(),
+            saida_dt=timezone.make_aware(datetime(2026, 9, 1, 8, 30)),
+            chegada_dt=timezone.make_aware(datetime(2026, 9, 1, 12, 0)),
+            retorno_saida_dt=timezone.make_aware(datetime(2026, 9, 3, 14, 0)),
+            retorno_chegada_dt=timezone.make_aware(datetime(2026, 9, 3, 18, 45)),
+        )
+        Oficio.objects.create(area=area_de_teste(), evento=evento, roteiro=roteiro)
+
+        response = self.client.get(
+            reverse("planos_trabalho:wizard_efetivo_diarias", args=[plano.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="saida_sede_data" value="2026-09-01"')
+        self.assertContains(response, 'name="saida_sede_hora" value="08:30"')
+        self.assertContains(response, 'name="chegada_sede_data" value="2026-09-03"')
+        self.assertContains(response, 'name="chegada_sede_hora" value="18:45"')
+        plano.refresh_from_db()
+        self.assertIsNone(plano.saida_sede_data, "o GET só sugere; salvar continua explícito")
+
+    def test_efetivo_diarias_nao_sobrescreve_deslocamento_ja_informado(self):
+        plano = criar_plano_maringa(self.maringa)
+        valores_manuais = (
+            plano.saida_sede_data,
+            plano.saida_sede_hora,
+            plano.chegada_sede_data,
+            plano.chegada_sede_hora,
+        )
+        evento = Evento.objects.create(area=area_de_teste(), titulo="Evento do plano")
+        plano.evento = evento
+        plano.save()
+        roteiro = Roteiro.objects.create(
+            area=area_de_teste(),
+            saida_dt=timezone.make_aware(datetime(2026, 10, 1, 6, 0)),
+            chegada_dt=timezone.make_aware(datetime(2026, 10, 1, 12, 0)),
+            retorno_saida_dt=timezone.make_aware(datetime(2026, 10, 5, 12, 0)),
+            retorno_chegada_dt=timezone.make_aware(datetime(2026, 10, 5, 22, 0)),
+        )
+        Oficio.objects.create(area=area_de_teste(), evento=evento, roteiro=roteiro)
+
+        response = self.client.get(
+            reverse("planos_trabalho:wizard_efetivo_diarias", args=[plano.pk])
+        )
+
+        form = response.context["diarias_form"]
+        self.assertEqual(
+            (
+                form.instance.saida_sede_data,
+                form.instance.saida_sede_hora,
+                form.instance.chegada_sede_data,
+                form.instance.chegada_sede_hora,
+            ),
+            valores_manuais,
+        )
 
     def test_resumo_de_diarias_usa_hierarquia_financeira_de_roteiros(self):
         """O resumo é `c-v2.fact`, com um valor em destaque e três de apoio.

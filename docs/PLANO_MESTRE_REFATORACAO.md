@@ -789,3 +789,5 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       lista, antes das abas e do bloco de registros, como nos catálogos normais.
 - [x] `NOVO-20260822-223340-d0f6b26e25e5` remove a caixa temática redundante dos modelos do RT
       e apresenta o tópico ativo como uma lista simples canônica, inclusive no estado vazio.
+- [x] `NOVO-20260825-134715-fb0414c466e5` pré-preenche saída e chegada na sede com o roteiro do
+      ofício vinculado ao evento, preservando valores próprios e edição manual no plano.
