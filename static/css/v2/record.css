@@ -286,8 +286,12 @@
 
 /* Para o vão ter folga a distribuir, o `fact-list` precisa da altura útil
    inteira do bloco — `start` deixaria a lista do tamanho do conteúdo e a sobra
-   ficaria embaixo, fora do alcance do `margin-top: auto`. */
-:is(html[data-theme]) .record .form-block--v2 > .form-block__body {
+   ficaria embaixo, fora do alcance do `margin-top: auto`.
+
+   O `:has` é parte do contrato: sem ele, o stretch também alcança os blocos de
+   Ofícios e Documentos no cartão de Evento e transforma a única `person-row`
+   deles numa faixa da altura inteira da coluna vizinha. */
+:is(html[data-theme]) .record .form-block--v2 > .form-block__body:has(> .fact-list) {
   align-content: stretch;
 }
 

@@ -11697,3 +11697,66 @@ A página abria dizendo "A geração continua em segundo plano" e "o download co
 motivo só substituía o parágrafo segundos depois, pelo JS de espera. As duas cascas (a de página
 inteira e a embutida no `<iframe>`) ganharam o estado de erro: título próprio, o motivo do
 servidor e nenhum girador.
+
+### NOVO-20260824-234511-dd2eedf33819 ✅ RESOLVIDO · `NOVO` Único ofício no card de Evento era esticado até a altura da coluna vizinha · UI · risco baixo
+
+O espaçamento variável das listas de fatos passou a aplicar `align-content: stretch` a todo
+`form-block` dentro de um `record`. No card de Evento, essa regra também alcançava os blocos de
+Ofícios e Documentos: quando havia um ofício ao lado de três documentos, a única `person-row`
+ocupava **93,97 px** em vez dos **60 px** do card normal.
+
+O stretch agora casa somente com corpos cujo filho direto é uma `fact-list`. A lista rolável de
+documentos continua com o mesmo teto, enquanto a linha `157/2026` voltou a 60 px e conserva a
+folga restante embaixo. `eventos.tests.test_evento_card_layout` impede que o seletor global volte.
+
+### NOVO-20260825-000241-dcb332aafe26 ✅ RESOLVIDO · `NOVO` Poucos documentos no picker eram inflados para preencher o teto da lista · UI · risco baixo
+
+O card de documento vinculado declarava `padding: 32px 12px` apesar de o contrato da própria
+lista fixar cada item em 62 px. Duas linhas de texto mais 64 px de padding ultrapassavam sozinhas
+o teto de 210 px: com dois resultados, cada card crescia para ocupar praticamente metade da
+caixa; com três, a grade os comprimia e recortava o padding.
+
+O padding voltou ao ritmo compacto do v2, `--gap-tight` por `--gap` (8 × 12 px). Medido no picker
+de Termos do Evento: três itens passaram a **62 px** cada numa lista natural de **202 px**; ao
+filtrar somente `Termo #4`, item e lista medem **62 px**, sem preenchimento artificial. O contrato
+foi acrescentado a `eventos.tests.test_evento_card_layout`.
+
+### NOVO-20260825-003828-2242787fc0dc ✅ RESOLVIDO · `NOVO` Tempo de viagem repassava o fluxo livre da ORS e divergia entre ida e volta · BE · risco médio
+
+Dois defeitos no mesmo ponto, ambos medidos contra o Google Maps em 32 rotas reais do PR
+(`scripts/calibrar_rotas.py`).
+
+**Divergência ida/volta.** A ORS devolve tempos ligeiramente diferentes em cada sentido — 37 min
+na ida e 35 na volta de Curitiba↔Fazenda Rio Grande, diferença real de traçado. O
+`round_trip_minutes_to_15` arredonda para baixo com resto ≤ 5 e para cima com resto > 5, então
+os dois sentidos caíam em blocos distintos: **2 minutos de diferença viravam 15 na tela**. No caso
+relatado, 52 e 49 min crus apareceram como 1h e 45min, e o resumo do mapa exibia a média
+(1h45 ÷ 2 = 52min), que não fechava com nenhum dos trechos.
+
+**Imprecisão.** A ORS acerta a distância (erro mediano de 0,5% contra o Google) mas calcula o tempo
+em fluxo livre: cruza a 84-87 km/h onde o trânsito real do Paraná faz 62-74 km/h. O viés não é
+constante — some no urbano curto e chega a **−75 min** em Curitiba→Cascavel, −61 em Maringá e em
+Foz —, então não havia fator único capaz de corrigi-lo.
+
+**Correção.** `route_time_rules.estimate_travel_minutes` reconstrói o ETA a partir da distância
+(o dado confiável) com velocidade de cruzeiro calibrada, e usa só um resíduo do tempo da ORS como
+sinal de terreno — peso 0,15, ajustado por leave-one-out; peso alto reimporta o viés de fluxo
+livre. A consulta de trecho passou a canonizar o par pela ordem dos IDs, e o preview iguala as
+pernas espelhadas antes de arredondar, de modo que ida e volta são o mesmo cálculo. O total da
+rota virou a soma das pernas exibidas, para o resumo do mapa fechar com os trechos.
+
+O tempo adicional, que era uma tabela em degraus (60 min de viagem valiam 15 de folga, 61 valiam
+30) e caía em cima do arredondamento — produzindo ida 75 / volta 90 em Foz —, virou proporcional
+contínuo: ~1/6 do tempo de viagem, piso de 15 min acima de 30 min, mesmos patamares nas pontas
+(180 → 30, 540 → 90).
+
+**Medido**, código de produção contra a API real nos mesmos 32 pares:
+
+| | erro médio | pior caso | ≤ 15 min | ≤ 30 min | divergência ida/volta |
+|---|---|---|---|---|---|
+| antes | 22,0 min | 74 min | 47% | 78% | 7 de 26 pares |
+| depois | 6,9 min | 19 min | 94% | 100% | 0 de 32 pares |
+
+Contratos em `roteiros.tests.test_routing` (ETA calibrado contra os pares medidos, ausência de
+salto no tempo adicional, bate-volta sem divergência, multidestino sem igualação indevida) e
+`roteiros.tests.test_trecho_route_service`.

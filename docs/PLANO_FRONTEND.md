@@ -514,3 +514,16 @@ igualmente na `main`. Os avisos deste recorte foram de 253 para 239.
   contagens, paginação ou compatibilidade com o parâmetro `aba` existente. Fechamento: o select
   múltiplo preserva valores repetidos na URL, combina os quatro recortes por OR e mantém
   `futuras` como padrão quando nenhum valor é enviado.
+
+## Geometria das linhas no card de Evento (24/08/2026)
+
+- [x] `NOVO-20260824-234511-dd2eedf33819` — restringir o `align-content: stretch` aos
+  `form-block` que contêm `fact-list`, para que um único ofício ao lado de uma lista maior de
+  documentos mantenha a altura canônica de 60 px. Fechamento medido no card `157/2026`:
+  93,97 → 60 px, com teste de contrato sobre o seletor CSS.
+
+## Geometria do picker de documentos vinculados (25/08/2026)
+
+- [x] `NOVO-20260825-000241-dcb332aafe26` — retirar o padding vertical de 32 px que fazia poucos
+  documentos preencherem o teto inteiro da lista. Fechamento: `Termo #4` mede 62 px sozinho e
+  com três resultados; padding computado 8 × 12 px nos temas claro e escuro.

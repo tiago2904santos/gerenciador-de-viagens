@@ -91,10 +91,13 @@ class TrechoRouteServiceTests(TestCase):
         self.assertEqual(out.get("rota_fonte"), ROTA_FONTE_TRECHO_ORS)
         body = post.call_args[1]["json"]
         self.assertEqual(len(body["coordinates"]), 2)
+        # A ORS crua diz 100 min para 100 km. O ETA calibrado nao repassa esse
+        # numero: reconstroi a partir da distancia (confiavel) usando so um residuo
+        # do tempo do provedor como sinal de terreno.
         self.assertEqual(out.get("raw_duration_minutes"), 100)
-        self.assertEqual(out.get("tempo_cru_estimado_min"), 105)
-        self.assertEqual(out.get("tempo_adicional_sugerido_min"), 30)
-        self.assertEqual(out.get("duracao_estimada_min"), 135)
+        self.assertEqual(out.get("tempo_cru_estimado_min"), 90)
+        self.assertEqual(out.get("tempo_adicional_sugerido_min"), 15)
+        self.assertEqual(out.get("duracao_estimada_min"), 105)
 
     def test_calcular_rota_consolidada_nao_atualiza_distancia_trecho_ida(self):
         roteiro = Roteiro.objects.create(area=area_de_teste(), 

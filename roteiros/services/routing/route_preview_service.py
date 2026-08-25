@@ -15,7 +15,11 @@ from .route_exceptions import (
     RouteValidationError,
 )
 from .route_metrics import summarize_route_leg_metrics
-from .route_time_rules import calculate_additional_time_minutes, round_trip_minutes_to_15
+from .route_time_rules import (
+    calculate_additional_time_minutes,
+    estimate_travel_minutes,
+    round_trip_minutes_to_15,
+)
 from .trecho_route_service import calcular_rota_trecho
 
 
@@ -180,7 +184,7 @@ def _build_leg_payload(
     *,
     geometry: dict | None = None,
 ) -> dict:
-    travel_minutes = round_trip_minutes_to_15(raw_minutes)
+    travel_minutes = round_trip_minutes_to_15(estimate_travel_minutes(distance_km, raw_minutes))
     additional_minutes = calculate_additional_time_minutes(travel_minutes)
     total_minutes = travel_minutes + additional_minutes
     out = dict(base_leg)
@@ -202,6 +206,50 @@ def _build_leg_payload(
     return out
 
 
+def _equalizar_pernas_espelhadas(legs: List[dict]) -> None:
+    """
+    Iguala, no lugar, as pernas que são o mesmo par percorrido ao contrário.
+
+    Num bate-volta a ORS devolve os dois sentidos com quilometragem e tempo
+    ligeiramente diferentes (30,0 km / 37 min contra 29,5 km / 35 min). São
+    diferenças reais de traçado, mas irrelevantes para o planejamento — e o bloco
+    de 15 as transformava em 45 contra 30 na tela. Aqui a ida e a volta do mesmo
+    par passam a compartilhar a média dos dois sentidos, e o arredondamento roda
+    uma vez só sobre um número único.
+
+    Só casa pernas de sentido oposto; num multidestino A→B→C→A nada é igualado,
+    porque não há par espelhado.
+    """
+    por_par: Dict[tuple, List[dict]] = {}
+    for leg in legs:
+        a, b = leg.get("from_cidade_id"), leg.get("to_cidade_id")
+        if a is None or b is None or a == b:
+            continue
+        por_par.setdefault((min(a, b), max(a, b)), []).append(leg)
+
+    for grupo in por_par.values():
+        sentidos = {(leg["from_cidade_id"], leg["to_cidade_id"]) for leg in grupo}
+        if len(grupo) < 2 or len(sentidos) < 2:
+            continue
+        dist = sum(float(leg.get("distance_km") or 0.0) for leg in grupo) / len(grupo)
+        cru = sum(int(leg.get("raw_duration_minutes") or 0) for leg in grupo) / len(grupo)
+        travel = round_trip_minutes_to_15(estimate_travel_minutes(dist, cru))
+        adicional = calculate_additional_time_minutes(travel)
+        for leg in grupo:
+            leg.update(
+                {
+                    "distance_km": round(dist, 2),
+                    "raw_duration_minutes": int(round(cru)),
+                    "travel_minutes": travel,
+                    "travel_hhmm": _hhmm(travel),
+                    "additional_minutes": adicional,
+                    "additional_hhmm": _hhmm(adicional),
+                    "total_minutes": travel + adicional,
+                    "total_hhmm": _hhmm(travel + adicional),
+                }
+            )
+
+
 def calculate_route_preview(payload: Dict[str, Any]) -> Dict[str, Any]:
     if str(payload.get("modo") or "").strip().lower() in {"bate_volta", "bate-volta"}:
         raise RouteDailyRoundTripBlockedError()
@@ -219,7 +267,9 @@ def calculate_route_preview(payload: Dict[str, Any]) -> Dict[str, Any]:
     segments = normalized.get("segments") or []
 
     route_raw_minutes = int(normalized.get("duration_minutes") or 0)
-    route_rounded = round_trip_minutes_to_15(route_raw_minutes)
+    route_rounded = round_trip_minutes_to_15(
+        estimate_travel_minutes(normalized.get("distance_km"), route_raw_minutes)
+    )
     calculated_at = timezone.now()
     route_payload = {
         "provider": normalized.get("provider") or "openrouteservice",
@@ -287,6 +337,21 @@ def calculate_route_preview(payload: Dict[str, Any]) -> Dict[str, Any]:
                     geometry=None,
                 )
             )
+
+    _equalizar_pernas_espelhadas(legs_payload)
+
+    # O total tem que ser a soma das pernas mostradas, não um arredondamento à
+    # parte do total cru da ORS: o resumo do mapa divide este número por dois para
+    # exibir "tempo de ida", e se ele não fechar com os trechos a tela se
+    # contradiz. Depois de igualar as pernas espelhadas a soma é par, então a
+    # metade cai exata.
+    if legs_payload:
+        route_payload["distance_km"] = round(
+            sum(float(leg.get("distance_km") or 0.0) for leg in legs_payload), 2
+        )
+        total_travel = sum(int(leg.get("travel_minutes") or 0) for leg in legs_payload)
+        route_payload["duration_minutes"] = total_travel
+        route_payload["duration_human"] = _duration_human(total_travel)
 
     points_payload = [
         {

@@ -4581,8 +4581,12 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 
 /* Para o vão ter folga a distribuir, o `fact-list` precisa da altura útil
    inteira do bloco — `start` deixaria a lista do tamanho do conteúdo e a sobra
-   ficaria embaixo, fora do alcance do `margin-top: auto`. */
-:is(html[data-theme]) .record .form-block--v2 > .form-block__body {
+   ficaria embaixo, fora do alcance do `margin-top: auto`.
+
+   O `:has` é parte do contrato: sem ele, o stretch também alcança os blocos de
+   Ofícios e Documentos no cartão de Evento e transforma a única `person-row`
+   deles numa faixa da altura inteira da coluna vizinha. */
+:is(html[data-theme]) .record .form-block--v2 > .form-block__body:has(> .fact-list) {
   align-content: stretch;
 }
 
@@ -10247,7 +10251,10 @@ html[data-theme="dark"] :is(.search-picker__selected-panel, .search-picker__sele
   gap: var(--gap);
   grid-template-columns: none;
   min-height: var(--escolhido-height, 56px);
-  padding: 32px 12px;
+  /* O conteúdo de duas linhas mede 36px; 8px verticais deixam o cartão dentro
+     dos 62px canônicos. Com 32px de cada lado, dois resultados sozinhos
+     encostavam no teto de 210px e eram comprimidos para preencher a lista. */
+  padding: var(--gap-tight) var(--gap);
   text-align: left;
   width: 100%;
 }

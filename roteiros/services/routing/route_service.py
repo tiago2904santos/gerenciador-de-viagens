@@ -20,6 +20,7 @@ from .route_exceptions import (
 from .route_metrics import summarize_route_leg_metrics
 from .route_point_builder import build_route_points_for_roteiro
 from .route_signature import build_route_signature
+from .route_time_rules import estimate_travel_minutes, round_trip_minutes_to_15
 
 
 def _duration_human(total_minutes: int) -> str:
@@ -222,7 +223,12 @@ def calcular_rota_para_roteiro(
     normalized = provider.calculate_route(payload_points, profile=profile)
 
     roteiro.rota_distancia_calculada_km = Decimal(str(normalized["distance_km"]))
-    roteiro.rota_duracao_calculada_min = int(normalized["duration_minutes"])
+    # A duracao vai calibrada para o banco, nao crua: este campo alimenta o
+    # cabecalho do oficio e o diario de bordo, e gravar o fluxo livre da ORS aqui
+    # reintroduziria o viés em todo documento gerado depois.
+    roteiro.rota_duracao_calculada_min = round_trip_minutes_to_15(
+        estimate_travel_minutes(normalized["distance_km"], normalized["duration_minutes"])
+    )
     roteiro.rota_geojson = normalized.get("geometry")
     roteiro.rota_fonte = Roteiro.ROTA_FONTE_OPENROUTESERVICE
     roteiro.rota_status = Roteiro.ROTA_STATUS_CALCULADA

@@ -30,6 +30,7 @@ from roteiros.services.routing.route_exceptions import (
 from roteiros.services.routing.route_metrics import summarize_route_leg_metrics
 from roteiros.services.routing.route_time_rules import (
     calculate_additional_time_minutes,
+    estimate_travel_minutes,
     round_trip_minutes_to_15,
 )
 from roteiros.services.routing.route_stale import mark_stale_when_signature_changed
@@ -918,20 +919,77 @@ class RoteirosRoutingTests(TestCase):
         for raw, expected in cases:
             self.assertEqual(round_trip_minutes_to_15(raw), expected)
 
-    def test_calculate_additional_time_minutes_tabela_operacional(self):
+    def test_calculate_additional_time_minutes_proporcional_sem_degrau(self):
+        # ~1/6 do tempo de viagem, piso de 15 a partir de 30 min de viagem.
         cases = [
             (20, 0),
+            (29, 0),
             (30, 15),
-            (45, 15),
             (60, 15),
-            (75, 30),
+            (61, 15),
+            (120, 15),
             (180, 30),
-            (181, 45),
+            (181, 30),
             (270, 45),
-            (271, 60),
+            (300, 45),
+            (360, 60),
+            (450, 75),
+            (540, 90),
         ]
         for travel, expected in cases:
             self.assertEqual(calculate_additional_time_minutes(travel), expected)
+
+    def test_calculate_additional_time_minutes_nao_tem_salto_de_um_minuto(self):
+        # A tabela antiga dobrava a folga entre 60 e 61 min de viagem, e o degrau
+        # caia em cima do arredondamento: a mesma rota saia com 75 na ida e 90 na
+        # volta. Nenhum minuto a mais pode valer mais que um bloco.
+        anterior = calculate_additional_time_minutes(1)
+        for travel in range(2, 901):
+            atual = calculate_additional_time_minutes(travel)
+            self.assertGreaterEqual(atual, anterior)
+            self.assertLessEqual(
+                atual - anterior, 15, f"salto maior que um bloco em {travel} min"
+            )
+            anterior = atual
+
+    def test_estimate_travel_minutes_corrige_o_fluxo_livre_da_ors(self):
+        # Pares medidos contra o Google Maps em 2026-08-24 (km e tempo cru da ORS
+        # contra o tempo real). O fluxo livre da ORS erra ate 75 min; o ETA
+        # calibrado tem que ficar dentro de 15 do real.
+        casos = [
+            # (km ORS, min crus ORS, min reais no Google)
+            (30.0, 37, 36),
+            (90.6, 69, 88),
+            (115.0, 89, 101),
+            (255.1, 187, 227),
+            (384.6, 277, 325),
+            (423.9, 298, 359),
+            (497.5, 344, 419),
+            (636.3, 453, 514),
+        ]
+        for km, cru, real in casos:
+            eta = round_trip_minutes_to_15(estimate_travel_minutes(km, cru))
+            self.assertLessEqual(
+                abs(eta - real),
+                15,
+                f"{km} km: ETA {eta} contra {real} reais (ORS crua dizia {cru})",
+            )
+
+    def test_estimate_travel_minutes_sem_tempo_do_provedor_usa_so_a_distancia(self):
+        # Provedor fora do ar nao pode zerar a estimativa nem mudar de regime.
+        somente_distancia = estimate_travel_minutes(384.6, None)
+        com_provedor = estimate_travel_minutes(384.6, 277)
+        self.assertGreater(somente_distancia, 0)
+        self.assertLess(abs(somente_distancia - com_provedor), 20)
+        self.assertEqual(estimate_travel_minutes(0, 0), 0.0)
+        self.assertEqual(estimate_travel_minutes(None, None), 0.0)
+
+    def test_estimate_travel_minutes_cresce_com_a_distancia(self):
+        anterior = -1.0
+        for km in range(1, 900, 7):
+            atual = estimate_travel_minutes(km, None)
+            self.assertGreater(atual, anterior)
+            anterior = atual
 
     def test_preview_sem_salvar_retorna_line_string_e_legs(self):
         mock_fc = {
@@ -968,13 +1026,15 @@ class RoteirosRoutingTests(TestCase):
         self.assertEqual(leg["from_cidade_id"], self.cidade_sede.pk)
         self.assertEqual(leg["to_cidade_id"], self.cidade_a.pk)
         self.assertEqual(leg["distance_km"], 423.5)
+        # 423,5 km. A ORS crua da 304 min (83 km/h, fluxo livre); o ETA calibrado
+        # sobe para 6h, que e a faixa medida no Google para essa distancia.
         self.assertEqual(leg["raw_duration_minutes"], 304)
-        self.assertEqual(leg["travel_minutes"], 300)
-        self.assertEqual(leg["travel_hhmm"], "05:00")
+        self.assertEqual(leg["travel_minutes"], 360)
+        self.assertEqual(leg["travel_hhmm"], "06:00")
         self.assertEqual(leg["additional_minutes"], 60)
         self.assertEqual(leg["additional_hhmm"], "01:00")
-        self.assertEqual(leg["total_minutes"], 360)
-        self.assertEqual(leg["total_hhmm"], "06:00")
+        self.assertEqual(leg["total_minutes"], 420)
+        self.assertEqual(leg["total_hhmm"], "07:00")
         self.assertEqual(leg["color_index"], 0)
         self.assertIn("points", out)
         self.assertGreaterEqual(len(out["points"]), 2)
@@ -1027,6 +1087,99 @@ class RoteirosRoutingTests(TestCase):
         self.assertTrue(route["duration_human_ida"])
         self.assertTrue(route["duration_human_round_trip"])
 
+    def test_preview_bate_volta_nao_diverge_entre_ida_e_volta(self):
+        # O defeito relatado: a ORS devolve 37 min na ida e 35 na volta do mesmo
+        # par (mao unica, alcas de acesso). Sao 2 min de diferenca real, mas o
+        # bloco de 15 os empurrava para blocos distintos e a tela mostrava 45
+        # contra 30 - ou, no caso reportado, 1h contra 45min.
+        mock_fc = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-49.27, -25.42], [-51.16, -23.31], [-49.27, -25.42]],
+                    },
+                    "properties": {
+                        "summary": {"distance": 59500, "duration": 4320},
+                        "segments": [
+                            {"distance": 30000, "duration": 2220},  # ida:   30,0 km / 37 min
+                            {"distance": 29500, "duration": 2100},  # volta: 29,5 km / 35 min
+                        ],
+                    },
+                }
+            ],
+        }
+        payload = {
+            "origem_cidade_id": self.cidade_sede.pk,
+            "destinos": [{"uuid": "tmp-1", "cidade_id": self.cidade_a.pk}],
+            "retorno_cidade_id": self.cidade_sede.pk,
+            "incluir_retorno": True,
+            "modo": "normal",
+        }
+        with patch("roteiros.services.routing.openrouteservice.requests.post") as post:
+            post.return_value.status_code = 200
+            post.return_value.json.return_value = mock_fc
+            out = calculate_route_preview(payload)
+
+        self.assertTrue(out["ok"])
+        ida, volta = out["legs"][0], out["legs"][1]
+        self.assertEqual(ida["travel_minutes"], volta["travel_minutes"])
+        self.assertEqual(ida["additional_minutes"], volta["additional_minutes"])
+        self.assertEqual(ida["total_minutes"], volta["total_minutes"])
+        self.assertEqual(ida["distance_km"], volta["distance_km"])
+
+        # O resumo do mapa divide o total por dois: ele tem que fechar com as
+        # pernas exibidas, sem sobrar minuto no meio.
+        rota = out["route"]
+        self.assertEqual(
+            rota["duration_minutes"], ida["travel_minutes"] + volta["travel_minutes"]
+        )
+        self.assertEqual(rota["duration_minutes_ida"], ida["travel_minutes"])
+        self.assertEqual(rota["distance_km_ida"], ida["distance_km"])
+
+    def test_preview_multidestino_nao_iguala_pernas_diferentes(self):
+        # A igualacao vale so para o mesmo par invertido. Num A->B->C as pernas
+        # sao trechos distintos e cada uma mantem o proprio tempo.
+        mock_fc = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-49.27, -25.42], [-51.16, -23.31]],
+                    },
+                    "properties": {
+                        "summary": {"distance": 300000, "duration": 15000},
+                        "segments": [
+                            {"distance": 100000, "duration": 5400},
+                            {"distance": 200000, "duration": 9600},
+                        ],
+                    },
+                }
+            ],
+        }
+        payload = {
+            "origem_cidade_id": self.cidade_sede.pk,
+            "destinos": [
+                {"uuid": "tmp-1", "cidade_id": self.cidade_a.pk},
+                {"uuid": "tmp-2", "cidade_id": self.cidade_b.pk},
+            ],
+            "incluir_retorno": False,
+        }
+        with patch("roteiros.services.routing.openrouteservice.requests.post") as post:
+            post.return_value.status_code = 200
+            post.return_value.json.return_value = mock_fc
+            out = calculate_route_preview(payload)
+
+        self.assertEqual(out["legs"][0]["distance_km"], 100.0)
+        self.assertEqual(out["legs"][1]["distance_km"], 200.0)
+        self.assertNotEqual(
+            out["legs"][0]["travel_minutes"], out["legs"][1]["travel_minutes"]
+        )
+
     def test_preview_fallback_quando_segments_incompativeis(self):
         mock_fc = {
             "type": "FeatureCollection",
@@ -1061,8 +1214,8 @@ class RoteirosRoutingTests(TestCase):
             out = calculate_route_preview(payload)
         self.assertTrue(out["fallback_per_leg_used"])
         self.assertEqual(trecho_calc.call_count, 2)
-        self.assertEqual(out["legs"][0]["travel_minutes"], 105)
-        self.assertEqual(out["legs"][1]["travel_minutes"], 120)
+        self.assertEqual(out["legs"][0]["travel_minutes"], 90)
+        self.assertEqual(out["legs"][1]["travel_minutes"], 165)
         # Confirma que não houve "divisão por 2" no trecho: veio do cálculo por leg.
         self.assertEqual(out["legs"][0]["distance_km"], 100.0)
         self.assertEqual(out["legs"][1]["distance_km"], 200.0)

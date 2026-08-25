@@ -13,7 +13,11 @@ from roteiros.services.estimativa_local import estimar_distancia_duracao, minuto
 
 from .openrouteservice import get_openrouteservice_provider
 from .route_exceptions import RouteServiceError, RouteValidationError
-from .route_time_rules import calculate_additional_time_minutes, round_trip_minutes_to_15
+from .route_time_rules import (
+    calculate_additional_time_minutes,
+    estimate_travel_minutes,
+    round_trip_minutes_to_15,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -89,23 +93,33 @@ def calcular_rota_trecho(origem_cidade_id: int, destino_cidade_id: int) -> Dict[
 
     if ors_attempted:
         try:
+            # A ORS devolve tempos levemente diferentes em cada sentido (mão única,
+            # alças de acesso): 37 min na ida e 35 na volta do mesmo par. Depois do
+            # bloco de 15 isso virava 45 contra 30 na tela. Consultar sempre o par
+            # na mesma ordem canônica torna ida e volta a *mesma* consulta, então
+            # não sobra divergência nenhuma para o arredondamento amplificar.
+            inverter = oid > did
+            a_lat, a_lon = (destino_lat, destino_lon) if inverter else (origem_lat, origem_lon)
+            b_lat, b_lon = (origem_lat, origem_lon) if inverter else (destino_lat, destino_lon)
             points = [
                 {
                     "id": "trecho-origem",
-                    "lat": origem_lat,
-                    "lng": origem_lon,
-                    "label": _label_cidade(origem),
+                    "lat": a_lat,
+                    "lng": a_lon,
+                    "label": _label_cidade(destino if inverter else origem),
                 },
                 {
                     "id": "trecho-destino",
-                    "lat": destino_lat,
-                    "lng": destino_lon,
-                    "label": _label_cidade(destino),
+                    "lat": b_lat,
+                    "lng": b_lon,
+                    "label": _label_cidade(origem if inverter else destino),
                 },
             ]
             normalized = provider.calculate_route(points, profile="driving-car")
             cru = int(normalized["duration_minutes"])
-            travel_min = round_trip_minutes_to_15(cru)
+            travel_min = round_trip_minutes_to_15(
+                estimate_travel_minutes(normalized["distance_km"], cru)
+            )
             additional_min = calculate_additional_time_minutes(travel_min)
             total_min = travel_min + additional_min
             dist = float(normalized["distance_km"])
@@ -160,7 +174,11 @@ def calcular_rota_trecho(origem_cidade_id: int, destino_cidade_id: int) -> Dict[
     )
     merged: Dict[str, Any] = dict(out)
     raw_min = int(merged.get("tempo_viagem_estimado_min") or merged.get("tempo_cru_estimado_min") or 0)
-    travel_min = round_trip_minutes_to_15(raw_min)
+    # Mesma calibração do caminho ORS: com a API fora do ar o número na tela não
+    # pode mudar de regime, senão a estimativa salta quando o provedor oscila.
+    travel_min = round_trip_minutes_to_15(
+        estimate_travel_minutes(merged.get("distancia_km"), raw_min)
+    )
     additional_min = calculate_additional_time_minutes(travel_min)
     total_min = travel_min + additional_min
     merged["ok"] = bool(out.get("ok"))

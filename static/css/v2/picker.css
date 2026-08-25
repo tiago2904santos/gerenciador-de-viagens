@@ -2596,7 +2596,10 @@ html[data-theme="dark"] :is(.search-picker__selected-panel, .search-picker__sele
   gap: var(--gap);
   grid-template-columns: none;
   min-height: var(--escolhido-height, 56px);
-  padding: 32px 12px;
+  /* O conteúdo de duas linhas mede 36px; 8px verticais deixam o cartão dentro
+     dos 62px canônicos. Com 32px de cada lado, dois resultados sozinhos
+     encostavam no teto de 210px e eram comprimidos para preencher a lista. */
+  padding: var(--gap-tight) var(--gap);
   text-align: left;
   width: 100%;
 }
