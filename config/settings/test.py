@@ -70,4 +70,7 @@ GOOGLE_DRIVE = {
     **GOOGLE_DRIVE,
     "MODO": "mock",
     "UPLOAD_EM_MOCK": False,
+    # Sem cache entre chamadas: o estado da pasta raiz que um teste monta não
+    # pode vazar para o seguinte dentro do mesmo processo.
+    "PASTA_CACHE_TTL_SECONDS": 0,
 }

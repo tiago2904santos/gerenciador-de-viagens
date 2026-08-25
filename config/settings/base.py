@@ -297,12 +297,15 @@ def _env_flag(name, default="false"):
 # Integração Google Drive
 #
 # Sem credenciais (MODO=mock), o sistema nunca chama a API — uploads são
-# apenas registrados em log. Para ativar:
-#   1. Crie um Service Account no Google Cloud, baixe a chave JSON.
-#   2. Compartilhe a pasta raiz do Drive com o email do service account.
-#   3. Defina GOOGLE_DRIVE_MODO=ativo, CREDENTIALS_PATH e PASTA_RAIZ_ID.
+# apenas registrados em log. A autorização é OAuth 2.0 por usuário (cada login
+# conecta a própria conta em Meu perfil); não existe caminho por Service
+# Account, apesar do que dizia este comentário até 25/08/2026. Para ativar:
+#   1. Ative a Google Drive API e crie um ID de cliente OAuth (Aplicativo Web).
+#   2. Registre GOOGLE_REDIRECT_URI como URI de redirecionamento autorizado.
+#   3. Defina GOOGLE_DRIVE_MODO=ativo, GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET.
+#   4. Conecte a conta e escolha a pasta raiz pela tela Meu perfil.
 #
-# Diagnóstico: python manage.py gdrive_check
+# Diagnóstico: python manage.py gdrive_check [--e2e]
 # Reprocessar pendentes: python manage.py gdrive_upload_pendentes
 # ---------------------------------------------------------------------------
 # O Google costuma devolver o token com escopos concedidos anteriormente somados
@@ -326,6 +329,11 @@ GOOGLE_DRIVE = {
     # (roda sequencial numa única thread) — sem nunca lançar exceção pro
     # try/except que já existe em cada artefato.
     "HTTP_TIMEOUT_SECONDS": float(os.getenv("GOOGLE_DRIVE_HTTP_TIMEOUT_SECONDS") or 30),
+    # Validade do cache de pastas e da checagem da pasta raiz. O gunicorn de
+    # produção mantém processos vivos por dias; com cache eterno, uma pasta
+    # movida ou lixeirada pelo Drive fazia todo envio seguinte daquele worker ir
+    # para um ID morto, sem erro nenhum.
+    "PASTA_CACHE_TTL_SECONDS": float(os.getenv("GOOGLE_DRIVE_PASTA_CACHE_TTL_SECONDS") or 300),
 }
 
 # ---------------------------------------------------------------------------
