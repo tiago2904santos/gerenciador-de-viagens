@@ -22,11 +22,18 @@ Codigos de saida:
 
 from __future__ import annotations
 
+import os
 import shutil
 import sys
 import time
 
 CAMINHO = "/etc/nginx/sites-enabled/gerenciador-viagens"
+
+# O backup NAO pode morar em sites-enabled: o nginx inclui `sites-enabled/*`,
+# entao um arquivo .bak ali vira um segundo server block com os mesmos nomes.
+# O sintoma e traicoeiro -- `nginx -t` passa, so avisa "conflicting server name",
+# e a config antiga continua atendendo. Custou uma rodada errada nesta sessao.
+DIR_BACKUP = "/etc/nginx/backups-midia"
 
 ANTIGO = """    location /media/ {
         alias /var/www/gerenciador-viagens/media/;
@@ -46,7 +53,22 @@ NOVO = """    # Nunca exponha /media/ diretamente. O Django autoriza o usuario/a
 """
 
 
+def limpar_backups_em_sites_enabled() -> None:
+    """Tira de `sites-enabled` qualquer .bak que esteja sendo lido como config."""
+    diretorio = os.path.dirname(CAMINHO)
+    os.makedirs(DIR_BACKUP, exist_ok=True)
+    for nome in sorted(os.listdir(diretorio)):
+        if ".bak-" not in nome:
+            continue
+        origem = os.path.join(diretorio, nome)
+        destino = os.path.join(DIR_BACKUP, nome)
+        shutil.move(origem, destino)
+        print("backup movido para fora de sites-enabled:", destino)
+
+
 def main() -> int:
+    limpar_backups_em_sites_enabled()
+
     conteudo = open(CAMINHO, encoding="utf-8").read()
 
     if "location /_protected_media/" in conteudo:
@@ -57,7 +79,11 @@ def main() -> int:
         print("ABORTADO: bloco /media/ esperado nao encontrado; config divergente")
         return 2
 
-    backup = "{}.bak-{}".format(CAMINHO, time.strftime("%Y%m%d-%H%M%S"))
+    os.makedirs(DIR_BACKUP, exist_ok=True)
+    backup = os.path.join(
+        DIR_BACKUP,
+        "gerenciador-viagens.bak-{}".format(time.strftime("%Y%m%d-%H%M%S")),
+    )
     shutil.copy2(CAMINHO, backup)
     print("backup:", backup)
 

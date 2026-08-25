@@ -40,7 +40,7 @@ jobs:
             echo "=== conteudo (host mascarado pelo Actions) ==="
             cat -n /etc/nginx/sites-enabled/gerenciador-viagens
             echo "=== backups existentes ==="
-            ls -l /etc/nginx/sites-enabled/*.bak-* 2>/dev/null || echo "nenhum backup"
+            ls -l /etc/nginx/backups-midia/ 2>/dev/null || echo "nenhum backup"
             echo "=== FIM ==="
 
       - name: Aplicar a config documentada
@@ -66,7 +66,7 @@ jobs:
             fi
 
             echo "=== nginx -t ==="
-            BACKUP=$(ls -t ${ARQ}.bak-* 2>/dev/null | head -1)
+            BACKUP=$(ls -t /etc/nginx/backups-midia/gerenciador-viagens.bak-* 2>/dev/null | head -1)
             if ! nginx -t; then
               echo "TESTE FALHOU -- revertendo para $BACKUP"
               cp -f "$BACKUP" "$ARQ"
@@ -96,7 +96,7 @@ jobs:
           script: |
             set -Eeuo pipefail
             ARQ=/etc/nginx/sites-enabled/gerenciador-viagens
-            BACKUP=$(ls -t ${ARQ}.bak-* 2>/dev/null | head -1)
+            BACKUP=$(ls -t /etc/nginx/backups-midia/gerenciador-viagens.bak-* 2>/dev/null | head -1)
             if [ -z "$BACKUP" ]; then echo "nenhum backup"; exit 1; fi
             echo "revertendo para $BACKUP"
             cp -f "$BACKUP" "$ARQ"
