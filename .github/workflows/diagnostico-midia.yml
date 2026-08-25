@@ -1,0 +1,63 @@
+name: Diagnostico de midia privada (leitura)
+
+# Anexo de solicitacao dando "not found" ao abrir: precisamos saber se o arquivo
+# existe em disco (registro orfao) ou se a entrega pelo nginx via X-Accel-Redirect
+# e que esta quebrada. Somente leitura.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  midia:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Estado dos anexos e do nginx
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 10m
+          script: |
+            set -uo pipefail
+            cd /var/www/gerenciador-viagens/app
+            source /var/www/gerenciador-viagens/venv/bin/activate
+            set -a
+            . ./.env
+            set +a
+
+            echo "=== nginx: location de midia privada ==="
+            grep -RnE "_protected_media|protected|internal;|alias .*media|location .*media" /etc/nginx/sites-enabled/ 2>/dev/null || echo "nada encontrado em sites-enabled"
+
+            echo "=== diretorio de midia em disco ==="
+            echo "MEDIA_ROOT do .env: ${MEDIA_ROOT:-<nao definido>}"
+            ls -ld "${MEDIA_ROOT:-/var/www/gerenciador-viagens/media}" 2>/dev/null || echo "MEDIA_ROOT nao existe"
+            ls -l "${MEDIA_ROOT:-/var/www/gerenciador-viagens/media}/eventos/68/solicitacoes/" 2>/dev/null || echo "pasta do evento 68 ausente"
+
+            echo "=== registros pelo ORM ==="
+            rm -f /tmp/diag_midia.b64
+            echo -n "aW1wb3J0IG9zCmltcG9ydCBkamFuZ28KZGphbmdvLnNldHVwKCkKZnJvbSBkamFuZ28uY29uZiBpbXBvcnQgc2V0dGluZ3MKZnJv" >> /tmp/diag_midia.b64
+            echo -n "bSBldmVudG9zLm1vZGVscyBpbXBvcnQgRXZlbnRvRG9jdW1lbnRvU29saWNpdGFjYW8gYXMgTQoKcHJpbnQoIk1FRElBX1JPT1Q6" >> /tmp/diag_midia.b64
+            echo -n "Iiwgc2V0dGluZ3MuTUVESUFfUk9PVCkKcHJpbnQoIlhfQUNDRUw6IiwgZ2V0YXR0cihzZXR0aW5ncywgIlBSSVZBVEVfTUVESUFf" >> /tmp/diag_midia.b64
+            echo -n "WF9BQ0NFTF9SRURJUkVDVCIsIE5vbmUpKQpwcmludCgiSU5URVJOQUxfVVJMOiIsIGdldGF0dHIoc2V0dGluZ3MsICJQUklWQVRF" >> /tmp/diag_midia.b64
+            echo -n "X01FRElBX0lOVEVSTkFMX1VSTCIsICIoZGVmYXVsdCAvX3Byb3RlY3RlZF9tZWRpYS8pIikpCnByaW50KCJ0b3RhbDoiLCBNLm9i" >> /tmp/diag_midia.b64
+            echo -n "amVjdHMuY291bnQoKSkKZmFsdGFuZG8gPSAwCmZvciBhIGluIE0ub2JqZWN0cy5hbGwoKS5vcmRlcl9ieSgiLXBrIilbOjI1XToK" >> /tmp/diag_midia.b64
+            echo -n "ICAgIG5vbWUgPSBhLmFycXVpdm8ubmFtZQogICAgdHJ5OgogICAgICAgIGV4aXN0ZSA9IGEuYXJxdWl2by5zdG9yYWdlLmV4aXN0" >> /tmp/diag_midia.b64
+            echo -n "cyhub21lKSBpZiBub21lIGVsc2UgRmFsc2UKICAgIGV4Y2VwdCBFeGNlcHRpb24gYXMgZXhjOgogICAgICAgIGV4aXN0ZSA9ICJF" >> /tmp/diag_midia.b64
+            echo -n "UlJPOiVzIiAlIGV4YwogICAgaWYgZXhpc3RlIGlzIG5vdCBUcnVlOgogICAgICAgIGZhbHRhbmRvICs9IDEKICAgIHByaW50KCJw" >> /tmp/diag_midia.b64
+            echo -n "az0lcyBldmVudG89JXMgZXhpc3RlPSVzIG5hbWU9JXIiICUgKGEucGssIGEuZXZlbnRvX2lkLCBleGlzdGUsIG5vbWUpKQpwcmlu" >> /tmp/diag_midia.b64
+            echo -n "dCgiZmFsdGFuZG8gbmEgYW1vc3RyYToiLCBmYWx0YW5kbykKdHJ5OgogICAgYWx2byA9IE0ub2JqZWN0cy5nZXQocGs9MTYpCiAg" >> /tmp/diag_midia.b64
+            echo -n "ICBwcmludCgiLS0tIGFuZXhvIDE2IC0tLSIpCiAgICBwcmludCgiZXZlbnRvOiIsIGFsdm8uZXZlbnRvX2lkLCAiYXJlYToiLCBh" >> /tmp/diag_midia.b64
+            echo -n "bHZvLmV2ZW50by5hcmVhX2lkKQogICAgcHJpbnQoIm5hbWU6IiwgcmVwcihhbHZvLmFycXVpdm8ubmFtZSkpCiAgICBwcmludCgi" >> /tmp/diag_midia.b64
+            echo -n "ZXhpc3RlOiIsIGFsdm8uYXJxdWl2by5zdG9yYWdlLmV4aXN0cyhhbHZvLmFycXVpdm8ubmFtZSkgaWYgYWx2by5hcnF1aXZvLm5h" >> /tmp/diag_midia.b64
+            echo -n "bWUgZWxzZSBGYWxzZSkKICAgIHByaW50KCJjYW1pbmhvIGFic29sdXRvOiIsIGFsdm8uYXJxdWl2by5wYXRoIGlmIGFsdm8uYXJx" >> /tmp/diag_midia.b64
+            echo -n "dWl2by5uYW1lIGVsc2UgIi0iKQogICAgcHJpbnQoImV4aXN0ZSBubyBmaWxlc3lzdGVtOiIsIG9zLnBhdGguZXhpc3RzKGFsdm8u" >> /tmp/diag_midia.b64
+            echo -n "YXJxdWl2by5wYXRoKSBpZiBhbHZvLmFycXVpdm8ubmFtZSBlbHNlIEZhbHNlKQpleGNlcHQgTS5Eb2VzTm90RXhpc3Q6CiAgICBw" >> /tmp/diag_midia.b64
+            echo -n "cmludCgiYW5leG8gMTYgbmFvIGV4aXN0ZSIpCmV4Y2VwdCBFeGNlcHRpb24gYXMgZXhjOgogICAgcHJpbnQoImVycm8gbm8gYW5l" >> /tmp/diag_midia.b64
+            echo -n "eG8gMTY6IiwgdHlwZShleGMpLl9fbmFtZV9fLCBleGMpCg==" >> /tmp/diag_midia.b64
+            base64 -d /tmp/diag_midia.b64 > /tmp/diag_midia.py
+            rm -f /tmp/diag_midia.b64
+
+            python /tmp/diag_midia.py
+            rm -f /tmp/diag_midia.py
+            echo "=== FIM ==="
