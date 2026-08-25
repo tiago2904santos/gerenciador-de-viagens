@@ -4060,7 +4060,9 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   gap: 4px;
   min-width: 260px;
   padding: 8px;
-  z-index: var(--z-modal, 1000);
+  /* O menu pode abrir para cima e cruzar o rail sticky do wizard. Como ele é
+     uma ação ativa, precisa continuar por cima da navegação durante o uso. */
+  z-index: calc(var(--z-sticky-stepper, 1100) + 10);
 }
 
 /* O `display` acima vence o `[hidden]` do navegador, que é regra de agente do

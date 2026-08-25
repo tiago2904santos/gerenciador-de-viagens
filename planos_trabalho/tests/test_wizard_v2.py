@@ -687,3 +687,15 @@ class WizardV2Tests(TestCase):
         # submit com `formaction`, porque formulário aninhado o HTML não tem.
         self.assertIn("formaction=", html)
         self.assertIn("formnovalidate", html)
+
+    def test_o_documento_gerado_fica_em_form_block_dentro_do_panel(self):
+        html = self._html("planos_trabalho:wizard_documentos")
+        documento = html.index('<details class="document-inline-card')
+        bloco = html.rfind("<section", 0, documento)
+        tag_bloco = html[bloco : html.index(">", bloco) + 1]
+
+        self.assertIn("form-block--v2", tag_bloco)
+
+        panel = html.rfind("<section", 0, bloco)
+        tag_panel = html[panel : html.index(">", panel) + 1]
+        self.assertIn("panel", tag_panel)

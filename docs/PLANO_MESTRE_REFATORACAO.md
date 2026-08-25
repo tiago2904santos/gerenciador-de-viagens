@@ -793,3 +793,11 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       ofício vinculado ao evento, preservando valores próprios e edição manual no plano.
 - [x] `NOVO-20260825-140933-0fa0187caab1` elimina da linha única de efetivo a coluna reservada ao
       botão de remoção oculto.
+- [x] `NOVO-20260825-144018-4cc6708a9154` coloca a prévia do documento gerado na camada interna
+      canônica de `form-block` dentro do `panel` da etapa final.
+- [x] `NOVO-20260825-151232-1ca1c51f0af2` mantém menus de ações v2 acima do stepper fixo quando
+      as duas camadas se cruzam.
+- [x] `NOVO-20260825-151904-a1fe8bf468c4` permite que o botão Fechar do seletor de downloads
+      alcance o manipulador delegado e encerre o diálogo.
+- [x] `NOVO-20260825-153728-f62003a70b19` troca o menu do termo principal pelo seletor completo
+      de documentos, pessoas, formato e modo de saída.

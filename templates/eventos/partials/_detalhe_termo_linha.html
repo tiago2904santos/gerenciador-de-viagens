@@ -3,8 +3,8 @@
   roteiro: título, meta e as ações à direita.
 
   A lista aqui mistura dois tipos de linha — o termo genérico do evento e um por
-  servidor —, e as duas vêm do mesmo presenter. O que muda é quais URLs a linha
-  traz: por isso cada ação é condicional.
+  servidor. O genérico abre o seletor do pacote inteiro; a linha individual
+  preserva o menu rápido daquele documento específico.
 {% endcomment %}
 <c-v2.record
   eyebrow="Termo"
@@ -13,7 +13,9 @@
 >
   <c-slot name="meta">{{ row.meta_line }}</c-slot>
   <c-slot name="actions">
-    {% if row.visualizar_url or row.pdf_url or row.docx_url %}
+    {% if row.downloads_url %}
+      <c-v2.download_picker :picker_id="row.download_picker_id" :src="row.downloads_url" />
+    {% elif row.visualizar_url or row.pdf_url or row.docx_url %}
       {% with row_index|stringformat:"s" as row_index_text %}
         {% with menu_id="evento-termo-document-menu-"|add:row_index_text %}
           <c-v2.icon_button icon="more" :menu_id="menu_id" aria_label="Abrir menu de documentos do termo" tooltip="Documentos" />

@@ -207,6 +207,25 @@
     alvo.hidden = !mensagem;
   }
 
+  function fecharDialogo(evento, dialogo) {
+    evento.preventDefault();
+    evento.stopPropagation();
+    if (window.CV.overlay && typeof window.CV.overlay.closeDialog === "function") {
+      window.CV.overlay.closeDialog(dialogo);
+    } else if (dialogo.open) {
+      dialogo.close();
+    }
+  }
+
+  function vincularFechamento(dialogo) {
+    var fechar = dialogo.querySelector("[data-download-picker-close]");
+    if (!fechar || fechar.hasAttribute("data-download-picker-close-bound")) return;
+    fechar.setAttribute("data-download-picker-close-bound", "");
+    fechar.addEventListener("click", function (evento) {
+      fecharDialogo(evento, dialogo);
+    });
+  }
+
   function processar(raiz, dados) {
     var formato = selecionado(raiz, "formato") || "pdf";
     var saida = selecionado(raiz, "saida") || "separados";
@@ -266,6 +285,7 @@
     var raiz = montagem.querySelector("[data-download-picker]");
     var dialogo = raiz.closest("dialog");
     var src = raiz.getAttribute("data-src");
+    vincularFechamento(dialogo);
 
     return pedir(src).then(function (response) {
       return response.json();
@@ -319,12 +339,7 @@
     if (fechar) {
       var dialogo = fechar.closest("dialog");
       if (!dialogo) return;
-      evento.preventDefault();
-      if (window.CV.overlay && typeof window.CV.overlay.closeDialog === "function") {
-        window.CV.overlay.closeDialog(dialogo);
-      } else if (dialogo.open) {
-        dialogo.close();
-      }
+      fecharDialogo(evento, dialogo);
       return;
     }
 

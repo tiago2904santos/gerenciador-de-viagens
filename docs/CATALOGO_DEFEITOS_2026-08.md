@@ -11812,3 +11812,43 @@ A variante `efetivo-row--single` agora troca a grade raiz de três para duas col
 com o botão oculto a largura e o `gap` que lhe pertenciam. Ao adicionar outra linha, o motor remove
 a variante e restaura a terceira coluna normalmente; ao voltar para uma linha, o espaço torna a
 sumir. O contrato CSS ficou coberto em `planos_trabalho.tests.test_wizard_v2`.
+
+### NOVO-20260825-144018-4cc6708a9154 ✅ RESOLVIDO · `NOVO` Documento gerado ignora a camada interna de form-block · UI · risco baixo
+
+Na etapa Resumo e documentos, o cartão de prévia é renderizado diretamente no corpo do `panel`.
+Isso quebra a hierarquia visual v2, na qual o `panel` representa a seção externa e cada conjunto
+funcional deve morar em um `form-block` interno com raio e superfície próprios.
+
+A prévia agora vive em um `form-block` nomeado para acessibilidade dentro do `panel`; cabeçalho,
+ação contextual e rodapé permanecem nas camadas externas próprias do wizard. Um teste renderizado
+garante a relação `panel > form-block > document-inline-card`.
+
+### NOVO-20260825-151232-1ca1c51f0af2 ✅ RESOLVIDO · `NOVO` Stepper fixo cobre menus de ações · UI · risco baixo
+
+Os menus v2 transplantados para o `body` usam `--z-modal` (`100`), enquanto o rail fixo do stepper
+usa `--z-sticky` (`900`). Quando um menu abre para cima e cruza a faixa do wizard, o stepper fica
+por cima de seus itens e traços, prejudicando leitura e interação.
+
+O componente global de menu agora ocupa um degrau imediatamente acima de `--z-sticky-stepper`.
+Assim ele vence o stepper enquanto aberto sem alterar os contratos de diálogos e outras camadas;
+o novo degrau está coberto no teste visual da lista de termos.
+
+### NOVO-20260825-151904-a1fe8bf468c4 ✅ RESOLVIDO · `NOVO` Botão Fechar não encerra seletor de downloads · JS · risco baixo
+
+No formulário de termo, o seletor de downloads mora no DOM dentro das ações do cabeçalho do cartão.
+O listener dessa faixa chama `stopPropagation()` antes que o clique em “Fechar” alcance a delegação
+de `download-queue.js`; o diálogo permanece aberto mesmo com botão e gancho corretos.
+
+A proteção do cabeçalho agora deixa qualquer clique originado em `dialog` continuar até os
+manipuladores delegados do documento. O botão Fechar volta a encerrar o modal sem permitir que a
+interação alterne o cartão `<details>` que permanece como seu ancestral no DOM.
+
+### NOVO-20260825-153728-f62003a70b19 ✅ RESOLVIDO · `NOVO` Termo principal oferece menu simples em vez do seletor completo · UI · risco baixo
+
+Na etapa Termos do evento, a ação do registro principal abre um menu com visualização, PDF e DOCX
+apenas do documento genérico. O formulário do mesmo termo já possui um seletor que lista o termo em
+branco, a viatura e cada servidor, além de formato e saída; a lista não reaproveita esse fluxo.
+
+O presenter do termo principal agora entrega a rota de catálogo e um id de modal exclusivo, e a
+linha renderiza o mesmo `download_picker` usado no formulário. As linhas de servidor preservam o
+menu rápido do documento individual; a etapa passou a carregar o motor compartilhado da fila.

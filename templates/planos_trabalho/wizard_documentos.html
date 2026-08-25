@@ -41,7 +41,11 @@
     </c-slot>
 
     <c-slot name="body">
-      {% include "planos_trabalho/partials/_documentos_preview_body.html" with baixar_docx_url=baixar_docx_url baixar_pdf_url=baixar_pdf_url documento_disponivel=documento_disponivel pdf_inline_url=pdf_inline_url plano=plano only %}
+      <c-v2.form_block aria_label="Documento gerado">
+        <c-slot name="body">
+          {% include "planos_trabalho/partials/_documentos_preview_body.html" with baixar_docx_url=baixar_docx_url baixar_pdf_url=baixar_pdf_url documento_disponivel=documento_disponivel pdf_inline_url=pdf_inline_url plano=plano only %}
+        </c-slot>
+      </c-v2.form_block>
 
       <c-v2.card_footer>
         <c-slot name="secondary">

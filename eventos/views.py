@@ -193,6 +193,8 @@ def _apresentar_termos_rows(termos_qs):
             visualizar_url=reverse("termos:termo_cadastro_generico_pdf_inline", args=[termo.pk]),
             pdf_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "pdf"]),
             docx_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "docx"]),
+            downloads_url=reverse("termos:termo_cadastro_downloads", args=[termo.pk]),
+            download_picker_id=f"evento-termo-downloads-{termo.pk}",
             **termo_cadastro_assinado_info(termo, None),
         )
         for termo in termos_qs

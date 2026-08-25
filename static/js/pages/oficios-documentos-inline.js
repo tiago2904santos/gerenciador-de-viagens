@@ -13,7 +13,7 @@
     el.addEventListener("click", function (e) {
       if (
         e.target.closest(
-          '[data-overlay-trigger], [data-attach-signed-trigger], [data-download-picker-trigger]',
+          'dialog, [data-overlay-trigger], [data-attach-signed-trigger], [data-download-picker-trigger]',
         )
       ) {
         return;
