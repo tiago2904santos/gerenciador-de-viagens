@@ -34,14 +34,21 @@ from django.conf import settings  # noqa: E402
 from django.core.exceptions import ValidationError  # noqa: E402
 from django.core.files.uploadedfile import SimpleUploadedFile  # noqa: E402
 
+from core.uploads import _scan_with_clamav  # noqa: E402
 from core.uploads import validate_private_document_upload  # noqa: E402
 
 # Assinatura de teste padrão do EICAR, montada em pedaços para que este próprio
 # arquivo não seja sinalizado como malware pelo antivírus da máquina.
 EICAR = rb"X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-" rb"FILE!$H+H*"
 
-PDF_LIMPO = b"%PDF-1.7\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%EOF\n"
-PDF_INFECTADO = b"%PDF-1.7\n" + EICAR + b"\n%%EOF\n"
+PDF_LIMPO = b"""%PDF-1.7
+1 0 obj
+<<>>
+endobj
+trailer
+<<>>
+%%EOF
+"""
 
 
 def main() -> int:
@@ -50,21 +57,29 @@ def main() -> int:
 
     falhas = []
 
+    # 1) Caminho real do usuário: o anexo limpo tem de passar. É este o caso que
+    #    estava quebrado — o clamd recusava por não conseguir ler o temporário.
     try:
         validate_private_document_upload(SimpleUploadedFile("documento.pdf", PDF_LIMPO))
     except ValidationError as exc:
         falhas.append(f"PDF limpo foi RECUSADO: {exc.messages}")
-        print("PDF limpo   -> RECUSADO:", exc.messages)
+        print("PDF limpo (política completa) -> RECUSADO:", exc.messages)
     else:
-        print("PDF limpo   -> ACEITO")
+        print("PDF limpo (política completa) -> ACEITO")
 
+    # 2) O scan tem de estar realmente inspecionando. O EICAR só é reconhecido
+    #    quando é o arquivo inteiro, e um arquivo assim jamais passa da checagem
+    #    de magic number do PDF — então a prova é chamar o scan diretamente.
     try:
-        validate_private_document_upload(SimpleUploadedFile("documento.pdf", PDF_INFECTADO))
+        _scan_with_clamav(SimpleUploadedFile("documento.pdf", EICAR))
     except ValidationError as exc:
-        print("EICAR       -> RECUSADO:", exc.messages)
+        mensagem = " ".join(exc.messages)
+        print("EICAR (scan direto) -> RECUSADO:", mensagem)
+        if "rejeitado pela verificação antivírus" not in mensagem:
+            falhas.append(f"EICAR recusado pelo motivo errado: {mensagem}")
     else:
         falhas.append("EICAR foi ACEITO: o scan não está inspecionando o conteúdo")
-        print("EICAR       -> ACEITO (ERRADO)")
+        print("EICAR (scan direto) -> ACEITO (ERRADO)")
 
     for falha in falhas:
         print("FALHA:", falha)
