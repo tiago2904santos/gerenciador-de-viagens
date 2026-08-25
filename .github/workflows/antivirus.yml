@@ -16,6 +16,7 @@ on:
         options:
           - checar
           - instalar
+          - verificar
         default: checar
 
 concurrency:
@@ -100,4 +101,51 @@ jobs:
 
             echo "=== Memória depois do clamd ==="
             free -m
+            echo "=== FIM ==="
+
+      - name: Verificar pelo próprio código do Django
+        if: ${{ inputs.modo == 'verificar' }}
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 10m
+          script: |
+            set -Eeuo pipefail
+            cd /var/www/gerenciador-viagens/app
+            source /var/www/gerenciador-viagens/venv/bin/activate
+            set -a; . ./.env; set +a
+            python - <<'PY'
+            import django, os
+            django.setup()
+            from django.conf import settings
+            from django.core.files.uploadedfile import SimpleUploadedFile
+            from core.uploads import validate_private_document_upload
+
+            print("REQUIRE_ANTIVIRUS:", settings.PRIVATE_UPLOAD_REQUIRE_ANTIVIRUS)
+            print("SCAN_COMMAND:", settings.CLAMAV_SCAN_COMMAND)
+
+            limpo = SimpleUploadedFile("documento.pdf", b"%PDF-1.7
+1 0 obj
+<<>>
+endobj
+%%EOF
+")
+            validate_private_document_upload(limpo)
+            print("PDF limpo -> ACEITO")
+
+            # EICAR: string de teste padrão, reconhecida por todo antivírus.
+            # Prova que o scan realmente roda, e não que ele apenas não estourou.
+            eicar = b"X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
+            infectado = SimpleUploadedFile("documento.pdf", b"%PDF-1.7
+" + eicar + b"
+%%EOF
+")
+            try:
+                validate_private_document_upload(infectado)
+                print("EICAR -> ACEITO (ERRADO: o scan nao esta pegando nada)")
+            except Exception as exc:
+                print("EICAR -> RECUSADO:", exc)
+            PY
             echo "=== FIM ==="
