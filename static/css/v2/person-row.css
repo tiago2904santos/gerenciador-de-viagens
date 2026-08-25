@@ -102,18 +102,26 @@
   min-width: 0;
 }
 
+/* `nowrap` porque o selo pertence ao nome: mandado para a linha de baixo ele
+   vira um rótulo solto, sem dizer de quem é. O componente permite um selo só,
+   então não há fila para quebrar. */
 :is(html[data-theme]) .person-row__name-row {
   align-items: center;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--gap-tight);
   min-width: 0;
 }
 
+/* `min-width: 0` é o que faz as reticências existirem: como item de flex o
+   nome não encolhe abaixo do próprio conteúdo por padrão, então um nome de
+   arquivo comprido empurrava o selo para a segunda linha e o
+   `text-overflow` abaixo nunca chegava a agir. */
 :is(html[data-theme]) .person-row__name {
   color: var(--text-strong);
   font-size: var(--text-size-base);
   font-weight: var(--weight-strong);
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -126,6 +134,7 @@
   background: color-mix(in srgb, var(--accent) 16%, transparent);
   border-radius: var(--radius-pill);
   color: var(--accent);
+  flex: 0 0 auto;
   font-size: var(--text-size-eyebrow);
   font-weight: var(--weight-strong);
   padding: 3px 10px;
