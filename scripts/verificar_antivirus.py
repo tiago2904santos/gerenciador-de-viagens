@@ -13,9 +13,20 @@ Uso na VPS, com o venv ativo e o .env carregado:
 
 from __future__ import annotations
 
+import os
 import sys
+from pathlib import Path
 
-import django
+# Rodar `python scripts/verificar_antivirus.py` coloca `scripts/` no sys.path,
+# nao a raiz do projeto -- sem isto o `django.setup()` nao acha `config`.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+if not os.environ.get("DJANGO_SETTINGS_MODULE"):
+    raise SystemExit(
+        "DJANGO_SETTINGS_MODULE nao definido; carregue o .env antes de rodar.",
+    )
+
+import django  # noqa: E402
 
 django.setup()
 
