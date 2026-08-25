@@ -15,6 +15,7 @@ on:
         options:
           - mostrar
           - aplicar
+          - verificar
           - reverter
         default: mostrar
 
@@ -84,6 +85,24 @@ jobs:
             echo "=== /media/ tem de dar 404 agora ==="
             curl -s -o /dev/null -w 'media publico: %{http_code}\n' --max-time 10 https://gerenciadorviagens.tech/media/eventos/68/solicitacoes/oficio_494-2026_solicita_apoio_operacional_-_ascom_1.pdf || true
             curl -s -o /dev/null -w 'health: %{http_code}\n' --max-time 10 https://gerenciadorviagens.tech/health/ || true
+            echo "=== FIM ==="
+
+      - name: Verificar a entrega de um arquivo privado
+        if: ${{ inputs.modo == 'verificar' }}
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 10m
+          script: |
+            set -Eeuo pipefail
+            cd /var/www/gerenciador-viagens/app
+            source /var/www/gerenciador-viagens/venv/bin/activate
+            set -a
+            . ./.env
+            set +a
+            python scripts/verificar_midia_privada.py
             echo "=== FIM ==="
 
       - name: Reverter para o backup mais recente

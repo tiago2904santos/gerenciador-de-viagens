@@ -11800,3 +11800,15 @@ O selector agora consolida somente ofícios e roteiros ativos da mesma área: a 
 etapa, cada componente ausente é completado apenas no objeto em memória; valores já salvos vencem,
 o POST/autosave continua sendo o único escritor e os campos permanecem editáveis. Dois testes de
 request cobrem o preenchimento sem persistência e a precedência dos valores próprios do plano.
+
+### NOVO-20260825-140933-0fa0187caab1 ✅ RESOLVIDO · `NOVO` Linha única de efetivo reservava espaço para remoção invisível · UI · risco baixo
+
+A classe `efetivo-row--single` esconde corretamente o botão de remoção, mas a grade raiz continua
+declarando três colunas fixas. A última coluna de `var(--control-height)` e o `gap` anterior ficam
+vazios à direita da quantidade, produzindo um espaço invisível que só desaparece quando uma segunda
+linha torna o botão necessário.
+
+A variante `efetivo-row--single` agora troca a grade raiz de três para duas colunas, removendo junto
+com o botão oculto a largura e o `gap` que lhe pertenciam. Ao adicionar outra linha, o motor remove
+a variante e restaura a terceira coluna normalmente; ao voltar para uma linha, o espaço torna a
+sumir. O contrato CSS ficou coberto em `planos_trabalho.tests.test_wizard_v2`.

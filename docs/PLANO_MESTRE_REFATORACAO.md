@@ -791,3 +791,5 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       e apresenta o tópico ativo como uma lista simples canônica, inclusive no estado vazio.
 - [x] `NOVO-20260825-134715-fb0414c466e5` pré-preenche saída e chegada na sede com o roteiro do
       ofício vinculado ao evento, preservando valores próprios e edição manual no plano.
+- [x] `NOVO-20260825-140933-0fa0187caab1` elimina da linha única de efetivo a coluna reservada ao
+      botão de remoção oculto.

@@ -467,6 +467,16 @@ class WizardV2Tests(TestCase):
         self.assertEqual(html.count("efetivo-row--without-labels"), 1)
         self.assertIn('classList.toggle("efetivo-row--without-labels", index > 0)', script)
 
+    def test_linha_unica_de_efetivo_nao_reserva_coluna_para_remocao_oculta(self):
+        css = (ROOT / "static" / "css" / "v2" / "efetivo-row.css").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn(
+            ".efetivo-row--single {\n  grid-template-columns: var(--control-height) minmax(0, 1fr);",
+            css,
+        )
+
     def test_o_resultado_das_diarias_tem_onde_receber_o_calculo(self):
         html = self._html("planos_trabalho:wizard_efetivo_diarias")
         for gancho in (

@@ -14680,9 +14680,13 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   }
 }
 
-/* Com uma linha só, o "×" nasce oculto — não há o que remover. Estando ele numa
-   coluna `auto`, o vão some junto com o botão e os campos ficam com a largura
-   inteira. */
+/* Com uma linha só, o "×" nasce oculto — não há o que remover. A grade também
+   perde a terceira coluna e o gap correspondente; esconder somente o botão
+   deixava um vão invisível à direita dos campos. */
+:is(html[data-theme]) .efetivo-row--single {
+  grid-template-columns: var(--control-height) minmax(0, 1fr);
+}
+
 :is(html[data-theme]) .efetivo-row--single .efetivo-row__remove {
   display: none;
 }
