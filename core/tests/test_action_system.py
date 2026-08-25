@@ -156,6 +156,27 @@ class GlobalActionSystemTests(SimpleTestCase):
         self.assertIn('href="/termos/7/pdf/"', html)
         self.assertIn("Destino não informado", html)
 
+    def test_menu_item_pode_executar_post_sem_virar_link_get(self):
+        html = render_to_string(
+            "cotton/v2/menu_item.html",
+            {
+                "action_url": "/planos-trabalho/novo/?evento=45",
+                "title": "Plano de Trabalho",
+                "description": "Criar para este evento",
+                "icon": "clipboard-copy",
+            },
+        )
+
+        self.assertIn(
+            '<form method="post" action="/planos-trabalho/novo/?evento=45" class="menu__form">',
+            html,
+        )
+        self.assertRegex(
+            html,
+            r'<button\s+class="menu__item"\s+type="submit"\s+role="menuitem"',
+        )
+        self.assertNotIn("<a", html)
+
     def test_item_desabilitado_sai_como_span_anunciavel(self):
         """"Diário de bordo — ainda não foi criado" não é um link quebrado.
 

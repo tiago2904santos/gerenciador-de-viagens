@@ -33,6 +33,7 @@ def _servidor_picker_widget(panel_title: str, field_label: str) -> forms.Select:
         attrs={
             **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
             "data-entity-picker": "true",
+            "data-picker-v2": "true",
             "data-pt-coordenador-picker": "true",
             "data-entity-picker-mode": "single",
             "data-picker-variant": "compact",
@@ -107,6 +108,7 @@ class PlanoIdentificacaoForm(forms.ModelForm):
                 attrs={
                     **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                     "data-entity-picker": "true",
+                    "data-picker-v2": "true",
                     "data-entity-picker-mode": "single",
                     "data-picker-variant": "compact",
                     "data-placeholder": "Buscar estado...",
@@ -117,6 +119,7 @@ class PlanoIdentificacaoForm(forms.ModelForm):
                 attrs={
                     **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                     "data-entity-picker": "true",
+                    "data-picker-v2": "true",
                     "data-entity-picker-mode": "single",
                     "data-picker-variant": "compact",
                     "data-placeholder": "Buscar cidade...",
@@ -544,6 +547,7 @@ class EfetivoPlanoForm(forms.ModelForm):
                 attrs={
                     **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                     "data-entity-picker": "true",
+                    "data-picker-v2": "true",
                     "data-entity-picker-mode": "single",
                     "data-picker-variant": "compact",
                     "data-placeholder": "Buscar unidade...",
@@ -656,6 +660,7 @@ class EfetivoEventoForm(forms.ModelForm):
                 attrs={
                     **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                     "data-entity-picker": "true",
+                    "data-picker-v2": "true",
                     "data-entity-picker-mode": "single",
                     "data-picker-variant": "compact",
                     "data-placeholder": "Buscar unidade...",

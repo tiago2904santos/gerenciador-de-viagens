@@ -527,3 +527,16 @@ igualmente na `main`. Os avisos deste recorte foram de 253 para 239.
 - [x] `NOVO-20260825-000241-dcb332aafe26` — retirar o padding vertical de 32 px que fazia poucos
   documentos preencherem o teto inteiro da lista. Fechamento: `Termo #4` mede 62 px sozinho e
   com três resultados; padding computado 8 × 12 px nos temas claro e escuro.
+
+## Pickers da edição de Plano de Trabalho (25/08/2026)
+
+- [x] `NOVO-20260825-023650-10ddab630c00` — marcar como V2 todos os pickers pesquisáveis das
+  etapas Identificação e Efetivo/Diárias. Fechamento: coordenadores, destinos e unidades do
+  efetivo — inclusive a linha clonada do formset — declaram `data-picker-v2`; nenhum dropdown
+  antigo é transportado para dentro do wizard V2.
+
+## Entrada direta nos cadastros a partir do Evento (25/08/2026)
+
+- [x] `NOVO-20260825-024621-97c9b859786c` — preservar a OS como link para seu formulário e
+  executar a criação numerada do Plano de Trabalho por POST dentro do menu V2. Fechamento: as duas
+  escolhas da etapa PT/OS entram diretamente no cadastro correspondente, mantendo o Evento.

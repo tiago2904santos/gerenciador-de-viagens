@@ -11,6 +11,7 @@ from PIL import Image
 
 from eventos.models import Evento, EventoDocumentoSolicitacao
 from eventos.services import converter_para_pdf_se_necessario
+from planos_trabalho.models import PlanoTrabalho
 from usuarios.models import AreaTrabalho
 from usuarios.models import VinculoUsuarioArea
 from core.testing import area_de_teste
@@ -115,9 +116,28 @@ class UploadSolicitacaoViewTests(TestCase):
         self.assertContains(resp, "Ordem de Serviço")
         self.assertContains(resp, "Plano de Trabalho")
         self.assertContains(resp, resp.context["create_urls"]["ordem"])
-        self.assertContains(resp, resp.context["create_urls"]["plano"])
+        self.assertIn(
+            f'<form method="post" action="{resp.context["create_urls"]["plano"]}" class="menu__form">',
+            resp.content.decode(),
+        )
         self.assertNotContains(resp, "Novo plano")
         self.assertNotContains(resp, "Nova OS")
+
+    def test_criar_planejamento_entra_direto_no_cadastro_respectivo(self):
+        resp = self.client.get(self.url)
+        ordem_url = resp.context["create_urls"]["ordem"]
+        plano_url = resp.context["create_urls"]["plano"]
+
+        ordem = self.client.get(ordem_url)
+        self.assertEqual(ordem.status_code, 200)
+        self.assertContains(ordem, "Nova Ordem de Serviço")
+
+        plano = self.client.post(plano_url)
+        rascunho = PlanoTrabalho.objects.get(evento=self.evento)
+        self.assertRedirects(
+            plano,
+            reverse("planos_trabalho:wizard_identificacao", args=[rascunho.pk]),
+        )
 
     def test_acoes_do_arquivo_usam_a_superficie_do_painel(self):
         EventoDocumentoSolicitacao.objects.create(

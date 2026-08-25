@@ -272,6 +272,33 @@ class WizardV2Tests(TestCase):
             html,
         )
 
+    def test_todo_picker_pesquisavel_das_etapas_declara_o_tema_v2(self):
+        """O motor é comum, mas a lista V2 depende de ``data-picker-v2``.
+
+        Sem a marca, coordenadores e unidades do efetivo ganham o dropdown
+        legado dentro da página nova. Os selects renderizados pelo renderer
+        compacto não entram nesta regra: eles já nascem com ``--v2``.
+        """
+        for nome in (
+            "planos_trabalho:wizard_identificacao",
+            "planos_trabalho:wizard_efetivo_diarias",
+        ):
+            html = self._html(nome)
+            pickers = re.findall(
+                r"<select\b(?=[^>]*\bdata-entity-picker(?:=\"true\")?)[^>]*>",
+                html,
+            )
+            pesquisaveis = [
+                tag
+                for tag in pickers
+                if 'data-entity-picker-renderer="select"' not in tag
+            ]
+
+            self.assertTrue(pesquisaveis, nome)
+            for tag in pesquisaveis:
+                with self.subTest(etapa=nome, select=tag):
+                    self.assertIn("data-picker-v2", tag)
+
     def test_generos_nao_oferecem_opcao_vazia(self):
         html = self._html("planos_trabalho:wizard_identificacao")
 

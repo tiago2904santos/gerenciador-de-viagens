@@ -11721,6 +11721,32 @@ de Termos do Evento: três itens passaram a **62 px** cada numa lista natural de
 filtrar somente `Termo #4`, item e lista medem **62 px**, sem preenchimento artificial. O contrato
 foi acrescentado a `eventos.tests.test_evento_card_layout`.
 
+### NOVO-20260825-023650-10ddab630c00 ✅ RESOLVIDO · `NOVO` Pickers pesquisáveis do Plano de Trabalho misturavam lista legada com página V2 · UI · risco baixo
+
+A migração do wizard para `c-v2.*` preservou o motor comum dos pickers, mas os selects dos dois
+coordenadores e das unidades do efetivo não receberam `data-picker-v2`. Sem essa marca, o campo
+era desenhado dentro da página nova enquanto seu dropdown continuava no tema anterior — um terceiro
+estado que não correspondia nem à tela legada completa nem ao contrato V2. Linhas novas do formset
+repetiam o defeito a cada efetivo adicionado.
+
+Todos os pickers pesquisáveis produzidos pelos forms do Plano de Trabalho agora declaram o tema V2:
+coordenador administrativo, coordenador operacional, estado, cidade e unidade nas duas variantes
+de efetivo. A catraca em `planos_trabalho.tests.test_wizard_v2` percorre as etapas Identificação e
+Efetivo/Diárias, incluindo o molde `__prefix__`, e impede novo picker híbrido.
+
+### NOVO-20260825-024621-97c9b859786c ✅ RESOLVIDO · `NOVO` Criar Plano de Trabalho pelo Evento abria a lista em vez do cadastro · HT/BE · risco baixo
+
+O menu da etapa PT/OS emitia os dois itens como links GET. Isso era correto para Ordem de Serviço,
+cuja rota `nova` renderiza o formulário, mas incompatível com Plano de Trabalho: sua rota `novo`
+só reserva a numeração e cria o rascunho por POST; no GET ela deliberadamente redireciona para a
+lista. Assim, “Plano de Trabalho” levava à lista e obrigava a pessoa a criar novamente pela aba de
+cadastro, perdendo o contexto do Evento.
+
+O `menu_item` V2 ganhou `action_url`, uma variante POST visualmente idêntica ao link e com CSRF.
+Na etapa do Evento, Ordem de Serviço permanece navegação direta para “Nova Ordem de Serviço”; Plano
+de Trabalho agora cria o rascunho já vinculado e redireciona imediatamente para Identificação e
+atuação. O teste percorre os dois caminhos e exige a página de cadastro respectiva.
+
 ### NOVO-20260825-003828-2242787fc0dc ✅ RESOLVIDO · `NOVO` Tempo de viagem repassava o fluxo livre da ORS e divergia entre ida e volta · BE · risco médio
 
 Dois defeitos no mesmo ponto, ambos medidos contra o Google Maps em 32 rotas reais do PR
