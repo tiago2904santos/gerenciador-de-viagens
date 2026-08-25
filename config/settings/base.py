@@ -241,7 +241,10 @@ PRIVATE_UPLOAD_REQUIRE_ANTIVIRUS = os.getenv(
     "PRIVATE_UPLOAD_REQUIRE_ANTIVIRUS",
     "false",
 ).lower() in {"1", "true", "yes"}
-CLAMAV_SCAN_COMMAND = os.getenv("CLAMAV_SCAN_COMMAND", "clamdscan")
+# Aceita flags (o valor passa por `shlex.split` em core/uploads.py).
+# `--fdpass` entrega o descritor já aberto ao clamd, que roda como usuário
+# `clamav` e não consegue ler o arquivo temporário 0600 do gunicorn.
+CLAMAV_SCAN_COMMAND = os.getenv("CLAMAV_SCAN_COMMAND", "clamdscan --fdpass")
 MEDIA_ROOT = env_path("MEDIA_ROOT", "media")
 
 # Núcleo documental (DOCX/PDF, conversão opcional, assinatura).

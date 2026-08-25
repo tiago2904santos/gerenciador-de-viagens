@@ -61,3 +61,21 @@ class PrivateUploadPolicyTests(SimpleTestCase):
 
         with self.assertRaisesMessage(ValidationError, "antivírus está indisponível"):
             validate_private_document_upload(upload)
+
+    @override_settings(
+        PRIVATE_UPLOAD_REQUIRE_ANTIVIRUS=True,
+        CLAMAV_SCAN_COMMAND="clamdscan --fdpass",
+    )
+    @mock.patch("core.uploads.subprocess.run")
+    def test_ajuste_do_scan_aceita_flags(self, run):
+        # Regressão medida na VPS: sem `--fdpass` o clamd (usuário `clamav`) não
+        # lê o temporário 0600 do gunicorn, responde "Access denied" e sai com 2,
+        # recusando todo anexo. A flag só chega ao processo se o ajuste for
+        # dividido em argumentos em vez de virar nome de executável.
+        run.return_value = mock.Mock(returncode=0)
+        upload = SimpleUploadedFile("documento.pdf", b"%PDF-1.7\n%%EOF")
+
+        validate_private_document_upload(upload)
+
+        argv = run.call_args.args[0]
+        self.assertEqual(argv[:3], ["clamdscan", "--fdpass", "--no-summary"])

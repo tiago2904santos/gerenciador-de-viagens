@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import re
+import shlex
 import subprocess
 import tempfile
 import unicodedata
@@ -70,7 +71,16 @@ def normalize_upload_filename(filename: str) -> str:
 
 
 def _scan_with_clamav(uploaded_file):
-    command = getattr(settings, "CLAMAV_SCAN_COMMAND", "clamdscan")
+    # `shlex.split` em vez de tratar o ajuste como nome de binário: a invocação
+    # correta do clamd precisa de flag, e sem isso o valor "clamdscan --fdpass"
+    # viraria um executável inexistente (FileNotFoundError) — a falha se
+    # disfarçaria de "antivírus indisponível".
+    command = getattr(settings, "CLAMAV_SCAN_COMMAND", "") or "clamdscan --fdpass"
+    argv = shlex.split(command)
+    if not argv:
+        raise ValidationError(
+            "O serviço antivírus está indisponível; tente novamente mais tarde.",
+        )
     position = uploaded_file.tell() if hasattr(uploaded_file, "tell") else 0
     try:
         uploaded_file.seek(0)
@@ -79,8 +89,13 @@ def _scan_with_clamav(uploaded_file):
                 temp.write(chunk)
             temp.flush()
             try:
+                # `--fdpass` não é preciosismo: o clamd roda como usuário
+                # `clamav` e recebe só o caminho, mas o NamedTemporaryFile nasce
+                # 0600 sob o usuário do gunicorn. Sem passar o descritor já
+                # aberto, o daemon responde "Access denied" e sai com 2, e todo
+                # anexo é recusado. Medido na VPS, não deduzido.
                 result = subprocess.run(
-                    [command, "--no-summary", temp.name],
+                    [*argv, "--no-summary", temp.name],
                     capture_output=True,
                     text=True,
                     timeout=30,

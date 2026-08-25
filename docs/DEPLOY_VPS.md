@@ -428,12 +428,29 @@ python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().d
 Para rotação sem indisponibilidade, informe `chave_nova,chave_antiga`, execute
 as migrações e, depois de recriptografar os registros, remova a chave antiga.
 
-Os uploads privados exigem antivírus em produção. Instale e habilite o ClamAV:
+Os uploads privados exigem antivírus em produção — a política é *fail-closed*,
+então sem `clamd` respondendo nenhum anexo entra. Prefira o workflow
+`Antivirus da VPS (ClamAV)` (modo `checar` antes, `instalar` depois) a fazer
+isto na mão; ele instala, baixa as assinaturas e valida o resultado no mesmo
+formato que o Django usa. O equivalente manual:
 
 ```bash
-sudo apt-get install -y clamav-daemon
-sudo systemctl enable --now clamav-daemon
+sudo apt-get install -y clamav-daemon clamav-freshclam
+sudo systemctl stop clamav-freshclam && sudo freshclam
+sudo systemctl enable --now clamav-freshclam clamav-daemon
 clamdscan --version
+```
+
+O `clamd` roda como usuário `clamav` e recebe apenas o caminho do arquivo, mas
+o temporário criado pelo Django nasce com modo 0600 sob o usuário do gunicorn.
+Sem `--fdpass` o daemon responde `Access denied` e sai com 2, e todo anexo é
+recusado — por isso o default de `CLAMAV_SCAN_COMMAND` é `clamdscan --fdpass`.
+Para conferir do jeito que o app faz:
+
+```bash
+T=$(mktemp /tmp/av-XXXXXX.pdf) && chmod 600 "$T" && printf '%%PDF-1.4
+' > "$T"
+clamdscan --fdpass --no-summary "$T"; echo "exit=$?"; rm -f "$T"
 ```
 
 Não exponha a porta 2003 no firewall ou no Nginx; o protocolo não possui
