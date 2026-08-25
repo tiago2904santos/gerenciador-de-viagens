@@ -492,6 +492,17 @@ server {
         return 404;
     }
 
+Para aplicar isto numa VPS que ainda esteja na configuracao antiga, use o
+workflow `Nginx da midia privada` (`mostrar` / `aplicar` / `verificar`). Ele faz
+backup datado, roda `nginx -t` e reverte sozinho se o teste falhar, e o modo
+`verificar` busca um documento real pela URL publica com sessao autenticada.
+
+Nunca deixe o backup da config dentro de `sites-enabled/`: o nginx inclui
+`sites-enabled/*`, entao o arquivo `.bak` vira um segundo `server` com os mesmos
+`server_name`. O `nginx -t` continua passando -- so aparece um aviso
+`conflicting server name` -- e a configuracao antiga segue atendendo. Os backups
+ficam em `/etc/nginx/backups-midia/`.
+
     location / {
         proxy_pass http://127.0.0.1:8000;
         proxy_set_header Host $host;
