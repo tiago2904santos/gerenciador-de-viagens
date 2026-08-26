@@ -70,7 +70,31 @@ class ShellCssProfileTests(SimpleTestCase):
 
         self.assertEqual(
             shell_css_profile(request),
-            {"shell_css_profile_path": "css/profiles/dashboard.css"},
+            {
+                "shell_css_profile_path": "css/profiles/dashboard.css",
+                # NOVO-70: a rota passou a receber também o perfil de componentes.
+                # Antes daqui o `ui.bundle.css` inteiro ia em toda página.
+                "ui_css_profile_path": "css/profiles/dashboard.ui.css",
+            },
+        )
+
+    @override_settings(CSS_ROUTE_PROFILES_ENABLED=True)
+    def test_login_recebe_perfil_de_componentes_sem_perfil_de_casca(self):
+        """NOVO-70: o login não estende `base.html`, então não há casca a podar.
+
+        `build_css_profiles.py` não gera `login.css`; pedir esse arquivo daria
+        404. O perfil de componentes existe e é o que corta os 552 KB.
+        """
+        request = SimpleNamespace(
+            resolver_match=SimpleNamespace(view_name="core:login")
+        )
+
+        self.assertEqual(
+            shell_css_profile(request),
+            {
+                "shell_css_profile_path": None,
+                "ui_css_profile_path": "css/profiles/login.ui.css",
+            },
         )
 
     @override_settings(CSS_ROUTE_PROFILES_ENABLED=True)
@@ -79,7 +103,10 @@ class ShellCssProfileTests(SimpleTestCase):
             resolver_match=SimpleNamespace(view_name="admin:index")
         )
 
-        self.assertEqual(shell_css_profile(request), {"shell_css_profile_path": None})
+        self.assertEqual(
+            shell_css_profile(request),
+            {"shell_css_profile_path": None, "ui_css_profile_path": None},
+        )
 
     @override_settings(CSS_ROUTE_PROFILES_ENABLED=False)
     def test_feature_flag_desativa_perfis(self):
@@ -87,7 +114,10 @@ class ShellCssProfileTests(SimpleTestCase):
             resolver_match=SimpleNamespace(view_name="core:dashboard")
         )
 
-        self.assertEqual(shell_css_profile(request), {"shell_css_profile_path": None})
+        self.assertEqual(
+            shell_css_profile(request),
+            {"shell_css_profile_path": None, "ui_css_profile_path": None},
+        )
 
 
 class CssPorRotaMetricTests(SimpleTestCase):

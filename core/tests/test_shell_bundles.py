@@ -89,10 +89,17 @@ class ShellBundleGateTests(SimpleTestCase):
         )
 
         # NOVO-120: a camada de componentes globais entra como um <link> próprio,
-        # depois do shell. É de propósito: este é o único ponto de entrega que NÃO
-        # passa pelo podador de `scripts/build_css_profiles.py` — o perfil por rota
-        # descarta regra cujo `rule_id` mudou, e foi isso que inviabilizou editar as
-        # folhas legadas. O orçamento continua fechado: dois arquivos, não N.
+        # depois do shell. O orçamento continua fechado: dois arquivos, não N.
+        #
+        # NOVO-70: os dois <link> passaram a ser perfis por família de rota; o que
+        # este teste lê são os FALLBACKS, que é o que sobra quando a rota não tem
+        # perfil (`{% static 'css/...bundle.css' %}` literal — o caminho do perfil
+        # é variável e o regex acima não o vê). A ressalva antiga continua valendo
+        # e agora vale para os dois: o perfil descarta regra cujo `rule_id` mudou,
+        # então editar uma folha do v2 exige recapturar o manifesto
+        # (`build_css_profiles.py --capture`). O gate contra esquecer é o
+        # `test_build_shell_bundles_check_passes` logo acima, que reprova quando o
+        # perfil no disco não bate com o que o podador geraria hoje.
         self.assertEqual(css_links, ["css/shell.bundle.css", "css/ui.bundle.css"])
         self.assertEqual(
             scripts,

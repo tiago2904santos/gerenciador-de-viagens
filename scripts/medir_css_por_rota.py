@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import sys
+from functools import lru_cache
 from pathlib import Path
 from typing import Iterable
 from urllib.parse import urljoin
@@ -35,9 +36,18 @@ def merge_ranges(ranges: Iterable[tuple[int, int]]) -> list[tuple[int, int]]:
     return [(start, end) for start, end in merged]
 
 
+# NOVO-70: recortar por offset exigia recodificar a folha inteira a cada intervalo
+# — 550 KB por regra casada. Com `--reveal` abrindo os diálogos o número de
+# intervalos multiplica, e a medição de uma rota passava de segundos a minutos.
+# A codificação é função pura do texto: fazer uma vez por folha dá o mesmo byte.
+@lru_cache(maxsize=8)
+def _utf16_bytes(text: str) -> bytes:
+    return text.encode("utf-16-le")
+
+
 def _text_for_utf16_offsets(text: str, start: int, end: int) -> str:
     """Recorta offsets UTF-16 do CDP sem deslocar conteúdo após caractere astral."""
-    raw = text.encode("utf-16-le")
+    raw = _utf16_bytes(text)
     segment = raw[max(0, start) * 2 : max(0, end) * 2]
     return segment.decode("utf-16-le", errors="ignore")
 
@@ -188,11 +198,22 @@ def _measure_page(
     session.send("CSS.startRuleUsageTracking")
     response = page.goto(urljoin(base_url, route.path.lstrip("/")), wait_until="networkidle", timeout=timeout_ms)
     if reveal:
+        # NOVO-70: `<dialog>` fechado é `display:none` no agente do usuário, então
+        # nada dentro dele casa — e o podador de perfis, que lê esta cobertura,
+        # apagava as famílias `modal__*` e `alert` de todas as rotas com diálogo.
+        # `show()` abre sem modal: não prende foco nem cria backdrop, e é isso que
+        # permite abrir todos os diálogos da página de uma vez.
         page.evaluate(
             """() => {
               document.querySelectorAll('[hidden]').forEach((el) => el.removeAttribute('hidden'));
               document.querySelectorAll('[aria-hidden="true"]').forEach((el) => el.setAttribute('aria-hidden', 'false'));
               document.querySelectorAll('details').forEach((el) => { el.open = true; });
+              document.querySelectorAll('dialog').forEach((el) => {
+                try { if (!el.open) el.show(); } catch (erro) { /* já aberto ou removido */ }
+              });
+              document.querySelectorAll('[popover]').forEach((el) => {
+                try { el.showPopover(); } catch (erro) { /* não suportado ou já visível */ }
+              });
               void document.documentElement.offsetHeight;
             }"""
         )

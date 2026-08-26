@@ -12,17 +12,20 @@
 
     - `fonts.css` — a família do produto;
     - `ui.bundle.css` — os componentes v2 que esta tela usa (`button`, `input`,
-      `field`, `form_errors`) já vêm prontos daqui. É o MESMO bundle que
+      `field`, `form_errors`) já vêm prontos daqui. É a MESMA fonte que
       `base.html` carrega, então a tela pública e a interna leem a mesma fonte
       de verdade; antes o login era o único lugar onde um campo e um botão
-      tinham definição própria, e foi por isso que ele divergiu do sistema;
+      tinham definição própria, e foi por isso que ele divergiu do sistema.
+      `NOVO-70`: em produção quem chega aqui é `profiles/login.ui.css`, a poda
+      desse bundle pelas classes que esta tela usa — mesmas regras, sem as
+      outras 40 telas junto;
     - `v2/auth.css` — o que é só da página: a casca e as duas colunas.
 
     `base.css` continua de fora, e é isso que obriga `v2/auth.css` a carregar o
     piso de foco de teclado — está comentado lá.
   {% endcomment %}
   <link rel="stylesheet" href="{% static 'css/base/fonts.css' %}">
-  <link rel="stylesheet" href="{% static 'css/ui.bundle.css' %}">
+  <link rel="stylesheet" href="{% if ui_css_profile_path %}{% static ui_css_profile_path %}{% else %}{% static 'css/ui.bundle.css' %}{% endif %}">
   <link rel="stylesheet" href="{% static 'css/v2/auth.css' %}">
 </head>
 <body class="auth-page">

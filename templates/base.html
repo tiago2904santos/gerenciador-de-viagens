@@ -10,7 +10,8 @@
   {# NOVO-12: um CSS de shell no lugar de 24 requests. Fontes em static/css/; regenere com scripts/build_shell_bundles.py #}
   {% block shell_css %}<link rel="stylesheet" href="{% if shell_css_profile_path %}{% static shell_css_profile_path %}{% else %}{% static 'css/shell.bundle.css' %}{% endif %}">{% endblock %}
   {# NOVO-120: componentes globais. Depois do shell, para vencer as folhas legadas na cascata. Fontes em static/css/ui/, um arquivo por componente. #}
-  <link rel="stylesheet" href="{% static 'css/ui.bundle.css' %}">
+  {# NOVO-70: mesma poda por família que o shell já fazia. Sem perfil, o bundle inteiro. #}
+  {% block ui_css %}<link rel="stylesheet" href="{% if ui_css_profile_path %}{% static ui_css_profile_path %}{% else %}{% static 'css/ui.bundle.css' %}{% endif %}">{% endblock %}
   {% block extra_css %}{% endblock %}
   {% block extra_css_after_theme %}{% endblock %}
 </head>

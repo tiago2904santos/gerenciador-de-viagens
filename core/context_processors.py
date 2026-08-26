@@ -7,6 +7,9 @@ from .navigation import build_navigation
 
 
 SHELL_CSS_PROFILE_BY_VIEW = {
+    # NOVO-70: o login não tem shell (não estende base.html), mas tem perfil de
+    # componentes — por isso entra aqui e é filtrado em shell_css_profile().
+    "core:login": "login",
     "core:dashboard": "dashboard",
     "oficios:index": "entity-lists",
     "roteiros:index": "entity-lists",
@@ -55,13 +58,25 @@ SHELL_CSS_PROFILE_BY_VIEW = {
 }
 
 
+# NOVO-70: o login é a única rota sem casca. `build_css_profiles.py` não gera
+# `login.css` para ela; só `login.ui.css`. Sem esta lista, o `base.html` pediria
+# um arquivo que não existe.
+PERFIS_SEM_SHELL = frozenset({"login"})
+
+
 def shell_css_profile(request):
     if not settings.CSS_ROUTE_PROFILES_ENABLED:
-        return {"shell_css_profile_path": None}
+        return {"shell_css_profile_path": None, "ui_css_profile_path": None}
     match = getattr(request, "resolver_match", None)
     profile = SHELL_CSS_PROFILE_BY_VIEW.get(getattr(match, "view_name", None))
+    if not profile:
+        return {"shell_css_profile_path": None, "ui_css_profile_path": None}
+    tem_shell = profile not in PERFIS_SEM_SHELL
     return {
-        "shell_css_profile_path": f"css/profiles/{profile}.css" if profile else None
+        "shell_css_profile_path": f"css/profiles/{profile}.css" if tem_shell else None,
+        # NOVO-70: o par do shell. O `ui.bundle.css` inteiro entregava 552 KB em
+        # toda rota a 9% de uso; o perfil poda pelas classes que a família usa.
+        "ui_css_profile_path": f"css/profiles/{profile}.ui.css",
     }
 
 

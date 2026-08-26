@@ -1,5 +1,24 @@
 #!/usr/bin/env python3
-"""Gera perfis de CSS do shell a partir da cobertura multiestado do PF-02.
+"""Gera perfis de CSS por família de rota a partir da cobertura multiestado do PF-02.
+
+Duas entregas por família, porque são dois `<link>` no `<head>` e o orçamento do
+`NOVO-12` é de dois arquivos:
+
+- ``<família>.css`` — poda de `shell.bundle.css` (ou da variante com componentes
+  de formulário). Existe desde o `PF-02`.
+- ``<família>.ui.css`` — poda de `ui.bundle.css`, o bundle do v2. Novo em
+  ``NOVO-20260820-171008-7afb74d82d2c``.
+
+O v2 ficava FORA da poda de propósito, e o custo disso foi medido: `ui.bundle.css`
+entrega 553 KB em toda rota e casa 9,0% deles. Era ele, sozinho, que derrubava o
+uso médio das 43 rotas de 48,9% para 13,6% e deixava o gate do `NOVO-70` vermelho.
+
+As duas entregas leem chaves separadas do manifesto (`rule_ids`/`dom_classes` para
+a casca, `ui_rule_ids`/`ui_dom_classes` para o v2) de propósito: a captura do
+`PF-02` é um dado histórico de estados que não sei reproduzir um a um, e
+sobrescrevê-la com uma captura mais pobre PODARIA a casca. Enquanto a captura da
+casca não for refeita por inteiro, as duas convivem — um `--capture` completo
+grava as duas com o mesmo conteúdo.
 
 O manifesto guarda apenas hashes de regras observadas. As regras continuam
 editáveis nas fontes canônicas e os perfis preservam a ordem da cascata do
@@ -23,6 +42,10 @@ MANIFEST = ROOT / "scripts" / "css_profiles_manifest.json"
 OUTPUT_DIR = STATIC_CSS / "profiles"
 
 PROFILE_ROUTES: dict[str, tuple[str, ...]] = {
+    # `login` não tem bundle de shell — a tela é uma casca própria, fora do
+    # `base.html`. Entra aqui só pela poda do v2, e é justamente a rota onde o
+    # bundle inteiro doía mais: 4,2% de uso.
+    "login": ("login",),
     "dashboard": ("dashboard",),
     "entity-lists": (
         "oficios-lista",
@@ -193,15 +216,21 @@ def _with_dom_families(
     return result
 
 
-def _shell_sheet(route: dict) -> dict:
+UI_SOURCE = "ui.bundle.css"
+
+
+def _shell_sheet(route: dict) -> dict | None:
     candidates = [
         sheet
         for sheet in route["stylesheet_usage"]
         if sheet["source_url"].endswith("/shell.bundle.css")
         or sheet["source_url"].endswith("/shell.form-components.bundle.css")
     ]
+    if not candidates:
+        # `login` é assim: casca própria, sem shell. Perfil só do v2.
+        return None
     if len(candidates) != 1:
-        raise ValueError("a rota não possui exatamente um bundle de shell")
+        raise ValueError("a rota possui mais de um bundle de shell")
     return candidates[0]
 
 
@@ -232,33 +261,52 @@ def capture(reports: list[Path]) -> dict:
     for profile, slugs in PROFILE_ROUTES.items():
         rule_ids: set[str] = set()
         dom_classes: set[str] = set()
+        ui_rule_ids: set[str] = set()
+        ui_dom_classes: set[str] = set()
         source_names = {
-            _shell_sheet(routes[slug])["source_url"].rsplit("/", 1)[-1]
+            folha["source_url"].rsplit("/", 1)[-1]
             for routes in loaded
             for slug in slugs
             if slug in routes
+            for folha in [_shell_sheet(routes[slug])]
+            if folha is not None
         }
-        if len(source_names) != 1:
+        if len(source_names) > 1:
             raise ValueError(f"perfil mistura variantes de shell: {profile}={source_names}")
-        source = source_names.pop()
-        suffixes = tuple(f"/static/css/{item}" for item in _source_sheet_suffixes(source))
+        source = source_names.pop() if source_names else None
+        suffixes = (
+            tuple(f"/static/css/{item}" for item in _source_sheet_suffixes(source))
+            if source
+            else ()
+        )
+        ui_suffixes = tuple(
+            f"/static/css/{item}" for item in _source_sheet_suffixes(UI_SOURCE)
+        )
         for routes in loaded:
             for slug in slugs:
                 route = routes.get(slug)
                 if not route:
                     continue
                 dom_classes.update(route.get("dom_classes", []))
+                ui_dom_classes.update(route.get("dom_classes", []))
                 for sheet in route["stylesheet_usage"]:
-                    if sheet["source_url"].endswith(suffixes):
+                    if suffixes and sheet["source_url"].endswith(suffixes):
                         for fragment in sheet.get("matched_fragments", []):
                             rule_ids.update(_fragment_rule_ids(fragment))
-        if not rule_ids:
-            raise ValueError(f"perfil sem cobertura: {profile}")
+                    elif sheet["source_url"].endswith(ui_suffixes):
+                        for fragment in sheet.get("matched_fragments", []):
+                            ui_rule_ids.update(_fragment_rule_ids(fragment))
+        if source and not rule_ids:
+            raise ValueError(f"perfil sem cobertura de shell: {profile}")
+        if not ui_rule_ids:
+            raise ValueError(f"perfil sem cobertura do v2: {profile}")
         profiles[profile] = {
             "source": source,
             "routes": list(slugs),
             "rule_ids": sorted(rule_ids),
+            "ui_rule_ids": sorted(ui_rule_ids),
             "dom_classes": sorted(dom_classes),
+            "ui_dom_classes": sorted(ui_dom_classes),
         }
     return {"schema_version": 1, "profiles": profiles}
 
@@ -295,33 +343,47 @@ def _render_rules(rules, selected: set[str], used_keyframes: set[str]) -> str:
     return "\n".join(chunks)
 
 
+def _podar(source_name: str, rule_ids: list[str], dom_classes: set[str]) -> str:
+    """Corpo do perfil: as regras casadas, mais o que a cobertura não enxerga.
+
+    O que entra além do medido, e por quê, está em `_token_rule_ids` (tema) e
+    `_with_dom_families` (estados de interação). Os dois existem porque a
+    cobertura do CDP é um retrato: mede um tema por vez e sem hover.
+    """
+    rules = tinycss2.parse_stylesheet(
+        _expanded_source(source_name), skip_comments=True, skip_whitespace=True
+    )
+    selected = _with_dom_families(
+        rules, set(rule_ids) | _token_rule_ids(rules), dom_classes
+    )
+    selected_css = "\n".join(
+        _serialized(rule)
+        for rule in _qualified_rules(rules)
+        if _rule_id(rule) in selected
+    )
+    keyframe_names = {
+        tinycss2.serialize(rule.prelude).strip()
+        for rule in rules
+        if rule.type == "at-rule" and rule.lower_at_keyword.endswith("keyframes")
+        and tinycss2.serialize(rule.prelude).strip() in selected_css
+    }
+    return _render_rules(rules, selected, keyframe_names)
+
+
 def build(manifest: dict) -> dict[Path, str]:
     outputs = {}
     banner = "/* AUTO-GENERATED by scripts/build_css_profiles.py — do not edit. */\n"
     for profile, config in manifest["profiles"].items():
-        rules = tinycss2.parse_stylesheet(
-            _expanded_source(config["source"]),
-            skip_comments=True,
-            skip_whitespace=True,
+        dom_classes = set(config.get("dom_classes", []))
+        if config.get("source"):
+            body = _podar(config["source"], config["rule_ids"], dom_classes)
+            outputs[OUTPUT_DIR / f"{profile}.css"] = banner + body + "\n"
+        ui_body = _podar(
+            UI_SOURCE,
+            config.get("ui_rule_ids", []),
+            set(config.get("ui_dom_classes", config.get("dom_classes", []))),
         )
-        selected = _with_dom_families(
-            rules,
-            set(config["rule_ids"]) | _token_rule_ids(rules),
-            set(config.get("dom_classes", [])),
-        )
-        selected_css = "\n".join(
-            _serialized(rule)
-            for rule in _qualified_rules(rules)
-            if _rule_id(rule) in selected
-        )
-        keyframe_names = {
-            tinycss2.serialize(rule.prelude).strip()
-            for rule in rules
-            if rule.type == "at-rule" and rule.lower_at_keyword.endswith("keyframes")
-            and tinycss2.serialize(rule.prelude).strip() in selected_css
-        }
-        body = _render_rules(rules, selected, keyframe_names)
-        outputs[OUTPUT_DIR / f"{profile}.css"] = banner + body + "\n"
+        outputs[OUTPUT_DIR / f"{profile}.ui.css"] = banner + ui_body + "\n"
     return outputs
 
 
