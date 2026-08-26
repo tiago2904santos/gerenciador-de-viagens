@@ -21,6 +21,7 @@ from core.deletion import DelecaoProtegidaError
 from documentos.services.async_generation import enfileirar_documento
 from documentos.services.types import DocumentoFormato
 from eventos.services import build_evento_document_seed
+from eventos.services import destinos_seed_para_formulario
 from eventos.services import resolve_evento_from_request
 
 from oficios.picker import LIMITE_BUSCA
@@ -495,6 +496,9 @@ def nova(request):
         initial["destino_estado"] = seed["estado"].pk
     if seed.get("cidade"):
         initial["destino_cidade"] = seed["cidade"].pk
+    destinos_seed = destinos_seed_para_formulario(seed)
+    if len(destinos_seed) > 1:
+        initial["destinos_seed"] = destinos_seed
     if seed.get("servidores"):
         initial["servidores"] = [servidor.pk for servidor in seed["servidores"]]
     if seed.get("oficios"):

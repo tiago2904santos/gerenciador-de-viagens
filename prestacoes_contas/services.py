@@ -144,9 +144,23 @@ def _sede(area) -> str:
         return ""
 
 
-def _diaria_por_servidor(roteiro, total_servidores: int) -> Decimal | None:
+def _diaria_por_servidor(roteiro) -> Decimal | None:
+    """Diária de UM servidor, que é exatamente o que o roteiro guarda.
+
+    `Roteiro.valor_diarias` é sempre o valor para um servidor: quem grava
+    recalcula com `quantidade_servidores=1` antes de persistir
+    (`roteiros/services/roteiro_editor.py:503`), e é por isso que
+    `Oficio.diarias_para_servidores` MULTIPLICA pelo efetivo para chegar ao total
+    da equipe.
+
+    Este módulo fazia o oposto — dividia pelo efetivo do ofício — e o relatório
+    técnico saía com a diária partida entre a equipe: com 4 servidores, uma
+    diária de R$ 800,00 era impressa como R$ 200,00
+    (`NOVO-20260826-...`, ver o teste de caracterização em
+    `test_diaria_rt.py`).
+    """
     if roteiro and roteiro.valor_diarias:
-        return Decimal(roteiro.valor_diarias) / Decimal(total_servidores or 1)
+        return Decimal(roteiro.valor_diarias)
     return None
 
 
@@ -154,8 +168,7 @@ def diaria_inicial_do_oficio(prestacao) -> str:
     """Diária por servidor conforme o roteiro original do ofício (sem ajustes)."""
     try:
         oficio = prestacao.oficio
-        total_servidores = oficio.servidores.count() or 1
-        valor = _diaria_por_servidor(getattr(oficio, "roteiro", None), total_servidores)
+        valor = _diaria_por_servidor(getattr(oficio, "roteiro", None))
         if valor is not None:
             return format_currency_br(valor)
     except Exception as exc:
@@ -166,9 +179,7 @@ def diaria_inicial_do_oficio(prestacao) -> str:
 def diaria_inicial_da_prestacao(prestacao) -> str:
     """Diária por servidor calculada a partir do roteiro efetivo (ajustado, se houver)."""
     try:
-        oficio = prestacao.oficio
-        total_servidores = oficio.servidores.count() or 1
-        valor = _diaria_por_servidor(roteiro_efetivo(prestacao), total_servidores)
+        valor = _diaria_por_servidor(roteiro_efetivo(prestacao))
         if valor is not None:
             return format_currency_br(valor)
     except Exception as exc:
@@ -213,12 +224,11 @@ def valor_diaria_liberado(servidor_prestacao) -> Decimal | None:
     """Quanto foi liberado para este servidor, arredondado como no documento.
 
     É o teto do que ele pode ter recebido. Arredondado antes de comparar
-    porque a divisão por servidor pode ter mais casas do que o documento
-    mostra — sem isso, digitar exatamente o valor impresso seria recusado.
+    porque o valor do roteiro pode ter mais casas do que o documento mostra —
+    sem isso, digitar exatamente o valor impresso seria recusado.
     """
     prestacao = servidor_prestacao.prestacao
-    total_servidores = prestacao.oficio.servidores.count() or 1
-    valor = _diaria_por_servidor(roteiro_efetivo(prestacao), total_servidores)
+    valor = _diaria_por_servidor(roteiro_efetivo(prestacao))
     if valor is None:
         return None
     return valor.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
