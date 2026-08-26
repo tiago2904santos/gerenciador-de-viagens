@@ -26,6 +26,16 @@
     <c-v2.alert tone="info" message="Modo mock — sem chamadas reais ao Drive." />
   {% endif %}
 
+  {% comment %}
+    A pasta escolhida pode ter sido apagada, lixeirada ou perdido a permissão
+    DEPOIS de configurada — e o Drive aceita gravar dentro de pasta lixeirada,
+    então nada falha: o documento só não aparece. O aviso mora aqui, ao lado do
+    seletor que resolve o problema (`NOVO-20260825-205014-1843068b6d33`).
+  {% endcomment %}
+  {% if drive_raiz_motivo %}
+    <c-v2.alert tone="error" :message="drive_raiz_motivo" />
+  {% endif %}
+
   <div class="folder-browser" id="gdrive-folder-browser"
        data-url-listar="{% url 'google_drive:api_listar_pastas' %}"
        data-url-criar="{% url 'google_drive:api_criar_pasta' %}"

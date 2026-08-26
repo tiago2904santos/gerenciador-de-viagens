@@ -144,7 +144,7 @@
     <div class="v2-lab__row">
       <c-v2.icon_button icon="folder" :menu_id="v2_menu.id" aria_label="Documentos do registro" tooltip="Visualizar e baixar" />
       <c-v2.menu_body :menu="v2_menu" />
-      <c-v2.download_picker picker_id="lab-acao-downloads" src="{% url 'termos:termo_cadastro_downloads' 1 %}" />
+      <c-v2.download_picker src="{% url 'termos:termo_cadastro_downloads' 1 %}" />
       {% comment %}
         Os dois estados do anexar assinado, lado a lado: sem arquivo o ícone é
         neutro e o rótulo diz "Anexar"; com arquivo ele ganha o realce de

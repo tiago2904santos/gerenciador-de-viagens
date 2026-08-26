@@ -64,11 +64,11 @@
     "prestacoes_contas:index": {
       "200": {
         "consultas": 16,
-        "kb_html": 271.9
+        "kb_html": 268.0
       },
       "20000": {
         "consultas": 16,
-        "kb_html": 360.0
+        "kb_html": 269.1
       }
     },
     "roteiros:index": {
@@ -84,11 +84,11 @@
     "termos:index": {
       "200": {
         "consultas": 7,
-        "kb_html": 155.3
+        "kb_html": 90.8
       },
       "20000": {
         "consultas": 7,
-        "kb_html": 155.8
+        "kb_html": 91.0
       }
     },
     "termos:index:busca": {
@@ -98,7 +98,7 @@
       },
       "20000": {
         "consultas": 6,
-        "kb_html": 155.8
+        "kb_html": 91.4
       }
     }
   }

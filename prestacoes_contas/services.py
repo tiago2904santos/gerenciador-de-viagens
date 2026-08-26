@@ -145,14 +145,19 @@ def _sede(area) -> str:
 
 
 def _diaria_por_servidor(roteiro) -> Decimal | None:
-    """Diária de UM servidor — que é exatamente o que o roteiro persiste.
+    """Diária de UM servidor, que é exatamente o que o roteiro guarda.
 
-    O roteiro é sempre calculado e gravado para 1 servidor
-    (`roteiros/services/roteiro_editor.py` fixa `quantidade_servidores=1`); quem
-    multiplica pelo efetivo é o ofício, uma única vez, em
-    `Oficio.diarias_para_servidores()`. Este módulo dividia o valor persistido
-    pela equipe, como se o roteiro guardasse o total do grupo: com 2 servidores
-    o RT imprimia metade do que cada um tem a sacar.
+    `Roteiro.valor_diarias` é sempre o valor para um servidor: quem grava
+    recalcula com `quantidade_servidores=1` antes de persistir
+    (`roteiros/services/roteiro_editor.py:503`), e é por isso que
+    `Oficio.diarias_para_servidores` MULTIPLICA pelo efetivo para chegar ao total
+    da equipe.
+
+    Este módulo fazia o oposto — dividia pelo efetivo do ofício — e o relatório
+    técnico saía com a diária partida entre a equipe: com 4 servidores, uma
+    diária de R$ 800,00 era impressa como R$ 200,00
+    (`NOVO-20260826-...`, ver o teste de caracterização em
+    `test_diaria_rt.py`).
     """
     if roteiro and roteiro.valor_diarias:
         return Decimal(roteiro.valor_diarias)
@@ -250,8 +255,8 @@ def valor_diaria_liberado(servidor_prestacao) -> Decimal | None:
     """Quanto foi liberado para este servidor, arredondado como no documento.
 
     É o teto do que ele pode ter recebido. Arredondado antes de comparar
-    porque o valor do roteiro pode ter mais casas do que o documento
-    mostra — sem isso, digitar exatamente o valor impresso seria recusado.
+    porque o valor do roteiro pode ter mais casas do que o documento mostra —
+    sem isso, digitar exatamente o valor impresso seria recusado.
     """
     prestacao = servidor_prestacao.prestacao
     valor = _diaria_por_servidor(roteiro_efetivo(prestacao))

@@ -99,6 +99,26 @@ def kinds_de_anexo_assinado(documentos):
     ]
 
 
+def kinds_de_anexo_assinado_json(kinds):
+    """Serializa os tipos para o atributo `data-attach-signed-kinds` do gatilho.
+
+    `NOVO-20260826-111043-802915c4fd6a` (`PF-07`): o payload viaja ESCAPADO dentro de um atributo HTML — cada
+    aspa vira `&quot;`, seis bytes. Com cinco tipos por cartão e vinte cartões, os
+    campos `current_*` vazios (o caso comum: nada anexado ainda) custavam 13,5 KB
+    de `&quot;&quot;` na lista de prestações.
+
+    Campo vazio não viaja. É seguro porque todo leitor no
+    `attach-signed-modal.js` já tem valor padrão (`item.current_name || ""`), e a
+    lista Python continua intacta — quem a consome é a etapa Documentos, que
+    renderiza um cartão por tipo e conta com as chaves presentes.
+    """
+    return json.dumps(
+        [{chave: valor for chave, valor in kind.items() if valor} for kind in kinds],
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+
+
 def _servidor_row(ps, solicitacao_form=None, prestacao_anexos=None, diario_pdf_url=""):
     """Dados de um servidor no card: identificação + solicitação inline + status."""
     servidor = ps.servidor
@@ -349,7 +369,7 @@ def apresentar_prestacao_servidor_card(
         "numero_display": oficio.numero_formatado,
         # A ação única do card reúne documentos compartilhados pelo ofício e
         # documentos próprios deste servidor, na ordem exibida pelo modal.
-        "attach_kinds_json": json.dumps(attach_kinds, ensure_ascii=False),
+        "attach_kinds_json": kinds_de_anexo_assinado_json(attach_kinds),
         "tem_documento_assinado": any(kind["current_name"] for kind in attach_kinds),
         "protocolo_display": protocolo_display,
         "destino_display": destino_display,
@@ -365,7 +385,6 @@ def apresentar_prestacao_servidor_card(
         "arquivar_url": reverse("prestacoes_contas:prestacao_servidor_arquivar", args=[ps.pk]),
         "finalizar_url": reverse("prestacoes_contas:prestacao_servidor_finalizar", args=[ps.pk]),
         "downloads_url": reverse("prestacoes_contas:prestacao_downloads", args=[ps.pk]),
-        "downloads_picker_id": f"prestacao-downloads-{ps.pk}",
         # Os gatilhos de menu do `_prestacao_card_body.html` apontam para cá (PF-04).
         "menus_url": menus_src,
         "servidores": [servidor],

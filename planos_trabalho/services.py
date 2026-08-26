@@ -1393,4 +1393,33 @@ def criar_plano_rascunho(evento=None) -> PlanoTrabalho:
     # A contextualização NÃO herda o motivo do evento: o motivo é texto curto de
     # agenda, não o parágrafo de abertura do plano. Fica no modo automático
     # (destino + programa) até o usuário editar à mão.
-    return salvar_plano_numerado(plano)
+    plano = salvar_plano_numerado(plano)
+    _semear_destinos_do_evento(plano, seed)
+    return plano
+
+
+def _semear_destinos_do_evento(plano, seed) -> None:
+    """Copia TODOS os destinos do evento para o rascunho do plano.
+
+    `NOVO-20260826-021707-b02175bdd4cd`: os campos legados
+    ``destino_cidade``/``destino_estado`` guardam um destino só, e era só eles
+    que o plano herdava. O formulário lista as linhas a partir de
+    ``PlanoDestino`` (rascunho = ``evento`` nulo), então sem estas linhas um
+    evento com dois destinos abria a etapa 4 mostrando um.
+    """
+    from eventos.services import destinos_seed_para_formulario
+
+    from .models import PlanoDestino
+
+    destinos = destinos_seed_para_formulario(seed)
+    if len(destinos) < 2:
+        # Um destino só já está coberto pelos campos legados acima; não vale
+        # criar linha para reproduzir o que o formulário monta sozinho.
+        return
+    PlanoDestino.objects.filter(plano=plano, evento__isnull=True).delete()
+    PlanoDestino.objects.bulk_create(
+        [
+            PlanoDestino(plano=plano, estado_id=estado_id, cidade_id=cidade_id, ordem=ordem)
+            for ordem, (estado_id, cidade_id) in enumerate(destinos, 1)
+        ]
+    )

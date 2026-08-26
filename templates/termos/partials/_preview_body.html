@@ -20,10 +20,7 @@
       <span class="document-inline-card__header-end">
         <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do termo genérico">
           {% if termo.pk %}
-            <c-v2.download_picker
-              picker_id="termo-cadastro-downloads"
-              src="{% url 'termos:termo_cadastro_downloads' termo.pk %}"
-            />
+            <c-v2.download_picker src="{% url 'termos:termo_cadastro_downloads' termo.pk %}" />
           {% endif %}
         </span>
       </span>

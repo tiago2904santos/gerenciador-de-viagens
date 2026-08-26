@@ -282,9 +282,20 @@
   }
 
   function abrir(montagem) {
-    var raiz = montagem.querySelector("[data-download-picker]");
+    /* `NOVO-20260826-111043-802915c4fd6a` (`PF-07`): o diálogo é UM por página, e não um por
+       gatilho — o markup dele é igual em toda instância e nascia escondido
+       vinte vezes na lista de prestações. Quem varia é o `data-src`, que agora
+       vem da montagem clicada. */
+    var raiz = document.querySelector("[data-download-picker]");
+    if (!raiz) {
+      window.CV.log.error(
+        "downloadPicker",
+        "a página não inclui c-v2.download_picker_dialogo; o gatilho não tem diálogo para abrir"
+      );
+      return Promise.resolve(null);
+    }
     var dialogo = raiz.closest("dialog");
-    var src = raiz.getAttribute("data-src");
+    var src = montagem.getAttribute("data-src");
     vincularFechamento(dialogo);
 
     return pedir(src).then(function (response) {

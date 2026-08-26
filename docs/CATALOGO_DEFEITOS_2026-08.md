@@ -11853,6 +11853,157 @@ O presenter do termo principal agora entrega a rota de catálogo e um id de moda
 linha renderiza o mesmo `download_picker` usado no formulário. As linhas de servidor preservam o
 menu rápido do documento individual; a etapa passou a carregar o motor compartilhado da fila.
 
+### NOVO-20260825-205014-1843068b6d33 ✅ RESOLVIDO · `NOVO` Pasta raiz na lixeira faz o Drive "funcionar" sem entregar nada · BE · risco médio
+
+Evidência medida em produção pelo workflow `Diagnostico manual (leitura)` (execução de
+07/07/2026): a pasta raiz configurada, `1ZjHyisn0BAhPQwkj_XeKdRiXjemvXToo` ("VIAGENS"), respondia
+`'trashed': True`. Nada no sistema conferia isso. O Drive aceita criar filhos dentro de uma pasta
+lixeirada — o arquivo nasce na lixeira junto com ela —, então cada upload devolvia `id` e
+`webViewLink` normalmente e `DriveArquivo` era gravado como sucesso. Pior: `get_or_create_pasta`
+busca subpastas com `trashed = false`, logo nunca reencontrava a árvore que ela mesma havia criado
+lá dentro, e recriava a estrutura inteira a cada envio (origem provável do `gdrive_limpar_duplicados`).
+Do lado do usuário, o sintoma era só um: o documento não aparece no Drive, e o sistema não acusa erro.
+
+`services.estado_pasta_raiz()` passa a inspecionar a raiz (existe, não está na lixeira, é pasta,
+aceita filhos) e `validar_pasta_raiz()` interrompe a operação com motivo legível. O portão fica em
+`organizer._raiz()`, por onde passa todo destino do organizador: o envio vira pendência explicada
+em vez de sucesso silencioso na lixeira. A tela Meu perfil mostra o motivo ao lado do seletor de
+pasta, e `gdrive_check` reprova com código de saída 1. Instalação sem raiz escolhida mantém o
+comportamento antigo (monta a árvore na raiz da conta).
+
+### NOVO-20260825-205015-e2fe5114f230 ✅ RESOLVIDO · `NOVO` Cache de pastas eterno manda arquivo para pasta morta · BE · risco médio
+
+`_RealClient._cache` guardava `(pai_id, nome) → folder_id` sem expiração, e o gunicorn de produção
+roda `--workers 3` com processos que vivem dias (a hipótese está escrita no commit `45fc94c`, que
+criou o diagnóstico para investigá-la). Bastava alguém mover, renomear ou lixeirar uma pasta pelo
+próprio Drive para que todo envio seguinte daquele worker fosse para um ID que não vale mais — sem
+erro nenhum, pelo mesmo motivo do defeito acima. Só reiniciar o serviço limpava.
+
+O cache passou a guardar o instante da resolução e a expirar por
+`GOOGLE_DRIVE_PASTA_CACHE_TTL_SECONDS` (padrão 300s, `0` desliga). O estrago de uma pasta movida
+por fora fica limitado à janela do TTL, sem devolver ao Drive uma consulta por pasta a cada envio.
+
+### NOVO-20260825-205016-141986d1201e ✅ RESOLVIDO · `NOVO` Token renovado só vivia na memória do processo · BE · risco baixo
+
+`_RealClient` montava `Credentials` sem informar `expiry`, então o google-auth considerava o token
+válido para sempre e só renovava depois de tomar 401 — e a renovação feita por `AuthorizedHttp`
+não voltava para o banco. O `access_token` salvo envelhecia para sempre: todo worker novo começava
+com um token morto e gastava um 401 antes da primeira chamada útil. Além disso, `invalid_grant`
+(acesso revogado, senha trocada, ou app com tela de consentimento em *Testing*, onde o refresh
+token caduca em 7 dias) chegava ao painel de pendências como traceback de OAuth.
+
+As credenciais agora são uma subclasse que grava no banco todo token novo, o vencimento é
+informado ao google-auth (renovação acontece antes da chamada, não depois do 401), a renovação
+ganha margem de 5 minutos para job longo e relógio fora de sincronia, e `invalid_grant` vira
+`DriveReauthError` com a instrução de reconectar a conta. Credencial sem refresh token é recusada
+na hora, com o mesmo texto.
+
+### NOVO-20260825-205017-dbab34b3e5f0 ✅ RESOLVIDO · `NOVO` Instruções de ativação mandavam criar Service Account · DOC · risco baixo
+
+`.env.example` e `config/settings/base.py` mandavam criar um Service Account, baixar a chave JSON e
+compartilhar a pasta com o e-mail dele — e citavam uma variável `CREDENTIALS_PATH` que não existe
+no código. O `_RealClient` só sabe ler token OAuth de `DriveCredenciais`; quem seguisse as
+instruções à risca montava um caminho que nunca funcionaria. O desenho real (uma conta Google por
+usuário institucional) está em `docs/MULTI_TENANT_LOGIN_DRIVE.md`.
+
+Os dois blocos passam a descrever o fluxo verdadeiro: ID de cliente OAuth (Aplicativo Web), URI de
+redirecionamento que precisa bater com `GOOGLE_REDIRECT_URI`, escopos `drive.file` e
+`drive.readonly`, o prazo de 7 dias enquanto a publicação estiver em *Testing*, e a conexão pela
+tela Meu perfil. `gdrive_check --e2e` fecha o roteiro provando o envio.
+
+### NOVO-20260826-021706-c02af444709b ✅ RESOLVIDO · `NOVO` Relatório Técnico divide a diária pela equipe · BE · risco alto
+
+Dois módulos afirmavam coisas opostas sobre o mesmo campo. `Oficio.diarias_para_servidores`
+(`oficios/models.py:279`) documenta e aplica o contrato — "o roteiro guarda sempre o valor para 1
+servidor" —, e quem grava garante isso recalculando com `quantidade_servidores=1` antes de
+persistir (`roteiros/services/roteiro_editor.py:503`, congelado em
+`test_roteiro_do_oficio_be12.py:552`). O ofício, portanto, MULTIPLICA pelo efetivo para chegar ao
+total da equipe.
+
+`prestacoes_contas/services.py:_diaria_por_servidor` fazia o inverso: dividia `valor_diarias` por
+`oficio.servidores.count()`. Com diária de R$ 800,00 e equipe de quatro, o ofício autorizava
+R$ 3.200,00 e o RT do mesmo servidor imprimia **R$ 200,00** — um quarto do que ele tinha direito de
+sacar. O erro contaminava as três leituras do módulo: a diária prevista, a diária efetiva (após
+ajuste de roteiro) e `valor_diaria_liberado`, que é o teto usado para validar o valor digitado pelo
+operador — digitar o valor impresso no ofício era recusado.
+
+Só o caso de um servidor acertava, o que explica ter passado despercebido. Pior, o defeito estava
+congelado como regra em `prestacoes_contas/tests.py:112`, que exigia R$100,00 para um roteiro de
+R$200,00 com dois servidores; esse teste foi corrigido junto, com o porquê registrado no corpo.
+
+A divisão saiu. `_diaria_por_servidor(roteiro)` devolve o que o roteiro guarda. Caracterização em
+`prestacoes_contas/test_diaria_rt.py` conforme o `AGENTS.md` §3.3, incluindo o caso de equipe
+crescente (o efetivo não altera quanto cada servidor saca) e o de servidor sozinho.
+
+### NOVO-20260826-021707-b02175bdd4cd ✅ RESOLVIDO · `NOVO` Documentos do evento herdam só o primeiro destino · BE · risco médio
+
+O evento grava a lista inteira de destinos desde sempre (`destino_uf`/`destino_cidade` para o
+primeiro, `destinos_extras` para o resto) e `build_evento_document_seed` devolve todos em
+`destinos`. O defeito estava no consumo: Ordem de Serviço (`ordens_servico/views.py:486`), Plano de
+Trabalho (`planos_trabalho/services.py:criar_plano_rascunho`) e Termo (`termos/views.py:514`) liam
+apenas `seed["cidade"]`/`seed["estado"]` — o primeiro. Um evento com dois destinos abria as etapas
+4 e 5 com um só, e o operador redigitava o que já havia cadastrado na etapa 1.
+
+Os formulários de OS e Termo montam as linhas extras a partir de `self.instance.pk`, que não existe
+em documento novo; por isso o seed não tinha por onde chegar. Passou a chegar por
+`initial["destinos_seed"]`, com os pares resolvidos por `eventos.services.destinos_seed_para_formulario`
+(que descarta destino cuja cidade não existe mais no cadastro). O plano grava as linhas
+`PlanoDestino` do rascunho na criação, que é de onde o formulário dele lista.
+
+Evento de destino único não muda: sem `destinos_seed`, o caminho antigo continua valendo, e o campo
+legado segue apontando para o primeiro destino. As etapas 2 (roteiro) e 3 (ofício) já liam a lista
+inteira — ficaram congeladas no mesmo teste para não regredirem junto.
+
+### NOVO-20260826-111043-802915c4fd6a ✅ RESOLVIDO · `NOVO` Um diálogo de download escondido por cartão · PF · risco médio
+
+A régua do `PF-07` reprovava a `main` havia semanas: `prestacoes_contas:index @ 200` media
+**334,6 KB** contra teto de 271,9 KB. Como o `deploy.yml` só dispara com o `Tests` verde, **nenhum
+deploy automático saía do repositório** enquanto isso durasse — os dois últimos PRs foram para
+produção por `workflow_dispatch`.
+
+Medido no HTML renderizado da rota, com os 20 cartões da primeira página:
+
+| bloco | ocorrências | peso | % da página |
+|---|---:|---:|---:|
+| `<dialog>` do seletor de downloads | 21 | 76,7 KB | 23,0% |
+| `data-attach-signed-kinds` (payload JSON) | 20 | 53,8 KB | 16,1% |
+| painel do `date-picker` | 20 | 18,1 KB | 5,4% |
+
+O `<dialog>` do seletor é **idêntico em toda instância** — hint, alerta, três `fieldset` de origem/
+formato/saída, seis rádios e a fila. Só o `data-src` variava, e a lista de documentos chega vazia,
+montada pelo JS a partir dele. Vinte cartões carregavam vinte cópias de markup que nasce escondido e
+do qual só um pode estar aberto por vez.
+
+**Correção:** o componente virou dois. `v2/download_picker.html` renderiza só o gatilho, com o
+`data-src` na montagem; `v2/download_picker_dialogo.html` é o diálogo, incluído **uma vez por
+página**, junto dos outros modais únicos (`attach_signed_modal`, `delete_modal`) — nunca dentro da
+lista de cartões, que é markup descartável. O `abrir()` do
+`download-queue.js` passou a resolver o diálogo compartilhado e a ler o `src` do gatilho clicado; se
+a página esquecer de incluí-lo, o motor registra erro em vez de falhar mudo.
+
+Segunda frente, no mesmo HTML: o payload de `data-attach-signed-kinds` viaja **escapado** dentro de
+um atributo, onde cada aspa custa `&quot;` — seis bytes. Os campos `current_*` vazios (o caso comum,
+nada anexado) somavam 13,5 KB de `&quot;&quot;` por página. `kinds_de_anexo_assinado_json` passou a
+omitir campo vazio; é seguro porque todo leitor no `attach-signed-modal.js` já tem valor padrão, e a
+lista Python continua intacta para a etapa Documentos, que conta com as chaves presentes.
+
+**Resultado medido** (PostgreSQL, mesma régua do CI):
+
+| rota | antes | depois | teto |
+|---|---:|---:|---:|
+| `prestacoes_contas:index @ 200` | 334,6 KB | **255,2 KB** | 271,9 → 268,0 |
+| `prestacoes_contas:index @ 20.000` | — | **256,3 KB** | 360,0 → 269,1 |
+| `termos:index @ 200` | 134,6 KB | **86,5 KB** | 155,3 → 90,8 |
+
+Os tetos de `prestacoes_contas` e `termos` desceram junto, que é a catraca fazendo o seu trabalho.
+Os das outras rotas ficaram como estavam: `--atualizar-tetos` propôs baixar seis delas, mas são
+melhoras de trabalhos anteriores que este PR não fez, e apertar gate alheio é mistura de escopo. Os
+tetos de **consulta** também ficaram intactos — este trabalho mexe em bytes, não em queries.
+
+Ficou de fora, medido e não feito: o painel do `date-picker` (18,1 KB, um por linha de servidor) tem
+a mesma forma de desperdício e resolve pelo mesmo caminho. Não entrou porque a régua já passa com
+6% de folga e o `AGENTS.md` §3.1 não quer duas mudanças estruturais no mesmo PR.
+
 ### NOVO-20260826-121500-6bdb9b6c4e27 ✅ RESOLVIDO · `NOVO` Drive e geração documental disputam o mesmo worker · PF · risco médio
 
 `config/celery.py` não declara rota alguma: toda tarefa cai na fila padrão e é servida pelo único
