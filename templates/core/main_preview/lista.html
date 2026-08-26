@@ -381,10 +381,7 @@
     {% endcomment %}
     <c-v2.panel>
       <c-slot name="body">
-        <c-v2.download_picker
-          picker_id="lab-downloads"
-          src="{% url 'termos:termo_cadastro_downloads' 1 %}"
-        />
+        <c-v2.download_picker src="{% url 'termos:termo_cadastro_downloads' 1 %}" />
 
         <div class="download-picker">
           <ul class="download-picker__list">

@@ -1,6 +1,7 @@
-{% cotton:vars picker_id src %}
+{% cotton:vars src %}
 {% comment %}
-  Download picker v2 — escolher QUAIS documentos baixar, e baixá-los em fila.
+  Download picker v2 — o GATILHO. O diálogo é um só por página
+  (`c-v2.download_picker_dialogo`), incluído pela própria página.
 
   Um termo não é um documento: são o genérico, o da viatura e um por servidor.
   O botão de baixar entregava sempre o pacote inteiro fundido num arquivo só, e
@@ -14,120 +15,25 @@
   A lista vem do servidor (`termos:termo_cadastro_downloads`), montada a partir
   do MESMO card da lista — os rótulos aqui e no cartão não podem divergir.
 
-  O modal usa `own_form`: o picker também aparece dentro de formulários de edição,
-  e um `<form method="dialog">` aninhado seria descartado pelo navegador junto com
-  a classe `modal__shell` que aplica o padding. O fechamento usa o gancho comum.
+  `NOVO-20260826-111043-802915c4fd6a` (`PF-07`): o diálogo morava AQUI, e saía uma vez por gatilho.
+  Como o markup dele é idêntico em toda instância — só o `src` variava —, vinte
+  cartões de prestação carregavam vinte diálogos escondidos, 23% do HTML da
+  página. O `src` subiu para o `data-src` da montagem, que é o que o JS lê ao
+  abrir; o diálogo virou um só.
 
-  O gancho do gatilho é SEM VALOR, e o JS acha o diálogo pelo elemento que
-  envolve os dois. Um `hook` com valor sairia escapado (`&quot;`) e o seletor
-  nunca casaria — o botão renderiza igual e não responde a nada.
+  Sem `picker_id`: ele nomeava os rádios de formato/saída, que agora vivem no
+  diálogo único e têm nome fixo. Um id por gatilho não tem mais o que
+  identificar.
 
-  Sem variável de rótulo: o `contrato()` que valida `cotton:vars` não enxerga
-  variável usada só em atributo de componente filho, e declarar uma que ele não
-  vê quebra o contrato. Os textos são os mesmos em todos os chamadores — o
-  parâmetro seria uma alavanca que ninguém puxa.
+  O gancho do gatilho é SEM VALOR, e o JS acha a montagem pelo elemento que o
+  envolve. Um `hook` com valor sairia escapado (`&quot;`) e o seletor nunca
+  casaria — o botão renderiza igual e não responde a nada.
 {% endcomment %}
-<span class="download-picker-mount">
+<span class="download-picker-mount" data-src="{{ src }}">
 <c-v2.icon_button
   icon="download"
   aria_label="Escolher documentos para baixar"
   tooltip="Baixar"
   hook="data-download-picker-trigger"
 />
-
-<c-v2.modal :modal_id="picker_id" title="Baixar documentos" :own_form="True">
-  <c-slot name="body">
-    <div class="download-picker" data-download-picker data-src="{{ src }}">
-      <p class="download-picker__hint">Marque o que você quer baixar.</p>
-
-      {% comment %}
-        O erro usa o ALERTA GLOBAL (`.alert` + `data-tone="error"`), e não um
-        estilo próprio: a mensagem de falha é a mesma coisa em toda a tela do
-        sistema, e uma segunda aparência para ela seria uma segunda convenção
-        para aprender. `role="alert"` fica porque aqui a mensagem surge DEPOIS
-        de uma ação — o leitor de tela precisa ser interrompido.
-
-        Ele fica LOGO ABAIXO da instrução, e não no fim do modal: a falha mais
-        comum é a consulta da lista não voltar, e aí a mensagem tem de estar onde
-        a lista deveria estar — no fim, ela aparecia depois da fila e dos ajustes,
-        longe do vazio que explica.
-      {% endcomment %}
-      <p class="alert" data-tone="error" data-download-picker-error hidden role="alert"></p>
-
-      <ul class="download-picker__list" data-download-picker-list></ul>
-
-      {% comment %}
-        Formato e saída são TOGGLES na mesma linha, no tamanho pequeno: são dois
-        ajustes de uma linha só, e empilhados em duas faixas de largura cheia
-        pesavam mais que a lista do que baixar, que é a decisão principal.
-
-        Os `<input type="radio">` continuam aí por baixo: a escolha é excludente,
-        e é o rádio que dá isso ao teclado e ao leitor de tela de graça (setas
-        circulam o grupo, o `name` garante um só marcado). O desenho é o do
-        `toggle` do sistema — as regras moram em `v2/toggle.css`, uma fonte só.
-      {% endcomment %}
-      <div class="download-picker__options">
-        <fieldset class="download-picker__option" data-download-picker-origin hidden>
-          <legend class="download-picker__legend">Origem</legend>
-          <div class="toggle toggle--state toggle--sm download-picker__segments">
-            <label class="toggle__item download-picker__radio">
-              <input type="radio" name="{{ picker_id }}-origem" value="original" checked>
-              <span>Original do sistema</span>
-            </label>
-            <label class="toggle__item download-picker__radio">
-              <input type="radio" name="{{ picker_id }}-origem" value="assinado">
-              <span>Documento assinado</span>
-            </label>
-          </div>
-        </fieldset>
-
-        <fieldset class="download-picker__option">
-          <legend class="download-picker__legend">Formato</legend>
-          <div class="toggle toggle--state toggle--sm download-picker__segments">
-            <label class="toggle__item download-picker__radio">
-              <input type="radio" name="{{ picker_id }}-formato" value="pdf" checked>
-              <span>PDF</span>
-            </label>
-            <label class="toggle__item download-picker__radio">
-              <input type="radio" name="{{ picker_id }}-formato" value="docx">
-              <span>DOCX</span>
-            </label>
-          </div>
-        </fieldset>
-
-        <fieldset class="download-picker__option">
-          <legend class="download-picker__legend">Saída</legend>
-          <div class="toggle toggle--state toggle--sm download-picker__segments">
-            <label class="toggle__item download-picker__radio">
-              <input type="radio" name="{{ picker_id }}-saida" value="separados" checked>
-              <span>Separados</span>
-            </label>
-            <label class="toggle__item download-picker__radio">
-              <input type="radio" name="{{ picker_id }}-saida" value="compilado">
-              <span>Um arquivo</span>
-            </label>
-          </div>
-        </fieldset>
-      </div>
-
-      {% comment %}
-        A fila fica DENTRO do modal, e não numa notificação de canto: cada
-        documento é gerado no servidor e pode demorar; sem o estado à vista, o
-        segundo arquivo chega sem aviso e parece um download que ninguém pediu.
-      {% endcomment %}
-      <ul class="download-picker__queue" data-download-picker-queue hidden></ul>
-    </div>
-  </c-slot>
-
-  <c-slot name="actions">
-    <c-v2.button label="Fechar" type="button" hook="data-download-picker-close" />
-    <c-v2.button
-      label="Baixar"
-      variant="primary"
-      icon="download"
-      type="button"
-      hook="data-download-picker-confirm"
-    />
-  </c-slot>
-</c-v2.modal>
 </span>

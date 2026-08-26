@@ -11953,3 +11953,53 @@ em documento novo; por isso o seed não tinha por onde chegar. Passou a chegar p
 Evento de destino único não muda: sem `destinos_seed`, o caminho antigo continua valendo, e o campo
 legado segue apontando para o primeiro destino. As etapas 2 (roteiro) e 3 (ofício) já liam a lista
 inteira — ficaram congeladas no mesmo teste para não regredirem junto.
+
+### NOVO-20260826-111043-802915c4fd6a ✅ RESOLVIDO · `NOVO` Um diálogo de download escondido por cartão · PF · risco médio
+
+A régua do `PF-07` reprovava a `main` havia semanas: `prestacoes_contas:index @ 200` media
+**334,6 KB** contra teto de 271,9 KB. Como o `deploy.yml` só dispara com o `Tests` verde, **nenhum
+deploy automático saía do repositório** enquanto isso durasse — os dois últimos PRs foram para
+produção por `workflow_dispatch`.
+
+Medido no HTML renderizado da rota, com os 20 cartões da primeira página:
+
+| bloco | ocorrências | peso | % da página |
+|---|---:|---:|---:|
+| `<dialog>` do seletor de downloads | 21 | 76,7 KB | 23,0% |
+| `data-attach-signed-kinds` (payload JSON) | 20 | 53,8 KB | 16,1% |
+| painel do `date-picker` | 20 | 18,1 KB | 5,4% |
+
+O `<dialog>` do seletor é **idêntico em toda instância** — hint, alerta, três `fieldset` de origem/
+formato/saída, seis rádios e a fila. Só o `data-src` variava, e a lista de documentos chega vazia,
+montada pelo JS a partir dele. Vinte cartões carregavam vinte cópias de markup que nasce escondido e
+do qual só um pode estar aberto por vez.
+
+**Correção:** o componente virou dois. `v2/download_picker.html` renderiza só o gatilho, com o
+`data-src` na montagem; `v2/download_picker_dialogo.html` é o diálogo, incluído **uma vez por
+página**, junto dos outros modais únicos (`attach_signed_modal`, `delete_modal`) — nunca dentro da
+lista de cartões, que é markup descartável. O `abrir()` do
+`download-queue.js` passou a resolver o diálogo compartilhado e a ler o `src` do gatilho clicado; se
+a página esquecer de incluí-lo, o motor registra erro em vez de falhar mudo.
+
+Segunda frente, no mesmo HTML: o payload de `data-attach-signed-kinds` viaja **escapado** dentro de
+um atributo, onde cada aspa custa `&quot;` — seis bytes. Os campos `current_*` vazios (o caso comum,
+nada anexado) somavam 13,5 KB de `&quot;&quot;` por página. `kinds_de_anexo_assinado_json` passou a
+omitir campo vazio; é seguro porque todo leitor no `attach-signed-modal.js` já tem valor padrão, e a
+lista Python continua intacta para a etapa Documentos, que conta com as chaves presentes.
+
+**Resultado medido** (PostgreSQL, mesma régua do CI):
+
+| rota | antes | depois | teto |
+|---|---:|---:|---:|
+| `prestacoes_contas:index @ 200` | 334,6 KB | **255,2 KB** | 271,9 → 268,0 |
+| `prestacoes_contas:index @ 20.000` | — | **256,3 KB** | 360,0 → 269,1 |
+| `termos:index @ 200` | 134,6 KB | **86,5 KB** | 155,3 → 90,8 |
+
+Os tetos de `prestacoes_contas` e `termos` desceram junto, que é a catraca fazendo o seu trabalho.
+Os das outras rotas ficaram como estavam: `--atualizar-tetos` propôs baixar seis delas, mas são
+melhoras de trabalhos anteriores que este PR não fez, e apertar gate alheio é mistura de escopo. Os
+tetos de **consulta** também ficaram intactos — este trabalho mexe em bytes, não em queries.
+
+Ficou de fora, medido e não feito: o painel do `date-picker` (18,1 KB, um por linha de servidor) tem
+a mesma forma de desperdício e resolve pelo mesmo caminho. Não entrou porque a régua já passa com
+6% de folga e o `AGENTS.md` §3.1 não quer duas mudanças estruturais no mesmo PR.
