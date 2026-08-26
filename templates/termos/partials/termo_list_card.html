@@ -21,10 +21,7 @@
   <c-slot name="meta">{{ card.meta_line }}</c-slot>
 
   <c-slot name="actions">
-    <c-v2.download_picker
-      picker_id="termo-{{ card.termo_pk }}-downloads"
-      :src="card.downloads_url"
-    />
+    <c-v2.download_picker :src="card.downloads_url" />
     {% if card.assinatura.url %}
       <c-v2.attach_signed_button
         :url="card.assinatura.url"

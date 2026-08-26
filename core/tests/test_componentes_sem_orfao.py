@@ -392,7 +392,15 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # `v2/date_picker.html` no modo multi, com a faixa de contexto ligada.
         # Vale como componente porque o preset é o contrato: quem chama não
         # decide sozinho o que "calendário de trecho" significa.
-        self.assertEqual(len(self.components()), 85)
+        #
+        # 86 (2026-08-26): +1 para `v2/download_picker_dialogo.html`, o diálogo do
+        # seletor de downloads. Não é marcação nova — é o MESMO bloco que morava
+        # dentro de `v2/download_picker.html`, separado do gatilho porque saía uma
+        # vez por gatilho e é idêntico em todas: vinte cartões de prestação
+        # carregavam vinte cópias escondidas, 23% do HTML da página
+        # (`NOVO-20260826-111043-802915c4fd6a`, `PF-07`). Vale como componente
+        # porque a página agora o inclui explicitamente, uma vez.
+        self.assertEqual(len(self.components()), 86)
 
     def test_fora_do_v2_so_restam_pecas_sem_equivalente(self):
         fora_do_v2 = {
