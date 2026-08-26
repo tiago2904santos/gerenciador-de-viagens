@@ -124,9 +124,11 @@ class RelatorioTecnicoDiariaTests(TestCase):
         response = self.client.get(reverse("prestacoes_contas:rt_servidor", args=[ps.pk]))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'value="R$100,00"')
+        # O roteiro guarda o valor de UM servidor; o RT é individual e imprime
+        # esse valor inteiro. Dividir pela equipe fazia cada um sacar metade.
+        self.assertContains(response, 'value="R$200,00"')
         relatorio = RelatorioTecnico.objects.get(prestacao=prestacao)
-        self.assertEqual(relatorio.diaria, "R$100,00")
+        self.assertEqual(relatorio.diaria, "R$200,00")
         self.assertEqual(relatorio.translado, "Não houve")
         self.assertEqual(relatorio.combustivel, "Cartão Prime")
         self.assertEqual(relatorio.passagem, "Não houve")

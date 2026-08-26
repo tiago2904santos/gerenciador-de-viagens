@@ -801,3 +801,9 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       alcance o manipulador delegado e encerre o diálogo.
 - [x] `NOVO-20260825-153728-f62003a70b19` troca o menu do termo principal pelo seletor completo
       de documentos, pessoas, formato e modo de saída.
+- [x] `NOVO-20260826-121500-6bdb9b6c4e27` dá fila Celery própria ao Google Drive, tirando a
+      geração documental de trás das conversões que o Drive enfileira (dois workers em produção).
+- [x] `NOVO-20260826-121500-1110928b1cfc` ignora no signal do Drive o save de ofício que só
+      carimbou `updated_at`, no mesmo formato do guard já existente para prestações.
+- [x] `NOVO-20260826-121500-b85b49c28b81` troca a sonda do motor Word por leitura de registro e
+      memoriza por configuração as sondas que dependem de instalação (Word, WeasyPrint, fpdf).

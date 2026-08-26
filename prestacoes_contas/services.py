@@ -144,18 +144,39 @@ def _sede(area) -> str:
         return ""
 
 
-def _diaria_por_servidor(roteiro, total_servidores: int) -> Decimal | None:
+def _diaria_por_servidor(roteiro) -> Decimal | None:
+    """Diária de UM servidor — que é exatamente o que o roteiro persiste.
+
+    O roteiro é sempre calculado e gravado para 1 servidor
+    (`roteiros/services/roteiro_editor.py` fixa `quantidade_servidores=1`); quem
+    multiplica pelo efetivo é o ofício, uma única vez, em
+    `Oficio.diarias_para_servidores()`. Este módulo dividia o valor persistido
+    pela equipe, como se o roteiro guardasse o total do grupo: com 2 servidores
+    o RT imprimia metade do que cada um tem a sacar.
+    """
     if roteiro and roteiro.valor_diarias:
-        return Decimal(roteiro.valor_diarias) / Decimal(total_servidores or 1)
+        return Decimal(roteiro.valor_diarias)
     return None
+
+
+def _diaria_por_servidor_legado(roteiro, total_servidores: int) -> Decimal | None:
+    """O valor dividido que este módulo produzia antes da correção.
+
+    Serve só para reconhecer um `RelatorioTecnico.diaria` preenchido
+    automaticamente naquela época e substituí-lo — sem isso, o texto errado já
+    gravado sobreviveria à correção, porque deixa de bater com o padrão atual.
+    """
+    valor = _diaria_por_servidor(roteiro)
+    if valor is None:
+        return None
+    return valor / Decimal(total_servidores or 1)
 
 
 def diaria_inicial_do_oficio(prestacao) -> str:
     """Diária por servidor conforme o roteiro original do ofício (sem ajustes)."""
     try:
         oficio = prestacao.oficio
-        total_servidores = oficio.servidores.count() or 1
-        valor = _diaria_por_servidor(getattr(oficio, "roteiro", None), total_servidores)
+        valor = _diaria_por_servidor(getattr(oficio, "roteiro", None))
         if valor is not None:
             return format_currency_br(valor)
     except Exception as exc:
@@ -166,14 +187,30 @@ def diaria_inicial_do_oficio(prestacao) -> str:
 def diaria_inicial_da_prestacao(prestacao) -> str:
     """Diária por servidor calculada a partir do roteiro efetivo (ajustado, se houver)."""
     try:
-        oficio = prestacao.oficio
-        total_servidores = oficio.servidores.count() or 1
-        valor = _diaria_por_servidor(roteiro_efetivo(prestacao), total_servidores)
+        valor = _diaria_por_servidor(roteiro_efetivo(prestacao))
         if valor is not None:
             return format_currency_br(valor)
     except Exception as exc:
         capture(exc, "prestacoes.diaria_efetiva", prestacao_id=prestacao.pk)
     return ""
+
+
+def _diarias_automaticas_legadas(prestacao) -> set[str]:
+    """Textos que o preenchimento automático antigo poderia ter gravado."""
+    try:
+        total_servidores = prestacao.oficio.servidores.count() or 1
+        if total_servidores == 1:
+            return set()
+        roteiros = (getattr(prestacao.oficio, "roteiro", None), roteiro_efetivo(prestacao))
+        valores = set()
+        for roteiro in roteiros:
+            valor = _diaria_por_servidor_legado(roteiro, total_servidores)
+            if valor is not None:
+                valores.add(normalize_spaces(format_currency_br(valor)))
+        return valores
+    except Exception as exc:
+        capture(exc, "prestacoes.diaria_legada", prestacao_id=prestacao.pk)
+        return set()
 
 
 def _ajustes_roteiro_itens(prestacao) -> list[str]:
@@ -213,12 +250,11 @@ def valor_diaria_liberado(servidor_prestacao) -> Decimal | None:
     """Quanto foi liberado para este servidor, arredondado como no documento.
 
     É o teto do que ele pode ter recebido. Arredondado antes de comparar
-    porque a divisão por servidor pode ter mais casas do que o documento
+    porque o valor do roteiro pode ter mais casas do que o documento
     mostra — sem isso, digitar exatamente o valor impresso seria recusado.
     """
     prestacao = servidor_prestacao.prestacao
-    total_servidores = prestacao.oficio.servidores.count() or 1
-    valor = _diaria_por_servidor(roteiro_efetivo(prestacao), total_servidores)
+    valor = _diaria_por_servidor(roteiro_efetivo(prestacao))
     if valor is None:
         return None
     return valor.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
@@ -311,6 +347,7 @@ def garantir_campos_padrao_relatorio_tecnico(relatorio: RelatorioTecnico) -> lis
     prestacao = relatorio.prestacao
     defaults = relatorio_tecnico_default_values(prestacao)
     valor_default_oficio = normalize_spaces(diaria_inicial_do_oficio(prestacao))
+    valores_automaticos_legados = _diarias_automaticas_legadas(prestacao)
 
     update_fields = []
     for campo in ("diaria", "translado", "combustivel", "passagem", "info_complementares"):
@@ -320,9 +357,13 @@ def garantir_campos_padrao_relatorio_tecnico(relatorio: RelatorioTecnico) -> lis
         valor_atual = normalize_spaces(getattr(relatorio, campo, "") or "")
 
         deve_atualizar = not valor_atual
-        if campo == "diaria" and valor_atual and valor_atual == valor_default_oficio:
+        if campo == "diaria" and valor_atual and (
+            valor_atual == valor_default_oficio
+            or valor_atual in valores_automaticos_legados
+        ):
             # Ainda é o valor automático anterior (não editado manualmente):
-            # sincroniza com o novo valor ajustado do roteiro.
+            # sincroniza com o novo valor ajustado do roteiro. `legados` cobre o
+            # texto dividido pela equipe que a versão anterior gravava sozinha.
             deve_atualizar = valor_atual != normalize_spaces(valor_padrao)
 
         if campo == "info_complementares" and valor_atual and not valor_padrao.endswith("Justificativa:"):

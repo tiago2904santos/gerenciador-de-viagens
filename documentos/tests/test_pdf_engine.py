@@ -31,10 +31,10 @@ class WeasyImportProbeTests(SimpleTestCase):
 
 class ResolvePdfEngineTests(SimpleTestCase):
     def setUp(self):
-        pe._availability_cache.clear()
+        pe.limpar_cache_de_sondas()
 
     def tearDown(self):
-        pe._availability_cache.clear()
+        pe.limpar_cache_de_sondas()
 
     @mock.patch.object(pe, "resolve_libreoffice_binary", return_value="/x/soffice")
     def test_libreoffice_disponivel_exige_verificacao_do_executavel(self, m_resolve):
@@ -107,6 +107,51 @@ class ResolvePdfEngineTests(SimpleTestCase):
         self.assertEqual(first.attempt_chain, second.attempt_chain)
         for probe in (m_simple, m_weasy, m_libreoffice, m_word, m_unoserver):
             probe.assert_called_once()
+
+    @override_settings(DOCUMENTOS_ENGINE_PROBE_CACHE_SECONDS=60)
+    @mock.patch.object(pe, "_unoserver_ok", return_value=False)
+    @mock.patch.object(pe, "_word_ok", return_value=False)
+    @mock.patch.object(pe, "_libreoffice_ok", return_value=True)
+    @mock.patch.object(pe, "_weasy_import_ok", return_value=False)
+    @mock.patch.object(pe, "_simple_fallback_allowed", return_value=False)
+    def test_sondas_estaveis_sobrevivem_a_troca_de_janela(
+        self,
+        m_simple,
+        m_weasy,
+        m_libreoffice,
+        m_word,
+        m_unoserver,
+    ):
+        """Word e WeasyPrint dependem de instalação, não de estado de runtime.
+
+        Sondá-los a cada minuto custava ~0,8 s (o Word era ABERTO só para
+        responder "existe") no caminho crítico da geração. Já unoserver e
+        LibreOffice precisam ser resondados: um serviço sobe ou cai sem
+        reiniciar o processo.
+        """
+        with mock.patch.object(pe.time, "monotonic", return_value=120):
+            resolve_pdf_engine(explicit_setting="auto", prefer_docx_pipeline=True)
+        with mock.patch.object(pe.time, "monotonic", return_value=600):
+            resolve_pdf_engine(explicit_setting="auto", prefer_docx_pipeline=True)
+
+        for estavel in (m_word, m_weasy, m_simple):
+            estavel.assert_called_once()
+        for volatil in (m_unoserver, m_libreoffice):
+            self.assertEqual(volatil.call_count, 2)
+
+    @override_settings(DOCUMENTOS_ENGINE_PROBE_CACHE_SECONDS=60)
+    @mock.patch.object(pe, "_unoserver_ok", return_value=False)
+    @mock.patch.object(pe, "_word_ok", return_value=False)
+    @mock.patch.object(pe, "_libreoffice_ok", return_value=True)
+    @mock.patch.object(pe, "_weasy_import_ok", return_value=False)
+    @mock.patch.object(pe, "_simple_fallback_allowed", return_value=False)
+    def test_troca_de_configuracao_invalida_sondas_estaveis(self, *_m):
+        with mock.patch.object(pe.time, "monotonic", return_value=120):
+            resolve_pdf_engine(explicit_setting="auto", prefer_docx_pipeline=True)
+            with override_settings(DOCUMENTOS_LIBREOFFICE_BINARY="/outro/soffice"):
+                resolve_pdf_engine(explicit_setting="auto", prefer_docx_pipeline=True)
+
+        self.assertEqual(len(pe._stable_probe_cache), 1)
 
     @override_settings(
         DOCUMENTOS_UNOSERVER_URL="http://127.0.0.1:2003",

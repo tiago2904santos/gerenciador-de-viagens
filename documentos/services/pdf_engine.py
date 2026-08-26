@@ -22,7 +22,27 @@ from documentos.services.libreoffice_resolve import sys_platform_is_linux
 
 
 _availability_cache: dict[tuple[object, ...], tuple[list[str], list[str]]] = {}
+_stable_probe_cache: dict[tuple[object, ...], dict[str, bool]] = {}
 _availability_cache_lock = threading.Lock()
+
+# Sondas cujo resultado não muda enquanto o processo vive: dependem de o
+# software estar instalado (Word) ou de o módulo importar (WeasyPrint, fpdf).
+# Repeti-las a cada janela custava caro à toa — o import que FALHA não fica em
+# `sys.modules`, então toda janela refazia a maquinaria de import do WeasyPrint
+# (e reimprimia o aviso de GTK ausente no Windows).
+#
+# `unoserver` e `libreoffice` ficam de fora de propósito: um serviço que sobe ou
+# cai, e um binário instalado depois, precisam ser notados sem reiniciar o
+# processo. São também as duas sondas baratas (HTTP curto e resolução de
+# caminho, sem `--version`).
+_STABLE_PROBE_NAMES = frozenset({"word_com", "weasyprint", "simple_fallback"})
+
+
+def limpar_cache_de_sondas() -> None:
+    """Zera as duas camadas de cache de sondagem (usada pelos testes)."""
+    with _availability_cache_lock:
+        _availability_cache.clear()
+        _stable_probe_cache.clear()
 
 
 @dataclass(frozen=True)
@@ -98,16 +118,24 @@ def _simple_fallback_allowed() -> bool:
     return False
 
 
-def _scan_availability_uncached() -> tuple[list[str], list[str]]:
+def _scan_availability_uncached(
+    memo: dict[str, bool] | None = None,
+) -> tuple[list[str], list[str]]:
     avail: list[str] = []
     missing: list[str] = []
-    for name, ok in (
-        ("unoserver", _unoserver_ok()),
-        ("word_com", _word_ok()),
-        ("libreoffice", _libreoffice_ok()),
-        ("weasyprint", _weasy_import_ok()),
-        ("simple_fallback", _simple_fallback_allowed()),
+    for name, probe in (
+        ("unoserver", _unoserver_ok),
+        ("word_com", _word_ok),
+        ("libreoffice", _libreoffice_ok),
+        ("weasyprint", _weasy_import_ok),
+        ("simple_fallback", _simple_fallback_allowed),
     ):
+        if memo is not None and name in _STABLE_PROBE_NAMES:
+            if name not in memo:
+                memo[name] = probe()
+            ok = memo[name]
+        else:
+            ok = probe()
         if ok:
             avail.append(name)
         else:
@@ -130,8 +158,7 @@ def _scan_availability() -> tuple[list[str], list[str]]:
         return _scan_availability_uncached()
 
     bucket = int(time.monotonic() // ttl)
-    key = (
-        bucket,
+    config = (
         platform.system(),
         getattr(settings, "DOCUMENTOS_UNOSERVER_URL", None),
         getattr(settings, "DOCUMENTOS_UNOSERVER_TIMEOUT_SECONDS", None),
@@ -147,12 +174,20 @@ def _scan_availability() -> tuple[list[str], list[str]]:
         id(_weasy_import_ok),
         id(_simple_fallback_allowed),
     )
+    key = (bucket, *config)
     with _availability_cache_lock:
         cached = _availability_cache.get(key)
         if cached is not None:
             return list(cached[0]), list(cached[1])
+        # Sobrevive à troca de janela: a mesma configuração continua valendo,
+        # só o `bucket` mudou. É o que evita reabrir o Word e reimportar o
+        # WeasyPrint a cada minuto.
+        memo = _stable_probe_cache.get(config)
+        if memo is None:
+            _stable_probe_cache.clear()
+            memo = _stable_probe_cache.setdefault(config, {})
 
-    result = _scan_availability_uncached()
+    result = _scan_availability_uncached(memo)
     with _availability_cache_lock:
         _availability_cache.clear()
         _availability_cache[key] = (list(result[0]), list(result[1]))

@@ -273,6 +273,18 @@ sudo systemctl status gerenciador-viagens
 Obrigatório em produção. O request cria um job durável e retorna polling; o
 worker gera o arquivo e o beat encerra jobs órfãos e remove resultados após 24 h.
 
+> **São dois workers, em filas separadas.** As tarefas do Google Drive não são
+> só upload: `organizar_oficio` gera de verdade ofício, justificativa, ordem de
+> serviço e **um termo por servidor**. Enquanto tudo dividia a fila padrão, o
+> download que o usuário acabou de pedir esperava atrás dessas conversões — no
+> mesmo worker e no mesmo unoserver, que converte uma por vez. A fila do Drive
+> vem de `CELERY_DRIVE_QUEUE` (padrão `drive`); a da geração documental, de
+> `CELERY_TASK_DEFAULT_QUEUE` (padrão `celery`).
+>
+> **Se você subir só um worker sem `-Q`, ele consome apenas `celery` e as
+> tarefas do Drive ficam paradas na fila.** Para voltar ao comportamento de um
+> worker só, defina `CELERY_DRIVE_QUEUE=celery` no `.env`.
+
 ```bash
 # Garanta que o Redis (instalado no passo 2.3) está ativo
 sudo systemctl enable --now redis-server
@@ -298,6 +310,8 @@ Environment="DJANGO_SETTINGS_MODULE=config.settings.prod"
 ExecStart=/var/www/gerenciador-viagens/venv/bin/celery \
           -A config worker \
           --loglevel=info \
+          --hostname=documentos@%%h \
+          --queues=celery \
           --logfile=/var/www/gerenciador-viagens/logs/celery.log
 Restart=always
 RestartSec=5
@@ -311,6 +325,44 @@ sudo systemctl daemon-reload
 sudo systemctl enable gerenciador-viagens-celery
 sudo systemctl start gerenciador-viagens-celery
 sudo systemctl status gerenciador-viagens-celery
+```
+
+Crie o worker do Drive, `/etc/systemd/system/gerenciador-viagens-celery-drive.service`
+— idêntico ao anterior, trocando fila, hostname e log:
+
+```ini
+[Unit]
+Description=Gerenciador de Viagens — Celery worker (Google Drive)
+After=network.target redis-server.service
+
+[Service]
+User=viagens
+Group=viagens
+WorkingDirectory=/var/www/gerenciador-viagens/app
+EnvironmentFile=/var/www/gerenciador-viagens/app/.env
+Environment="DJANGO_SETTINGS_MODULE=config.settings.prod"
+ExecStart=/var/www/gerenciador-viagens/venv/bin/celery \
+          -A config worker \
+          --loglevel=info \
+          --hostname=drive@%%h \
+          --queues=drive \
+          --concurrency=1 \
+          --logfile=/var/www/gerenciador-viagens/logs/celery-drive.log
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+`--concurrency=1` é intencional: o Drive é sequencial por natureza (cria pasta,
+depois sobe arquivo dentro dela) e mais paralelismo só disputaria CPU com a
+geração documental.
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now gerenciador-viagens-celery-drive
+sudo systemctl status gerenciador-viagens-celery-drive
 ```
 
 Crie também `/etc/systemd/system/gerenciador-viagens-celery-beat.service`:
@@ -410,7 +462,7 @@ sudo systemctl enable --now gerenciador-viagens-unoserver
 /var/www/gerenciador-viagens/unoserver-venv/bin/unoping \
   --host 127.0.0.1 \
   --port 2003
-sudo systemctl restart gerenciador-viagens gerenciador-viagens-celery gerenciador-viagens-celery-beat
+sudo systemctl restart gerenciador-viagens gerenciador-viagens-celery gerenciador-viagens-celery-drive gerenciador-viagens-celery-beat
 cd /var/www/gerenciador-viagens/app
 source /var/www/gerenciador-viagens/venv/bin/activate
 python manage.py documentos_unoserver_check \
@@ -556,7 +608,7 @@ python manage.py migrate --noinput
 python manage.py collectstatic --noinput --clear
 
 sudo systemctl restart gerenciador-viagens
-sudo systemctl restart gerenciador-viagens-celery gerenciador-viagens-celery-beat
+sudo systemctl restart gerenciador-viagens-celery gerenciador-viagens-celery-drive gerenciador-viagens-celery-beat
 ```
 
 Ou use o script pronto:
@@ -599,7 +651,7 @@ Acesse `http://SEU_IP_VPS/admin` e faça login com o superusuário criado.
 - [ ] `python manage.py importar_base_geografica` executado (dados de cidades)
 - [ ] Superusuário criado (`createsuperuser`)
 - [ ] Serviço systemd ativo e respondendo
-- [ ] Redis + worker + beat Celery configurados (documentos e Drive — seção 5.3)
+- [ ] Redis + **dois** workers (`-Q celery` e `-Q drive`) + beat Celery configurados (seção 5.3)
 - [ ] Nginx configurado e recarregado
 - [ ] (Opcional) HTTPS configurado com Certbot
 - [ ] Login funcional no navegador

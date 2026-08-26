@@ -11852,3 +11852,87 @@ branco, a viatura e cada servidor, além de formato e saída; a lista não reapr
 O presenter do termo principal agora entrega a rota de catálogo e um id de modal exclusivo, e a
 linha renderiza o mesmo `download_picker` usado no formulário. As linhas de servidor preservam o
 menu rápido do documento individual; a etapa passou a carregar o motor compartilhado da fila.
+
+### NOVO-20260826-121500-6bdb9b6c4e27 ✅ RESOLVIDO · `NOVO` Drive e geração documental disputam o mesmo worker · PF · risco médio
+
+`config/celery.py` não declara rota alguma: toda tarefa cai na fila padrão e é servida pelo único
+worker de produção (`docs/DEPLOY_VPS.md` §5.3, sem `-Q`). As tarefas do Google Drive não são só
+upload — `organizar_oficio` chama os `_garantir_*` de `integracoes/google_drive/organizer.py:984`,
+que geram de verdade ofício, justificativa, ordem de serviço e **um termo por servidor**. Ao
+finalizar um ofício, o `post_save` enfileira essa organização; o download que o usuário pede em
+seguida entra atrás dela no mesmo worker e no mesmo unoserver, que converte uma por vez. Com
+`autoretry_for=(Exception,)` e `max_retries=8`, um Drive fora do ar reocupa o worker por até 1 h de
+backoff.
+
+`CELERY_TASK_ROUTES` passa a mandar `integracoes.google_drive.tasks.*` para a fila
+`CELERY_DRIVE_QUEUE` (padrão `drive`), e a produção sobe dois workers: `-Q celery` para a geração
+documental e `-Q drive` para o Drive. `CELERY_DRIVE_QUEUE=celery` volta ao comportamento anterior.
+`integracoes/google_drive/tests/test_fila_celery.py` prova que toda tarefa do módulo do Drive
+resolve para a fila do Drive e que as de `documentos.tasks` continuam na padrão. **Deploy:** sem o
+segundo worker as tarefas do Drive param na fila — a seção 5.3 e o checklist final do
+`DEPLOY_VPS.md` foram atualizados.
+
+### NOVO-20260826-121500-1110928b1cfc ✅ RESOLVIDO · `NOVO` Carimbo de `updated_at` enfileira organização inteira do ofício · PF · risco baixo
+
+`_organizar_oficio_ao_salvar` dispara em qualquer `post_save` de ofício fora de rascunho, sem olhar
+`update_fields` — ao contrário de `_organizar_prestacao`, que já ignora saves de flags de listagem.
+`oficios/wizard_document_views.py:160` salva só `["updated_at"]` no "salvar rascunho" da etapa de
+documentos; num ofício já finalizado isso agenda `organizar_oficio`, que percorre a árvore de pastas
+pela API do Drive mesmo quando não há nada novo para gerar.
+
+O signal ganhou `_OFICIO_CAMPOS_SEM_DRIVE = {"updated_at"}`, no mesmo formato do guard de prestação.
+A lista é deliberadamente mínima: quase todo campo do Ofício alimenta o conteúdo do documento ou o
+nome de pasta/arquivo em `integracoes/google_drive/naming.py`. Finalização
+(`status`/`data_criacao`) e saves completos continuam enfileirando, coberto em
+`integracoes/google_drive/tests/test_signals_oficio.py`.
+
+### NOVO-20260826-121500-b85b49c28b81 ✅ RESOLVIDO · `NOVO` Sonda de motor PDF abre o Word a cada janela · PF · risco baixo
+
+`is_word_pdf_available()` fazia `DispatchEx("Word.Application")` — abria e fechava o Word — só para
+responder se o motor existe. A sonda está no caminho crítico: a cadeia de motores entra na chave de
+cache do documento (`oficios/services.py:70`), então toda geração a paga, e
+`DOCUMENTOS_ENGINE_PROBE_CACHE_SECONDS` (60 s) fazia isso se repetir a cada minuto. Medido em
+`auto` no Windows: sonda 4,5 s a frio e 0,8 s depois; `_document_cache_key` 3,72 s; geração fria
+completa 11,9 s. O import do WeasyPrint que falha também repetia a cada janela, porque import com
+erro não fica em `sys.modules`.
+
+A sonda passou a ler o ProgID `Word.Application\CLSID` no registro, sem abrir processo — o
+`DocumentoFacade` já tenta os motores em ordem e cai para o seguinte, então uma sonda otimista custa
+no máximo uma tentativa perdida. E `_scan_availability` ganhou duas camadas: `unoserver` e
+`libreoffice` continuam sondados por janela (sobem e caem em runtime), enquanto `word_com`,
+`weasyprint` e `simple_fallback` — que dependem de instalação — são memorizados por configuração,
+não por janela. Depois: sonda 0,00 s, `_document_cache_key` 0,38 s, geração fria 3,7–6,0 s.
+Produção usa `DOCUMENTOS_DEFAULT_PDF_ENGINE=unoserver`, que já pulava a varredura por
+`_fast_unoserver_chain`; o ganho é do modo `auto` (desenvolvimento e qualquer instalação sem
+unoserver).
+
+---
+
+### NOVO-20260826-124037-4fedd7ed1e61 ✅ RESOLVIDO · 🔴 `COR` RT divide entre a equipe a diária que é de cada servidor · BE · risco baixo
+
+Relatado pelo usuário com o caso real: diária de **R$ 624,68** saindo no RT como **R$ 312,34**,
+com dois servidores no ofício.
+
+`prestacoes_contas/services.py:_diaria_por_servidor` fazia
+`roteiro.valor_diarias / oficio.servidores.count()`. Isso valia enquanto o roteiro guardava o total
+do grupo; desde o `NOVO-39` o roteiro é calculado e persistido **para 1 servidor**
+(`roteiros/services/roteiro_editor.py` fixa `quantidade_servidores=1`) e a multiplicação pelo
+efetivo acontece uma única vez, no ofício, com o snapshot `Oficio.diarias_quantidade_servidores`.
+A divisão sobreviveu àquela correção do outro lado do sistema: o ofício passou a imprimir o total
+certo e o RT — que é individual — passou a imprimir a fração.
+
+**Alcance:** o valor inicial do RT (`diaria_inicial_do_oficio`/`_da_prestacao`) e, silenciosamente,
+o **teto** de `valor_diaria_liberado`: quem tivesse recebido o valor cheio era barrado ao digitá-lo,
+com a mensagem de que não pode passar do liberado. O presenter da prestação (`whatsapp_diaria`) e o
+diário já usavam o valor sem dividir — a divisão era só deste módulo.
+
+**Correção:** `_diaria_por_servidor(roteiro)` devolve o valor persistido, sem dividir.
+`garantir_campos_padrao_relatorio_tecnico` reconhece também o texto dividido que a versão anterior
+gravava sozinha (`_diarias_automaticas_legadas`) e o substitui no próximo acesso — sem isso o valor
+errado já gravado sobreviveria à correção, por deixar de bater com o padrão atual. Valor digitado à
+mão continua intocado.
+
+`prestacoes_contas/test_diaria_por_servidor.py` trava os quatro limites com o valor do relato
+(624,68 com equipe de 2). O caso de caracterização antigo em `tests.py`
+(`test_diaria_inicial_e_valor_por_servidor_da_prestacao`) travava a divisão — R$ 200,00 → R$ 100,00
+— e foi reescrito para a regra correta.

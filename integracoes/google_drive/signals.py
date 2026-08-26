@@ -230,7 +230,15 @@ def _organizar_solicitacao(sender, instance, **kwargs) -> None:
     )
 
 
-def _organizar_oficio_ao_salvar(sender, instance, **kwargs) -> None:
+# Deliberadamente minúsculo: quase todo campo do Ofício alimenta o conteúdo do
+# documento ou o nome da pasta/arquivo no Drive (número, protocolo, evento,
+# roteiro, servidores, motorista, transporte…). Só o carimbo automático de
+# atualização é seguramente irrelevante. Ao acrescentar um campo aqui, confira
+# antes `integracoes/google_drive/naming.py` e o payload do documento.
+_OFICIO_CAMPOS_SEM_DRIVE = {"updated_at"}
+
+
+def _organizar_oficio_ao_salvar(sender, instance, update_fields=None, **kwargs) -> None:
     """Assim que o ofício deixa de ser rascunho, gera e sobe ao Drive tudo que
     ainda faltar (ofício, justificativa, termos, ordem de serviço) — sem
     depender de alguém abrir/baixar o documento manualmente.
@@ -244,6 +252,12 @@ def _organizar_oficio_ao_salvar(sender, instance, **kwargs) -> None:
     if _drive_desligado():
         return
     if instance.status == instance.STATUS_RASCUNHO:
+        return
+    # Save que só carimbou o relógio (ex.: "salvar rascunho" na etapa de
+    # documentos, com o ofício já finalizado) não muda nada no Drive — e
+    # `organizar_oficio` é caro mesmo quando não gera nada: percorre a árvore
+    # de pastas pela API a cada execução.
+    if update_fields is not None and set(update_fields) <= _OFICIO_CAMPOS_SEM_DRIVE:
         return
     from .tasks import organizar_oficio
 
