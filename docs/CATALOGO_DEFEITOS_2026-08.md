@@ -11910,3 +11910,46 @@ Os dois blocos passam a descrever o fluxo verdadeiro: ID de cliente OAuth (Aplic
 redirecionamento que precisa bater com `GOOGLE_REDIRECT_URI`, escopos `drive.file` e
 `drive.readonly`, o prazo de 7 dias enquanto a publicação estiver em *Testing*, e a conexão pela
 tela Meu perfil. `gdrive_check --e2e` fecha o roteiro provando o envio.
+
+### NOVO-20260826-021706-c02af444709b ✅ RESOLVIDO · `NOVO` Relatório Técnico divide a diária pela equipe · BE · risco alto
+
+Dois módulos afirmavam coisas opostas sobre o mesmo campo. `Oficio.diarias_para_servidores`
+(`oficios/models.py:279`) documenta e aplica o contrato — "o roteiro guarda sempre o valor para 1
+servidor" —, e quem grava garante isso recalculando com `quantidade_servidores=1` antes de
+persistir (`roteiros/services/roteiro_editor.py:503`, congelado em
+`test_roteiro_do_oficio_be12.py:552`). O ofício, portanto, MULTIPLICA pelo efetivo para chegar ao
+total da equipe.
+
+`prestacoes_contas/services.py:_diaria_por_servidor` fazia o inverso: dividia `valor_diarias` por
+`oficio.servidores.count()`. Com diária de R$ 800,00 e equipe de quatro, o ofício autorizava
+R$ 3.200,00 e o RT do mesmo servidor imprimia **R$ 200,00** — um quarto do que ele tinha direito de
+sacar. O erro contaminava as três leituras do módulo: a diária prevista, a diária efetiva (após
+ajuste de roteiro) e `valor_diaria_liberado`, que é o teto usado para validar o valor digitado pelo
+operador — digitar o valor impresso no ofício era recusado.
+
+Só o caso de um servidor acertava, o que explica ter passado despercebido. Pior, o defeito estava
+congelado como regra em `prestacoes_contas/tests.py:112`, que exigia R$100,00 para um roteiro de
+R$200,00 com dois servidores; esse teste foi corrigido junto, com o porquê registrado no corpo.
+
+A divisão saiu. `_diaria_por_servidor(roteiro)` devolve o que o roteiro guarda. Caracterização em
+`prestacoes_contas/test_diaria_rt.py` conforme o `AGENTS.md` §3.3, incluindo o caso de equipe
+crescente (o efetivo não altera quanto cada servidor saca) e o de servidor sozinho.
+
+### NOVO-20260826-021707-b02175bdd4cd ✅ RESOLVIDO · `NOVO` Documentos do evento herdam só o primeiro destino · BE · risco médio
+
+O evento grava a lista inteira de destinos desde sempre (`destino_uf`/`destino_cidade` para o
+primeiro, `destinos_extras` para o resto) e `build_evento_document_seed` devolve todos em
+`destinos`. O defeito estava no consumo: Ordem de Serviço (`ordens_servico/views.py:486`), Plano de
+Trabalho (`planos_trabalho/services.py:criar_plano_rascunho`) e Termo (`termos/views.py:514`) liam
+apenas `seed["cidade"]`/`seed["estado"]` — o primeiro. Um evento com dois destinos abria as etapas
+4 e 5 com um só, e o operador redigitava o que já havia cadastrado na etapa 1.
+
+Os formulários de OS e Termo montam as linhas extras a partir de `self.instance.pk`, que não existe
+em documento novo; por isso o seed não tinha por onde chegar. Passou a chegar por
+`initial["destinos_seed"]`, com os pares resolvidos por `eventos.services.destinos_seed_para_formulario`
+(que descarta destino cuja cidade não existe mais no cadastro). O plano grava as linhas
+`PlanoDestino` do rascunho na criação, que é de onde o formulário dele lista.
+
+Evento de destino único não muda: sem `destinos_seed`, o caminho antigo continua valendo, e o campo
+legado segue apontando para o primeiro destino. As etapas 2 (roteiro) e 3 (ofício) já liam a lista
+inteira — ficaram congeladas no mesmo teste para não regredirem junto.

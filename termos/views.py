@@ -29,6 +29,7 @@ from documentos.selectors import mapa_artefatos_pdf_termo_cadastro_em_lote
 from documentos.services.async_generation import enfileirar_documento
 from documentos.services.types import DocumentoFormato
 from eventos.services import build_evento_document_seed
+from eventos.services import destinos_seed_para_formulario
 from eventos.services import resolve_evento_from_request
 
 from oficios.picker import LIMITE_BUSCA
@@ -529,6 +530,9 @@ def novo(request):
         initial["destino_estado"] = seed["estado"].pk
     if seed.get("cidade"):
         initial["destino_cidade"] = seed["cidade"].pk
+    destinos_seed = destinos_seed_para_formulario(seed)
+    if len(destinos_seed) > 1:
+        initial["destinos_seed"] = destinos_seed
     if servidores_seed:
         initial["servidores"] = [servidor.pk for servidor in servidores_seed]
     if seed.get("viatura"):

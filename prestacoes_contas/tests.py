@@ -110,6 +110,15 @@ class RelatorioTecnicoDiariaTests(TestCase):
         self.servidor_b = Servidor.objects.create(area=area_de_teste(), nome="Servidor B", cargo=self.cargo, cpf="55566677788")
 
     def test_diaria_inicial_e_valor_por_servidor_da_prestacao(self):
+        """`NOVO-20260826-021706-c02af444709b`: esperava R$100,00 e congelava o defeito.
+
+        `Roteiro.valor_diarias` é o valor de UM servidor — quem grava recalcula
+        com `quantidade_servidores=1` antes de persistir, e é por isso que
+        `Oficio.diarias_para_servidores` multiplica pelo efetivo. Este teste
+        afirmava que dois servidores partiam a diária ao meio no RT; era a
+        divisão indevida, não a regra. Com R$200,00 no roteiro, cada servidor
+        saca R$200,00, e o ofício autoriza R$400,00 para a dupla.
+        """
         roteiro = Roteiro.objects.create(area=area_de_teste(), valor_diarias=Decimal("200.00"))
         oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
@@ -124,9 +133,9 @@ class RelatorioTecnicoDiariaTests(TestCase):
         response = self.client.get(reverse("prestacoes_contas:rt_servidor", args=[ps.pk]))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'value="R$100,00"')
+        self.assertContains(response, 'value="R$200,00"')
         relatorio = RelatorioTecnico.objects.get(prestacao=prestacao)
-        self.assertEqual(relatorio.diaria, "R$100,00")
+        self.assertEqual(relatorio.diaria, "R$200,00")
         self.assertEqual(relatorio.translado, "Não houve")
         self.assertEqual(relatorio.combustivel, "Cartão Prime")
         self.assertEqual(relatorio.passagem, "Não houve")

@@ -262,6 +262,24 @@ def resolve_evento_destinos(evento):
     return resolvidos
 
 
+def destinos_seed_para_formulario(seed) -> list[tuple[int, int]]:
+    """Pares ``(estado_id, cidade_id)`` de TODOS os destinos do evento.
+
+    `NOVO-20260826-021707-b02175bdd4cd`: `build_evento_document_seed` sempre
+    devolveu a lista inteira em ``destinos``, mas Ordem de Serviço, Plano de
+    Trabalho e Termo liam apenas ``cidade``/``estado`` — o primeiro destino. Um
+    evento com dois destinos abria os documentos das etapas 4 e 5 com um só, e
+    o operador tinha de redigitar o que já havia cadastrado na etapa 1.
+    """
+    pares = []
+    for cidade, estado in (seed or {}).get("destinos") or []:
+        estado_id = getattr(estado, "pk", None) or getattr(cidade, "estado_id", None)
+        cidade_id = getattr(cidade, "pk", None)
+        if estado_id and cidade_id:
+            pares.append((estado_id, cidade_id))
+    return pares
+
+
 def build_evento_document_seed(evento) -> dict:
     """Consolida valores do evento e dos documentos vinculados para novos cadastros."""
 

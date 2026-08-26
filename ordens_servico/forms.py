@@ -340,6 +340,12 @@ class OrdemServicoForm(forms.ModelForm):
                     rows.append(self._destination_row_from_values(idx, cidade.estado_id, cidade.pk))
             else:
                 rows.append(self._destination_row_from_values(0, estado_id, cidade_id))
+        elif self.initial.get("destinos_seed"):
+            # Documento novo, semeado por um evento com mais de um destino: a
+            # instância ainda não tem pk, então o ramo acima não vale
+            # (`NOVO-20260826-021707-b02175bdd4cd`).
+            for idx, (seed_estado_id, seed_cidade_id) in enumerate(self.initial["destinos_seed"]):
+                rows.append(self._destination_row_from_values(idx, seed_estado_id, seed_cidade_id))
         else:
             rows.append(self._destination_row_from_values(0, estado_id, cidade_id))
 
