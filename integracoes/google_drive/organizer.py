@@ -101,9 +101,21 @@ def _mime_por_nome(nome: str) -> str:
 
 
 def _raiz() -> str | None:
-    from .services import get_pasta_raiz_id
+    """ID da pasta raiz, já conferido; ``None`` quando não há raiz escolhida.
 
-    return get_pasta_raiz_id(get_usuario_contexto()) or None
+    Sem raiz escolhida o organizador segue montando a árvore na raiz da conta —
+    comportamento antigo, preservado. Mas quando existe uma raiz configurada,
+    ela é validada antes de qualquer envio: se estiver na lixeira ou sem
+    permissão de escrita, `validar_pasta_raiz` interrompe a operação
+    (`NOVO-20260825-205014-1843068b6d33`). O envio vira pendência com motivo
+    legível, em vez de "sucesso" que enche a lixeira do Drive.
+    """
+    from .services import get_pasta_raiz_id, validar_pasta_raiz
+
+    usuario = get_usuario_contexto()
+    if not get_pasta_raiz_id(usuario):
+        return None
+    return validar_pasta_raiz(usuario)
 
 
 # ---------------------------------------------------------------------------

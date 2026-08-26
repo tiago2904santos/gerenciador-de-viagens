@@ -11852,3 +11852,61 @@ branco, a viatura e cada servidor, além de formato e saída; a lista não reapr
 O presenter do termo principal agora entrega a rota de catálogo e um id de modal exclusivo, e a
 linha renderiza o mesmo `download_picker` usado no formulário. As linhas de servidor preservam o
 menu rápido do documento individual; a etapa passou a carregar o motor compartilhado da fila.
+
+### NOVO-20260825-205014-1843068b6d33 ✅ RESOLVIDO · `NOVO` Pasta raiz na lixeira faz o Drive "funcionar" sem entregar nada · BE · risco médio
+
+Evidência medida em produção pelo workflow `Diagnostico manual (leitura)` (execução de
+07/07/2026): a pasta raiz configurada, `1ZjHyisn0BAhPQwkj_XeKdRiXjemvXToo` ("VIAGENS"), respondia
+`'trashed': True`. Nada no sistema conferia isso. O Drive aceita criar filhos dentro de uma pasta
+lixeirada — o arquivo nasce na lixeira junto com ela —, então cada upload devolvia `id` e
+`webViewLink` normalmente e `DriveArquivo` era gravado como sucesso. Pior: `get_or_create_pasta`
+busca subpastas com `trashed = false`, logo nunca reencontrava a árvore que ela mesma havia criado
+lá dentro, e recriava a estrutura inteira a cada envio (origem provável do `gdrive_limpar_duplicados`).
+Do lado do usuário, o sintoma era só um: o documento não aparece no Drive, e o sistema não acusa erro.
+
+`services.estado_pasta_raiz()` passa a inspecionar a raiz (existe, não está na lixeira, é pasta,
+aceita filhos) e `validar_pasta_raiz()` interrompe a operação com motivo legível. O portão fica em
+`organizer._raiz()`, por onde passa todo destino do organizador: o envio vira pendência explicada
+em vez de sucesso silencioso na lixeira. A tela Meu perfil mostra o motivo ao lado do seletor de
+pasta, e `gdrive_check` reprova com código de saída 1. Instalação sem raiz escolhida mantém o
+comportamento antigo (monta a árvore na raiz da conta).
+
+### NOVO-20260825-205015-e2fe5114f230 ✅ RESOLVIDO · `NOVO` Cache de pastas eterno manda arquivo para pasta morta · BE · risco médio
+
+`_RealClient._cache` guardava `(pai_id, nome) → folder_id` sem expiração, e o gunicorn de produção
+roda `--workers 3` com processos que vivem dias (a hipótese está escrita no commit `45fc94c`, que
+criou o diagnóstico para investigá-la). Bastava alguém mover, renomear ou lixeirar uma pasta pelo
+próprio Drive para que todo envio seguinte daquele worker fosse para um ID que não vale mais — sem
+erro nenhum, pelo mesmo motivo do defeito acima. Só reiniciar o serviço limpava.
+
+O cache passou a guardar o instante da resolução e a expirar por
+`GOOGLE_DRIVE_PASTA_CACHE_TTL_SECONDS` (padrão 300s, `0` desliga). O estrago de uma pasta movida
+por fora fica limitado à janela do TTL, sem devolver ao Drive uma consulta por pasta a cada envio.
+
+### NOVO-20260825-205016-141986d1201e ✅ RESOLVIDO · `NOVO` Token renovado só vivia na memória do processo · BE · risco baixo
+
+`_RealClient` montava `Credentials` sem informar `expiry`, então o google-auth considerava o token
+válido para sempre e só renovava depois de tomar 401 — e a renovação feita por `AuthorizedHttp`
+não voltava para o banco. O `access_token` salvo envelhecia para sempre: todo worker novo começava
+com um token morto e gastava um 401 antes da primeira chamada útil. Além disso, `invalid_grant`
+(acesso revogado, senha trocada, ou app com tela de consentimento em *Testing*, onde o refresh
+token caduca em 7 dias) chegava ao painel de pendências como traceback de OAuth.
+
+As credenciais agora são uma subclasse que grava no banco todo token novo, o vencimento é
+informado ao google-auth (renovação acontece antes da chamada, não depois do 401), a renovação
+ganha margem de 5 minutos para job longo e relógio fora de sincronia, e `invalid_grant` vira
+`DriveReauthError` com a instrução de reconectar a conta. Credencial sem refresh token é recusada
+na hora, com o mesmo texto.
+
+### NOVO-20260825-205017-dbab34b3e5f0 ✅ RESOLVIDO · `NOVO` Instruções de ativação mandavam criar Service Account · DOC · risco baixo
+
+`.env.example` e `config/settings/base.py` mandavam criar um Service Account, baixar a chave JSON e
+compartilhar a pasta com o e-mail dele — e citavam uma variável `CREDENTIALS_PATH` que não existe
+no código. O `_RealClient` só sabe ler token OAuth de `DriveCredenciais`; quem seguisse as
+instruções à risca montava um caminho que nunca funcionaria. O desenho real (uma conta Google por
+usuário institucional) está em `docs/MULTI_TENANT_LOGIN_DRIVE.md`.
+
+Os dois blocos passam a descrever o fluxo verdadeiro: ID de cliente OAuth (Aplicativo Web), URI de
+redirecionamento que precisa bater com `GOOGLE_REDIRECT_URI`, escopos `drive.file` e
+`drive.readonly`, o prazo de 7 dias enquanto a publicação estiver em *Testing*, e a conexão pela
+tela Meu perfil. `gdrive_check --e2e` fecha o roteiro provando o envio.

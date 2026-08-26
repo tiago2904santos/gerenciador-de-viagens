@@ -513,6 +513,7 @@ def perfil(request):
     from integracoes.google_drive.services import (
         escopo_faltante,
         esta_autorizado,
+        estado_pasta_raiz,
         get_credenciais,
         get_pasta_raiz_id,
     )
@@ -557,6 +558,14 @@ def perfil(request):
         usuario=usuario_drive,
         area=area_drive,
     )
+    # `NOVO-20260825-205014-1843068b6d33`: uma raiz na lixeira deixava o envio
+    # "dar certo" com o documento invisível. O aviso mora onde a pasta é
+    # escolhida. Só faz sentido perguntar ao Drive com conta conectada.
+    drive_raiz_motivo = ""
+    if drive_autorizado and drive_pasta_raiz_id:
+        estado_raiz = estado_pasta_raiz(usuario_drive)
+        if not estado_raiz.ok:
+            drive_raiz_motivo = estado_raiz.motivo
 
     return render(
         request,
@@ -576,6 +585,7 @@ def perfil(request):
             "drive_creds": drive_creds,
             "drive_escopo_faltante": escopo_faltante(usuario_drive),
             "drive_pasta_raiz_id": drive_pasta_raiz_id,
+            "drive_raiz_motivo": drive_raiz_motivo,
             "drive_pasta_raiz_nome": drive_creds.pasta_raiz_nome if drive_creds else "",
             "drive_total_arquivos": DriveArquivo.objects.filter(artefato__area=area_drive).count(),
             "drive_modo_ativo": drive_modo != "mock",

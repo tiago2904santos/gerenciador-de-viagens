@@ -26,7 +26,7 @@
   description="Pasta raiz onde os documentos desta área são organizados"
   :heading_level="3"
 >
-  <c-slot name="body">{% include "core/partials/_gdrive_diretorio_body.html" with csrf_token=csrf_token drive_autorizado=drive_autorizado drive_job_reorg=drive_job_reorg drive_modo_ativo=drive_modo_ativo drive_pasta_raiz_id=drive_pasta_raiz_id drive_pasta_raiz_nome=drive_pasta_raiz_nome drive_pode_reorganizar=drive_pode_reorganizar drive_total_arquivos=drive_total_arquivos drive_total_eventos=drive_total_eventos only %}</c-slot>
+  <c-slot name="body">{% include "core/partials/_gdrive_diretorio_body.html" with csrf_token=csrf_token drive_autorizado=drive_autorizado drive_job_reorg=drive_job_reorg drive_modo_ativo=drive_modo_ativo drive_pasta_raiz_id=drive_pasta_raiz_id drive_pasta_raiz_nome=drive_pasta_raiz_nome drive_raiz_motivo=drive_raiz_motivo drive_pode_reorganizar=drive_pode_reorganizar drive_total_arquivos=drive_total_arquivos drive_total_eventos=drive_total_eventos only %}</c-slot>
 </c-v2.form_block>
 
 {% if drive_total_pendencias %}
