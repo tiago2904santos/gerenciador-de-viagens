@@ -540,3 +540,9 @@ igualmente na `main`. Os avisos deste recorte foram de 253 para 239.
 - [x] `NOVO-20260825-024621-97c9b859786c` — preservar a OS como link para seu formulário e
   executar a criação numerada do Plano de Trabalho por POST dentro do menu V2. Fechamento: as duas
   escolhas da etapa PT/OS entram diretamente no cadastro correspondente, mantendo o Evento.
+
+## Largura da busca dos modelos do RT (26/08/2026)
+
+- [x] `NOVO-20260826-124301-1799c62a400b` — aplicar ao formulário de busca o contrato
+  `rail__form`, fazendo formulário e input ocuparem integralmente a largura interna do rail.
+  Fechamento medido no navegador: os três têm **861,13 px** no viewport de **1186 × 698 px**.

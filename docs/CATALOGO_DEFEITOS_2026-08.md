@@ -11906,6 +11906,18 @@ Produção usa `DOCUMENTOS_DEFAULT_PDF_ENGINE=unoserver`, que já pulava a varre
 `_fast_unoserver_chain`; o ganho é do modo `auto` (desenvolvimento e qualquer instalação sem
 unoserver).
 
+### NOVO-20260826-124301-1799c62a400b ✅ RESOLVIDO · `NOVO` Busca dos modelos do RT não ocupa a largura do rail · UI · risco baixo
+
+Relatado pelo usuário na lista de modelos de texto do relatório técnico. O slot `controls` do
+`list_page` já cria a fila externa `.rail__controls`, mas o formulário de busca repetia essa mesma
+classe como filho. Como a regra de expansão pertence a `.rail__form`, o formulário ficava na
+largura intrínseca de 264 px e deixava vazia a maior parte da faixa.
+
+O formulário passou ao contrato canônico `.rail__form`, já usado nas demais listas com filtro de
+servidor, e recebeu `role="search"`. Medido no navegador após a correção: rail interno, formulário
+e componente de input têm a mesma largura, **861,13 px** no viewport de **1186 × 698 px** do relato.
+O teste de regressão exige a classe de geometria no HTML renderizado.
+
 ---
 
 ### NOVO-20260826-124037-4fedd7ed1e61 ✅ RESOLVIDO · 🔴 `COR` RT divide entre a equipe a diária que é de cada servidor · BE · risco baixo

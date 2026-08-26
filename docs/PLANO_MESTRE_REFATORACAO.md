@@ -807,3 +807,5 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       carimbou `updated_at`, no mesmo formato do guard já existente para prestações.
 - [x] `NOVO-20260826-121500-b85b49c28b81` troca a sonda do motor Word por leitura de registro e
       memoriza por configuração as sondas que dependem de instalação (Word, WeasyPrint, fpdf).
+- [x] `NOVO-20260826-124301-1799c62a400b` faz a busca dos modelos do RT consumir toda a largura
+      interna do rail pelo contrato canônico `rail__form`, com teste estrutural e medição visual.
