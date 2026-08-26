@@ -220,6 +220,11 @@
     padding: 14px;
   }
 }
+@media (prefers-reduced-motion: reduce) {
+:is(html[data-theme]) .skip-link {
+    transition: none;
+  }
+}
 :is(html[data-theme="dark"]) .skip-link {
   background: var(--color-surface-strong);
   border: 1px solid var(--color-border-strong);
@@ -317,6 +322,11 @@
     transform: rotate(360deg);
   }
 }
+@media (prefers-reduced-motion: reduce) {
+:is(html[data-theme]) .document-loading__spinner {
+    animation-duration: 1.8s;
+  }
+}
 :is(html[data-theme]) .button {
   align-items: center;
   background: var(--surface-field);
@@ -382,6 +392,13 @@
   min-height: var(--control-height-sm);
   padding: 0 10px;
 }
+:is(html[data-theme]) .button--sm.button--icon {
+  width: var(--control-height-sm);
+}
+:is(html[data-theme]) .button--sm .button__icon svg {
+  height: 14px;
+  width: 14px;
+}
 :is(html[data-theme]) .button__icon {
   align-items: center;
   display: inline-flex;
@@ -431,6 +448,12 @@
   color: var(--color-text);
   min-height: var(--control-height-md);
   padding: 0 var(--space-3);
+}
+:where(.cv-field__control--textarea) {
+  min-height: var(--text-area-height-md);
+  padding-bottom: var(--space-3);
+  padding-top: var(--space-3);
+  resize: vertical;
 }
 @media (max-width: 600px) {
 .field-grid--cols-2,
@@ -502,6 +525,14 @@
   gap: 3px;
   min-width: 0;
 }
+.form-block:not(.form-block--split):not(.form-block--resource) >
+  .form-block__header .form-block__copy {
+  align-items: baseline;
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+  width: 100%;
+}
 .form-block__title,
 .form-block__description {
   margin: 0;
@@ -542,6 +573,11 @@
   }
 }
 @media (max-width: 640px) {
+.form-block:not(.form-block--split):not(.form-block--resource) >
+    .form-block__header .form-block__copy {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 .form-block__header,
   .form-block--split > .form-block__header {
     align-items: flex-start;
@@ -787,9 +823,15 @@
 :is(html[data-theme]) .header + .rail {
   border-radius: 0 0 var(--radius-rail) var(--radius-rail);
 }
+:is(html[data-theme]) :is(.form-page, .list-page) > .header + .rail {
+  border-top: 0;
+}
 :is(html[data-theme]) .rail {
   display: grid;
   gap: var(--gap);
+}
+:is(html[data-theme]) .rail__controls > .button:last-child {
+  margin-left: auto;
 }
 :root {
   
@@ -854,10 +896,39 @@ html[data-theme="dark"] {
   font-weight: var(--font-weight-semibold);
   line-height: 1.2;
 }
+:is(html[data-theme])
+  :is(.search-picker__option:first-child, .search-picker__option:last-child) {
+  border-radius: 10px;
+}
 html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .date-picker__popover) {
   background: var(--color-surface-elevated);
   border: 1px solid var(--color-border-strong);
   box-shadow: var(--shadow-elevated);
+}
+html[data-theme="dark"] :is(.custom-select__option:hover, .custom-select__option--focused, .search-picker__option:hover, .search-picker__option--active) {
+  background: var(--color-surface-soft);
+}
+html[data-theme="dark"] :is(.custom-select__option--selected, .search-picker__option--selected) {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-hover);
+  color: var(--color-white);
+}
+html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-select__option--selected.custom-select__option--focused, .search-picker__option--selected:hover) {
+  background: color-mix(in srgb, var(--color-primary-hover) 35%, var(--color-primary-dark));
+  border-color: var(--color-primary-hover);
+  color: var(--color-white);
+}
+:is(html[data-theme="dark"])
+
+:is(html[data-theme="dark"])
+
+:is(html[data-theme="dark"])
+  .search-picker__dropdown {
+  background: var(--color-surface-strong);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(2, 9, 16, 0.48);
+  padding: 6px;
 }
 :is(html[data-theme]) .custom-select__menu--v2,
 :is(html[data-theme]) .custom-select__menu--v2.floating-dropdown--active,
@@ -923,8 +994,32 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   padding: 3px 10px;
   white-space: nowrap;
 }
+:is(html[data-theme]) .chip--v2[data-tone="done"] {
+  --chip-tone: var(--status-done);
+}
 :is(html[data-theme]) .chip--v2[data-tone="progress"] {
   --chip-tone: var(--status-progress);
+}
+:is(html[data-theme]) .chip--v2[data-tone="late"] {
+  --chip-tone: var(--status-late);
+}
+:is(html[data-theme]) .chip--v2[data-tone="info"] {
+  --chip-tone: var(--status-info);
+}
+:is(html[data-theme]) .chip--v2[data-tone="success"] {
+  --chip-tone: var(--status-done);
+}
+:is(html[data-theme]) .chip--v2[data-tone="pending"] {
+  --chip-tone: var(--status-progress);
+}
+:is(html[data-theme]) .chip--v2[data-tone="warning"],
+:is(html[data-theme]) .chip--v2[data-tone="danger"] {
+  --chip-tone: var(--status-late);
+}
+:is(html[data-theme]) .chip--v2[data-tone="entity"],
+:is(html[data-theme]) .chip--v2[data-tone="neutral"],
+:is(html[data-theme]) .chip--v2[data-tone="muted"] {
+  --chip-tone: var(--text-muted);
 }
 :is(html[data-theme]) .panel {
   --surface-contrast: var(--surface-field);
@@ -998,14 +1093,23 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
 :is(html[data-theme]) .alert::before {
   content: none;
 }
+:is(html[data-theme]) .alert[data-tone="success"] {
+  --alert-tone: var(--status-done);
+}
 :is(html[data-theme]) .alert[data-tone="warning"] {
   --alert-tone: var(--status-progress);
 }
 :is(html[data-theme]) .alert[data-tone="error"] {
   --alert-tone: var(--status-late);
 }
+:is(html[data-theme]) .alert[data-tone="info"] {
+  --alert-tone: var(--status-info);
+}
 :is(html[data-theme]) .alert:empty {
   display: none;
+}
+:is(html[data-theme]) :is(.prestacao-card__facts, .oficio-card__facts, .evento-card__docs) .form-block--v2 {
+  grid-column: auto;
 }
 :is(html[data-theme]) .route-source__saved,
 :is(html[data-theme]) .route-source__new {
@@ -1258,6 +1362,16 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   text-align: left;
 }
 :is(html[data-theme])
+  :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block).form-block--split {
+  align-items: center;
+  gap: 16px;
+  grid-template-columns: minmax(148px, 0.62fr) minmax(0, 2.1fr);
+}
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block).form-block--split > .form-block__body {
+  align-self: center;
+}
+:is(html[data-theme])
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) :is(
     .search-picker,
     .search-picker--people,
@@ -1283,65 +1397,51 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   padding: 12px 14px !important;
   text-align: left;
 }
+@media (max-width: 900px) {
 :is(html[data-theme])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block.route-destinos-block--split,
-:is(html[data-theme])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block.route-destinos-block--split:hover {
-  align-items: start;
-  background: var(--step1-surface) !important;
-  border: 0 !important;
-  border-radius: 14px;
-  box-shadow: none !important;
-  column-gap: 16px;
-  display: grid;
-  filter: none !important;
-  grid-template-columns: 14rem minmax(0, 1fr);
-  margin: 14px 0 0;
-  padding: 14px;
-  row-gap: 0;
-  transform: none !important;
-  transition: none !important;
+    :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block).form-block--split {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 :is(html[data-theme])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single,
-:is(html[data-theme])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single:hover {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  [data-travel-document-wizard-documentos]
+  :is(
+    .summary-item:not(.oficio-documentos-route-trecho-scroll-item),
+    .oficio-documentos-fact,
+    .oficio-documentos-traveller-tile:not(.oficio-documentos-traveller-tile--motorista),
+    .oficio-documentos-traveller-line:not(.oficio-documentos-traveller-line--motorista),
+    .oficio-documentos-vehicle-executive__driver,
+    .document-inline-card,
+    .oficio-documentos-route-card__diarias-subblock,
+    .oficio-documentos-route-card__fallback-fact,
+    .oficio-documentos-route-card__trecho
+  ) {
+  border-radius: 10px;
 }
 :is(html[data-theme])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row,
-:is(html[data-theme])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row:hover {
-  align-items: center;
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 0;
-  box-shadow: none !important;
-  column-gap: 12px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  min-height: 0;
-  padding: 0 !important;
-  row-gap: 0;
-  transition: none !important;
+  [data-travel-document-wizard-roteiro]
+  #sec-mapa-rota > .form-block__header {
+  display: none !important;
 }
 :is(html[data-theme])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single,
-:is(html[data-theme])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single:hover {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  .roteiro-editor--oficio :is(
+    .roteiro-mapa__frame,
+    .roteiro-mapa__frame #map,
+    .roteiro-mapa__frame .leaflet-container
+  ) {
+  height: 600px;
+  min-height: 600px;
 }
 @media (max-width: 720px) {
 :is(html[data-theme])
-    :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row,
-  :is(html[data-theme])
-    :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row:hover,
-  :is(html[data-theme])
-    :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single,
-  :is(html[data-theme])
-    :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single:hover {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 8px;
+    .roteiro-editor--oficio :is(
+      .roteiro-mapa__frame,
+      .roteiro-mapa__frame #map,
+      .roteiro-mapa__frame .leaflet-container
+    ) {
+    height: 420px;
+    min-height: 420px;
   }
 }
 :is(html[data-theme])
@@ -1383,93 +1483,27 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   [data-travel-document-wizard-roteiro] .roteiro-editor__section--trecho .roteiro-trecho-card {
   gap: var(--space-3, 12px);
 }
-:is(html[data-theme])
-  [data-travel-document-wizard-roteiro]
-  .oficio-roteiro-bate-volta-toggle
-  .field-side-action--toggle:is(:hover, :focus, :focus-visible, :active) {
-  box-shadow: none !important;
-  filter: none;
-  transform: none !important;
-}
-:is(html[data-theme])
-  [data-travel-document-wizard-roteiro]
-  .oficio-roteiro-bate-volta-toggle
-  .field-side-action--toggle:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
-  outline-offset: 2px;
-}
-:is(html[data-theme])
-  [data-travel-document-wizard-roteiro]
-  .oficio-roteiro-bate-volta-toggle
-  .field-side-action--toggle:is(.field-side-action--danger, .is-inactive),
-:is(html[data-theme])
-  [data-travel-document-wizard-roteiro]
-  .oficio-roteiro-bate-volta-toggle
-  .field-side-action--toggle:is(.field-side-action--danger, .is-inactive):is(:hover, :focus, :focus-visible) {
-  background: var(--step1-panel, var(--color-surface-soft)) !important;
-  border-color: color-mix(in srgb, var(--color-border) 55%, transparent) !important;
-  color: var(--color-muted-strong) !important;
-}
-:is(html[data-theme])
-  [data-travel-document-wizard-roteiro]
-  .oficio-roteiro-bate-volta-toggle
-  .field-side-action--toggle:is(.field-side-action--danger, .is-inactive):is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--color-white) 4%, var(--step1-panel, var(--color-surface-soft))) !important;
-  border-color: color-mix(in srgb, var(--color-border) 70%, transparent) !important;
-}
-:is(html[data-theme])
-  [data-travel-document-wizard-roteiro]
-  .oficio-roteiro-bate-volta-toggle
-  .field-side-action--state:is(.field-side-action--danger, .is-inactive)::before {
-  background: var(--color-muted) !important;
-}
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-sede-block.form-block--split,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-sede-block.form-block--split:hover {
-  align-items: center;
-  background: var(--step1-surface) !important;
-  border: 0 !important;
-  border-radius: 14px;
-  box-shadow: none !important;
-  column-gap: 16px;
-  filter: none !important;
-  grid-template-columns: 14rem minmax(0, 1fr);
-  margin: 0;
-  padding: 14px;
-  transform: none !important;
-  transition: none !important;
-}
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row,
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row:hover {
-  align-items: center;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  
-  column-gap: 12px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  min-height: 0;
-  padding: 0 !important;
-  transition: none !important;
-}
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .ordered-field-row__drag-handle:active {
-  cursor: grabbing;
-  color: var(--color-heading);
-}
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .ordered-field-row.is-drop-target {
+  [data-travel-document-wizard-roteiro] :is(.roteiro-editor__empty, .summary-item) {
+  background: var(--step1-field, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
+  border-color: transparent;
   box-shadow: none;
 }
 :is(html[data-theme="dark"])
-  .roteiro-editor--oficio .roteiro-editor__switch-row .field-side-action--danger:hover {
-  background: var(--color-input-bg);
-  border-color: color-mix(in srgb, var(--color-border) 78%, var(--color-text) 22%);
-  box-shadow: none;
+  [data-travel-document-wizard-documentos]
+  :is(
+    .summary-item:not(.oficio-documentos-route-trecho-scroll-item),
+    .oficio-documentos-fact,
+    .oficio-documentos-traveller-tile:not(.oficio-documentos-traveller-tile--motorista),
+    .oficio-documentos-traveller-line:not(.oficio-documentos-traveller-line--motorista),
+    .oficio-documentos-vehicle-executive__driver,
+    .document-inline-card,
+    .oficio-documentos-route-card__diarias-subblock,
+    .oficio-documentos-route-card__fallback-fact,
+    .oficio-documentos-route-card__trecho
+  ) {
+  background: var(--step1-field, var(--color-input-bg)) !important;
+  border-color: transparent !important;
 }
 :is(html[data-theme]) .card-footer {
   align-items: center;
@@ -1633,16 +1667,6 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
 :is(html[data-theme]) .wizard-sticky-scope > .rail {
   transition: border-radius var(--ease);
 }
-:is(html[data-theme]) .wizard-page > .header.is-detached,
-:is(html[data-theme]) .wizard-sticky-scope > .header.is-detached {
-  border-bottom-left-radius: var(--radius-brand);
-  border-bottom-right-radius: var(--radius-brand);
-}
-:is(html[data-theme]) .wizard-page > .rail.is-detached,
-:is(html[data-theme]) .wizard-sticky-scope > .rail.is-detached {
-  border-top-left-radius: var(--radius-rail);
-  border-top-right-radius: var(--radius-rail);
-}
 :is(html[data-theme]) .destination-row {
   align-items: center;
   display: grid;
@@ -1677,6 +1701,10 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
 :is(html[data-theme]) .destination-row__handle:hover {
   color: var(--accent);
 }
+:is(html[data-theme]) .destination-row__handle svg {
+  height: 16px;
+  width: 16px;
+}
 :is(html[data-theme]) .destination-row {
   transition: transform 140ms ease, opacity 140ms ease;
 }
@@ -1689,6 +1717,10 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
 }
 :is(html[data-theme]) .destination-row.is-drop-target.is-drop-after {
   transform: translateY(-4px);
+}
+:is(html[data-theme]) .is-dragging-destination,
+:is(html[data-theme]) .is-dragging-destination * {
+  user-select: none;
 }
 :is(html[data-theme]) .destinations__list:not(:has(> [data-location-row] ~ [data-location-row]))
   .destination-row__handle {
@@ -1706,6 +1738,9 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   display: grid;
   gap: var(--gap-tight);
   min-width: 0;
+}
+:is(html[data-theme]) .destinations__list:empty {
+  min-height: var(--control-height);
 }
 :root {
   --sp-field-bg: var(--theme-input-bg, var(--color-input-bg));
@@ -1958,6 +1993,16 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   scrollbar-color: var(--field-border-hover) transparent;
   scrollbar-width: thin;
 }
+.search-picker__list::-webkit-scrollbar {
+  width: var(--space-1);
+}
+.search-picker__list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.search-picker__list::-webkit-scrollbar-thumb {
+  background: var(--field-border-hover);
+  border-radius: var(--radius-pill);
+}
 .search-picker__empty,
 .search-picker__selected-empty {
   background: var(--field-bg-soft);
@@ -1979,6 +2024,9 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   gap: var(--space-3);
   grid-template-columns: 1fr;
   min-width: 0;
+}
+.search-picker--compact .search-picker__selected-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .search-picker--disabled {
   opacity: 1;
@@ -2043,6 +2091,11 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   box-shadow: none;
   outline: none;
 }
+html[data-theme="dark"] :is(.search-picker__selected-panel, .search-picker__selected-card) {
+  background: var(--color-surface-soft);
+  border-color: var(--color-border-strong);
+  box-shadow: none;
+}
 :is(html[data-theme="dark"])
   .search-picker__list {
   display: grid;
@@ -2054,6 +2107,9 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   display: grid;
   gap: var(--gap);
   min-width: 0;
+}
+:is(html[data-theme]) .picker > .search-picker__native {
+  display: none !important;
 }
 :is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__control {
   align-items: center;
@@ -2135,6 +2191,9 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
 :is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker--has-query .search-picker__clear {
   display: inline-flex;
 }
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__clear[hidden] {
+  display: none;
+}
 :is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-empty {
   align-items: center;
   background: var(--surface-contrast, var(--surface-field));
@@ -2150,6 +2209,9 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   min-height: 56px;
   padding: 10px 12px;
   text-align: center;
+}
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-empty[hidden] {
+  display: none;
 }
 :is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-list {
   --escolhido-height: 56px;
@@ -2197,8 +2259,23 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
 .related-route-list {
   scrollbar-color: color-mix(in srgb, var(--text-muted) 60%, transparent) transparent;
 }
+.related-route-list::-webkit-scrollbar {
+  width: 28px;
+}
+.related-route-list::-webkit-scrollbar-track {
+  background: transparent;
+  margin: var(--space-1) 0;
+}
+.related-route-list::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-muted) 45%, transparent);
+  border-radius: var(--radius-pill);
+  transition: background 0.2s;
+}
 .related-route-list::-webkit-scrollbar-thumb:hover {
   background: var(--color-accent);
+}
+.related-route-list::-webkit-scrollbar-button {
+  display: none;
 }
 html {
   --date-picker-selected-bg-start: var(--stepper-active-bg, var(--color-accent));
@@ -2352,12 +2429,6 @@ html[data-theme="light"] {
     border-color var(--transition-fast),
     color var(--transition-fast);
 }
-.date-picker__nav:hover,
-.date-picker__footer-action:hover {
-  background:
-    linear-gradient(var(--field-bg-hover), var(--field-bg-hover)) padding-box,
-    linear-gradient(var(--color-border-strong, var(--color-border-strong)), var(--color-border-strong, var(--color-border-strong))) border-box;
-}
 .date-picker__weekdays,
 .date-picker__days {
   column-gap: var(--date-picker-day-gap);
@@ -2472,43 +2543,11 @@ html[data-theme="light"] {
   gap: var(--space-2);
   justify-content: flex-end;
 }
-html[data-theme] .date-picker__footer .date-picker__footer-action:hover,
-html[data-theme] .date-picker__footer .date-picker__footer-action:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted));
-  background-image: none;
-  border: 0;
-  box-shadow: none;
-  color: var(--color-accent-text, var(--color-accent));
-  outline: 0;
-  transform: none;
-}
 html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   background: var(--color-surface-elevated);
   border: 1px solid var(--color-border-strong);
   color: var(--color-text);
   box-shadow: var(--shadow-elevated);
-}
-:is(html[data-theme="dark"])
-  .travel-period-filter--filled
-  .travel-period-filter__btn,
-:is(html[data-theme="dark"])
-  .travel-period-filter--filled
-  .travel-period-filter__btn:hover:not(:disabled) {
-  background: var(--color-card-soft);
-  border-color: transparent;
-  box-shadow: none;
-}
-.travel-period-filter__btn:hover:not(:disabled) {
-  background:
-    linear-gradient(var(--field-bg-hover), var(--field-bg-hover)) padding-box,
-    linear-gradient(var(--color-secondary), var(--color-secondary)) border-box;
-}
-.travel-period-filter__btn:focus-visible {
-  background:
-    linear-gradient(var(--field-bg-hover), var(--field-bg-hover)) padding-box,
-    linear-gradient(var(--select-border-focus), var(--select-border-focus)) border-box;
-  box-shadow: var(--select-focus-shadow);
-  outline: none;
 }
 :is(html[data-theme]) .date-field {
   --trigger-size: 28px;
@@ -2575,10 +2614,6 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
 :is(html[data-theme]) .date-field .date-picker__trigger:hover {
   color: var(--accent);
 }
-:is(html[data-theme]) .date-field .travel-period-filter__btn:focus-visible {
-  border-color: var(--focus-ring);
-  outline: none !important;
-}
 :is(html[data-theme]) .date-field .date-picker__summary {
   display: none;
 }
@@ -2597,6 +2632,16 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   font-weight: var(--weight-strong);
   
   line-height: 1.5;
+}
+:is(html[data-theme="dark"])
+  :is(.card, .app-card, .module-card, .document-card) {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-xs);
+}
+:is(html[data-theme="dark"])
+  :is(.card, .app-card, .module-card, .document-card):hover {
+  box-shadow: var(--shadow-sm);
 }
 :is(html[data-theme]) .form-page__form {
   display: grid;
@@ -2642,6 +2687,12 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+:is(html[data-theme]) .fact-list:not(:has(> .fact:nth-child(2))):not(:has(.fact__value--strong)) {
+  --fact-value-size: clamp(1.2rem, 20cqw, 2.6rem);
+}
+:is(html[data-theme]) .fact-list:has(> .fact:nth-child(2)):not(:has(> .fact:nth-child(3))):not(:has(.fact__value--strong)) {
+  --fact-value-size: clamp(1.1rem, 16cqw, 2.2rem);
 }
 :is(html[data-theme]) .fact-list:has(> .fact:nth-child(2)):has(.fact__value--strong) {
   --fact-value-size-strong: clamp(1.15rem, 18cqw, 2.8rem);
@@ -2845,6 +2896,10 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   color: var(--text-on-brand);
   font-weight: var(--weight-strong);
 }
+:is(html[data-theme]) .sidebar-link[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
 :is(html[data-theme]) .sidebar-link:focus-visible {
   outline: 2px solid var(--focus-ring-on-brand);
   outline-offset: -2px;
@@ -3005,10 +3060,20 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
     position: fixed;
   }
 }
+@media (prefers-reduced-motion: reduce) {
+:is(html[data-theme]) .sidebar-accordion,
+  :is(html[data-theme]) .sidebar-link,
+  :is(html[data-theme]) .sidebar-module-expand__chevron {
+    transition: none;
+  }
+}
 :is(html[data-theme]) .sidebar-accordion[hidden] {
   display: none;
 }
 @media (max-width: 840px) {
+:is(html[data-theme]) body.has-sidebar-open {
+    overflow: hidden;
+  }
 :is(html[data-theme]) .sidebar {
     height: 100dvh;
     left: 0;
@@ -3050,6 +3115,12 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
     max-height: none;
   }
 }
+@media (prefers-reduced-motion: reduce) {
+:is(html[data-theme]) .sidebar,
+  :is(html[data-theme]) .sidebar-scrim {
+    transition: none;
+  }
+}
 @media (max-width: 840px) {
 html[data-theme] .sidebar {
     height: 100dvh;
@@ -3087,4 +3158,12 @@ html[data-theme] .app-theme-grid__btn small {
   background: var(--surface-rail);
   --surface: var(--surface-rail);
   --surface-contrast: var(--surface-field);
+}
+:is(html[data-theme]) :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail) {
+  background: var(--surface-field);
+  --surface: var(--surface-field);
+  --surface-contrast: var(--surface-rail);
 }

@@ -15,10 +15,10 @@ uso médio das 43 rotas de 48,9% para 13,6% e deixava o gate do `NOVO-70` vermel
 
 As duas entregas leem chaves separadas do manifesto (`rule_ids`/`dom_classes` para
 a casca, `ui_rule_ids`/`ui_dom_classes` para o v2) de propósito: a captura do
-`PF-02` é um dado histórico de estados que não sei reproduzir um a um, e
-sobrescrevê-la com uma captura mais pobre PODARIA a casca. Enquanto a captura da
-casca não for refeita por inteiro, as duas convivem — um `--capture` completo
-grava as duas com o mesmo conteúdo.
+`PF-02` é um dado histórico — 629 das classes dela são marcação legada que não
+existe mais no DOM — e sobrescrevê-la aqui mudaria os 15 perfis de casca num PR
+que não é sobre eles. Enquanto a captura da casca não for refeita por inteiro, as
+duas convivem; um `--capture` completo grava as duas com o mesmo conteúdo.
 
 O manifesto guarda apenas hashes de regras observadas. As regras continuam
 editáveis nas fontes canônicas e os perfis preservam a ordem da cascata do
@@ -107,6 +107,12 @@ _INTERACTIVE_STATE = re.compile(
     r"|\.(?:is|has)-[\w-]+|\[(?:aria-(?:expanded|selected|pressed|checked)|open)="
 )
 _STATE_CLASS = re.compile(r"^(?:is|has)-")
+# `:is(...)`/`:where(...)` são ALTERNATIVAS, não conjunção. Extrair classe de
+# dentro deles e exigir todas junto reprova o seletor inteiro por causa de um
+# ramo que a família não usa — `:is(.picker, .destination-row, .field)
+# .search-picker__clear` some de uma tela que tem `.picker` só porque não tem
+# `.destination-row`. Para o critério de presença, o grupo vira coringa.
+_IS_WHERE = re.compile(r":(?:is|where)\((?:[^()]|\([^()]*\))*\)")
 _IMPORT = re.compile(r'@import\s+url\(["\']?([^"\')]+)["\']?\)\s*;')
 
 def _serialized(rule) -> str:
@@ -188,16 +194,36 @@ def _token_rule_ids(rules) -> set[str]:
 
 
 def _with_dom_families(
-    rules, selected: set[str], dom_classes: set[str]
+    rules, selected: set[str], dom_classes: set[str], *, incluir_base: bool = False
 ) -> set[str]:
+    """Acrescenta ao medido o que a cobertura do CDP não sabe ver.
+
+    `incluir_base` troca o critério de "o CDP viu casar" por "a família tem essas
+    classes no DOM". É o que o v2 usa, e existe porque a cobertura não enxerga
+    estado que o próprio CSS esconde: `li.file-picker__row` nasce `display:none`
+    por regra, não por atributo, então `--reveal` não o descobre e o podador
+    apagava a família inteira do `file-picker` — 39 elementos por tema, medidos.
+    A casca continua no critério antigo: o manifesto dela é a captura do PF-02, e
+    trocar o critério mudaria os 15 perfis num PR que não é sobre eles.
+    """
     qualified = list(_qualified_rules(rules))
     result = set(selected)
     for rule in qualified:
         selector = _selector(rule)
         classes = set(_CLASS.findall(selector))
+        fonte_de_classes = (
+            _IS_WHERE.sub(" ", selector) if incluir_base else selector
+        )
         structural_classes = {
-            class_name for class_name in classes if not _STATE_CLASS.match(class_name)
+            class_name
+            for class_name in _CLASS.findall(fonte_de_classes)
+            if not _STATE_CLASS.match(class_name)
         }
+        if incluir_base and not structural_classes and classes:
+            # Seletor cujas classes vivem TODAS dentro de um `:is(...)`. Sem nada
+            # fora do grupo não há o que conferir; entra, que é o lado seguro.
+            result.add(_rule_id(rule))
+            continue
         # Regras normais presentes no DOM ja entram pelos fragmentos medidos do
         # manifesto. A expansao por familia existe somente para estados que o
         # CDP nao casa sem interacao (hover/focus/checked etc.). Classes de
@@ -206,7 +232,7 @@ def _with_dom_families(
         if (
             structural_classes
             and structural_classes.issubset(dom_classes)
-            and _INTERACTIVE_STATE.search(selector)
+            and (incluir_base or _INTERACTIVE_STATE.search(selector))
         ):
             result.add(_rule_id(rule))
         elif _INTERACTIVE_STATE.search(selector) and not classes and re.search(
@@ -343,7 +369,13 @@ def _render_rules(rules, selected: set[str], used_keyframes: set[str]) -> str:
     return "\n".join(chunks)
 
 
-def _podar(source_name: str, rule_ids: list[str], dom_classes: set[str]) -> str:
+def _podar(
+    source_name: str,
+    rule_ids: list[str],
+    dom_classes: set[str],
+    *,
+    incluir_base: bool = False,
+) -> str:
     """Corpo do perfil: as regras casadas, mais o que a cobertura não enxerga.
 
     O que entra além do medido, e por quê, está em `_token_rule_ids` (tema) e
@@ -354,7 +386,10 @@ def _podar(source_name: str, rule_ids: list[str], dom_classes: set[str]) -> str:
         _expanded_source(source_name), skip_comments=True, skip_whitespace=True
     )
     selected = _with_dom_families(
-        rules, set(rule_ids) | _token_rule_ids(rules), dom_classes
+        rules,
+        set(rule_ids) | _token_rule_ids(rules),
+        dom_classes,
+        incluir_base=incluir_base,
     )
     selected_css = "\n".join(
         _serialized(rule)
@@ -382,6 +417,7 @@ def build(manifest: dict) -> dict[Path, str]:
             UI_SOURCE,
             config.get("ui_rule_ids", []),
             set(config.get("ui_dom_classes", config.get("dom_classes", []))),
+            incluir_base=True,
         )
         outputs[OUTPUT_DIR / f"{profile}.ui.css"] = banner + ui_body + "\n"
     return outputs

@@ -220,6 +220,11 @@
     padding: 14px;
   }
 }
+@media (prefers-reduced-motion: reduce) {
+:is(html[data-theme]) .skip-link {
+    transition: none;
+  }
+}
 :is(html[data-theme="dark"]) .skip-link {
   background: var(--color-surface-strong);
   border: 1px solid var(--color-border-strong);
@@ -317,6 +322,11 @@
     transform: rotate(360deg);
   }
 }
+@media (prefers-reduced-motion: reduce) {
+:is(html[data-theme]) .document-loading__spinner {
+    animation-duration: 1.8s;
+  }
+}
 :is(html[data-theme]) .button {
   align-items: center;
   background: var(--surface-field);
@@ -370,6 +380,10 @@
   min-height: var(--control-height-sm);
   padding: 0 10px;
 }
+:is(html[data-theme]) .button--sm .button__icon svg {
+  height: 14px;
+  width: 14px;
+}
 :is(html[data-theme]) .button__icon {
   align-items: center;
   display: inline-flex;
@@ -418,6 +432,20 @@
   min-height: var(--control-height);
   padding: var(--pad-field);
   width: 100%;
+}
+:where(.cv-field__control) {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  min-height: var(--control-height-md);
+  padding: 0 var(--space-3);
+}
+:where(.cv-field__control--textarea) {
+  min-height: var(--text-area-height-md);
+  padding-bottom: var(--space-3);
+  padding-top: var(--space-3);
+  resize: vertical;
 }
 :is(html[data-theme]) .field {
   display: grid;
@@ -663,6 +691,9 @@
   gap: var(--gap);
   min-width: 0;
 }
+:is(html[data-theme]) .form-block--v2 > .form-block__body:has(> *):not(:has(> :not([hidden]))) {
+  display: none;
+}
 :is(html[data-theme]) .form-block--v2.form-block--split {
   --split-label: 200px;
 
@@ -750,9 +781,15 @@
 :is(html[data-theme]) .header + .rail {
   border-radius: 0 0 var(--radius-rail) var(--radius-rail);
 }
+:is(html[data-theme]) :is(.form-page, .list-page) > .header + .rail {
+  border-top: 0;
+}
 :is(html[data-theme]) .rail {
   display: grid;
   gap: var(--gap);
+}
+:is(html[data-theme]) .rail__controls > .button:last-child {
+  margin-left: auto;
 }
 :root {
   
@@ -811,10 +848,39 @@ html[data-theme="dark"] {
   gap: var(--space-2);
   min-width: 0;
 }
+:is(html[data-theme])
+  :is(.search-picker__option:first-child, .search-picker__option:last-child) {
+  border-radius: 10px;
+}
 html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .date-picker__popover) {
   background: var(--color-surface-elevated);
   border: 1px solid var(--color-border-strong);
   box-shadow: var(--shadow-elevated);
+}
+html[data-theme="dark"] :is(.custom-select__option:hover, .custom-select__option--focused, .search-picker__option:hover, .search-picker__option--active) {
+  background: var(--color-surface-soft);
+}
+html[data-theme="dark"] :is(.custom-select__option--selected, .search-picker__option--selected) {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-hover);
+  color: var(--color-white);
+}
+html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-select__option--selected.custom-select__option--focused, .search-picker__option--selected:hover) {
+  background: color-mix(in srgb, var(--color-primary-hover) 35%, var(--color-primary-dark));
+  border-color: var(--color-primary-hover);
+  color: var(--color-white);
+}
+:is(html[data-theme="dark"])
+
+:is(html[data-theme="dark"])
+
+:is(html[data-theme="dark"])
+  .search-picker__dropdown {
+  background: var(--color-surface-strong);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(2, 9, 16, 0.48);
+  padding: 6px;
 }
 :is(html[data-theme]) .custom-select__menu--v2,
 :is(html[data-theme]) .custom-select__menu--v2.floating-dropdown--active,
@@ -925,6 +991,111 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   flex: none;
   gap: var(--gap-tight);
 }
+:is(html[data-theme]) :is(.prestacao-card__facts, .oficio-card__facts, .evento-card__docs) .form-block--v2 {
+  grid-column: auto;
+}
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block) > .form-block__header {
+  align-items: flex-start;
+  gap: 12px;
+}
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block) .form-block__description {
+  text-align: left;
+}
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block).form-block--split {
+  align-items: center;
+  gap: 16px;
+  grid-template-columns: minmax(148px, 0.62fr) minmax(0, 2.1fr);
+}
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block).form-block--split > .form-block__body {
+  align-self: center;
+}
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) :is(
+    .search-picker,
+    .search-picker--people,
+    .search-picker--people.search-picker--roster,
+    .search-picker--vehicle
+  ) {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none !important;
+  gap: 10px;
+  padding: 0 !important;
+}
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .search-picker__selected-panel {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  gap: 8px;
+  padding: 0 !important;
+}
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .search-picker__selected-empty {
+  border-radius: 10px;
+}
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .search-picker__selected-empty {
+  background: var(--step1-empty, var(--surface-contrast, var(--surface-field))) !important;
+  border: 0 !important;
+  color: var(--color-muted);
+  padding: 12px 14px !important;
+  text-align: left;
+}
+@media (max-width: 900px) {
+:is(html[data-theme])
+    :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block).form-block--split {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+:is(html[data-theme])
+  [data-travel-document-wizard-documentos]
+  :is(
+    .summary-item:not(.oficio-documentos-route-trecho-scroll-item),
+    .oficio-documentos-fact,
+    .oficio-documentos-traveller-tile:not(.oficio-documentos-traveller-tile--motorista),
+    .oficio-documentos-traveller-line:not(.oficio-documentos-traveller-line--motorista),
+    .oficio-documentos-vehicle-executive__driver,
+    .document-inline-card,
+    .oficio-documentos-route-card__diarias-subblock,
+    .oficio-documentos-route-card__fallback-fact,
+    .oficio-documentos-route-card__trecho
+  ) {
+  border-radius: 10px;
+}
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  #sec-mapa-rota > .form-block__header {
+  display: none !important;
+}
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] :is(.roteiro-editor__empty, .summary-item) {
+  background: var(--step1-field, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
+  border-color: transparent;
+  box-shadow: none;
+}
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-documentos]
+  :is(
+    .summary-item:not(.oficio-documentos-route-trecho-scroll-item),
+    .oficio-documentos-fact,
+    .oficio-documentos-traveller-tile:not(.oficio-documentos-traveller-tile--motorista),
+    .oficio-documentos-traveller-line:not(.oficio-documentos-traveller-line--motorista),
+    .oficio-documentos-vehicle-executive__driver,
+    .document-inline-card,
+    .oficio-documentos-route-card__diarias-subblock,
+    .oficio-documentos-route-card__fallback-fact,
+    .oficio-documentos-route-card__trecho
+  ) {
+  background: var(--step1-field, var(--color-input-bg)) !important;
+  border-color: transparent !important;
+}
 :is(html[data-theme]) .icon-button {
   align-items: center;
   
@@ -999,6 +1170,9 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   position: relative;
   text-align: center;
 }
+:is(html[data-theme]) .stepper__item[data-state="current"] {
+  color: var(--text-strong);
+}
 :is(html[data-theme]) .stepper__item::before {
   background: var(--line);
   border-radius: var(--radius-pill);
@@ -1042,6 +1216,12 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   height: 14px;
   width: 14px;
 }
+:is(html[data-theme]) .stepper__item[data-state="current"] .stepper__marker {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--text-on-accent);
+}
 :is(html[data-theme]) .stepper__copy {
   display: grid;
   gap: 1px;
@@ -1051,6 +1231,10 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   font-size: var(--text-size-micro);
   font-weight: var(--weight-normal);
   line-height: 1.35;
+}
+:is(html[data-theme]) .stepper__item[data-state="current"] .stepper__label {
+  color: var(--text-strong);
+  font-weight: var(--weight-strong);
 }
 :is(html[data-theme]) .stepper__status {
   clip-path: inset(50%);
@@ -1109,15 +1293,9 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
 :is(html[data-theme]) .wizard-sticky-scope > .rail {
   transition: border-radius var(--ease);
 }
-:is(html[data-theme]) .wizard-page > .header.is-detached,
-:is(html[data-theme]) .wizard-sticky-scope > .header.is-detached {
-  border-bottom-left-radius: var(--radius-brand);
-  border-bottom-right-radius: var(--radius-brand);
-}
-:is(html[data-theme]) .wizard-page > .rail.is-detached,
-:is(html[data-theme]) .wizard-sticky-scope > .rail.is-detached {
-  border-top-left-radius: var(--radius-rail);
-  border-top-right-radius: var(--radius-rail);
+:is(html[data-theme]) .is-dragging-destination,
+:is(html[data-theme]) .is-dragging-destination * {
+  user-select: none;
 }
 :root {
   --sp-field-bg: var(--theme-input-bg, var(--color-input-bg));
@@ -1417,6 +1595,16 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   scrollbar-color: var(--field-border-hover) transparent;
   scrollbar-width: thin;
 }
+.search-picker__list::-webkit-scrollbar {
+  width: var(--space-1);
+}
+.search-picker__list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.search-picker__list::-webkit-scrollbar-thumb {
+  background: var(--field-border-hover);
+  border-radius: var(--radius-pill);
+}
 .search-picker__empty,
 .search-picker__selected-empty {
   background: var(--field-bg-soft);
@@ -1448,6 +1636,15 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   gap: var(--space-3);
   justify-content: space-between;
   min-width: 0;
+}
+.search-picker__selected-title {
+  color: var(--color-label);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-black);
+  letter-spacing: var(--letter-spacing-label);
+  line-height: 1.2;
+  margin: 0;
+  text-transform: uppercase;
 }
 .search-picker__selected-list {
   display: grid;
@@ -1542,6 +1739,15 @@ html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .dat
   border-radius: 0;
 }
 :is(html[data-theme])
+  :is(.app-form-label, .cv-field__label, .search-picker__label) {
+  color: var(--color-heading);
+  font-size: 0.78rem;
+  font-weight: var(--font-weight-black);
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-transform: none;
+}
+:is(html[data-theme])
   .search-picker__selected-list {
   gap: 8px;
   grid-template-columns: minmax(0, 1fr);
@@ -1626,6 +1832,9 @@ html[data-theme="dark"] :is(.search-picker__selected-panel, .search-picker__sele
   color: var(--text-strong);
   font: inherit;
 }
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__control:focus-within {
+  border-color: var(--focus-ring);
+}
 :is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__input {
   background: none;
   border: 0;
@@ -1679,6 +1888,9 @@ html[data-theme="dark"] :is(.search-picker__selected-panel, .search-picker__sele
   cursor: pointer;
   display: none;
   flex: none;
+}
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__clear[hidden] {
+  display: none;
 }
 :is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-panel {
   
@@ -1801,11 +2013,19 @@ html[data-theme="dark"] :is(.search-picker__selected-panel, .search-picker__sele
 :is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-main {
   flex: 1 1 auto;
 }
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove:hover {
+  color: var(--danger);
+}
 :is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove,
 :is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove:hover,
 :is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove:active,
 :is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove:focus:not(:focus-visible) {
   outline: none !important;
+}
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove:focus-visible {
+  border-radius: var(--radius-pill);
+  outline: 2px solid var(--focus-ring) !important;
+  outline-offset: 2px;
 }
 :is(html[data-theme]) .picker .search-picker--detailed,
 :is(html[data-theme]) .picker .search-picker--people.search-picker--roster,
@@ -1849,6 +2069,9 @@ html[data-theme="dark"] :is(.search-picker__selected-panel, .search-picker__sele
 :is(html[data-theme]) .picker .search-picker {
   gap: var(--gap-tight);
 }
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-list:empty {
+  display: none;
+}
 :is(html[data-theme]) .picker .search-picker__field,
 :is(html[data-theme]) .picker .search-picker--people.search-picker--roster .search-picker__field,
 :is(html[data-theme]) .picker .search-picker--detailed .search-picker__field {
@@ -1876,6 +2099,22 @@ html[data-theme="dark"] {
 }
 html[data-theme="light"] {
   --date-picker-selected-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
+}
+html[data-theme="dark"] :is(.date-picker__panel, .popover) {
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+  box-shadow: var(--shadow-elevated);
+}
+:is(html[data-theme="dark"])
+  :is(.card, .app-card, .module-card, .document-card) {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-xs);
+}
+:is(html[data-theme="dark"])
+  :is(.card, .app-card, .module-card, .document-card):hover {
+  box-shadow: var(--shadow-sm);
 }
 :is(html[data-theme]) .form-page__form {
   display: grid;
@@ -2085,6 +2324,10 @@ html[data-theme="light"] {
   color: var(--text-on-brand);
   font-weight: var(--weight-strong);
 }
+:is(html[data-theme]) .sidebar-link[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
 :is(html[data-theme]) .sidebar-link:focus-visible {
   outline: 2px solid var(--focus-ring-on-brand);
   outline-offset: -2px;
@@ -2245,10 +2488,20 @@ html[data-theme="light"] {
     position: fixed;
   }
 }
+@media (prefers-reduced-motion: reduce) {
+:is(html[data-theme]) .sidebar-accordion,
+  :is(html[data-theme]) .sidebar-link,
+  :is(html[data-theme]) .sidebar-module-expand__chevron {
+    transition: none;
+  }
+}
 :is(html[data-theme]) .sidebar-accordion[hidden] {
   display: none;
 }
 @media (max-width: 840px) {
+:is(html[data-theme]) body.has-sidebar-open {
+    overflow: hidden;
+  }
 :is(html[data-theme]) .sidebar {
     height: 100dvh;
     left: 0;
@@ -2290,6 +2543,12 @@ html[data-theme="light"] {
     max-height: none;
   }
 }
+@media (prefers-reduced-motion: reduce) {
+:is(html[data-theme]) .sidebar,
+  :is(html[data-theme]) .sidebar-scrim {
+    transition: none;
+  }
+}
 @media (max-width: 840px) {
 html[data-theme] .sidebar {
     height: 100dvh;
@@ -2316,6 +2575,21 @@ html[data-theme] .app-theme-grid__btn small {
   border: 1px solid var(--line);
 }
 :is(html[data-theme]) :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail) {
+  background: var(--surface-field);
+  --surface: var(--surface-field);
+  --surface-contrast: var(--surface-rail);
+}
+:is(html[data-theme]) :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail) {
+  background: var(--surface-rail);
+  --surface: var(--surface-rail);
+  --surface-contrast: var(--surface-field);
+}
+:is(html[data-theme]) :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail)
   :is(.panel, .form-block--v2, .record, .rail) {
   background: var(--surface-field);
   --surface: var(--surface-field);

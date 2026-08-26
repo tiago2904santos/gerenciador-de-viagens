@@ -149,10 +149,20 @@
 :is(html[data-theme]) .skip-link:focus {
   transform: translateY(0);
 }
+@media (prefers-reduced-motion: reduce) {
+:is(html[data-theme]) .skip-link {
+    transition: none;
+  }
+}
 :is(html[data-theme="dark"]) .skip-link {
   background: var(--color-surface-strong);
   border: 1px solid var(--color-border-strong);
   box-shadow: var(--shadow-md);
+  color: var(--color-heading);
+}
+:is(html[data-theme="dark"]) :is(.app-mobile-bar__toggle, .sidebar-drawer-close) {
+  background: var(--color-primary-soft);
+  border: 1px solid var(--color-border);
   color: var(--color-heading);
 }
 :is(html[data-theme]) .button {
@@ -215,6 +225,9 @@
   padding: var(--pad-field);
   width: 100%;
 }
+:is(html[data-theme]) .input__control::placeholder {
+  color: var(--text-muted);
+}
 :is(html[data-theme]) .input__control:focus-visible {
   border-color: var(--focus-ring);
   outline: none !important;
@@ -222,6 +235,20 @@
 :is(html[data-theme]) .input__control:disabled {
   cursor: not-allowed;
   opacity: 0.55;
+}
+:where(.cv-field__control) {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  min-height: var(--control-height-md);
+  padding: 0 var(--space-3);
+}
+:where(.cv-field__control--textarea) {
+  min-height: var(--text-area-height-md);
+  padding-bottom: var(--space-3);
+  padding-top: var(--space-3);
+  resize: vertical;
 }
 :is(html[data-theme]) .field {
   display: grid;
@@ -289,6 +316,83 @@ html[data-theme="dark"] {
   --cs-trigger-shadow: none;
   --cs-option-selected-color: var(--color-info-text);
 }
+:is(html[data-theme])
+  :is(.search-picker__option:first-child, .search-picker__option:last-child) {
+  border-radius: 10px;
+}
+html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .date-picker__popover) {
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--shadow-elevated);
+}
+html[data-theme="dark"] :is(.custom-select__option:hover, .custom-select__option--focused, .search-picker__option:hover, .search-picker__option--active) {
+  background: var(--color-surface-soft);
+}
+html[data-theme="dark"] :is(.custom-select__option--selected, .search-picker__option--selected) {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-hover);
+  color: var(--color-white);
+}
+html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-select__option--selected.custom-select__option--focused, .search-picker__option--selected:hover) {
+  background: color-mix(in srgb, var(--color-primary-hover) 35%, var(--color-primary-dark));
+  border-color: var(--color-primary-hover);
+  color: var(--color-white);
+}
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) :is(
+    .search-picker,
+    .search-picker--people,
+    .search-picker--people.search-picker--roster,
+    .search-picker--vehicle
+  ) {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none !important;
+  gap: 10px;
+  padding: 0 !important;
+}
+:is(html[data-theme])
+  [data-travel-document-wizard-documentos]
+  :is(
+    .summary-item:not(.oficio-documentos-route-trecho-scroll-item),
+    .oficio-documentos-fact,
+    .oficio-documentos-traveller-tile:not(.oficio-documentos-traveller-tile--motorista),
+    .oficio-documentos-traveller-line:not(.oficio-documentos-traveller-line--motorista),
+    .oficio-documentos-vehicle-executive__driver,
+    .document-inline-card,
+    .oficio-documentos-route-card__diarias-subblock,
+    .oficio-documentos-route-card__fallback-fact,
+    .oficio-documentos-route-card__trecho
+  ) {
+  border-radius: 10px;
+}
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] :is(.roteiro-editor__empty, .summary-item) {
+  background: var(--step1-field, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
+  border-color: transparent;
+  box-shadow: none;
+}
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-documentos]
+  :is(
+    .summary-item:not(.oficio-documentos-route-trecho-scroll-item),
+    .oficio-documentos-fact,
+    .oficio-documentos-traveller-tile:not(.oficio-documentos-traveller-tile--motorista),
+    .oficio-documentos-traveller-line:not(.oficio-documentos-traveller-line--motorista),
+    .oficio-documentos-vehicle-executive__driver,
+    .document-inline-card,
+    .oficio-documentos-route-card__diarias-subblock,
+    .oficio-documentos-route-card__fallback-fact,
+    .oficio-documentos-route-card__trecho
+  ) {
+  background: var(--step1-field, var(--color-input-bg)) !important;
+  border-color: transparent !important;
+}
+:is(html[data-theme]) .is-dragging-destination,
+:is(html[data-theme]) .is-dragging-destination * {
+  user-select: none;
+}
 :root {
   --sp-field-bg: var(--theme-input-bg, var(--color-input-bg));
   --sp-field-bg-soft: var(--theme-surface-card-soft, var(--color-card-soft));
@@ -303,6 +407,20 @@ html[data-theme="dark"] {
   --sp-selected-card-bg: var(--theme-surface-card, var(--color-card));
   --sp-selected-card-border: var(--theme-border-card, var(--color-border-soft));
 }
+:is(html[data-theme])
+  :is(.app-form-label, .cv-field__label, .search-picker__label) {
+  color: var(--color-heading);
+  font-size: 0.78rem;
+  font-weight: var(--font-weight-black);
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-transform: none;
+}
+html[data-theme="dark"] :is(.search-picker__selected-panel, .search-picker__selected-card) {
+  background: var(--color-surface-soft);
+  border-color: var(--color-border-strong);
+  box-shadow: none;
+}
 html {
   --date-picker-selected-bg-start: var(--stepper-active-bg, var(--color-accent));
   --date-picker-selected-bg-end: var(--stepper-active-bg, var(--color-accent));
@@ -316,6 +434,22 @@ html[data-theme="dark"] {
 }
 html[data-theme="light"] {
   --date-picker-selected-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
+}
+html[data-theme="dark"] :is(.date-picker__panel, .popover) {
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+  box-shadow: var(--shadow-elevated);
+}
+:is(html[data-theme="dark"])
+  :is(.card, .app-card, .module-card, .document-card) {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-xs);
+}
+:is(html[data-theme="dark"])
+  :is(.card, .app-card, .module-card, .document-card):hover {
+  box-shadow: var(--shadow-sm);
 }
 @font-face {
   font-family: "Great Vibes";
@@ -352,4 +486,36 @@ html[data-theme="light"] {
   src: url("../vendor/fonts/HerrVonMuellerhoff-Regular.ttf") format("truetype");
   font-weight: 400;
   font-display: swap;
+}
+@media (max-width: 840px) {
+:is(html[data-theme]) body.has-sidebar-open {
+    overflow: hidden;
+  }
+}
+:is(html[data-theme])
+  :is(.panel, .form-block--v2, .record, .rail):not(
+    :is(.panel, .form-block--v2, .record, .rail) *
+  ) {
+  border: 1px solid var(--line);
+}
+:is(html[data-theme]) :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail) {
+  background: var(--surface-field);
+  --surface: var(--surface-field);
+  --surface-contrast: var(--surface-rail);
+}
+:is(html[data-theme]) :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail) {
+  background: var(--surface-rail);
+  --surface: var(--surface-rail);
+  --surface-contrast: var(--surface-field);
+}
+:is(html[data-theme]) :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail) {
+  background: var(--surface-field);
+  --surface: var(--surface-field);
+  --surface-contrast: var(--surface-rail);
 }

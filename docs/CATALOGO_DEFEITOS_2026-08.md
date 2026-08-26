@@ -10922,8 +10922,9 @@ do jeito ingênuo teria dado tudo verde.
 Não substitui a conferência em tela — ela vê alinhamento, hierarquia e cor, que
 nenhuma medição pega. Cobre o que é medível, para a conferência humana não
 gastar rodada com o que uma consulta ao DOM responde. **Não foi ligada no CI**:
-precisa de servidor no ar e banco populado, e o único job que tem isso é o que
-está vermelho pelo `NOVO-20260820-171008-7afb74d82d2c`.
+precisa de servidor no ar e banco populado, e o único job que tem isso era o que
+estava vermelho pelo `NOVO-20260820-171008-7afb74d82d2c` (resolvido em
+26/08/2026 — ligar a régua nesse job voltou a ser possível).
 
 Depois: varredura limpa, 43 rotas × 2 temas, zero achados.
 
@@ -10934,7 +10935,7 @@ passada: são helpers exportados (o `_build_abas` está no `__all__` de
 `prestacoes_contas.views`) e há outra branch em voo no mesmo repositório.
 Apagá-los é limpeza própria, não ajuste de aparência.
 
-### NOVO-20260820-171008-7afb74d82d2c 🔴 ABERTO · `NOVO` O v2 entrega 517 KB de CSS em toda página: NOVO-70 e o aceite PF-02 ficam incompatíveis · FE/PERF · risco médio
+### NOVO-20260820-171008-7afb74d82d2c ✅ RESOLVIDO (26/08/2026) · `NOVO` O v2 entrega 517 KB de CSS em toda página: NOVO-70 e o aceite PF-02 ficam incompatíveis · FE/PERF · risco médio
 
 O `NOVO-70` mede quanto do CSS entregue numa rota é de fato usado, e é catraca:
 o uso só pode subir. Nas 43 rotas ele caiu de **48,9% em média para 12,9%** — o
@@ -10990,6 +10991,76 @@ comprimido e o arquivo é UM só, cacheado uma vez para o app inteiro, enquanto 
 perfis são um por família de rota. Pela métrica de regra não usada está muito
 pior; pelo custo de rede numa navegação de várias telas, não necessariamente. A
 métrica continua certa em apontar — o desperdício de parse e de bytes existe.
+
+---
+
+**RESOLVIDO em 26/08/2026 — o conserto foi o previsto acima: aplicar ao v2 o
+mesmo PF-02 que a casca já tinha.**
+
+`build_css_profiles.py` passou a emitir DUAS entregas por família —
+`<família>.css` (poda da casca, como antes) e `<família>.ui.css` (poda do
+`ui.bundle.css`) — e `base.html`/`login.html` pedem a segunda pelo
+`ui_css_profile_path`. O orçamento do `NOVO-12` continua fechado: dois `<link>`,
+não N. Rota sem perfil recebe o bundle inteiro, e `CSS_ROUTE_PROFILES_ENABLED=false`
+devolve os dois bundles. Família nova `login`, a única rota sem casca.
+
+| | antes | depois |
+|---|---:|---:|
+| uso médio das 43 rotas | 13,60% | **50,14%** |
+| pior rota | 4,22% (`login`) | **39,26%** (`justificativas-lista`) |
+| melhor rota | 20,81% | 60,02% (`oficios-detalhe`) |
+| CSS entregue somando as 43 rotas | 25,73 MB | **5,48 MB** |
+| `login` | 565 KB | 28 KB |
+
+Os dois lados fecham: o gate `NOVO-70` passa contra pisos regravados e o
+`test_todas_as_rotas_cumprem_o_aceite_pf02_de_35_por_cento` passa porque o menor
+piso é **38,26%**.
+
+**O caminho até aqui produziu três achados que valem mais que o número.**
+
+**1. Uma poda de captura única perde estilo, e não aparece em print.** A primeira
+versão deste perfil saiu de uma captura só (claro, 1440×900, nada revelado).
+Comparando estilo computado de 5.480 elementos por tema, perfil contra bundle:
+**994 elementos divergentes no claro e 1.065 no escuro**. Nenhum aparecia numa
+captura de tela de desktop, porque o que sumia estava escondido ali: a barra
+móvel, o `skip-link`, os painéis do acordeão da barra lateral, o spinner de
+carregamento. A conferência que pega isto é o diff de estilo computado, não o
+print.
+
+**2. `<dialog>` fechado é invisível para a cobertura do CDP.** Diálogo fechado é
+`display:none` no agente do usuário: nada dentro dele casa, e as famílias
+`modal__*` e `alert` eram podadas de TODA rota com diálogo — 240 elementos por
+tema depois de já ter multiestado de tema e viewport. `--reveal` passou a abrir
+`<dialog>` e `[popover]`; `show()` e não `showModal()`, porque sem prender foco
+nem criar backdrop dá para abrir todos os diálogos da página de uma vez.
+
+**3. Cobertura não é critério suficiente para podar — presença de classe é.**
+Sobrava `li.file-picker__row`, que nasce `display:none` **por regra CSS**, não por
+atributo: `--reveal` não o descobre, e a família inteira do `file-picker` era
+podada. O critério do v2 passou a ser "a família tem estas classes no DOM", e não
+"o CDP viu casar" (`_with_dom_families(..., incluir_base=True)`). Junto com isso,
+`:is(...)`/`:where(...)` deixou de ser tratado como conjunção — exigir todas as
+classes de `:is(.picker, .destination-row, .field) .search-picker__clear` reprovava
+o seletor numa tela que tem `.picker` só por não ter `.destination-row`.
+
+**Prova de que nada se perdeu:** estilo computado de 5.480 elementos, perfil
+contra bundle, em 10 rotas × 2 temas × 2 viewports (1440×900 e 390×844):
+**zero divergências**. E 40 pares de print (as mesmas 10 telas × 2 temas × 2
+viewports): pior diferença de **2 pixels**.
+
+**A catraca andou nos dois sentidos, e isso precisa estar dito.** Dos 43 pisos,
+**20 subiram e 23 baixaram**; a média ficou em 49,14% contra 48,92%. Baixar piso
+é enfraquecer catraca, e a razão é medível: o perfil correto carrega regra de
+estado que a medição — um retrato estático, um tema, sem interação — nunca vê
+casar. O maior recuo é o `login` (56,31% → 38,78%), que entrega 28 KB dos quais
+3,3 KB são `@font-face` que a cobertura do CDP nunca marca como usada: a 28 KB
+esses 3,3 KB sozinhos custam 12 pontos percentuais. Nenhum piso ficou abaixo de
+35%, e cada piso é `min(3 medições) − 1,0 pp` — a margem existe porque medições
+repetidas variam até 0,55 pp entre si.
+
+**O que este PR NÃO fez:** a captura da casca continua sendo a do PF-02, byte a
+byte (`cmp` confere que os 15 perfis de casca saem idênticos). Ela envelheceu, e
+os achados estão em `NOVO-20260826-124840-50a3e47836ae`.
 
 ### NOVO-20260820-205803-34867022900a ✅ RESOLVIDO · `NOVO` `pages/oficios.css` não era carregada por página nenhuma, e a família que ela vestia ficou sem base · UI-04 · 0,5 d
 
@@ -11081,7 +11152,7 @@ dívida voltar inteira sem CI vermelho:
 Nenhum dos dois números é conquista deste PR: os dois já estavam pagos e sem trava. O que muda é
 que agora regridem em vermelho.
 
-### NOVO-20260820-211943-6a686a695549 🔴 ABERTO · `NOVO` Os perfis de CSS por rota podam o tema escuro inteiro: 42 rotas servem tokens claros com `data-theme="dark"` · PF-02 / UI-02 · **risco alto — atinge produção**
+### NOVO-20260820-211943-6a686a695549 ✅ RESOLVIDO (20/08/2026, reconferido em 26/08) · `NOVO` Os perfis de CSS por rota podam o tema escuro inteiro: 42 rotas servem tokens claros com `data-theme="dark"` · PF-02 / UI-02 · **risco alto — atinge produção**
 
 O `PF-02` fechou o empacotamento com 15 perfis determinísticos por família de rota
 (`scripts/build_css_profiles.py`), servidos no lugar do `shell.bundle.css` pelo
@@ -11128,6 +11199,58 @@ lê-la — e no tema claro ninguém lia a versão escura.
 Encosta no `NOVO-20260820-171008-7afb74d82d2c`: a decisão de estender os perfis ao `ui.bundle.css`
 não deve sair antes deste conserto, ou o mesmo corte de tema atingiria também o v2 — hoje o v2
 escapa só porque `ui.bundle.css` não passa pelo podador.
+
+**Fechado por `3a857de`, sob outro ID.** A correção saiu na mesma noite dentro do
+`NOVO-20260820-212014-104180cf2901` (o quarto item daquele commit) e é a saída 2
+desta linha: `_token_rule_ids` põe toda regra de RAIZ (`:root`, `html`,
+`html[data-theme=…]`, inclusive embrulhada em `:is(...)`) no perfil sem passar
+pela cobertura. Esta entrada é a mesma queixa aberta em paralelo e ficou
+vermelha por esquecimento, não por dívida.
+
+**Reconferido em 26/08/2026**, porque o `NOVO-20260820-171008-7afb74d82d2c`
+dependia disto: estilo computado de 5.480 elementos por tema, perfil contra
+bundle, nas duas larguras — zero divergências no escuro. A ressalva da
+sequência caiu junto: o v2 já passa pelo podador, e passa com o tema inteiro.
+
+### NOVO-20260826-124840-50a3e47836ae 🟡 ABERTO · `NOVO` O manifesto de perfis do PF-02 envelheceu: 90% dos `rule_ids` da casca já não existem, e `oficio-new` é perfil fantasma · PF-02 · risco baixo
+
+Levantado ao estender os perfis ao v2 (`NOVO-20260820-171008-7afb74d82d2c`), que
+leu o manifesto de perto sem mexer nele. Três coisas, todas na parte da CASCA:
+
+**1. Os `rule_ids` gravados não batem mais com as fontes.** O manifesto guarda o
+sha256 do texto SERIALIZADO de cada regra que casou na captura; editar a regra
+muda o hash. Contando quantos `rule_ids` de cada perfil ainda existem em
+`shell.bundle.css`/`shell.form-components.bundle.css` de hoje:
+
+| perfil | `rule_ids` órfãos |
+|---|---|
+| `dashboard` | 175 de 196 |
+| `entity-lists` | 481 de 511 |
+| `oficio-core` | 544 de 579 |
+| (os outros 12) | mesma ordem de grandeza |
+
+**Não quebra tela hoje, e é importante dizer por quê:** a poda da casca é rasa. O
+`shell.bundle.css` tem 102 blocos e o perfil sai com quase tudo, porque
+`_token_rule_ids` (regra de raiz) e `_with_dom_families` (estado interativo)
+seguram o grosso independentemente dos hashes. O manifesto virou, na prática,
+uma lista de dados mortos — e é exatamente por isso que ninguém percebeu.
+
+**2. `oficio-new` é perfil fantasma.** `oficios:novo` responde GET com
+`redirect("oficios:index")` (`oficios/list_views.py:135`), e `oficios:index` mapeia
+para `entity-lists`. Nenhuma requisição serve `profiles/oficio-new.css`. A rota
+canônica `oficios-novo` mede a lista: `oficios-lista` e `oficios-novo` dão o
+mesmo número em toda medição.
+
+**3. O `source` gravado para `oficio-new` já não é o que a rota entrega.** O
+manifesto diz `shell.bundle.css`; a página que a rota realmente mostra
+(`templates/oficios/index.html`) carrega a variante com componentes de
+formulário. `capture()` avisa e não corrige.
+
+**O conserto é uma recaptura completa da casca** — o mesmo multiestado que o v2
+passou a usar (2 temas × 2 viewports × com e sem `--reveal`), com os perfis
+regravados e a paridade de estilo computado reconferida nos dois temas. Ficou de
+fora do PR do v2 de propósito: mexer nos 15 perfis de casca é outra etapa, e
+misturar as duas tornaria impossível provar que a casca não mudou.
 
 ### NOVO-20260821-172128-3ad8129911ce ✅ RESOLVIDO · `NOVO` Headers de página voltaram a exibir selos de estado · HT/UI · risco baixo
 
