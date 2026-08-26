@@ -67,6 +67,15 @@ class ModelosDeTextoRTTests(TestCase):
         self.assertLess(quick_add, abas)
         self.assertLess(abas, lista)
 
+    def test_busca_ocupa_a_largura_do_rail(self):
+        response = self.client.get(reverse("prestacoes_contas:modelos_index"))
+
+        self.assertContains(
+            response,
+            'class="rail__form" role="search" data-server-filter-form',
+            count=1,
+        )
+
     def test_topico_ativo_usa_lista_simples_sem_form_block_proprio(self):
         self._criar()
         response = self.client.get(reverse("prestacoes_contas:modelos_index"))

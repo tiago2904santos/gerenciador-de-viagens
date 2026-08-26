@@ -111,6 +111,9 @@ jobs:
               python -m pip install -r requirements/lock.txt --quiet
               systemctl restart gerenciador-viagens
               systemctl restart gerenciador-viagens-celery
+              # Pode não existir ainda: a falha é capaz de acontecer antes do
+              # passo que provisiona a unit. Reverter não pode morrer por isso.
+              systemctl restart gerenciador-viagens-celery-drive 2>/dev/null || true
 
               if [ "$rollback" -ne 0 ]; then
                 echo "código revertido, mas o BANCO continua adiante dele — leia a instrução acima."
@@ -145,8 +148,47 @@ jobs:
             # o health check.
             python manage.py collectstatic --noinput --clear
             python manage.py migrate --noinput
+
+            # Fila própria do Drive (NOVO-20260826-121500-6bdb9b6c4e27). A partir
+            # deste commit as tarefas do Google Drive são roteadas para
+            # CELERY_DRIVE_QUEUE; sem um worker consumindo essa fila elas ficariam
+            # paradas no Redis, em silêncio. Provisionado aqui, e não à mão, para
+            # que o deploy que introduz a rota já entregue o consumidor dela.
+            # O worker principal não muda: sem `-Q` ele consome a fila padrão,
+            # que continua sendo a da geração documental.
+            DRIVE_QUEUE="${CELERY_DRIVE_QUEUE:-drive}"
+            DRIVE_UNIT=/etc/systemd/system/gerenciador-viagens-celery-drive.service
+            DRIVE_UNIT_NOVA="$(mktemp)"
+            # `printf` e não heredoc: o script inteiro é um bloco YAML indentado,
+            # e o terminador de heredoc precisaria estar na coluna zero.
+            printf '%s\n' \
+              '[Unit]' \
+              'Description=Gerenciador de Viagens - Celery worker (Google Drive)' \
+              'After=network.target redis-server.service' \
+              '' \
+              '[Service]' \
+              'User=viagens' \
+              'Group=viagens' \
+              'WorkingDirectory=/var/www/gerenciador-viagens/app' \
+              'EnvironmentFile=/var/www/gerenciador-viagens/app/.env' \
+              'Environment="DJANGO_SETTINGS_MODULE=config.settings.prod"' \
+              "ExecStart=/var/www/gerenciador-viagens/venv/bin/celery -A config worker --loglevel=info --hostname=drive@%%h --queues=${DRIVE_QUEUE} --concurrency=1 --logfile=/var/www/gerenciador-viagens/logs/celery-drive.log" \
+              'Restart=always' \
+              'RestartSec=5' \
+              '' \
+              '[Install]' \
+              'WantedBy=multi-user.target' \
+              > "$DRIVE_UNIT_NOVA"
+            if ! cmp -s "$DRIVE_UNIT_NOVA" "$DRIVE_UNIT"; then
+              install -m 0644 "$DRIVE_UNIT_NOVA" "$DRIVE_UNIT"
+              systemctl daemon-reload
+            fi
+            rm -f "$DRIVE_UNIT_NOVA"
+
             systemctl restart gerenciador-viagens
             systemctl restart gerenciador-viagens-celery
+            systemctl enable --now gerenciador-viagens-celery-drive
+            systemctl restart gerenciador-viagens-celery-drive
 
             # Health check pelo mesmo caminho por onde o Nginx fala com o app:
             # gunicorn escuta em socket unix (config/settings/prod.py), o Host
