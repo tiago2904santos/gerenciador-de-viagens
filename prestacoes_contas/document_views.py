@@ -227,8 +227,7 @@ def documentos_servidor(request, ps_pk):
             # metadados de cabeçalho (H-02).
             **contexto_do_fluxo(ps, "documentos"),
             "back_url": reverse("prestacoes_contas:index"),
-            # A etapa anterior é o RT desde a inversão de 2026-08-28 (diário → RT → documentos).
-            "rt_url": reverse("prestacoes_contas:rt_servidor", args=[ps.pk]),
+            "diario_url": reverse("prestacoes_contas:diario_servidor", args=[ps.pk]),
             "consolidado_url": reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk]),
         },
     )

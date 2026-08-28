@@ -87,7 +87,7 @@ def diario_criar(request, pc_pk):
 
 
 def diario_servidor(request, ps_pk):
-    """Etapa 1 do wizard: diário compartilhado; navegação por servidor."""
+    """Etapa 2 do wizard: diário compartilhado; navegação por servidor."""
     ps = _prestacao_servidor_full(ps_pk)
     prestacao = ps.prestacao
 

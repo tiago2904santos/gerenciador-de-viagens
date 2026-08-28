@@ -11166,6 +11166,16 @@ e reprovaram cada um com a ordem errada por extenso na mensagem. E um teste
 existente (`test_lista_exibe_uploads_assinados_conforme_o_papel`) travava a ordem
 **errada** — foi corrigido, não apagado, com o motivo na linha.
 
+**As etapas do wizard entraram junto.** Poucas horas antes, `90ccdee`
+(`NOVO-20260828-101500-3c7a5d19e4b2`) tinha invertido as etapas para diário →
+RT, com a justificativa de que o pacote final já montava nessa ordem e o wizard
+era o único fora. A observação sobre o código estava certa; a conclusão, não —
+quem estava invertido era o pacote. Com a ordem canônica definida pelo dono, o
+`90ccdee` foi revertido e as etapas voltaram a RT (Etapa 1) → Diário (Etapa 2),
+junto com os três rodapés, o `aria-label` do botão de editar do card e a
+descrição do pacote final. Preencher e entregar seguem a MESMA ordem; era isso
+que aquela linha buscava, e é o que se mantém — no sentido certo.
+
 **O que NÃO mudou:** os nomes dos arquivos no Drive (`integracoes/google_drive/naming.py`)
 não têm prefixo de ordem, e a pasta do Drive não impõe sequência — não há o que
 ordenar lá. `PrestacaoDocumentoAnexo.TIPO_CHOICES` também ficou como está: é
@@ -12166,3 +12176,20 @@ Dois testes travavam a ordem antiga e foram reescritos para a nova:
 `tests.test_rodape_do_rt_nao_exibe_botao_salvar_texto` e
 `test_componentes_v2.test_rodape_do_diario_nao_repete_downloads_da_pre_visualizacao`.
 Suíte completa: **2.755 testes verdes** (64s, `--parallel 4`).
+
+**REVERTIDO em 28/08/2026, por decisão do dono.** A premissa desta linha era que
+"o pacote final sempre empilhou diário → RT" e que só o wizard divergia. A
+premissa estava certa sobre o código e **errada sobre a intenção**: perguntado
+diretamente, o dono definiu a ordem canônica dos cinco documentos como **ofício,
+despacho, RT, DB, comprovante**. Ou seja, quem estava invertido era o pacote, não
+o wizard.
+
+O conserto completo está em `NOVO-20260828-185303-995fcc0f4b5c`: o pacote, o
+seletor de download e os dois modais passaram para RT antes do DB, e as etapas
+desta linha voltaram a RT (Etapa 1) → Diário (Etapa 2). O `git revert` de
+`90ccdee` cobriu as etapas; os rodapés, o `aria-label` do card e a descrição do
+pacote final acompanham.
+
+Fica registrado porque a lição não é sobre este par de documentos: uma ordem
+observada no código não é evidência da ordem desejada, e as duas discordavam
+havia tempo em quatro lugares diferentes.

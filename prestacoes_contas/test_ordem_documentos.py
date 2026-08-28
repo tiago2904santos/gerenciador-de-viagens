@@ -157,3 +157,30 @@ class OrdemDosDocumentosTests(TestCase):
             [kind["key"] for kind in response.context["attach_kinds"]],
             ["oficio", "despacho", "rt", "diario", "comprovante"],
         )
+
+    def test_o_wizard_preenche_na_mesma_ordem_em_que_o_pacote_entrega(self):
+        """RT (Etapa 1) antes do Diário (Etapa 2), como os documentos saem.
+
+        Em 28/08/2026 as etapas foram invertidas para diário → RT
+        (`90ccdee`, `NOVO-20260828-101500-3c7a5d19e4b2`) pelo argumento de que o
+        pacote final já montava assim e o wizard era o único fora de linha. A
+        observação sobre o código estava certa e a conclusão invertida: com a
+        ordem canônica definida, quem estava errado era o pacote. Este teste
+        prende os dois lados juntos para não haver uma terceira rodada.
+        """
+        from .view_common import _build_prestacao_steps
+
+        etapas = _build_prestacao_steps(self.ps, "rt")
+
+        self.assertEqual(
+            [(etapa["step_label"], etapa["title"]) for etapa in etapas],
+            [
+                ("Etapa 1", "Relatório Técnico"),
+                ("Etapa 2", "Diário de Bordo"),
+                ("Etapa 3", "Documentos"),
+                ("Etapa 4", "PDF Final"),
+            ],
+        )
+        # O par RT/DB do wizard é o MESMO par da ordem canônica dos documentos.
+        canonica = [item for item in ORDEM_DOCUMENTOS if item in {"rt", "diario"}]
+        self.assertEqual(canonica, ["rt", "diario"])
