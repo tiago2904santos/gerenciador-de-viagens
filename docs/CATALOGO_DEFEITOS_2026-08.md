@@ -11129,6 +11129,49 @@ Encosta no `NOVO-20260820-171008-7afb74d82d2c`: a decisão de estender os perfis
 não deve sair antes deste conserto, ou o mesmo corte de tema atingiria também o v2 — hoje o v2
 escapa só porque `ui.bundle.css` não passa pelo podador.
 
+### NOVO-20260828-185303-995fcc0f4b5c ✅ RESOLVIDO (28/08/2026) · `NOVO` Os cinco documentos da prestação saíam em quatro ordens diferentes · HT/BE · risco baixo
+
+A ordem correta é a que a etapa Documentos sempre desenhou na tela: **ofício,
+despacho, RT, DB, comprovante** — o bloco do ofício com os dois primeiros
+(`_docs_despacho_body.html`), o bloco do servidor com os três últimos
+(`_docs_anexos_servidor_body.html`).
+
+Nenhum outro lugar seguia essa ordem, e nenhum seguia o outro:
+
+| onde | ordem que entregava |
+|---|---|
+| etapa Documentos, botões do modal (`document_views.py`) | despacho, **ofício**, RT, DB, comprovante |
+| cartão da lista, botões do MESMO modal (`presenters.py`) | ofício, despacho, **DB, RT**, comprovante |
+| seletor de download (`payload_downloads`) | ofício, despacho, **DB, RT**, comprovante |
+| PDF juntado dos originais (`_originais`) | ofício, **DB, RT** |
+| PDF juntado dos assinados (`compilar_download`) | **a ordem da query string** |
+
+Os dois primeiros doem mais do que parece: o modal de anexo é **um só**, e a
+lista de botões vem de quem o abriu. A mesma pessoa via a ordem mudar conforme
+tivesse aberto pela etapa ou pelo cartão. O último é pior: `itens` chega na
+ordem em que o JS montou as caixas, e ia direto para o `_merge_pdf_parts` — o
+PDF juntado saía na ordem de clique.
+
+**Correção.** `download_services.ORDEM_DOCUMENTOS` é a sequência, num lugar só, e
+`em_ordem(ids)` reordena qualquer conjunto de chaves por ela. Os cinco
+consumidores passaram a derivar dela em vez de reescrever a lista à mão. Os
+geradores de original viraram um dicionário por chave (`GERADORES_ORIGINAIS`),
+que é o que permite montar o PDF na ordem canônica sem `if` em cascata —
+despacho e comprovante não estão lá porque não têm original: só existem
+assinados.
+
+**A inversão do `AGENTS.md` §4 pegou o que se esperava dela.** Os quatro cenários
+de `prestacoes_contas/test_ordem_documentos.py` foram escritos antes da correção
+e reprovaram cada um com a ordem errada por extenso na mensagem. E um teste
+existente (`test_lista_exibe_uploads_assinados_conforme_o_papel`) travava a ordem
+**errada** — foi corrigido, não apagado, com o motivo na linha.
+
+**O que NÃO mudou:** os nomes dos arquivos no Drive (`integracoes/google_drive/naming.py`)
+não têm prefixo de ordem, e a pasta do Drive não impõe sequência — não há o que
+ordenar lá. `PrestacaoDocumentoAnexo.TIPO_CHOICES` também ficou como está: é
+ordem de `<option>` em formulário interno, e mexer nela gera migração sem mudar
+nada que a pessoa veja.
+
 ### NOVO-20260821-172128-3ad8129911ce ✅ RESOLVIDO · `NOVO` Headers de página voltaram a exibir selos de estado · HT/UI · risco baixo
 
 O contrato de `NOVO-20260813-164208-774d64105a96` regrediu durante a migração para os componentes

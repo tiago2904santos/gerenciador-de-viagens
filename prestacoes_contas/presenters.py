@@ -321,16 +321,16 @@ def apresentar_prestacao_servidor_card(
                 despacho_assinado,
             ),
             (
-                "diario",
-                "Diário de bordo",
-                f"o diário de bordo do ofício {oficio.numero_formatado}",
-                servidor["diario_assinado"],
-            ),
-            (
                 "rt",
                 "Relatório técnico",
                 f"o relatório técnico de {servidor['name']}",
                 servidor["rt_assinado"],
+            ),
+            (
+                "diario",
+                "Diário de bordo",
+                f"o diário de bordo do ofício {oficio.numero_formatado}",
+                servidor["diario_assinado"],
             ),
             (
                 "comprovante",

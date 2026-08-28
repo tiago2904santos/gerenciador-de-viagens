@@ -18,6 +18,13 @@ from .services import gerar_relatorio_tecnico_docx
 from .services import gerar_relatorio_tecnico_pdf
 
 
+# `NOVO-20260828-185303-995fcc0f4b5c`: a ordem dos cinco documentos da prestação,
+# num lugar só. Ela existe na tela desde sempre — a etapa Documentos desenha
+# ofício e despacho no bloco do ofício, RT, DB e comprovante no bloco do servidor
+# — mas cada consumidor remontava a lista à mão e três discordavam dela. Quem
+# ordena documento importa este nome; não escreva a sequência de novo.
+ORDEM_DOCUMENTOS = ("oficio", "despacho", "rt", "diario", "comprovante")
+
 TIPOS = {
     "oficio": PrestacaoDocumentoAnexo.TIPO_OFICIO_ASSINADO,
     "despacho": PrestacaoDocumentoAnexo.TIPO_DESPACHO,
@@ -25,6 +32,12 @@ TIPOS = {
     "rt": PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO,
     "comprovante": PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
 }
+
+
+def em_ordem(ids):
+    """Reordena chaves de documento pela ordem canônica, descartando o resto."""
+    escolhidas = set(ids)
+    return [item_id for item_id in ORDEM_DOCUMENTOS if item_id in escolhidas]
 
 
 def anexos_por_tipo(ps):
@@ -62,13 +75,14 @@ def payload_downloads(ps):
         {"pdf": reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "pdf"])}
         if diario else {}
     )
-    definicoes = [
-        ("oficio", "Ofício", oficio.numero_formatado, oficio_urls),
-        ("despacho", "Despacho", "Documento do ofício", {}),
-        ("diario", "Diário de bordo", oficio.numero_formatado, diario_urls),
-        ("rt", "Relatório técnico", ps.servidor.nome, rt_urls),
-        ("comprovante", "Comprovante", ps.servidor.nome, {}),
-    ]
+    rotulos = {
+        "oficio": ("Ofício", oficio.numero_formatado, oficio_urls),
+        "despacho": ("Despacho", "Documento do ofício", {}),
+        "rt": ("Relatório técnico", ps.servidor.nome, rt_urls),
+        "diario": ("Diário de bordo", oficio.numero_formatado, diario_urls),
+        "comprovante": ("Comprovante", ps.servidor.nome, {}),
+    }
+    definicoes = [(item_id, *rotulos[item_id]) for item_id in ORDEM_DOCUMENTOS]
     itens = []
     for item_id, titulo, subtitulo, originais in definicoes:
         assinado = anexos.get(TIPOS[item_id])
@@ -116,31 +130,52 @@ def _fundir_docx(conteudos):
     return output.getvalue()
 
 
+def _original_oficio(ps, formato):
+    return (
+        "ofício",
+        gerar_oficio_prestacao_documento(ps.prestacao, DocumentoFormato(formato)),
+    )
+
+
+def _original_rt(ps, formato):
+    relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=ps.prestacao)
+    gerador = gerar_relatorio_tecnico_pdf if formato == "pdf" else gerar_relatorio_tecnico_docx
+    return ("relatório técnico", gerador(relatorio, ps))
+
+
+def _original_diario(ps, formato):
+    if formato != "pdf":
+        raise DocumentValidationError("O diário de bordo não possui versão DOCX.")
+    try:
+        diario = ps.prestacao.diario_bordo
+    except DiarioBordo.DoesNotExist as exc:
+        raise DocumentValidationError("Diário de bordo não encontrado.") from exc
+    return ("diário de bordo", gerar_diario_bordo_pdf(diario))
+
+
+# Despacho e comprovante não têm original do sistema: só existem assinados.
+GERADORES_ORIGINAIS = {
+    "oficio": _original_oficio,
+    "rt": _original_rt,
+    "diario": _original_diario,
+}
+
+
 def _originais(ps, formato, escolhidos):
-    prestacao = ps.prestacao
-    partes = []
-    if "oficio" in escolhidos:
-        partes.append(("ofício", gerar_oficio_prestacao_documento(prestacao, DocumentoFormato(formato))))
-    if "diario" in escolhidos:
-        if formato != "pdf":
-            raise DocumentValidationError("O diário de bordo não possui versão DOCX.")
-        try:
-            diario = prestacao.diario_bordo
-        except DiarioBordo.DoesNotExist as exc:
-            raise DocumentValidationError("Diário de bordo não encontrado.") from exc
-        partes.append(("diário de bordo", gerar_diario_bordo_pdf(diario)))
-    if "rt" in escolhidos:
-        relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=prestacao)
-        gerador = gerar_relatorio_tecnico_pdf if formato == "pdf" else gerar_relatorio_tecnico_docx
-        partes.append(("relatório técnico", gerador(relatorio, ps)))
-    return partes
+    return [
+        GERADORES_ORIGINAIS[item_id](ps, formato)
+        for item_id in em_ordem(escolhidos)
+        if item_id in GERADORES_ORIGINAIS
+    ]
 
 
 def compilar_download(ps, *, origem, formato, escolhidos):
     if origem == "assinado":
         if formato != "pdf":
             raise DocumentValidationError("Documentos assinados estão disponíveis em PDF.")
-        partes = [(item_id, pdf_assinado(ps, item_id)) for item_id in escolhidos]
+        # `em_ordem` e não `escolhidos`: a query string chega na ordem em que o JS
+        # montou as caixas do modal, e o PDF juntado saía nessa ordem.
+        partes = [(item_id, pdf_assinado(ps, item_id)) for item_id in em_ordem(escolhidos)]
     else:
         partes = _originais(ps, formato, escolhidos)
     if not partes:
