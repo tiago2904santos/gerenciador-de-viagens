@@ -540,6 +540,11 @@
   
   letter-spacing: normal;
 }
+:is(html[data-theme]) .field__error {
+  color: var(--text-danger);
+  font-size: var(--text-size-eyebrow);
+  margin: 0;
+}
 :is(html[data-theme]) .field--invalid .input__control {
   border-color: var(--danger);
 }
@@ -1772,6 +1777,55 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 :is(html[data-theme]) .panel--empty-band[hidden] {
   display: none;
 }
+:is(html[data-theme]) .alert {
+  
+  background: color-mix(in srgb, var(--alert-tone, var(--status-info)) 16%, transparent);
+  
+  border: 0;
+  border-left: 3px solid var(--alert-tone, var(--status-info));
+  border-radius: var(--radius-field);
+  color: var(--alert-tone, var(--status-info));
+  font-size: var(--text-size-base);
+  margin: 0;
+  
+  padding: 12px 14px 12px 10px;
+  
+  box-shadow: none;
+  display: block;
+  font-weight: 600;
+  position: relative;
+}
+:is(html[data-theme]) .alert::before {
+  content: none;
+}
+:is(html[data-theme]) .alert[data-tone="success"] {
+  --alert-tone: var(--status-done);
+}
+:is(html[data-theme]) .alert[data-tone="warning"] {
+  --alert-tone: var(--status-progress);
+}
+:is(html[data-theme]) .alert[data-tone="error"] {
+  --alert-tone: var(--status-late);
+}
+:is(html[data-theme]) .alert[data-tone="info"] {
+  --alert-tone: var(--status-info);
+}
+:is(html[data-theme]) .alert:empty {
+  display: none;
+}
+:is(html[data-theme]) .notice--saindo {
+  opacity: 0;
+}
+:is(html[data-theme]) .alert--list {
+  display: grid;
+  gap: 6px;
+  
+  grid-template-columns: minmax(0, 1fr);
+  padding: 12px 14px;
+}
+:is(html[data-theme]) .alert--list::before {
+  content: none;
+}
 :is(html[data-theme]) :is(.prestacao-card__facts, .oficio-card__facts, .evento-card__docs) .form-block--v2 {
   grid-column: auto;
 }
@@ -1937,6 +1991,22 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 :is(html[data-theme]) .icon-button:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
+}
+:is(html[data-theme]) .form-errors {
+  display: grid;
+  gap: 6px;
+}
+:is(html[data-theme]) .form-errors__title {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  margin: 0;
+}
+:is(html[data-theme]) .form-errors__list {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  margin: 0;
+  padding-left: 18px;
 }
 :is(html[data-theme]) .card-footer {
   align-items: center;

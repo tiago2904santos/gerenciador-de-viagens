@@ -319,6 +319,29 @@ def _ramo_aplicavel(ramo: str, dom_classes: set[str], *, incluir_base: bool) -> 
 
 UI_SOURCE = "ui.bundle.css"
 
+# Marcação que só existe DEPOIS de uma requisição malsucedida, e que por isso
+# nenhuma captura por GET enxerga — nem com `--reveal`, porque o elemento não
+# está escondido: ele não existe. Senha errada no login renderia o bloco de erro
+# sem estilo nenhum, e é justamente o momento em que a tela não pode falhar.
+#
+# São os nomes exatos porque `_nasce_de` não cobre o `__`: `form-errors__title`
+# não "nasce de" `form-errors` pelo critério de traço, de propósito.
+#
+# Conserto de fundo, fora desta etapa: derivar as classes dos TEMPLATES que cada
+# rota renderiza (`response.templates` do test client) em vez de só do DOM
+# capturado, que resolve toda marcação condicional de uma vez.
+CLASSES_DE_FEEDBACK = frozenset(
+    {
+        "alert",
+        "form-errors",
+        "form-errors__title",
+        "form-errors__list",
+        "field__error",
+        "field--invalid",
+        "notice",
+    }
+)
+
 
 PERFIS_SEM_SHELL = frozenset({"login"})
 
@@ -458,6 +481,24 @@ def capture(reports: list[Path]) -> dict:
                             ui_rule_ids.update(_fragment_rule_ids(fragment))
         if source and not rule_ids:
             raise ValueError(f"perfil sem cobertura de shell: {profile}")
+        vistas = {
+            slug
+            for routes in loaded
+            for slug in slugs
+            if slug in routes
+        }
+        faltando = [slug for slug in slugs if slug not in vistas]
+        if faltando:
+            # `--include-matched-css` exige `--route`, então conjunto incompleto
+            # de relatórios é entrada plausível — e a família compartilha UM
+            # arquivo. Sem esta trava, um relatório só de `oficios-lista`
+            # produziria um `entity-lists.ui.css` válido, servido a Termos sem
+            # nenhuma classe de Termos.
+            raise ValueError(
+                f"perfil {profile}: faltam rotas na captura ({', '.join(faltando)}). "
+                "A família inteira precisa estar nos relatórios — o perfil é um "
+                "arquivo só para todas elas."
+            )
         if not ui_rule_ids:
             raise ValueError(
                 f"perfil sem cobertura do v2: {profile}. A causa quase certa é a "
@@ -556,7 +597,8 @@ def build(manifest: dict) -> dict[Path, str]:
         ui_body = _podar(
             UI_SOURCE,
             config.get("ui_rule_ids", []),
-            set(config.get("ui_dom_classes", config.get("dom_classes", []))),
+            set(config.get("ui_dom_classes", config.get("dom_classes", [])))
+            | CLASSES_DE_FEEDBACK,
             incluir_base=True,
         )
         outputs[OUTPUT_DIR / f"{profile}.ui.css"] = banner + ui_body + "\n"

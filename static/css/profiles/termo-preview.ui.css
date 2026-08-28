@@ -466,6 +466,11 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+:is(html[data-theme]) .field__error {
+  color: var(--text-danger);
+  font-size: var(--text-size-eyebrow);
+  margin: 0;
+}
 :root {
   --field-grid-gap: var(--space-4);
 }
@@ -841,6 +846,9 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 :is(html[data-theme]) .alert:empty {
   display: none;
 }
+:is(html[data-theme]) .notice--saindo {
+  opacity: 0;
+}
 :is(html[data-theme]) .alert--list {
   display: grid;
   gap: 6px;
@@ -952,6 +960,22 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 :is(html[data-theme]) .modal--attach-signed [data-attach-signed-form] {
   display: grid;
   gap: var(--gap);
+}
+:is(html[data-theme]) .form-errors {
+  display: grid;
+  gap: 6px;
+}
+:is(html[data-theme]) .form-errors__title {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  margin: 0;
+}
+:is(html[data-theme]) .form-errors__list {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  margin: 0;
+  padding-left: 18px;
 }
 :is(html[data-theme]) .is-dragging-destination,
 :is(html[data-theme]) .is-dragging-destination * {

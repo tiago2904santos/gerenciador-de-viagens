@@ -11006,10 +11006,9 @@ devolve os dois bundles. Família nova `login`, a única rota sem casca.
 
 | | antes | depois |
 |---|---:|---:|
-| uso médio das 43 rotas | 13,60% | **46,94%** |
-| pior rota | 4,22% (`login`) | **36,02%** (`justificativas-lista`) |
-| melhor rota | 20,81% | 56,73% |
-| CSS entregue somando as 43 rotas | 25,73 MB | **5,88 MB** |
+| uso médio das 43 rotas | 13,60% | **46,63%** |
+| pior rota | 4,22% (`login`) | **35,44%** (`login`) |
+| CSS entregue somando as 43 rotas | 25,73 MB | **5,91 MB** |
 
 Os dois lados fecham: o gate `NOVO-70` passa contra pisos regravados e o
 `test_todas_as_rotas_cumprem_o_aceite_pf02_de_35_por_cento` passa porque o menor
@@ -11074,6 +11073,27 @@ download compartilhado em várias telas. DOM novo que a captura não conhecia �
 o `termo-preview` perdia 45 elementos das famílias `modal__*` e
 `download-picker`. **Perfil por cobertura tem prazo de validade: mudou marcação,
 recaptura.** Os 16 relatórios foram refeitos contra o DOM de hoje.
+
+**O quarto, também do Codex, é o que teria doído mais em produção:** a marcação
+que só existe DEPOIS de uma requisição malsucedida. Senha errada no login
+renderia `.alert.form-errors`, `.form-errors__title`, `.form-errors__list` e
+`.field__error` **sem estilo nenhum** — nenhuma das quatro estava em
+`login.ui.css`, e é justamente o momento em que a tela não pode falhar. Captura
+por GET não vê: o elemento não está escondido, ele não existe, então nem
+`--reveal` resolve. `CLASSES_DE_FEEDBACK` entra sempre, como os tokens e as
+`@font-face`; custa ~1 KB por perfil.
+
+O conserto de fundo, registrado e fora desta etapa, é derivar as classes dos
+TEMPLATES que cada rota renderiza (`response.templates` do test client) em vez de
+só do DOM capturado — isso resolveria toda marcação condicional de uma vez, e não
+só a de erro.
+
+**Nota sobre a folga dos pisos.** As três correções de correção custam uso: cada
+regra preservada que a medição estática não vê casar entra no denominador. O
+`login` fecha em **35,44%** contra o aceite de 35% — 0,44 pp de folga, e o piso
+dele ficou em 35,00 em vez de 34,44 justamente para não furar o aceite. É a folga
+mais fina do arquivo e vale saber que ela existe: mais uma família preservada no
+perfil do login empurra essa rota para baixo do critério.
 
 **Um terceiro defeito, achado pela revisão automática do Codex, e é o mais
 instrutivo dos três.** Metade do que alguns componentes desenham **não existe no
