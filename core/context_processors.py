@@ -29,8 +29,12 @@ SHELL_CSS_PROFILE_BY_VIEW = {
     "termos:preview_termo_oficio": "termo-preview",
     "oficios:modelo_motivo_create": "model-forms",
     "oficios:modelo_motivo_update": "model-forms",
-    "justificativas:legacy_modelo_create": "model-forms",
-    "justificativas:legacy_modelo_update": "model-forms",
+    # `justificativas:legacy_modelo_create` e `legacy_modelo_update` saíram
+    # daqui: as quatro rotas `legacy_*` apontam para `legacy_modelos_redirect`,
+    # que só devolve `redirect(...)`. View que não renderiza template descarta o
+    # contexto, então o perfil nunca chegava a lugar nenhum — mesmo fantasma do
+    # `oficio-new`, registrado em `NOVO-20260826-124840-50a3e47836ae`. Quem serve
+    # o perfil dessas URLs é o destino do redirect, `modelos_index`.
     "justificativas:modelos_index": "model-forms",
     "justificativas:modelo_create": "model-forms",
     "justificativas:modelo_update": "model-forms",
@@ -51,6 +55,10 @@ SHELL_CSS_PROFILE_BY_VIEW = {
     "roteiros:novo": "roteiro-form",
     "roteiros:editar": "roteiro-form",
     "cadastros:configuracao": "admin-form",
+    # Mesma view (`configuracao_sistema`), mesma página: as abas de Ofício e
+    # Roteiros entram por `configuracao/<aba>/`. Sem esta linha elas caíam no
+    # fallback e baixavam o `ui.bundle.css` inteiro — duas das três abas.
+    "cadastros:configuracao_aba": "admin-form",
     "cadastros:servidor_create": "admin-form",
     "cadastros:servidor_update": "admin-form",
     "cadastros:viatura_create": "admin-form",

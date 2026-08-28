@@ -7,7 +7,21 @@ from types import SimpleNamespace
 
 from django.test import SimpleTestCase, override_settings
 
+from core.context_processors import SHELL_CSS_PROFILE_BY_VIEW
 from core.context_processors import shell_css_profile
+
+
+def _view_names(padrao, prefixo=""):
+    """(nome completo, callback) de cada URL, descendo pelos includes."""
+    from django.urls.resolvers import URLPattern, URLResolver
+
+    if isinstance(padrao, URLResolver):
+        espaco = padrao.namespace
+        novo = f"{prefixo}{espaco}:" if espaco else prefixo
+        for filho in padrao.url_patterns:
+            yield from _view_names(filho, novo)
+    elif isinstance(padrao, URLPattern) and padrao.name:
+        yield f"{prefixo}{padrao.name}", padrao.callback
 from scripts import medir_css_por_rota as css_metric
 from scripts import build_css_profiles as css_profiles
 from scripts import audit_css_variaveis_orfas as orfas_metric
@@ -122,6 +136,33 @@ class ShellCssProfileTests(SimpleTestCase):
             css_profiles._ramos_do_seletor(":is(.a, .b) .c"),
             [":is(.a, .b) .c"],
         )
+
+    def test_url_que_serve_a_mesma_view_de_uma_rota_mapeada_tambem_tem_perfil(self):
+        """`NOVO-70`: rota mapeada pela metade cai no bundle inteiro, calada.
+
+        `cadastros:configuracao` estava no mapa e `cadastros:configuracao_aba`
+        não — mesma view, mesma página, só o segmento de aba a mais. Duas das
+        três abas de configuração baixavam os 552 KB que este trabalho existe
+        para evitar, e nada acusava: o fallback é silencioso por desenho.
+
+        A trava é genérica: se uma view tem perfil, TODA URL que aponta para ela
+        precisa ter também.
+        """
+        from django.urls import get_resolver
+
+        por_callback: dict[object, set[str]] = {}
+        for padrao in get_resolver().url_patterns:
+            for nome, view in _view_names(padrao):
+                por_callback.setdefault(view, set()).add(nome)
+
+        faltando = sorted(
+            nome
+            for nomes in por_callback.values()
+            if nomes & set(SHELL_CSS_PROFILE_BY_VIEW)
+            for nome in nomes - set(SHELL_CSS_PROFILE_BY_VIEW)
+        )
+
+        self.assertEqual(faltando, [], "views com perfil e URL sem perfil")
 
     def test_todo_url_dos_perfis_aponta_para_arquivo_que_existe(self):
         """`NOVO-70`: perfil que muda de diretório leva `url(...)` quebrada junto.

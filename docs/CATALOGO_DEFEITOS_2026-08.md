@@ -11420,6 +11420,23 @@ para `entity-lists`. Nenhuma requisição serve `profiles/oficio-new.css`. A rot
 canônica `oficios-novo` mede a lista: `oficios-lista` e `oficios-novo` dão o
 mesmo número em toda medição.
 
+**2b. E não é só o `oficio-new`.** As quatro rotas `justificativas:legacy_*`
+apontam para `legacy_modelos_redirect`, que só devolve `redirect(...)`; duas
+delas estavam no `SHELL_CSS_PROFILE_BY_VIEW`. View que não renderiza template
+descarta o contexto, então aquele perfil nunca chegava a lugar nenhum. Saíram do
+mapa; quem serve essas URLs é o destino do redirect.
+
+**2c. O contrário também existia, e custava os 552 KB:**
+`cadastros:configuracao_aba` — a MESMA view de `cadastros:configuracao`, com o
+segmento de aba a mais — **não** estava mapeada. Duas das três abas de
+configuração caíam no fallback e baixavam o `ui.bundle.css` inteiro, sem nada
+acusar: o fallback é silencioso por desenho. Achado da revisão do Codex.
+
+A trava contra os dois sentidos é
+`test_url_que_serve_a_mesma_view_de_uma_rota_mapeada_tambem_tem_perfil`: se uma
+view tem perfil, toda URL que aponta para ela precisa ter também. Foi ela que
+encontrou as duas `legacy_*` restantes.
+
 **3. O `source` gravado para `oficio-new` já não é o que a rota entrega.** O
 manifesto diz `shell.bundle.css`; a página que a rota realmente mostra
 (`templates/oficios/index.html`) carrega a variante com componentes de
