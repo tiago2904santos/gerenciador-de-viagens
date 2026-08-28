@@ -812,6 +812,11 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
 - [x] `NOVO-20260820-171008-7afb74d82d2c` estende ao `ui.bundle.css` os perfis por família de
       rota do `PF-02`, fechando o impasse entre o gate `NOVO-70` e o aceite de 35%: uso médio das
       43 rotas de 13,60% para 46,94%, entrega de 25,73 MB para 5,88 MB, nenhum piso abaixo de 35.
+- [ ] `NOVO-20260828-214005-d50d20556880` consertar as 217 violações de acessibilidade que
+      apareceram quando o `NOVO-70` parou de reprovar — 181 de contraste, 16 de nome de botão,
+      10 de rótulo. Provado que não vêm da poda de CSS (saída idêntica com e sem perfis). NÃO
+      atualizar a baseline: ela é de 18/08 e existe para congelar dívida conhecida, não a nova.
+      Enquanto existirem, o "Tests" não fica verde e o deploy continua por dispatch manual.
 - [ ] `NOVO-20260826-124840-50a3e47836ae` recapturar a casca do `PF-02`: 90% dos `rule_ids` já
       não existem nas fontes, `oficio-new` é perfil fantasma e o podador trata vírgula de seletor
       como conjunção. Fora do PR do v2 de propósito — mexer nos 15 perfis de casca é outra etapa.

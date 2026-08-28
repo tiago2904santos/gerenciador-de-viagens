@@ -391,6 +391,11 @@ def classes_criadas_por_js() -> frozenset[str]:
 CLASSES_DE_FEEDBACK = frozenset(
     {
         "alert",
+        # A pilha de mensagens do Django: `templates/cotton/v2/alert.html` só
+        # desenha o embrulho quando há mensagem, ou seja, depois de um redirect
+        # que carregue uma. Sem ela os alertas perdem o espaçamento, o gap da
+        # grade e a transição de auto-dismiss de `static/css/v2/alert.css`.
+        "alert-stack",
         "form-errors",
         "form-errors__title",
         "form-errors__list",

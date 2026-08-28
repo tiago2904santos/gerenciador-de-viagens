@@ -11310,6 +11310,49 @@ dependia disto: estilo computado de 5.480 elementos por tema, perfil contra
 bundle, nas duas larguras — zero divergências no escuro. A ressalva da
 sequência caiu junto: o v2 já passa pelo podador, e passa com o tema inteiro.
 
+### NOVO-20260828-214005-d50d20556880 🔴 ABERTO · `NOVO` 217 violações de acessibilidade acumuladas atrás do gate vermelho · HT/QA · risco médio
+
+Terceiro passo a aparecer quando o `NOVO-70` deixou de reprovar, e o maior dos
+três. O passo de acessibilidade roda **depois** da régua de CSS e da divergência
+de tema; com o `NOVO-70` vermelho, o job morria antes e ele não rodava. O
+primeiro build em que os dois anteriores passaram trouxe:
+
+    ERRO: 210 novas violações de acessibilidade.
+
+**Não é da poda de CSS, e isso está provado, não suposto.** O
+`audit_accessibility.py` foi rodado localmente contra os DOIS servidores ao mesmo
+tempo — um com `CSS_ROUTE_PROFILES_ENABLED=true` (perfis podados) na 8000 e
+outro com `false` (bundle inteiro) na 8001, mesmo banco, mesma sessão. As duas
+saídas são **idênticas linha a linha**: 217 violações iguais. A poda não cria
+nenhuma e não conserta nenhuma.
+
+Distribuição das 217, por regra do axe:
+
+| regra | ocorrências |
+|---|---:|
+| `color-contrast` | 181 |
+| `button-name` | 16 |
+| `label` | 10 |
+| `nested-interactive` | 8 |
+| `link-in-text-block` | 2 |
+
+A baseline (`scripts/accessibility-baseline.json`, 292 entradas) é de `b31c08b`,
+**18/08/2026** — antes da leva de redesenho do v2. São dez dias de regressão de
+contraste e de nome acessível que ninguém pôde ver, porque a régua que as pegaria
+estava atrás de uma que já estava vermelha.
+
+**O que NÃO fazer:** rodar `--update-baseline`. Isso apaga as 217 do radar em vez
+de consertá-las, e é o movimento que o `AGENTS.md` §3.5 proíbe para catraca. A
+baseline existe para congelar dívida conhecida de 18/08, não para absorver o que
+veio depois.
+
+**Consequência imediata, e ela importa para o deploy:** consertar o `NOVO-70`
+**não** deixa o "Tests" verde na `main`. O `deploy.yml` dispara em `workflow_run`
+de "Tests" concluído com sucesso; enquanto estas 217 existirem, o lançamento
+continua dependendo de `workflow_dispatch` manual. As três reprovações em fila —
+`NOVO-70`, teto fóssil de `oficios-novo`, e esta — são o preço de a `main` ter
+ficado vermelha por 25 execuções: cada gate escondia o próximo.
+
 ### NOVO-20260826-124840-50a3e47836ae 🟡 ABERTO · `NOVO` O manifesto de perfis do PF-02 envelheceu: 90% dos `rule_ids` da casca já não existem, e `oficio-new` é perfil fantasma · PF-02 · risco baixo
 
 Levantado ao estender os perfis ao v2 (`NOVO-20260820-171008-7afb74d82d2c`), que

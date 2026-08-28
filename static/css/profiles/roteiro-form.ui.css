@@ -1199,6 +1199,10 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 :is(html[data-theme]) .panel--empty-band[hidden] {
   display: none;
 }
+:is(html[data-theme]) .alert-stack {
+  display: grid;
+  gap: var(--gap-tight);
+}
 :is(html[data-theme]) .alert {
   
   background: color-mix(in srgb, var(--alert-tone, var(--status-info)) 16%, transparent);
@@ -1235,8 +1239,30 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 :is(html[data-theme]) .alert:empty {
   display: none;
 }
+:is(html[data-theme]) .notice-stack,
+:is(html[data-theme]) .alerts,
+:is(html[data-theme]) .alert-stack {
+  margin-bottom: var(--gap);
+  padding-bottom: var(--gap-tight);
+}
+:is(html[data-theme]) .notice-stack .notice,
+:is(html[data-theme]) .alerts .alert,
+:is(html[data-theme]) .alert-stack .alert {
+  transition:
+    height var(--ease),
+    margin var(--ease),
+    opacity var(--ease),
+    padding var(--ease);
+}
 :is(html[data-theme]) .notice--saindo {
   opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+:is(html[data-theme]) .notice-stack .notice,
+  :is(html[data-theme]) .alerts .alert,
+  :is(html[data-theme]) .alert-stack .alert {
+    transition: none;
+  }
 }
 :is(html[data-theme]) .alert--list {
   display: grid;
