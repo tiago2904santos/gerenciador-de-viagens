@@ -31,6 +31,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import posixpath
 import re
 from pathlib import Path
 
@@ -260,19 +261,65 @@ def _shell_sheet(route: dict) -> dict | None:
     return candidates[0]
 
 
-def _expanded_source(source_name: str) -> str:
-    text = (STATIC_CSS / source_name).read_text(encoding="utf-8")
+# `url(...)` relativa, ignorando `data:`, absoluta e externa — mesma forma que o
+# `build_shell_bundles.py` usa para reancorar folha que muda de diretório.
+_CSS_URL = re.compile(
+    r"url\((?P<quote>['\"])(?P<path>(?!data:|https?:|/|#)[^'\"]+)(?P=quote)\)"
+)
+
+
+def _reancorar(text: str, origem_rel: str) -> str:
+    """Reescreve `url(...)` de uma folha em `origem_rel` para `css/profiles/`.
+
+    `NOVO-70`: o perfil é escrito em `static/css/profiles/`, um nível abaixo de
+    onde o `ui.bundle.css` mora, e as `@font-face` dele apontam para
+    `../vendor/fonts/…`. Copiadas sem reancorar, viram `css/vendor/fonts/…` e o
+    `collectstatic` com o storage de manifesto do WhiteNoise reprova o deploy —
+    foi assim que a CI pegou. As folhas do shell não mudam de profundidade
+    (`css/base/` e `css/profiles/` estão no mesmo nível), então para elas isto é
+    identidade e os 15 perfis de casca continuam byte a byte iguais.
+    """
+    origem_dir = posixpath.dirname(origem_rel)
+    destino_dir = OUTPUT_DIR.relative_to(STATIC_CSS.parent).as_posix()
+    if origem_dir == destino_dir:
+        return text
 
     def replace(match) -> str:
+        alvo = posixpath.normpath(posixpath.join(origem_dir, match.group("path")))
+        aspas = match.group("quote")
+        return f"url({aspas}{posixpath.relpath(alvo, destino_dir)}{aspas})"
+
+    return _CSS_URL.sub(replace, text)
+
+
+def _expanded_source(source_name: str) -> str:
+    text = (STATIC_CSS / source_name).read_text(encoding="utf-8")
+    importados: list[str] = []
+
+    def guardar(match) -> str:
         relative = match.group(1)
         if relative.startswith(("http://", "https://")):
             return match.group(0)
         imported = (STATIC_CSS / relative).resolve()
         if not imported.is_relative_to(STATIC_CSS.resolve()):
             raise ValueError(f"import CSS fora de static/css: {relative}")
-        return imported.read_text(encoding="utf-8")
+        # Cada folha importada tem o SEU diretório como âncora, e não o do
+        # bundle: `base/fonts.css` escreve `../../vendor/…` a partir de si mesma.
+        # Guardar num marcador é o que impede a reancoragem de rodar duas vezes
+        # sobre o mesmo texto — foi esse duplo passe que somou um `../` a mais
+        # nas fontes dos perfis de casca na primeira tentativa.
+        importados.append(
+            _reancorar(
+                imported.read_text(encoding="utf-8"),
+                posixpath.join("css", relative.removeprefix("./")),
+            )
+        )
+        return f"/*__IMPORT_{len(importados) - 1}__*/"
 
-    return _IMPORT.sub(replace, text)
+    marcado = _reancorar(_IMPORT.sub(guardar, text), posixpath.join("css", source_name))
+    for indice, conteudo in enumerate(importados):
+        marcado = marcado.replace(f"/*__IMPORT_{indice}__*/", conteudo)
+    return marcado
 
 
 def _source_sheet_suffixes(source_name: str) -> tuple[str, ...]:

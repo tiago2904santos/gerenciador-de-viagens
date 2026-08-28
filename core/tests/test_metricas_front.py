@@ -78,6 +78,30 @@ class ShellCssProfileTests(SimpleTestCase):
             },
         )
 
+    def test_todo_url_dos_perfis_aponta_para_arquivo_que_existe(self):
+        """`NOVO-70`: perfil que muda de diretório leva `url(...)` quebrada junto.
+
+        O `ui.bundle.css` mora em `static/css/` e escreve `../vendor/fonts/…`;
+        o perfil é gravado um nível abaixo, em `static/css/profiles/`. Copiada
+        sem reancorar, a `@font-face` passa a apontar para `css/vendor/fonts/…`,
+        que não existe. Nada quebra em tela — a fonte só não carrega — mas o
+        `collectstatic` com o storage de manifesto do WhiteNoise reprova o
+        DEPLOY, e foi lá que isto apareceu. Este teste é o mesmo contrato, sem
+        precisar rodar o `collectstatic`.
+        """
+        raiz = Path(css_profiles.STATIC_CSS)
+        quebradas = []
+        for perfil in sorted(css_profiles.OUTPUT_DIR.glob("*.css")):
+            for match in css_profiles._CSS_URL.finditer(
+                perfil.read_text(encoding="utf-8")
+            ):
+                alvo = (perfil.parent / match.group("path")).resolve()
+                if not alvo.is_file():
+                    quebradas.append(
+                        f"{perfil.name}: {match.group('path')}"
+                    )
+        self.assertEqual(quebradas, [], f"(raiz do CSS: {raiz})")
+
     @override_settings(CSS_ROUTE_PROFILES_ENABLED=True)
     def test_login_recebe_perfil_de_componentes_sem_perfil_de_casca(self):
         """NOVO-70: o login não estende `base.html`, então não há casca a podar.
