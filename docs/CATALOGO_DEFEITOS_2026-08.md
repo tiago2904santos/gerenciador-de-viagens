@@ -11294,6 +11294,30 @@ regravados e a paridade de estilo computado reconferida nos dois temas. Ficou de
 fora do PR do v2 de propósito: mexer nos 15 perfis de casca é outra etapa, e
 misturar as duas tornaria impossível provar que a casca não mudou.
 
+**4. O perfil fantasma tinha um segundo sintoma, e ele derrubou a CI.** O teto de
+divergência de tema de `oficios-novo` era **748** — calibrado contra a tela de
+confirmação que a rota mostrava até 19/08/2026, quando a criação virou POST puro
+e o GET passou a redirecionar para a lista (`oficios/list_views.py:135`). A lista
+diverge **875**, e o teto dela é 2.290: a MESMA página, com dois tetos que
+diferem por 3×.
+
+Ninguém viu porque o passo de divergência de tema roda **depois** do `NOVO-70`, e
+o `NOVO-70` estava vermelho — o mesmo mecanismo que escondeu o próprio `NOVO-70`
+por 25 execuções, uma casa adiante. O primeiro build em que o `NOVO-70` passou
+foi o primeiro em que este teto foi cobrado.
+
+Corrigido junto com o `NOVO-70` porque sem isso aquele PR não fecha: os três
+tetos de `oficios-novo` passaram a ser os de `oficios-lista`. Não é afrouxar a
+catraca — é a mesma página herdar o teto que já a governa. Some de vez quando a
+rota fantasma sair do corpus.
+
+**Nota de fidelidade da régua:** a `medir_divergencia_tema.py` NÃO reproduz
+localmente o número do runner (158 diferenças aqui contra 875 lá, com 101/733
+elementos divergentes contra 717/717). A `medir_css_por_rota.py` reproduz com
+fidelidade — `dashboard` 56,43% e `oficios-lista` 51,74% no runner batem com a
+medição local. A divergência de tema, portanto, só é conferível na CI hoje; vale
+investigar quando esta linha for trabalhada.
+
 ### NOVO-20260821-172128-3ad8129911ce ✅ RESOLVIDO · `NOVO` Headers de página voltaram a exibir selos de estado · HT/UI · risco baixo
 
 O contrato de `NOVO-20260813-164208-774d64105a96` regrediu durante a migração para os componentes
