@@ -12099,3 +12099,27 @@ mão continua intocado.
 (624,68 com equipe de 2). O caso de caracterização antigo em `tests.py`
 (`test_diaria_inicial_e_valor_por_servidor_da_prestacao`) travava a divisão — R$ 200,00 → R$ 100,00
 — e foi reescrito para a regra correta.
+
+---
+
+### NOVO-20260828-101500-3c7a5d19e4b2 ✅ RESOLVIDO · `NOVO` Wizard da prestação abria pelo RT, não pelo diário · UI · risco baixo
+
+Relatado pelo usuário: a ordem das etapas da prestação de contas está errada — o Diário de Bordo
+tem de vir antes do Relatório Técnico. O fluxo nasceu como RT (Etapa 1) → Diário (Etapa 2) →
+Documentos → PDF Final, mas o diário é o documento que registra o roteiro executado e o relatório
+descreve a viagem que o diário já registrou. O pacote final (`download_services.payload_downloads`
+e `_originais`) sempre empilhou ofício → despacho → **diário → RT** → comprovante: o wizard era o
+único lugar do sistema com a ordem invertida.
+
+**Correção:** `_build_prestacao_steps` passa a listar `diario` como Etapa 1 e `rt` como Etapa 2 — o
+stepper é navegável, então a numeração é o que muda de fato para quem opera. Os três rodapés
+acompanham: o diário deixa de oferecer "Voltar ao Relatório Técnico" e volta à lista (é o começo do
+fluxo), o RT deixa de mandar para o diário e segue para Documentos, e Documentos volta ao RT. As
+views passaram a receber o `*_url` que o novo vizinho exige (`document_views` ganhou `rt_url` no
+lugar de `diario_url`). O botão de editar do card, cujo `aria-label` promete "etapa 1", passou a
+abrir o diário. A descrição do pacote final no consolidado foi alinhada à ordem real de montagem.
+
+Dois testes travavam a ordem antiga e foram reescritos para a nova:
+`tests.test_rodape_do_rt_nao_exibe_botao_salvar_texto` e
+`test_componentes_v2.test_rodape_do_diario_nao_repete_downloads_da_pre_visualizacao`.
+Suíte completa: **2.755 testes verdes** (64s, `--parallel 4`).

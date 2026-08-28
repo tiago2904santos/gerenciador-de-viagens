@@ -87,8 +87,9 @@ class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
 
         self.assertNotIn('label="Gerar XLSX"', source)
         self.assertNotIn('label="Gerar PDF"', source)
-        self.assertIn('label="Voltar ao Relatório Técnico"', source)
-        self.assertIn('label="Ir para Documentos"', source)
+        # Etapa 1 do fluxo desde 2026-08-28: atrás está a lista, adiante o RT.
+        self.assertIn('label="Voltar à lista"', source)
+        self.assertIn('label="Ir para Relatório Técnico"', source)
 
     def test_documentos_da_prestacao_usam_componentes_globais_v2(self):
         equipe = marcacao(PRESTACOES / "partials" / "_docs_equipe_body.html")
