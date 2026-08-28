@@ -11006,10 +11006,10 @@ devolve os dois bundles. Família nova `login`, a única rota sem casca.
 
 | | antes | depois |
 |---|---:|---:|
-| uso médio das 43 rotas | 13,60% | **50,14%** |
+| uso médio das 43 rotas | 13,60% | **50,06%** |
 | pior rota | 4,22% (`login`) | **39,26%** (`justificativas-lista`) |
-| melhor rota | 20,81% | 60,02% (`oficios-detalhe`) |
-| CSS entregue somando as 43 rotas | 25,73 MB | **5,48 MB** |
+| melhor rota | 20,81% | 60,01% (`oficios-detalhe`) |
+| CSS entregue somando as 43 rotas | 25,73 MB | **5,49 MB** |
 | `login` | 565 KB | 28 KB |
 
 Os dois lados fecham: o gate `NOVO-70` passa contra pisos regravados e o
@@ -11057,6 +11057,24 @@ casar. O maior recuo é o `login` (56,31% → 38,78%), que entrega 28 KB dos qua
 esses 3,3 KB sozinhos custam 12 pontos percentuais. Nenhum piso ficou abaixo de
 35%, e cada piso é `min(3 medições) − 1,0 pp` — a margem existe porque medições
 repetidas variam até 0,55 pp entre si.
+
+**Dois defeitos que só a CI e a `main` acharam, e valem como método.**
+
+O `collectstatic` reprovou o deploy com `MissingFileError:
+css/vendor/fonts/GreatVibes-Regular.ttf`. O perfil é gravado em
+`static/css/profiles/`, um nível abaixo de onde o `ui.bundle.css` mora, e as
+`@font-face` dele apontam para `../vendor/fonts/…`; copiadas sem reancorar,
+viram `css/vendor/fonts/…`. Em tela nada quebra — a fonte só não carrega —, e
+por isso nem a paridade de estilo computado nem os prints pegaram: o que pega é
+o `collectstatic` com o storage de manifesto do WhiteNoise. `_reancorar()`
+conserta, `test_todo_url_dos_perfis_aponta_para_arquivo_que_existe` trava, e a
+casca não muda porque `css/base/` e `css/profiles/` estão na mesma profundidade.
+
+O segundo veio da `main`: o `PF-07` (#428) passou a incluir o diálogo de
+download compartilhado em várias telas. DOM novo que a captura não conhecia →
+o `termo-preview` perdia 45 elementos das famílias `modal__*` e
+`download-picker`. **Perfil por cobertura tem prazo de validade: mudou marcação,
+recaptura.** Os 16 relatórios foram refeitos contra o DOM de hoje.
 
 **O que este PR NÃO fez:** a captura da casca continua sendo a do PF-02, byte a
 byte (`cmp` confere que os 15 perfis de casca saem idênticos). Ela envelheceu, e

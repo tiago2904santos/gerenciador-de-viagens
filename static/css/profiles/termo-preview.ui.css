@@ -358,6 +358,11 @@
   cursor: not-allowed;
   opacity: 0.55;
 }
+:is(html[data-theme]) .button--primary {
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-weight: var(--weight-strong);
+}
 :is(html[data-theme]) .button--secondary {
   background: var(--surface-contrast, var(--surface-rail));
   border-color: transparent;
@@ -366,6 +371,9 @@
 :is(html[data-theme]) .button--secondary:hover:not(:disabled):not([aria-disabled="true"]) {
   background: color-mix(in srgb, var(--accent) 14%, var(--surface-contrast, var(--surface-rail)));
   color: var(--accent);
+}
+:is(html[data-theme]) .button--primary:hover:not(:disabled):not([aria-disabled="true"]) {
+  box-shadow: inset 0 0 0 999px rgb(255 255 255 / 0.16);
 }
 :is(html[data-theme]) .button--sm {
   font-size: var(--text-size-eyebrow);
@@ -624,6 +632,91 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   border-color: var(--color-primary-hover);
   color: var(--color-white);
 }
+:is(html[data-theme]) .toggle {
+  align-items: center;
+  
+  background: var(--surface-contrast, var(--surface-field));
+  border-radius: var(--radius-field);
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+}
+:is(html[data-theme]) .toggle--sm {
+  --toggle-item-height: 26px;
+  --toggle-item-padding: 10px;
+  --toggle-item-size: var(--text-size-eyebrow);
+  padding: 2px;
+}
+:is(html[data-theme]) .toggle__item {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--toggle-item-size, var(--text-size-base));
+  gap: 6px;
+  min-height: var(--toggle-item-height, 34px);
+  padding: 0 var(--toggle-item-padding, 14px);
+  text-decoration: none;
+  white-space: nowrap;
+}
+:is(html[data-theme]) .toggle__item[aria-current="page"],
+:is(html[data-theme]) .toggle__item[aria-pressed="true"],
+:is(html[data-theme]) .toggle__item[aria-selected="true"],
+:is(html[data-theme]) .toggle__item:has(input:checked) {
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-weight: var(--weight-strong);
+}
+:is(html[data-theme]) .toggle__item[aria-current="page"]:hover,
+:is(html[data-theme]) .toggle__item[aria-pressed="true"]:hover,
+:is(html[data-theme]) .toggle__item:has(input:checked):hover {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+:is(html[data-theme]) .toggle__item:hover:not([aria-current="page"]):not([aria-pressed="true"]):not(:has(input:checked)) {
+  background: var(--surface, var(--surface-rail));
+  color: var(--text-strong);
+}
+:is(html[data-theme]) .alert {
+  
+  background: color-mix(in srgb, var(--alert-tone, var(--status-info)) 16%, transparent);
+  
+  border: 0;
+  border-left: 3px solid var(--alert-tone, var(--status-info));
+  border-radius: var(--radius-field);
+  color: var(--alert-tone, var(--status-info));
+  font-size: var(--text-size-base);
+  margin: 0;
+  
+  padding: 12px 14px 12px 10px;
+  
+  box-shadow: none;
+  display: block;
+  font-weight: 600;
+  position: relative;
+}
+:is(html[data-theme]) .alert::before {
+  content: none;
+}
+:is(html[data-theme]) .alert[data-tone="success"] {
+  --alert-tone: var(--status-done);
+}
+:is(html[data-theme]) .alert[data-tone="warning"] {
+  --alert-tone: var(--status-progress);
+}
+:is(html[data-theme]) .alert[data-tone="error"] {
+  --alert-tone: var(--status-late);
+}
+:is(html[data-theme]) .alert[data-tone="info"] {
+  --alert-tone: var(--status-info);
+}
+:is(html[data-theme]) .alert:empty {
+  display: none;
+}
 :is(html[data-theme]) :is(.prestacao-card__facts, .oficio-card__facts, .evento-card__docs) .form-block--v2 {
   grid-column: auto;
 }
@@ -687,6 +780,40 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   ) {
   background: var(--step1-field, var(--color-input-bg)) !important;
   border-color: transparent !important;
+}
+:is(html[data-theme]) .modal {
+  
+  --surface: var(--surface-rail);
+  --surface-contrast: var(--surface-field);
+  background: var(--surface-rail);
+  border: 0;
+  border-radius: var(--radius-rail);
+  color: var(--text-strong);
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 0;
+  width: 100%;
+}
+:is(html[data-theme]) .modal::backdrop {
+  background: rgb(0 0 0 / 0.5);
+}
+:is(html[data-theme]) .modal__shell {
+  display: grid;
+  gap: var(--gap);
+  padding: var(--gap-loose);
+}
+:is(html[data-theme]) .modal__title {
+  font-size: var(--text-size-title);
+  font-weight: var(--weight-strong);
+  margin: 0;
+}
+:is(html[data-theme]) .modal__body {
+  display: grid;
+  gap: var(--gap);
+}
+:is(html[data-theme]) .modal__actions {
+  display: flex;
+  gap: var(--gap-tight);
+  justify-content: flex-end;
 }
 :is(html[data-theme]) .is-dragging-destination,
 :is(html[data-theme]) .is-dragging-destination * {
@@ -789,6 +916,80 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   src: url("../../vendor/fonts/HerrVonMuellerhoff-Regular.ttf") format("truetype");
   font-weight: 400;
   font-display: swap;
+}
+:is(html[data-theme]) .download-picker {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+:is(html[data-theme]) .download-picker__hint {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  margin: 0;
+}
+:is(html[data-theme]) .download-picker__list {
+  max-height: 11.7rem;
+  overflow-y: auto;
+  
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+:is(html[data-theme]) .download-picker__list,
+:is(html[data-theme]) .download-picker__queue {
+  display: grid;
+  gap: var(--gap-tight);
+  list-style: none;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+:is(html[data-theme]) .download-picker__queue[hidden] {
+  display: none;
+}
+:is(html[data-theme]) .download-picker__options {
+  
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+}
+:is(html[data-theme]) .download-picker__options {
+  border-top: 1px solid var(--line);
+  padding-top: var(--gap);
+}
+:is(html[data-theme]) .download-picker__option {
+  align-items: center;
+  border: 0;
+  display: flex;
+  gap: var(--gap-tight);
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+:is(html[data-theme]) .download-picker__option[hidden] {
+  display: none;
+}
+:is(html[data-theme]) .download-picker__legend {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  letter-spacing: 0.06em;
+  padding: 0;
+  text-transform: uppercase;
+}
+:is(html[data-theme]) .download-picker__radio input[type="radio"] {
+  height: 0;
+  opacity: 0;
+  position: absolute;
+  width: 0;
+}
+:is(html[data-theme]) .download-picker__radio:has(input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+:is(html[data-theme]) .download-picker .alert[hidden] {
+  display: none;
 }
 :is(html[data-theme]) .sidebar {
   background: var(--surface-brand);
