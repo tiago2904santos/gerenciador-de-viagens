@@ -184,3 +184,40 @@ class OrdemDosDocumentosTests(TestCase):
         # O par RT/DB do wizard é o MESMO par da ordem canônica dos documentos.
         canonica = [item for item in ORDEM_DOCUMENTOS if item in {"rt", "diario"}]
         self.assertEqual(canonica, ["rt", "diario"])
+
+    def test_o_modal_reordena_sozinho_o_que_a_tela_passar_fora_de_ordem(self):
+        """A constante só é fonte única se quem monta a lista não decidir a ordem.
+
+        Antes, cada tela montava a sequência à mão e as duas discordavam entre
+        si — contra o MESMO modal. Agora `kinds_de_anexo_assinado` ordena, então
+        mudar `ORDEM_DOCUMENTOS` move os botões junto com o pacote e o seletor.
+        """
+        from .presenters import kinds_de_anexo_assinado
+
+        info = {
+            "anexar_url": "/anexar/",
+            "nome_original": "",
+            "view_url": "",
+            "remover_url": "",
+        }
+        embaralhado = [
+            ("comprovante", "Comprovante", "o comprovante", info),
+            ("diario", "DB", "o diário", info),
+            ("oficio", "Ofício", "o ofício", info),
+            ("rt", "RT", "o relatório", info),
+            ("despacho", "Despacho", "o despacho", info),
+        ]
+
+        self.assertEqual(
+            [kind["key"] for kind in kinds_de_anexo_assinado(embaralhado)],
+            list(ORDEM_DOCUMENTOS),
+        )
+
+    def test_documento_fora_da_constante_e_erro_de_programacao(self):
+        """Um sexto documento entra na constante primeiro, não no fim da lista."""
+        from .presenters import kinds_de_anexo_assinado
+
+        with self.assertRaises(ValueError) as erro:
+            kinds_de_anexo_assinado([("parecer", "Parecer", "o parecer", {})])
+
+        self.assertIn("parecer", str(erro.exception))

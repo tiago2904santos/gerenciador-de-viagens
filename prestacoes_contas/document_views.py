@@ -175,10 +175,12 @@ def documentos_servidor(request, ps_pk):
     # `H-03`: eram cinco chaves ordinais (`primary`…`quinary`) — nome que dizia a
     # POSIÇÃO, não o documento. Cada uma virava 6 atributos `data-*` planos no
     # gatilho, 30 no total. Ver `kinds_de_anexo_assinado`.
-    # `NOVO-20260828-185303-995fcc0f4b5c`: ordem canônica `ORDEM_DOCUMENTOS` —
-    # ofício, despacho, RT, DB, comprovante. Esta lista abria pelo despacho e a
-    # do cartão da lista punha o DB antes do RT; como o modal é o MESMO, a ordem
-    # dos botões mudava conforme a tela de onde a pessoa o abriu.
+    # `NOVO-20260828-185303-995fcc0f4b5c`: a ordem dos botões NÃO vem desta
+    # lista — `kinds_de_anexo_assinado` reordena por `ORDEM_DOCUMENTOS`. Esta
+    # lista abria pelo despacho e a do cartão punha o DB antes do RT; como o
+    # modal é o MESMO, a ordem mudava conforme a tela de onde a pessoa o abriu.
+    # Aqui ficam só os RÓTULOS, que são de propósito diferentes por tela ("RT"
+    # aqui, "Relatório técnico" no cartão).
     attach_kinds = kinds_de_anexo_assinado(
         [
             ("oficio", "Ofício", f"o ofício {numero}", oficio_assinado),
