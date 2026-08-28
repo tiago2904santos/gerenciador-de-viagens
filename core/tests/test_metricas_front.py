@@ -10,6 +10,13 @@ from django.test import SimpleTestCase, override_settings
 from core.context_processors import SHELL_CSS_PROFILE_BY_VIEW
 from core.context_processors import shell_css_profile
 
+from scripts import medir_css_por_rota as css_metric
+from scripts import build_css_profiles as css_profiles
+from scripts import audit_css_variaveis_orfas as orfas_metric
+from scripts import medir_divergencia_tema as theme_metric
+from scripts import sonda_mesmo_tema as same_theme_metric
+from scripts.rotas_do_sistema import ROTAS
+
 
 def _view_names(padrao, prefixo=""):
     """(nome completo, callback) de cada URL, descendo pelos includes."""
@@ -22,12 +29,6 @@ def _view_names(padrao, prefixo=""):
             yield from _view_names(filho, novo)
     elif isinstance(padrao, URLPattern) and padrao.name:
         yield f"{prefixo}{padrao.name}", padrao.callback
-from scripts import medir_css_por_rota as css_metric
-from scripts import build_css_profiles as css_profiles
-from scripts import audit_css_variaveis_orfas as orfas_metric
-from scripts import medir_divergencia_tema as theme_metric
-from scripts import sonda_mesmo_tema as same_theme_metric
-from scripts.rotas_do_sistema import ROTAS
 
 
 class ShellCssProfileTests(SimpleTestCase):
