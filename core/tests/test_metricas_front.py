@@ -7,13 +7,28 @@ from types import SimpleNamespace
 
 from django.test import SimpleTestCase, override_settings
 
+from core.context_processors import SHELL_CSS_PROFILE_BY_VIEW
 from core.context_processors import shell_css_profile
+
 from scripts import medir_css_por_rota as css_metric
 from scripts import build_css_profiles as css_profiles
 from scripts import audit_css_variaveis_orfas as orfas_metric
 from scripts import medir_divergencia_tema as theme_metric
 from scripts import sonda_mesmo_tema as same_theme_metric
 from scripts.rotas_do_sistema import ROTAS
+
+
+def _view_names(padrao, prefixo=""):
+    """(nome completo, callback) de cada URL, descendo pelos includes."""
+    from django.urls.resolvers import URLPattern, URLResolver
+
+    if isinstance(padrao, URLResolver):
+        espaco = padrao.namespace
+        novo = f"{prefixo}{espaco}:" if espaco else prefixo
+        for filho in padrao.url_patterns:
+            yield from _view_names(filho, novo)
+    elif isinstance(padrao, URLPattern) and padrao.name:
+        yield f"{prefixo}{padrao.name}", padrao.callback
 
 
 class ShellCssProfileTests(SimpleTestCase):
@@ -23,7 +38,7 @@ class ShellCssProfileTests(SimpleTestCase):
             skip_comments=True,
             skip_whitespace=True,
         )
-        selected = css_profiles._with_dom_families(rules, set(), {"card"})
+        selected, _ = css_profiles._with_dom_families(rules, set(), {"card"})
 
         self.assertNotIn(css_profiles._rule_id(rules[0]), selected)
         self.assertIn(css_profiles._rule_id(rules[1]), selected)
@@ -36,7 +51,7 @@ class ShellCssProfileTests(SimpleTestCase):
             skip_whitespace=True,
         )
 
-        selected = css_profiles._with_dom_families(
+        selected, _ = css_profiles._with_dom_families(
             rules,
             set(),
             {"sidebar-item--collapsible", "sidebar-accordion"},
@@ -70,7 +85,127 @@ class ShellCssProfileTests(SimpleTestCase):
 
         self.assertEqual(
             shell_css_profile(request),
-            {"shell_css_profile_path": "css/profiles/dashboard.css"},
+            {
+                "shell_css_profile_path": "css/profiles/dashboard.css",
+                # NOVO-70: a rota passou a receber também o perfil de componentes.
+                # Antes daqui o `ui.bundle.css` inteiro ia em toda página.
+                "ui_css_profile_path": "css/profiles/dashboard.ui.css",
+            },
+        )
+
+    def test_variante_e_parte_criadas_por_js_sobrevivem_a_poda(self):
+        """`NOVO-70`: metade de um componente só existe no DOM depois do clique.
+
+        `date-picker__day--selected` nasce quando a pessoa escolhe o dia;
+        `download-picker__queue-item` nasce quando o download começa. Nenhum
+        aparece em captura nenhuma, e exigir a classe exata apagava o dia
+        selecionado e a fila de downloads de telas que usam esses componentes o
+        tempo todo — achado do Codex no PR do NOVO-70.
+        """
+        nasce_de = css_profiles._nasce_de
+
+        self.assertTrue(nasce_de("date-picker__day--selected", {"date-picker__day"}))
+        self.assertTrue(
+            nasce_de("download-picker__queue-item", {"download-picker__queue"})
+        )
+
+    def test_a_poda_nao_arrasta_vizinho_de_nome_parecido(self):
+        """O outro lado: sem isto a poda deixa de podar.
+
+        Aceitar qualquer prefixo até um traço fazia `button` arrastar
+        `button-group`, e o bloco arrastar todos os elementos dele. Medido: o
+        `login` caía de 39,8% para 34,5% de uso e `justificativas-lista` para
+        25%, abaixo do aceite de 35% do PF-02.
+        """
+        nasce_de = css_profiles._nasce_de
+
+        self.assertFalse(nasce_de("button-group", {"button"}))
+        self.assertFalse(nasce_de("search-picker__option", {"search-picker"}))
+
+    def test_virgula_no_seletor_e_alternativa_e_nao_conjuncao(self):
+        """Um ramo morto não pode derrubar o vivo.
+
+        `.nav:hover, .legado:hover` vale para os dois; exigir a união das
+        classes dos dois ramos apagava a regra da tela que só tem o primeiro.
+        """
+        self.assertEqual(
+            css_profiles._ramos_do_seletor(".nav:hover, .legado:hover"),
+            [".nav:hover", ".legado:hover"],
+        )
+        # Vírgula DENTRO de `:is(...)` não divide.
+        self.assertEqual(
+            css_profiles._ramos_do_seletor(":is(.a, .b) .c"),
+            [":is(.a, .b) .c"],
+        )
+
+    def test_url_que_serve_a_mesma_view_de_uma_rota_mapeada_tambem_tem_perfil(self):
+        """`NOVO-70`: rota mapeada pela metade cai no bundle inteiro, calada.
+
+        `cadastros:configuracao` estava no mapa e `cadastros:configuracao_aba`
+        não — mesma view, mesma página, só o segmento de aba a mais. Duas das
+        três abas de configuração baixavam os 552 KB que este trabalho existe
+        para evitar, e nada acusava: o fallback é silencioso por desenho.
+
+        A trava é genérica: se uma view tem perfil, TODA URL que aponta para ela
+        precisa ter também.
+        """
+        from django.urls import get_resolver
+
+        por_callback: dict[object, set[str]] = {}
+        for padrao in get_resolver().url_patterns:
+            for nome, view in _view_names(padrao):
+                por_callback.setdefault(view, set()).add(nome)
+
+        faltando = sorted(
+            nome
+            for nomes in por_callback.values()
+            if nomes & set(SHELL_CSS_PROFILE_BY_VIEW)
+            for nome in nomes - set(SHELL_CSS_PROFILE_BY_VIEW)
+        )
+
+        self.assertEqual(faltando, [], "views com perfil e URL sem perfil")
+
+    def test_todo_url_dos_perfis_aponta_para_arquivo_que_existe(self):
+        """`NOVO-70`: perfil que muda de diretório leva `url(...)` quebrada junto.
+
+        O `ui.bundle.css` mora em `static/css/` e escreve `../vendor/fonts/…`;
+        o perfil é gravado um nível abaixo, em `static/css/profiles/`. Copiada
+        sem reancorar, a `@font-face` passa a apontar para `css/vendor/fonts/…`,
+        que não existe. Nada quebra em tela — a fonte só não carrega — mas o
+        `collectstatic` com o storage de manifesto do WhiteNoise reprova o
+        DEPLOY, e foi lá que isto apareceu. Este teste é o mesmo contrato, sem
+        precisar rodar o `collectstatic`.
+        """
+        raiz = Path(css_profiles.STATIC_CSS)
+        quebradas = []
+        for perfil in sorted(css_profiles.OUTPUT_DIR.glob("*.css")):
+            for match in css_profiles._CSS_URL.finditer(
+                perfil.read_text(encoding="utf-8")
+            ):
+                alvo = (perfil.parent / match.group("path")).resolve()
+                if not alvo.is_file():
+                    quebradas.append(
+                        f"{perfil.name}: {match.group('path')}"
+                    )
+        self.assertEqual(quebradas, [], f"(raiz do CSS: {raiz})")
+
+    @override_settings(CSS_ROUTE_PROFILES_ENABLED=True)
+    def test_login_recebe_perfil_de_componentes_sem_perfil_de_casca(self):
+        """NOVO-70: o login não estende `base.html`, então não há casca a podar.
+
+        `build_css_profiles.py` não gera `login.css`; pedir esse arquivo daria
+        404. O perfil de componentes existe e é o que corta os 552 KB.
+        """
+        request = SimpleNamespace(
+            resolver_match=SimpleNamespace(view_name="core:login")
+        )
+
+        self.assertEqual(
+            shell_css_profile(request),
+            {
+                "shell_css_profile_path": None,
+                "ui_css_profile_path": "css/profiles/login.ui.css",
+            },
         )
 
     @override_settings(CSS_ROUTE_PROFILES_ENABLED=True)
@@ -79,7 +214,10 @@ class ShellCssProfileTests(SimpleTestCase):
             resolver_match=SimpleNamespace(view_name="admin:index")
         )
 
-        self.assertEqual(shell_css_profile(request), {"shell_css_profile_path": None})
+        self.assertEqual(
+            shell_css_profile(request),
+            {"shell_css_profile_path": None, "ui_css_profile_path": None},
+        )
 
     @override_settings(CSS_ROUTE_PROFILES_ENABLED=False)
     def test_feature_flag_desativa_perfis(self):
@@ -87,7 +225,10 @@ class ShellCssProfileTests(SimpleTestCase):
             resolver_match=SimpleNamespace(view_name="core:dashboard")
         )
 
-        self.assertEqual(shell_css_profile(request), {"shell_css_profile_path": None})
+        self.assertEqual(
+            shell_css_profile(request),
+            {"shell_css_profile_path": None, "ui_css_profile_path": None},
+        )
 
 
 class CssPorRotaMetricTests(SimpleTestCase):

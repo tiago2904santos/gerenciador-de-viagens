@@ -7,6 +7,9 @@ from .navigation import build_navigation
 
 
 SHELL_CSS_PROFILE_BY_VIEW = {
+    # NOVO-70: o login não tem shell (não estende base.html), mas tem perfil de
+    # componentes — por isso entra aqui e é filtrado em shell_css_profile().
+    "core:login": "login",
     "core:dashboard": "dashboard",
     "oficios:index": "entity-lists",
     "roteiros:index": "entity-lists",
@@ -26,8 +29,12 @@ SHELL_CSS_PROFILE_BY_VIEW = {
     "termos:preview_termo_oficio": "termo-preview",
     "oficios:modelo_motivo_create": "model-forms",
     "oficios:modelo_motivo_update": "model-forms",
-    "justificativas:legacy_modelo_create": "model-forms",
-    "justificativas:legacy_modelo_update": "model-forms",
+    # `justificativas:legacy_modelo_create` e `legacy_modelo_update` saíram
+    # daqui: as quatro rotas `legacy_*` apontam para `legacy_modelos_redirect`,
+    # que só devolve `redirect(...)`. View que não renderiza template descarta o
+    # contexto, então o perfil nunca chegava a lugar nenhum — mesmo fantasma do
+    # `oficio-new`, registrado em `NOVO-20260826-124840-50a3e47836ae`. Quem serve
+    # o perfil dessas URLs é o destino do redirect, `modelos_index`.
     "justificativas:modelos_index": "model-forms",
     "justificativas:modelo_create": "model-forms",
     "justificativas:modelo_update": "model-forms",
@@ -48,6 +55,10 @@ SHELL_CSS_PROFILE_BY_VIEW = {
     "roteiros:novo": "roteiro-form",
     "roteiros:editar": "roteiro-form",
     "cadastros:configuracao": "admin-form",
+    # Mesma view (`configuracao_sistema`), mesma página: as abas de Ofício e
+    # Roteiros entram por `configuracao/<aba>/`. Sem esta linha elas caíam no
+    # fallback e baixavam o `ui.bundle.css` inteiro — duas das três abas.
+    "cadastros:configuracao_aba": "admin-form",
     "cadastros:servidor_create": "admin-form",
     "cadastros:servidor_update": "admin-form",
     "cadastros:viatura_create": "admin-form",
@@ -55,13 +66,25 @@ SHELL_CSS_PROFILE_BY_VIEW = {
 }
 
 
+# NOVO-70: o login é a única rota sem casca. `build_css_profiles.py` não gera
+# `login.css` para ela; só `login.ui.css`. Sem esta lista, o `base.html` pediria
+# um arquivo que não existe.
+PERFIS_SEM_SHELL = frozenset({"login"})
+
+
 def shell_css_profile(request):
     if not settings.CSS_ROUTE_PROFILES_ENABLED:
-        return {"shell_css_profile_path": None}
+        return {"shell_css_profile_path": None, "ui_css_profile_path": None}
     match = getattr(request, "resolver_match", None)
     profile = SHELL_CSS_PROFILE_BY_VIEW.get(getattr(match, "view_name", None))
+    if not profile:
+        return {"shell_css_profile_path": None, "ui_css_profile_path": None}
+    tem_shell = profile not in PERFIS_SEM_SHELL
     return {
-        "shell_css_profile_path": f"css/profiles/{profile}.css" if profile else None
+        "shell_css_profile_path": f"css/profiles/{profile}.css" if tem_shell else None,
+        # NOVO-70: o par do shell. O `ui.bundle.css` inteiro entregava 552 KB em
+        # toda rota a 9% de uso; o perfil poda pelas classes que a família usa.
+        "ui_css_profile_path": f"css/profiles/{profile}.ui.css",
     }
 
 
