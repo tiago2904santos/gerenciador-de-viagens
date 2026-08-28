@@ -809,3 +809,9 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       memoriza por configuração as sondas que dependem de instalação (Word, WeasyPrint, fpdf).
 - [x] `NOVO-20260826-124301-1799c62a400b` faz a busca dos modelos do RT consumir toda a largura
       interna do rail pelo contrato canônico `rail__form`, com teste estrutural e medição visual.
+- [x] `NOVO-20260820-171008-7afb74d82d2c` estende ao `ui.bundle.css` os perfis por família de
+      rota do `PF-02`, fechando o impasse entre o gate `NOVO-70` e o aceite de 35%: uso médio das
+      43 rotas de 13,60% para 46,94%, entrega de 25,73 MB para 5,88 MB, nenhum piso abaixo de 35.
+- [ ] `NOVO-20260826-124840-50a3e47836ae` recapturar a casca do `PF-02`: 90% dos `rule_ids` já
+      não existem nas fontes, `oficio-new` é perfil fantasma e o podador trata vírgula de seletor
+      como conjunção. Fora do PR do v2 de propósito — mexer nos 15 perfis de casca é outra etapa.

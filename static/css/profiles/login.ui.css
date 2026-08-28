@@ -201,8 +201,37 @@
   color: var(--text-on-accent);
   font-weight: var(--weight-strong);
 }
+:is(html[data-theme]) .button--secondary {
+  background: var(--surface-contrast, var(--surface-rail));
+  border-color: transparent;
+  color: var(--text-strong);
+}
+:is(html[data-theme]) .button--danger {
+  background: var(--danger);
+  color: var(--text-on-danger);
+  font-weight: var(--weight-strong);
+}
+:is(html[data-theme]) .button--secondary:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface-contrast, var(--surface-rail)));
+  color: var(--accent);
+}
 :is(html[data-theme]) .button--primary:hover:not(:disabled):not([aria-disabled="true"]) {
   box-shadow: inset 0 0 0 999px rgb(255 255 255 / 0.16);
+}
+:is(html[data-theme]) .button--danger:hover:not(:disabled):not([aria-disabled="true"]) {
+  box-shadow: inset 0 0 0 999px rgb(0 0 0 / 0.12);
+}
+:is(html[data-theme]) .button--icon {
+  padding: 0;
+  width: var(--control-height);
+}
+:is(html[data-theme]) .button--sm {
+  font-size: var(--text-size-eyebrow);
+  min-height: var(--control-height-sm);
+  padding: 0 10px;
+}
+:is(html[data-theme]) .button--sm.button--icon {
+  width: var(--control-height-sm);
 }
 :is(html[data-theme]) .input {
   align-items: center;
@@ -232,9 +261,27 @@
   border-color: var(--focus-ring);
   outline: none !important;
 }
+:is(html[data-theme]) .input--with-icon .input__control {
+  padding-left: 38px;
+}
 :is(html[data-theme]) .input__control:disabled {
   cursor: not-allowed;
   opacity: 0.55;
+}
+:is(html[data-theme]) .input__control--textarea {
+  min-height: 96px;
+  padding: 10px 12px;
+  resize: vertical;
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+:is(html[data-theme]) .input__control[readonly],
+:is(html[data-theme]) .cv-field__control[readonly] {
+  background: var(--surface-contrast, var(--surface-field));
+  border-color: transparent;
+  color: var(--text-strong);
+  opacity: 1;
 }
 :where(.cv-field__control) {
   background: var(--color-card);
@@ -261,6 +308,14 @@
   font-weight: var(--weight-strong);
   
   letter-spacing: normal;
+}
+:is(html[data-theme]) .field--invalid .input__control {
+  border-color: var(--danger);
+}
+:is(html[data-theme]) .field--invalid .input__control:focus-visible {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 40%, transparent);
+  outline: none !important;
 }
 :root {
   --field-grid-gap: var(--space-4);

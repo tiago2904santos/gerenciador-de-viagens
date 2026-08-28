@@ -78,6 +78,51 @@ class ShellCssProfileTests(SimpleTestCase):
             },
         )
 
+    def test_variante_e_parte_criadas_por_js_sobrevivem_a_poda(self):
+        """`NOVO-70`: metade de um componente só existe no DOM depois do clique.
+
+        `date-picker__day--selected` nasce quando a pessoa escolhe o dia;
+        `download-picker__queue-item` nasce quando o download começa. Nenhum
+        aparece em captura nenhuma, e exigir a classe exata apagava o dia
+        selecionado e a fila de downloads de telas que usam esses componentes o
+        tempo todo — achado do Codex no PR do NOVO-70.
+        """
+        nasce_de = css_profiles._nasce_de
+
+        self.assertTrue(nasce_de("date-picker__day--selected", {"date-picker__day"}))
+        self.assertTrue(
+            nasce_de("download-picker__queue-item", {"download-picker__queue"})
+        )
+
+    def test_a_poda_nao_arrasta_vizinho_de_nome_parecido(self):
+        """O outro lado: sem isto a poda deixa de podar.
+
+        Aceitar qualquer prefixo até um traço fazia `button` arrastar
+        `button-group`, e o bloco arrastar todos os elementos dele. Medido: o
+        `login` caía de 39,8% para 34,5% de uso e `justificativas-lista` para
+        25%, abaixo do aceite de 35% do PF-02.
+        """
+        nasce_de = css_profiles._nasce_de
+
+        self.assertFalse(nasce_de("button-group", {"button"}))
+        self.assertFalse(nasce_de("search-picker__option", {"search-picker"}))
+
+    def test_virgula_no_seletor_e_alternativa_e_nao_conjuncao(self):
+        """Um ramo morto não pode derrubar o vivo.
+
+        `.nav:hover, .legado:hover` vale para os dois; exigir a união das
+        classes dos dois ramos apagava a regra da tela que só tem o primeiro.
+        """
+        self.assertEqual(
+            css_profiles._ramos_do_seletor(".nav:hover, .legado:hover"),
+            [".nav:hover", ".legado:hover"],
+        )
+        # Vírgula DENTRO de `:is(...)` não divide.
+        self.assertEqual(
+            css_profiles._ramos_do_seletor(":is(.a, .b) .c"),
+            [":is(.a, .b) .c"],
+        )
+
     def test_todo_url_dos_perfis_aponta_para_arquivo_que_existe(self):
         """`NOVO-70`: perfil que muda de diretório leva `url(...)` quebrada junto.
 

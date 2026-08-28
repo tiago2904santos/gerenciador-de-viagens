@@ -11006,11 +11006,10 @@ devolve os dois bundles. Família nova `login`, a única rota sem casca.
 
 | | antes | depois |
 |---|---:|---:|
-| uso médio das 43 rotas | 13,60% | **50,06%** |
-| pior rota | 4,22% (`login`) | **39,26%** (`justificativas-lista`) |
-| melhor rota | 20,81% | 60,01% (`oficios-detalhe`) |
-| CSS entregue somando as 43 rotas | 25,73 MB | **5,49 MB** |
-| `login` | 565 KB | 28 KB |
+| uso médio das 43 rotas | 13,60% | **46,94%** |
+| pior rota | 4,22% (`login`) | **36,02%** (`justificativas-lista`) |
+| melhor rota | 20,81% | 56,73% |
+| CSS entregue somando as 43 rotas | 25,73 MB | **5,88 MB** |
 
 Os dois lados fecham: o gate `NOVO-70` passa contra pisos regravados e o
 `test_todas_as_rotas_cumprem_o_aceite_pf02_de_35_por_cento` passa porque o menor
@@ -11075,6 +11074,31 @@ download compartilhado em várias telas. DOM novo que a captura não conhecia �
 o `termo-preview` perdia 45 elementos das famílias `modal__*` e
 `download-picker`. **Perfil por cobertura tem prazo de validade: mudou marcação,
 recaptura.** Os 16 relatórios foram refeitos contra o DOM de hoje.
+
+**Um terceiro defeito, achado pela revisão automática do Codex, e é o mais
+instrutivo dos três.** Metade do que alguns componentes desenham **não existe no
+DOM em captura nenhuma**, por mais estados que ela abra:
+`date-picker__day--selected` nasce quando a pessoa escolhe o dia,
+`download-picker__queue-item` quando o download começa. Exigir a classe exata
+apagava o dia selecionado e a fila de downloads de telas que usam esses
+componentes o tempo todo — 13 regras do calendário e 12 da fila.
+
+O critério passou a aceitar a classe que **nasce de** uma vista: variante
+(`<vista>--x`) ou parte de um elemento visto (`<vista>-x`, com `__` na vista).
+As duas fronteiras foram calibradas com medição, não por gosto:
+
+| critério | uso médio | pior rota | veredito |
+|---|---:|---:|---|
+| classe exata | 50,06% | 39,26% | perde o dia selecionado e a fila |
+| bloco BEM inteiro | 41,34% | **25,38%** | reprova o aceite de 35% do PF-02 |
+| qualquer prefixo até `-` | 46,00% | **34,47%** | `button` arrastava `button-group` |
+| **variante + parte de elemento** | **46,94%** | **36,02%** | adotado |
+
+Na mesma revisão saiu que vírgula em seletor é **alternativa**, e o podador
+tratava como conjunção — um ramo morto derrubava o vivo. Corrigido no caminho do
+v2; a casca tem o mesmo defeito e ele está em
+`NOVO-20260826-124840-50a3e47836ae`, porque consertá-lo aqui mudaria os 15
+perfis do PF-02.
 
 **O que este PR NÃO fez:** a captura da casca continua sendo a do PF-02, byte a
 byte (`cmp` confere que os 15 perfis de casca saem idênticos). Ela envelheceu, e

@@ -108,6 +108,40 @@ _INTERACTIVE_STATE = re.compile(
     r"|\.(?:is|has)-[\w-]+|\[(?:aria-(?:expanded|selected|pressed|checked)|open)="
 )
 _STATE_CLASS = re.compile(r"^(?:is|has)-")
+_MODIFICADOR_BEM = re.compile(r"--[\w-]+$")
+
+
+def _nasce_de(class_name: str, presentes: set[str]) -> bool:
+    """A classe é uma VARIANTE ou PARTE de algo que a captura viu?
+
+    Metade do que o `date-picker` e o `download-picker` desenham só existe no DOM
+    depois de uma interação: `date-picker__day--selected` nasce no clique,
+    `download-picker__queue-item` nasce quando o download começa. Nenhum aparece
+    numa captura, por mais estados que ela abra, e exigir a classe exata apagava
+    o dia selecionado e a fila de downloads de telas que usam esses componentes o
+    tempo todo.
+
+    O critério é o prefixo até um traço: `download-picker__queue-item` entra
+    porque `download-picker__queue` foi visto; `date-picker__day--selected`
+    entra porque `date-picker__day` foi visto. Deliberadamente NÃO vale para o
+    `__`: `search-picker__option` não entra só porque a página tem
+    `search-picker`, senão a poda deixaria de podar — medido, isso levava o uso
+    de `justificativas-lista` de 39% para 25%.
+    """
+    if class_name in presentes:
+        return True
+    for visto in presentes:
+        # Variante: `date-picker__day--selected` nasce de `date-picker__day`.
+        if class_name.startswith(f"{visto}--"):
+            return True
+        # Parte de um ELEMENTO visto: `download-picker__queue-item` nasce de
+        # `download-picker__queue`. Exigir o `__` no que foi visto é o que
+        # impede um nome curto de arrastar vizinho alheio — sem isso, `button`
+        # casaria `button-group` de outro componente, e o `login` (28 KB, onde
+        # cada regra a mais pesa) caía de 39,8% para 34,5% de uso.
+        if "__" in visto and class_name.startswith(f"{visto}-"):
+            return True
+    return False
 # `:is(...)`/`:where(...)` são ALTERNATIVAS, não conjunção. Extrair classe de
 # dentro deles e exigir todas junto reprova o seletor inteiro por causa de um
 # ramo que a família não usa — `:is(.picker, .destination-row, .field)
@@ -194,6 +228,30 @@ def _token_rule_ids(rules) -> set[str]:
     return {_rule_id(rule) for rule in _qualified_rules(rules) if _is_root_rule(rule)}
 
 
+def _ramos_do_seletor(selector: str) -> list[str]:
+    """Divide `a, b` no nível de cima, respeitando `:is(a, b)` e afins.
+
+    Vírgula em CSS é ALTERNATIVA: `.nav:hover, .legado:hover` vale para as duas.
+    Avaliar a união das classes dos dois ramos deixa um ramo morto derrubar o
+    vivo — e o seletor inteiro some da tela que usa só o primeiro.
+    """
+    ramos: list[str] = []
+    profundidade = 0
+    atual: list[str] = []
+    for caractere in selector:
+        if caractere == "(":
+            profundidade += 1
+        elif caractere == ")":
+            profundidade -= 1
+        if caractere == "," and profundidade == 0:
+            ramos.append("".join(atual))
+            atual = []
+            continue
+        atual.append(caractere)
+    ramos.append("".join(atual))
+    return [ramo.strip() for ramo in ramos if ramo.strip()]
+
+
 def _with_dom_families(
     rules, selected: set[str], dom_classes: set[str], *, incluir_base: bool = False
 ) -> set[str]:
@@ -211,39 +269,58 @@ def _with_dom_families(
     result = set(selected)
     for rule in qualified:
         selector = _selector(rule)
-        classes = set(_CLASS.findall(selector))
-        fonte_de_classes = (
-            _IS_WHERE.sub(" ", selector) if incluir_base else selector
-        )
-        structural_classes = {
-            class_name
-            for class_name in _CLASS.findall(fonte_de_classes)
-            if not _STATE_CLASS.match(class_name)
-        }
-        if incluir_base and not structural_classes and classes:
-            # Seletor cujas classes vivem TODAS dentro de um `:is(...)`. Sem nada
-            # fora do grupo não há o que conferir; entra, que é o lado seguro.
-            result.add(_rule_id(rule))
-            continue
-        # Regras normais presentes no DOM ja entram pelos fragmentos medidos do
-        # manifesto. A expansao por familia existe somente para estados que o
-        # CDP nao casa sem interacao (hover/focus/checked etc.). Classes de
-        # estado como ``is-open`` so aparecem depois da interacao e, portanto,
-        # nao podem ser exigidas no retrato inicial do DOM.
-        if (
-            structural_classes
-            and structural_classes.issubset(dom_classes)
-            and (incluir_base or _INTERACTIVE_STATE.search(selector))
-        ):
-            result.add(_rule_id(rule))
-        elif _INTERACTIVE_STATE.search(selector) and not classes and re.search(
-            r"\b(?:a|button|input|select|textarea):", selector
+        # Vírgula é alternativa: basta UM ramo aplicável para a regra entrar.
+        # Só no caminho do v2. A casca tem o MESMO defeito, e ele está registrado
+        # em `NOVO-20260826-124840-50a3e47836ae` — consertá-lo aqui mudaria os 15
+        # perfis do PF-02 num PR que promete não tocá-los, e sem a recaptura que
+        # a casca precisa de qualquer jeito.
+        ramos = _ramos_do_seletor(selector) if incluir_base else [selector]
+        if any(
+            _ramo_aplicavel(ramo, dom_classes, incluir_base=incluir_base)
+            for ramo in ramos
         ):
             result.add(_rule_id(rule))
     return result
 
 
+def _ramo_aplicavel(ramo: str, dom_classes: set[str], *, incluir_base: bool) -> bool:
+    classes = set(_CLASS.findall(ramo))
+    fonte_de_classes = _IS_WHERE.sub(" ", ramo) if incluir_base else ramo
+    structural_classes = {
+        class_name
+        for class_name in _CLASS.findall(fonte_de_classes)
+        if not _STATE_CLASS.match(class_name)
+    }
+    if incluir_base and not structural_classes and classes:
+        # Ramo cujas classes vivem TODAS dentro de um `:is(...)`. Sem nada fora
+        # do grupo não há o que conferir; entra, que é o lado seguro.
+        return True
+    # Regras normais presentes no DOM ja entram pelos fragmentos medidos do
+    # manifesto. A expansao por familia existe somente para estados que o
+    # CDP nao casa sem interacao (hover/focus/checked etc.). Classes de
+    # estado como ``is-open`` so aparecem depois da interacao e, portanto,
+    # nao podem ser exigidas no retrato inicial do DOM.
+    if incluir_base:
+        cobertas = all(_nasce_de(nome, dom_classes) for nome in structural_classes)
+    else:
+        cobertas = structural_classes.issubset(dom_classes)
+    if (
+        structural_classes
+        and cobertas
+        and (incluir_base or _INTERACTIVE_STATE.search(ramo))
+    ):
+        return True
+    return bool(
+        _INTERACTIVE_STATE.search(ramo)
+        and not classes
+        and re.search(r"\b(?:a|button|input|select|textarea):", ramo)
+    )
+
+
 UI_SOURCE = "ui.bundle.css"
+
+
+PERFIS_SEM_SHELL = frozenset({"login"})
 
 
 def _shell_sheet(route: dict) -> dict | None:
@@ -254,8 +331,13 @@ def _shell_sheet(route: dict) -> dict | None:
         or sheet["source_url"].endswith("/shell.form-components.bundle.css")
     ]
     if not candidates:
-        # `login` é assim: casca própria, sem shell. Perfil só do v2.
+        # `login` é assim: casca própria, sem shell. Perfil só do v2. Qualquer
+        # OUTRA rota sem folha de shell é relatório malformado — a página ou o
+        # asset não carregou —, e devolver `None` ali faria `capture()` gravar
+        # `source: null`, parar de emitir aquele perfil e deixar o arquivo velho
+        # no disco, que o context processor continuaria servindo.
         return None
+
     if len(candidates) != 1:
         raise ValueError("a rota possui mais de um bundle de shell")
     return candidates[0]
@@ -360,6 +442,11 @@ def capture(reports: list[Path]) -> dict:
                 route = routes.get(slug)
                 if not route:
                     continue
+                if _shell_sheet(route) is None and profile not in PERFIS_SEM_SHELL:
+                    raise ValueError(
+                        f"perfil {profile}: a rota {slug} veio sem folha de shell "
+                        "no relatório — recapture; só o `login` não tem casca"
+                    )
                 dom_classes.update(route.get("dom_classes", []))
                 ui_dom_classes.update(route.get("dom_classes", []))
                 for sheet in route["stylesheet_usage"]:
@@ -372,7 +459,13 @@ def capture(reports: list[Path]) -> dict:
         if source and not rule_ids:
             raise ValueError(f"perfil sem cobertura de shell: {profile}")
         if not ui_rule_ids:
-            raise ValueError(f"perfil sem cobertura do v2: {profile}")
+            raise ValueError(
+                f"perfil sem cobertura do v2: {profile}. A causa quase certa é a "
+                "captura ter rodado contra um servidor com CSS_ROUTE_PROFILES_ENABLED "
+                "ligado (o padrão): aí a rota entrega `css/profiles/<família>.ui.css` "
+                "e não `css/ui.bundle.css`, e não há bundle para medir. Suba o "
+                "servidor com CSS_ROUTE_PROFILES_ENABLED=false e recapture."
+            )
         profiles[profile] = {
             "source": source,
             "routes": list(slugs),
