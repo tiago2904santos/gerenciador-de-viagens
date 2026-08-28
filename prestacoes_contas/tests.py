@@ -174,8 +174,7 @@ class RelatorioTecnicoDiariaTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "Salvar texto")
-        # O RT é a etapa 2 desde 2026-08-28: adiante ficam os Documentos.
-        self.assertContains(response, "Ir para Documentos")
+        self.assertContains(response, "Ir para Diário de Bordo")
 
     def test_salvar_oficio_sincroniza_prestacoes_para_equipe_existente(self):
         oficio = Oficio.objects.create(area=area_de_teste(), 
@@ -713,11 +712,15 @@ class PrestacaoAssinadoUploadTests(TestCase):
         for payload in payloads:
             self.assertEqual(
                 [(k["key"], k["option_label"]) for k in payload],
+                # `NOVO-20260828-185303-995fcc0f4b5c`: a ordem era `diario`
+                # antes de `rt`. Este teste travava a lista errada — a etapa
+                # Documentos abre o MESMO modal e sempre desenhou o RT primeiro.
+                # A ordem canônica está em `download_services.ORDEM_DOCUMENTOS`.
                 [
                     ("oficio", "Ofício assinado"),
                     ("despacho", "Despacho"),
-                    ("diario", "Diário de bordo"),
                     ("rt", "Relatório técnico"),
+                    ("diario", "Diário de bordo"),
                     ("comprovante", "Comprovante"),
                 ],
             )

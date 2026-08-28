@@ -11129,6 +11129,59 @@ Encosta no `NOVO-20260820-171008-7afb74d82d2c`: a decisão de estender os perfis
 não deve sair antes deste conserto, ou o mesmo corte de tema atingiria também o v2 — hoje o v2
 escapa só porque `ui.bundle.css` não passa pelo podador.
 
+### NOVO-20260828-185303-995fcc0f4b5c ✅ RESOLVIDO (28/08/2026) · `NOVO` Os cinco documentos da prestação saíam em quatro ordens diferentes · HT/BE · risco baixo
+
+A ordem correta é a que a etapa Documentos sempre desenhou na tela: **ofício,
+despacho, RT, DB, comprovante** — o bloco do ofício com os dois primeiros
+(`_docs_despacho_body.html`), o bloco do servidor com os três últimos
+(`_docs_anexos_servidor_body.html`).
+
+Nenhum outro lugar seguia essa ordem, e nenhum seguia o outro:
+
+| onde | ordem que entregava |
+|---|---|
+| etapa Documentos, botões do modal (`document_views.py`) | despacho, **ofício**, RT, DB, comprovante |
+| cartão da lista, botões do MESMO modal (`presenters.py`) | ofício, despacho, **DB, RT**, comprovante |
+| seletor de download (`payload_downloads`) | ofício, despacho, **DB, RT**, comprovante |
+| PDF juntado dos originais (`_originais`) | ofício, **DB, RT** |
+| PDF juntado dos assinados (`compilar_download`) | **a ordem da query string** |
+
+Os dois primeiros doem mais do que parece: o modal de anexo é **um só**, e a
+lista de botões vem de quem o abriu. A mesma pessoa via a ordem mudar conforme
+tivesse aberto pela etapa ou pelo cartão. O último é pior: `itens` chega na
+ordem em que o JS montou as caixas, e ia direto para o `_merge_pdf_parts` — o
+PDF juntado saía na ordem de clique.
+
+**Correção.** `download_services.ORDEM_DOCUMENTOS` é a sequência, num lugar só, e
+`em_ordem(ids)` reordena qualquer conjunto de chaves por ela. Os cinco
+consumidores passaram a derivar dela em vez de reescrever a lista à mão. Os
+geradores de original viraram um dicionário por chave (`GERADORES_ORIGINAIS`),
+que é o que permite montar o PDF na ordem canônica sem `if` em cascata —
+despacho e comprovante não estão lá porque não têm original: só existem
+assinados.
+
+**A inversão do `AGENTS.md` §4 pegou o que se esperava dela.** Os quatro cenários
+de `prestacoes_contas/test_ordem_documentos.py` foram escritos antes da correção
+e reprovaram cada um com a ordem errada por extenso na mensagem. E um teste
+existente (`test_lista_exibe_uploads_assinados_conforme_o_papel`) travava a ordem
+**errada** — foi corrigido, não apagado, com o motivo na linha.
+
+**As etapas do wizard entraram junto.** Poucas horas antes, `90ccdee`
+(`NOVO-20260828-101500-3c7a5d19e4b2`) tinha invertido as etapas para diário →
+RT, com a justificativa de que o pacote final já montava nessa ordem e o wizard
+era o único fora. A observação sobre o código estava certa; a conclusão, não —
+quem estava invertido era o pacote. Com a ordem canônica definida pelo dono, o
+`90ccdee` foi revertido e as etapas voltaram a RT (Etapa 1) → Diário (Etapa 2),
+junto com os três rodapés, o `aria-label` do botão de editar do card e a
+descrição do pacote final. Preencher e entregar seguem a MESMA ordem; era isso
+que aquela linha buscava, e é o que se mantém — no sentido certo.
+
+**O que NÃO mudou:** os nomes dos arquivos no Drive (`integracoes/google_drive/naming.py`)
+não têm prefixo de ordem, e a pasta do Drive não impõe sequência — não há o que
+ordenar lá. `PrestacaoDocumentoAnexo.TIPO_CHOICES` também ficou como está: é
+ordem de `<option>` em formulário interno, e mexer nela gera migração sem mudar
+nada que a pessoa veja.
+
 ### NOVO-20260821-172128-3ad8129911ce ✅ RESOLVIDO · `NOVO` Headers de página voltaram a exibir selos de estado · HT/UI · risco baixo
 
 O contrato de `NOVO-20260813-164208-774d64105a96` regrediu durante a migração para os componentes
@@ -12123,3 +12176,20 @@ Dois testes travavam a ordem antiga e foram reescritos para a nova:
 `tests.test_rodape_do_rt_nao_exibe_botao_salvar_texto` e
 `test_componentes_v2.test_rodape_do_diario_nao_repete_downloads_da_pre_visualizacao`.
 Suíte completa: **2.755 testes verdes** (64s, `--parallel 4`).
+
+**REVERTIDO em 28/08/2026, por decisão do dono.** A premissa desta linha era que
+"o pacote final sempre empilhou diário → RT" e que só o wizard divergia. A
+premissa estava certa sobre o código e **errada sobre a intenção**: perguntado
+diretamente, o dono definiu a ordem canônica dos cinco documentos como **ofício,
+despacho, RT, DB, comprovante**. Ou seja, quem estava invertido era o pacote, não
+o wizard.
+
+O conserto completo está em `NOVO-20260828-185303-995fcc0f4b5c`: o pacote, o
+seletor de download e os dois modais passaram para RT antes do DB, e as etapas
+desta linha voltaram a RT (Etapa 1) → Diário (Etapa 2). O `git revert` de
+`90ccdee` cobriu as etapas; os rodapés, o `aria-label` do card e a descrição do
+pacote final acompanham.
+
+Fica registrado porque a lição não é sobre este par de documentos: uma ordem
+observada no código não é evidência da ordem desejada, e as duas discordavam
+havia tempo em quatro lugares diferentes.

@@ -175,10 +175,16 @@ def documentos_servidor(request, ps_pk):
     # `H-03`: eram cinco chaves ordinais (`primary`…`quinary`) — nome que dizia a
     # POSIÇÃO, não o documento. Cada uma virava 6 atributos `data-*` planos no
     # gatilho, 30 no total. Ver `kinds_de_anexo_assinado`.
+    # `NOVO-20260828-185303-995fcc0f4b5c`: a ordem dos botões NÃO vem desta
+    # lista — `kinds_de_anexo_assinado` reordena por `ORDEM_DOCUMENTOS`. Esta
+    # lista abria pelo despacho e a do cartão punha o DB antes do RT; como o
+    # modal é o MESMO, a ordem mudava conforme a tela de onde a pessoa o abriu.
+    # Aqui ficam só os RÓTULOS, que são de propósito diferentes por tela ("RT"
+    # aqui, "Relatório técnico" no cartão).
     attach_kinds = kinds_de_anexo_assinado(
         [
-            ("despacho", "Despacho", f"o despacho do ofício {numero}", despacho_assinado),
             ("oficio", "Ofício", f"o ofício {numero}", oficio_assinado),
+            ("despacho", "Despacho", f"o despacho do ofício {numero}", despacho_assinado),
             (
                 "rt",
                 "RT",
@@ -223,8 +229,7 @@ def documentos_servidor(request, ps_pk):
             # metadados de cabeçalho (H-02).
             **contexto_do_fluxo(ps, "documentos"),
             "back_url": reverse("prestacoes_contas:index"),
-            # A etapa anterior é o RT desde a inversão de 2026-08-28 (diário → RT → documentos).
-            "rt_url": reverse("prestacoes_contas:rt_servidor", args=[ps.pk]),
+            "diario_url": reverse("prestacoes_contas:diario_servidor", args=[ps.pk]),
             "consolidado_url": reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk]),
         },
     )

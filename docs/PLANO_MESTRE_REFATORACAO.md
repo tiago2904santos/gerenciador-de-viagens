@@ -809,3 +809,11 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       memoriza por configuração as sondas que dependem de instalação (Word, WeasyPrint, fpdf).
 - [x] `NOVO-20260826-124301-1799c62a400b` faz a busca dos modelos do RT consumir toda a largura
       interna do rail pelo contrato canônico `rail__form`, com teste estrutural e medição visual.
+- [x] `NOVO-20260828-185303-995fcc0f4b5c` põe os cinco documentos da prestação numa ordem só —
+      ofício, despacho, RT, DB, comprovante — nos dois modais de anexo, no seletor de download e
+      no PDF juntado, que antes saía na ordem de clique. `ORDEM_DOCUMENTOS` é a fonte única e
+      `kinds_de_anexo_assinado` reordena, então a constante move os botões junto com o pacote.
+- [x] `NOVO-20260828-101500-3c7a5d19e4b2` **revertido** no mesmo PR: as etapas do wizard voltam a
+      RT (Etapa 1) → Diário (Etapa 2). A premissa dele — "o pacote sempre montou diário → RT" —
+      descrevia o código certo e a intenção errada; com a ordem canônica definida pelo dono, quem
+      estava invertido era o pacote.

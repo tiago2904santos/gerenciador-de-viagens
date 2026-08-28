@@ -21,6 +21,7 @@ from oficios.presenters import (
 
 from .forms import PrestacaoSolicitacaoForm
 from .services import diaria_recebida_display
+from .download_services import ORDEM_DOCUMENTOS
 from .models import PrestacaoDocumentoAnexo
 
 
@@ -81,9 +82,24 @@ def kinds_de_anexo_assinado(documentos):
       template, modal e JS.
 
     `documentos` é uma lista de `(key, option_label, doc_label, info)`, onde
-    `info` é o retorno de `_anexo_assinado_info`. A ordem da lista é a ordem em
-    que os botões aparecem no modal.
+    `info` é o retorno de `_anexo_assinado_info`.
+
+    `NOVO-20260828-185303-995fcc0f4b5c`: a ordem dos botões NÃO é mais a ordem em
+    que a chamadora montou a lista — é sempre `ORDEM_DOCUMENTOS`. Ordenar aqui, e
+    não em cada chamadora, é o que faz a constante ser fonte única de verdade: o
+    modal é UM só, servido por duas telas que passam rótulos diferentes de
+    propósito ("RT" na etapa, "Relatório técnico" no cartão), e era justamente
+    por cada uma montar a sequência à mão que as duas discordavam. Chave fora da
+    constante é erro de programação, não dado de entrada: um sexto documento
+    entra na constante primeiro.
     """
+    conhecidas = set(ORDEM_DOCUMENTOS)
+    desconhecidas = [key for key, *_ in documentos if key not in conhecidas]
+    if desconhecidas:
+        raise ValueError(
+            "documento fora de ORDEM_DOCUMENTOS: " + ", ".join(sorted(desconhecidas))
+        )
+    documentos = sorted(documentos, key=lambda item: ORDEM_DOCUMENTOS.index(item[0]))
     return [
         {
             "key": key,
@@ -321,16 +337,16 @@ def apresentar_prestacao_servidor_card(
                 despacho_assinado,
             ),
             (
-                "diario",
-                "Diário de bordo",
-                f"o diário de bordo do ofício {oficio.numero_formatado}",
-                servidor["diario_assinado"],
-            ),
-            (
                 "rt",
                 "Relatório técnico",
                 f"o relatório técnico de {servidor['name']}",
                 servidor["rt_assinado"],
+            ),
+            (
+                "diario",
+                "Diário de bordo",
+                f"o diário de bordo do ofício {oficio.numero_formatado}",
+                servidor["diario_assinado"],
             ),
             (
                 "comprovante",
