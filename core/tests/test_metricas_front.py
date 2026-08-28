@@ -23,7 +23,7 @@ class ShellCssProfileTests(SimpleTestCase):
             skip_comments=True,
             skip_whitespace=True,
         )
-        selected = css_profiles._with_dom_families(rules, set(), {"card"})
+        selected, _ = css_profiles._with_dom_families(rules, set(), {"card"})
 
         self.assertNotIn(css_profiles._rule_id(rules[0]), selected)
         self.assertIn(css_profiles._rule_id(rules[1]), selected)
@@ -36,7 +36,7 @@ class ShellCssProfileTests(SimpleTestCase):
             skip_whitespace=True,
         )
 
-        selected = css_profiles._with_dom_families(
+        selected, _ = css_profiles._with_dom_families(
             rules,
             set(),
             {"sidebar-item--collapsible", "sidebar-accordion"},

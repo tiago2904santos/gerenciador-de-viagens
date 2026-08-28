@@ -309,6 +309,10 @@
   color: var(--color-danger);
   font-weight: 900;
 }
+:is(html[data-theme]) [data-document-download-active] {
+  cursor: wait;
+  pointer-events: none;
+}
 @media (max-width: 600px) {
 :is(html[data-theme]) .document-loading {
     right: 16px;
@@ -500,16 +504,13 @@
   scrollbar-gutter: stable;
   scrollbar-width: thin;
 }
-:is(html[data-theme]) .input__control[readonly],
-:is(html[data-theme]) .cv-field__control[readonly] {
+:is(html[data-theme]) .input__control[readonly] {
   background: var(--surface-contrast, var(--surface-field));
   border-color: transparent;
   color: var(--text-strong);
   opacity: 1;
 }
-:is(html[data-theme]) .field > .form-control,
-:is(html[data-theme]) .field > .form-select,
-:is(html[data-theme]) .field > .cv-field__control {
+:is(html[data-theme]) .field > .form-control {
   background: var(--surface-contrast, var(--surface-field));
   border: 1px solid transparent;
   border-radius: var(--radius-field);
@@ -521,9 +522,7 @@
   padding: var(--pad-field);
   width: 100%;
 }
-:is(html[data-theme]) .field > .form-control:focus-visible,
-:is(html[data-theme]) .field > .form-select:focus-visible,
-:is(html[data-theme]) .field > .cv-field__control:focus-visible {
+:is(html[data-theme]) .field > .form-control:focus-visible {
   border-color: var(--focus-ring);
   
   box-shadow: none !important;
@@ -592,10 +591,7 @@
   gap:                   var(--field-grid-gap);
   width:                 100%;
 }
-.field-grid > .field,
-.field-grid > .app-form-field,
-.field-grid--cols-3 > .field,
-.field-grid--cols-3 > .app-form-field {
+.field-grid > .field, .field-grid--cols-3 > .field {
   min-width: 0;
   width:     100%;
 }
@@ -947,14 +943,10 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 :is(html[data-theme]) .alert:empty {
   display: none;
 }
-:is(html[data-theme]) .notice-stack,
-:is(html[data-theme]) .alerts,
 :is(html[data-theme]) .alert-stack {
   margin-bottom: var(--gap);
   padding-bottom: var(--gap-tight);
 }
-:is(html[data-theme]) .notice-stack .notice,
-:is(html[data-theme]) .alerts .alert,
 :is(html[data-theme]) .alert-stack .alert {
   transition:
     height var(--ease),
@@ -966,9 +958,7 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   opacity: 0;
 }
 @media (prefers-reduced-motion: reduce) {
-:is(html[data-theme]) .notice-stack .notice,
-  :is(html[data-theme]) .alerts .alert,
-  :is(html[data-theme]) .alert-stack .alert {
+:is(html[data-theme]) .alert-stack .alert {
     transition: none;
   }
 }
@@ -1026,8 +1016,7 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   grid-template-columns: repeat(6, minmax(0, 1fr));
   min-width: 0;
 }
-:is(html[data-theme]) .record__row,
-:is(html[data-theme]) .record__footer {
+:is(html[data-theme]) .record__row {
   grid-column: 1 / -1;
 }
 :is(html[data-theme]) .record__row {
@@ -1103,6 +1092,9 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 }
 :is(html[data-theme]) :is(.prestacao-card__facts, .oficio-card__facts, .evento-card__docs) .form-block--v2 {
   grid-column: auto;
+}
+:is(html[data-theme]) #bate-volta-body[hidden] {
+  display: none;
 }
 :is(html[data-theme])
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) :is(

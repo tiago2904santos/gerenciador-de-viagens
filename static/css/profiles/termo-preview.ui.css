@@ -309,6 +309,10 @@
   color: var(--color-danger);
   font-weight: 900;
 }
+:is(html[data-theme]) [data-document-download-active] {
+  cursor: wait;
+  pointer-events: none;
+}
 @media (max-width: 600px) {
 :is(html[data-theme]) .document-loading {
     right: 16px;
@@ -514,10 +518,7 @@
 .field-grid {
     grid-template-columns: 1fr;
   }
-.field-size-1,
-  .field-size-2,
-  .field-size-3,
-  .field-size-4 {
+.field-size-4 {
     grid-column: 1;
   }
 }
@@ -528,8 +529,7 @@
   justify-content: space-between;
   min-width: 0;
 }
-.form-block__title,
-.form-block__description {
+.form-block__title {
   margin: 0;
 }
 .form-block__body {
@@ -538,8 +538,7 @@
   min-width: 0;
 }
 @media (max-width: 640px) {
-.form-block__header,
-  .form-block--split > .form-block__header {
+.form-block__header {
     align-items: flex-start;
     flex-direction: column;
   }
@@ -850,14 +849,10 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 :is(html[data-theme]) .alert:empty {
   display: none;
 }
-:is(html[data-theme]) .notice-stack,
-:is(html[data-theme]) .alerts,
 :is(html[data-theme]) .alert-stack {
   margin-bottom: var(--gap);
   padding-bottom: var(--gap-tight);
 }
-:is(html[data-theme]) .notice-stack .notice,
-:is(html[data-theme]) .alerts .alert,
 :is(html[data-theme]) .alert-stack .alert {
   transition:
     height var(--ease),
@@ -869,9 +864,7 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   opacity: 0;
 }
 @media (prefers-reduced-motion: reduce) {
-:is(html[data-theme]) .notice-stack .notice,
-  :is(html[data-theme]) .alerts .alert,
-  :is(html[data-theme]) .alert-stack .alert {
+:is(html[data-theme]) .alert-stack .alert {
     transition: none;
   }
 }
@@ -925,6 +918,9 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 }
 :is(html[data-theme]) :is(.prestacao-card__facts, .oficio-card__facts, .evento-card__docs) .form-block--v2 {
   grid-column: auto;
+}
+:is(html[data-theme]) #bate-volta-body[hidden] {
+  display: none;
 }
 :is(html[data-theme])
   :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block) > .form-block__header {

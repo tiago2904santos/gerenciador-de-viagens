@@ -309,6 +309,10 @@
   color: var(--color-danger);
   font-weight: 900;
 }
+:is(html[data-theme]) [data-document-download-active] {
+  cursor: wait;
+  pointer-events: none;
+}
 @media (max-width: 600px) {
 :is(html[data-theme]) .document-loading {
     right: 16px;
@@ -507,9 +511,7 @@
   color: var(--text-strong);
   opacity: 1;
 }
-:is(html[data-theme]) .field > .form-control,
-:is(html[data-theme]) .field > .form-select,
-:is(html[data-theme]) .field > .cv-field__control {
+:is(html[data-theme]) .field > .form-select, :is(html[data-theme]) .field > .cv-field__control {
   background: var(--surface-contrast, var(--surface-field));
   border: 1px solid transparent;
   border-radius: var(--radius-field);
@@ -521,9 +523,7 @@
   padding: var(--pad-field);
   width: 100%;
 }
-:is(html[data-theme]) .field > .form-control:focus-visible,
-:is(html[data-theme]) .field > .form-select:focus-visible,
-:is(html[data-theme]) .field > .cv-field__control:focus-visible {
+:is(html[data-theme]) .field > .form-select:focus-visible, :is(html[data-theme]) .field > .cv-field__control:focus-visible {
   border-color: var(--focus-ring);
   
   box-shadow: none !important;
@@ -924,7 +924,6 @@ html[data-theme="dark"] .custom-select--v2 .custom-select__chevron svg {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.custom-select--disabled .custom-select__trigger,
 .custom-select__trigger:disabled {
   background:
     linear-gradient(var(--color-input-disabled-bg), var(--color-input-disabled-bg)) padding-box,
@@ -973,21 +972,11 @@ html[data-theme="dark"] .custom-select--v2 .custom-select__chevron svg {
   --cs-chevron-color: var(--color-accent);
 }
 :is(html[data-theme])
-  .custom-select__trigger--v2 .custom-select__chevron,
-:is(html[data-theme])
-  .custom-select__trigger--v2:hover .custom-select__chevron,
-:is(html[data-theme])
-  .custom-select__trigger--v2:focus .custom-select__chevron,
-:is(html[data-theme])
-  .custom-select__trigger--v2:focus-visible .custom-select__chevron,
-:is(html[data-theme])
-  .custom-select__trigger--v2[aria-expanded="true"] .custom-select__chevron,
-:is(html[data-theme])
-  .custom-select--v2.custom-select--open .custom-select__chevron,
-:is(html[data-theme])
-  .custom-select--v2.custom-select--disabled .custom-select__chevron,
-:is(html[data-theme])
-  .list-header__rail .custom-select__trigger--v2 .custom-select__chevron {
+  .custom-select__trigger--v2 .custom-select__chevron, :is(html[data-theme])
+  .custom-select__trigger--v2:hover .custom-select__chevron, :is(html[data-theme])
+  .custom-select__trigger--v2:focus .custom-select__chevron, :is(html[data-theme])
+  .custom-select__trigger--v2:focus-visible .custom-select__chevron, :is(html[data-theme])
+  .custom-select__trigger--v2[aria-expanded="true"] .custom-select__chevron {
   align-items: center;
   align-self: stretch;
   background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface-muted));
@@ -999,13 +988,9 @@ html[data-theme="dark"] .custom-select--v2 .custom-select__chevron svg {
   width: 44px;
 }
 :is(html[data-theme])
-  .custom-select--v2.custom-select--open .custom-select__chevron svg,
-:is(html[data-theme])
   .custom-select__trigger--v2[aria-expanded="true"] .custom-select__chevron svg {
   transform: rotate(180deg);
 }
-:is(html[data-theme])
-  .custom-select--v2.custom-select--disabled .custom-select__trigger--v2,
 :is(html[data-theme])
   .custom-select__trigger--v2:disabled {
   background: var(--color-surface-muted);
@@ -1088,9 +1073,7 @@ html[data-theme="dark"] .custom-select--v2 .custom-select__chevron svg {
 }
 :is(html[data-theme]) .select
   .custom-select__trigger:is(:hover, :focus, :focus-visible, [aria-expanded="true"])
-  .custom-select__chevron,
-:is(html[data-theme]) .select.custom-select--open .custom-select__chevron,
-:is(html[data-theme]) .select.custom-select--disabled .custom-select__chevron {
+  .custom-select__chevron {
   align-self: center;
   background: none;
   color: var(--accent);
@@ -1239,10 +1222,7 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   border-color: var(--color-primary-hover);
   color: var(--color-white);
 }
-:is(html[data-theme]) .custom-select__menu--v2,
-:is(html[data-theme]) .custom-select__menu--v2.floating-dropdown--active,
-:is(html[data-theme]) .search-picker__dropdown--v2,
-:is(html[data-theme]) .search-picker__dropdown--v2.floating-dropdown--active {
+:is(html[data-theme]) .custom-select__menu--v2 {
   --listbox-option-height: 40px;
   --listbox-option-gap: 8px;
   --listbox-padding: 6px;
@@ -1270,8 +1250,7 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   scrollbar-color: var(--text-muted) transparent;
   scrollbar-width: thin;
 }
-:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option,
-:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option {
+:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option {
   align-items: center;
   background: none;
   border: 0;
@@ -1294,34 +1273,21 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   width: 100%;
 }
 :is(html[data-theme]) .custom-select__menu--v2
-  .custom-select__option:hover:not(.custom-select__option--selected),
-:is(html[data-theme]) .custom-select__menu--v2
-  .custom-select__option--focused:not(.custom-select__option--selected),
-:is(html[data-theme]) .search-picker__dropdown--v2
-  .search-picker__option:hover:not(.search-picker__option--selected),
-:is(html[data-theme]) .search-picker__dropdown--v2
-  .search-picker__option--active:not(.search-picker__option--selected) {
+  .custom-select__option:hover:not(.custom-select__option--selected), :is(html[data-theme]) .custom-select__menu--v2
+  .custom-select__option--focused:not(.custom-select__option--selected) {
   background: var(--surface-field);
   color: var(--text-strong);
 }
-:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option--selected,
-:is(html[data-theme]) .custom-select__menu--v2
-  .custom-select__option--selected:hover:not(.custom-select__option--disabled),
-:is(html[data-theme]) .custom-select__menu--v2
-  .custom-select__option--selected.custom-select__option--focused,
-:is(html[data-theme]) .search-picker__dropdown--v2
-  .search-picker__option--selected,
-:is(html[data-theme]) .search-picker__dropdown--v2
-  .search-picker__option[aria-selected="true"] {
+:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option--selected, :is(html[data-theme]) .custom-select__menu--v2
+  .custom-select__option--selected:hover:not(.custom-select__option--disabled), :is(html[data-theme]) .custom-select__menu--v2
+  .custom-select__option--selected.custom-select__option--focused {
   background: var(--surface-selected);
   
   box-shadow: inset 3px 0 0 0 var(--accent);
   color: var(--accent);
   font-weight: var(--weight-strong);
 }
-:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option-label,
-:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-content,
-:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-main {
+:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option-label {
   color: inherit;
   font-size: inherit;
   font-weight: inherit;
@@ -1330,8 +1296,7 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option-check,
-:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-status {
+:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option-check {
   align-items: center;
   background: none;
   color: var(--accent);
@@ -1339,8 +1304,7 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   flex: none;
   margin-left: auto;
 }
-:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option-check svg,
-:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-status svg {
+:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option-check svg {
   display: block;
   fill: none;
   height: 14px;
@@ -1426,14 +1390,10 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 :is(html[data-theme]) .alert:empty {
   display: none;
 }
-:is(html[data-theme]) .notice-stack,
-:is(html[data-theme]) .alerts,
 :is(html[data-theme]) .alert-stack {
   margin-bottom: var(--gap);
   padding-bottom: var(--gap-tight);
 }
-:is(html[data-theme]) .notice-stack .notice,
-:is(html[data-theme]) .alerts .alert,
 :is(html[data-theme]) .alert-stack .alert {
   transition:
     height var(--ease),
@@ -1445,9 +1405,7 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   opacity: 0;
 }
 @media (prefers-reduced-motion: reduce) {
-:is(html[data-theme]) .notice-stack .notice,
-  :is(html[data-theme]) .alerts .alert,
-  :is(html[data-theme]) .alert-stack .alert {
+:is(html[data-theme]) .alert-stack .alert {
     transition: none;
   }
 }
@@ -1505,8 +1463,7 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   grid-template-columns: repeat(6, minmax(0, 1fr));
   min-width: 0;
 }
-:is(html[data-theme]) .record__row,
-:is(html[data-theme]) .record__footer {
+:is(html[data-theme]) .record__row {
   grid-column: 1 / -1;
 }
 :is(html[data-theme]) .record__row {
@@ -1569,6 +1526,9 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 }
 :is(html[data-theme]) :is(.prestacao-card__facts, .oficio-card__facts, .evento-card__docs) .form-block--v2 {
   grid-column: auto;
+}
+:is(html[data-theme]) #bate-volta-body[hidden] {
+  display: none;
 }
 :is(html[data-theme])
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) :is(
@@ -1821,8 +1781,7 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   min-width: 0;
   position: relative;
 }
-.search-picker__control,
-.search-picker__dropdown {
+.search-picker__control {
   --field-bg: var(--sp-field-bg);
   --field-bg-soft: var(--sp-field-bg-soft);
   --field-border: var(--sp-field-border);
@@ -1922,7 +1881,6 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 .search-picker__input::-webkit-search-cancel-button {
   appearance: none;
 }
-.search-picker__empty,
 .search-picker__selected-empty {
   background: var(--field-bg-soft);
   border: 1px dashed var(--selected-panel-border);
@@ -1960,19 +1918,14 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 .search-picker--disabled {
   opacity: 1;
 }
-.search-picker--disabled .search-picker__control,
-.search-picker--disabled .search-picker__selected-panel,
-.search-picker--disabled .search-picker__selected-card {
+.search-picker--disabled .search-picker__control {
   background: var(--color-input-disabled-bg);
   box-shadow: none;
 }
 .search-picker--disabled .search-picker__control {
   cursor: not-allowed;
 }
-.search-picker--disabled .search-picker__input,
-.search-picker--disabled .search-picker__selected-name,
-.search-picker--disabled .search-picker__selected-meta,
-.search-picker--disabled .search-picker__selected-detail {
+.search-picker--disabled .search-picker__input {
   color: var(--color-input-disabled-text);
 }
 @media (max-width: 720px) {
@@ -2298,9 +2251,7 @@ html[data-theme="dark"] :is(.search-picker__selected-panel, .search-picker__sele
 }
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
-  .related-route-picker.termo-oficio-picker.search-picker--people.search-picker--roster,
-.document-form-page .related-route-picker.termo-oficio-picker.search-picker--people.search-picker--roster,
-.termo-oficio-picker.search-picker--people.search-picker--roster {
+  .related-route-picker.termo-oficio-picker.search-picker--people.search-picker--roster, .termo-oficio-picker.search-picker--people.search-picker--roster {
   gap: 0 !important;
 }
 .termo-oficio-picker .search-picker__field,
@@ -2318,11 +2269,7 @@ html[data-theme="dark"] :is(.search-picker__selected-panel, .search-picker__sele
   margin-top: 0;
   padding: 0;
 }
-.termo-oficio-picker .search-picker__selected-list,
-.termo-oficio-picker .roteiro-editor__route-list,
-.termo-oficio-summary-panel .search-picker__selected-list,
-.termo-oficio-summary-panel .related-route-list,
-:is(html[data-theme="dark"])
+.termo-oficio-picker .search-picker__selected-list, .termo-oficio-summary-panel .search-picker__selected-list, .termo-oficio-summary-panel .related-route-list, :is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
   :is(.search-picker__selected-list, #termo-oficio-lista, #os-oficio-lista) {

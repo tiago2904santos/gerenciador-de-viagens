@@ -253,7 +253,12 @@ def _ramos_do_seletor(selector: str) -> list[str]:
 
 
 def _with_dom_families(
-    rules, selected: set[str], dom_classes: set[str], *, incluir_base: bool = False
+    rules,
+    selected: set[str],
+    dom_classes: set[str],
+    *,
+    incluir_base: bool = False,
+    manter_sem_classe: bool = False,
 ) -> set[str]:
     """Acrescenta ao medido o que a cobertura do CDP não sabe ver.
 
@@ -267,6 +272,7 @@ def _with_dom_families(
     """
     qualified = list(_qualified_rules(rules))
     result = set(selected)
+    aplicaveis: dict[str, list[str]] = {}
     for rule in qualified:
         selector = _selector(rule)
         # Vírgula é alternativa: basta UM ramo aplicável para a regra entrar.
@@ -275,15 +281,30 @@ def _with_dom_families(
         # perfis do PF-02 num PR que promete não tocá-los, e sem a recaptura que
         # a casca precisa de qualquer jeito.
         ramos = _ramos_do_seletor(selector) if incluir_base else [selector]
-        if any(
-            _ramo_aplicavel(ramo, dom_classes, incluir_base=incluir_base)
+        vivos = [
+            ramo
             for ramo in ramos
-        ):
-            result.add(_rule_id(rule))
-    return result
+            if _ramo_aplicavel(
+                ramo,
+                dom_classes,
+                incluir_base=incluir_base,
+                manter_sem_classe=manter_sem_classe,
+            )
+        ]
+        if vivos:
+            rid = _rule_id(rule)
+            result.add(rid)
+            aplicaveis[rid] = vivos
+    return result, aplicaveis
 
 
-def _ramo_aplicavel(ramo: str, dom_classes: set[str], *, incluir_base: bool) -> bool:
+def _ramo_aplicavel(
+    ramo: str,
+    dom_classes: set[str],
+    *,
+    incluir_base: bool,
+    manter_sem_classe: bool = False,
+) -> bool:
     classes = set(_CLASS.findall(ramo))
     fonte_de_classes = _IS_WHERE.sub(" ", ramo) if incluir_base else ramo
     structural_classes = {
@@ -310,6 +331,22 @@ def _ramo_aplicavel(ramo: str, dom_classes: set[str], *, incluir_base: bool) -> 
         and (incluir_base or _INTERACTIVE_STATE.search(ramo))
     ):
         return True
+    if manter_sem_classe and not classes:
+        # Seletor SEM classe nenhuma não é podável por predicado de classe: ou é
+        # global (`:root`, `html`), ou é dirigido por atributo que o JS põe em
+        # runtime — `:is(html[data-theme]) [data-document-download-active]` é o
+        # guarda de `pointer-events` que impede o segundo clique disparar uma
+        # segunda geração de documento. São 14 regras em 1.596 no `ui.bundle.css`.
+        #
+        # `manter_sem_classe` é falso onde não há casca: quem dirige esses
+        # atributos é o JS do shell, que o `login` não carrega. As regras de raiz
+        # (`:root`, `html[data-theme]`) chegam lá por `_token_rule_ids` de
+        # qualquer forma. Sem esse recorte o `login` cai a 34,5% de uso, abaixo
+        # do aceite do PF-02.
+        return True
+    # Regra de ESTADO em elemento, sem classe: `button:focus-visible`. É o
+    # critério original do PF-02 e continua valendo para a casca — tirá-lo
+    # apagava o piso de foco de teclado dos 15 perfis.
     return bool(
         _INTERACTIVE_STATE.search(ramo)
         and not classes
@@ -581,12 +618,39 @@ def capture(reports: list[Path]) -> dict:
     return {"schema_version": 1, "profiles": profiles}
 
 
-def _render_rules(rules, selected: set[str], used_keyframes: set[str]) -> str:
+def _reescrever(rule, ramos: list[str]) -> str:
+    """A regra com SÓ os ramos aplicáveis: `a, b { x }` vira `a { x }`.
+
+    Vírgula é alternativa, então basta um ramo aplicável para a regra entrar —
+    mas emitir a regra inteira arrasta o texto dos outros ramos junto. Medido: o
+    perfil do `login` carregava seletor de `oficio-documentos-*`, `search-picker`
+    e `rail` — componentes que uma tela de login não tem — só porque dividiam a
+    regra com algo que ela tem.
+
+    Podar ramo é o MESMO julgamento que podar a regra inteira, uma casa abaixo: o
+    ramo cujas classes a família não tem não pode casar ali. Não mexe em
+    especificidade nem em ordem de cascata dos ramos que ficam.
+    """
+    return f"{', '.join(ramos)} {{{tinycss2.serialize(rule.content)}}}"
+
+
+def _render_rules(
+    rules,
+    selected: set[str],
+    used_keyframes: set[str],
+    ramos_por_regra: dict[str, list[str]] | None = None,
+) -> str:
     chunks: list[str] = []
     for rule in rules:
         if rule.type == "qualified-rule":
             if _rule_id(rule) in selected:
-                chunks.append(_serialized(rule))
+                ramos = (ramos_por_regra or {}).get(_rule_id(rule))
+                todos = _ramos_do_seletor(_selector(rule))
+                chunks.append(
+                    _reescrever(rule, ramos)
+                    if ramos and len(ramos) < len(todos)
+                    else _serialized(rule)
+                )
             continue
         if rule.type != "at-rule":
             continue
@@ -606,7 +670,7 @@ def _render_rules(rules, selected: set[str], used_keyframes: set[str]) -> str:
         nested = tinycss2.parse_rule_list(
             rule.content, skip_comments=True, skip_whitespace=True
         )
-        body = _render_rules(nested, selected, used_keyframes)
+        body = _render_rules(nested, selected, used_keyframes, ramos_por_regra)
         if body:
             prelude = tinycss2.serialize(rule.prelude).strip()
             chunks.append(f"@{rule.at_keyword} {prelude} {{\n{body}\n}}")
@@ -619,6 +683,7 @@ def _podar(
     dom_classes: set[str],
     *,
     incluir_base: bool = False,
+    manter_sem_classe: bool = False,
 ) -> str:
     """Corpo do perfil: as regras casadas, mais o que a cobertura não enxerga.
 
@@ -629,12 +694,16 @@ def _podar(
     rules = tinycss2.parse_stylesheet(
         _expanded_source(source_name), skip_comments=True, skip_whitespace=True
     )
-    selected = _with_dom_families(
+    selected, ramos_por_regra = _with_dom_families(
         rules,
         set(rule_ids) | _token_rule_ids(rules),
         dom_classes,
         incluir_base=incluir_base,
+        manter_sem_classe=manter_sem_classe,
     )
+    if not incluir_base:
+        # A casca não reescreve ramo: os 15 perfis do PF-02 saem byte a byte.
+        ramos_por_regra = {}
     selected_css = "\n".join(
         _serialized(rule)
         for rule in _qualified_rules(rules)
@@ -646,7 +715,7 @@ def _podar(
         if rule.type == "at-rule" and rule.lower_at_keyword.endswith("keyframes")
         and tinycss2.serialize(rule.prelude).strip() in selected_css
     }
-    return _render_rules(rules, selected, keyframe_names)
+    return _render_rules(rules, selected, keyframe_names, ramos_por_regra)
 
 
 def build(manifest: dict) -> dict[Path, str]:
@@ -669,6 +738,7 @@ def build(manifest: dict) -> dict[Path, str]:
             # percentuais de uso numa rota que entrega 21 KB.
             | (frozenset() if profile in PERFIS_SEM_SHELL else classes_criadas_por_js()),
             incluir_base=True,
+            manter_sem_classe=profile not in PERFIS_SEM_SHELL,
         )
         outputs[OUTPUT_DIR / f"{profile}.ui.css"] = banner + ui_body + "\n"
     return outputs

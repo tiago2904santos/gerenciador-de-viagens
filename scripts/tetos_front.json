@@ -7,130 +7,130 @@
         "usage_percent_min": 35.0
       },
       "dashboard": {
-        "usage_percent_min": 52.2322
+        "usage_percent_min": 51.8894
       },
       "oficios-lista": {
-        "usage_percent_min": 45.7658
+        "usage_percent_min": 46.0396
       },
       "oficios-novo": {
-        "usage_percent_min": 45.7658
+        "usage_percent_min": 46.0396
       },
       "oficios-detalhe": {
-        "usage_percent_min": 54.7052
+        "usage_percent_min": 54.8222
       },
       "oficios-editar": {
-        "usage_percent_min": 54.7052
+        "usage_percent_min": 54.8222
       },
       "oficios-wizard-dados-viajantes": {
-        "usage_percent_min": 54.7052
+        "usage_percent_min": 54.8222
       },
       "oficios-wizard-transporte": {
-        "usage_percent_min": 46.5215
+        "usage_percent_min": 46.3364
       },
       "oficios-wizard-roteiro": {
-        "usage_percent_min": 51.851
+        "usage_percent_min": 51.4545
       },
       "oficios-wizard-justificativa": {
-        "usage_percent_min": 50.1328
+        "usage_percent_min": 50.7085
       },
       "oficios-wizard-resumo": {
-        "usage_percent_min": 50.3244
+        "usage_percent_min": 50.1135
       },
       "oficios-wizard-documentos": {
-        "usage_percent_min": 50.3244
+        "usage_percent_min": 50.1135
       },
       "eventos-lista": {
-        "usage_percent_min": 46.631
+        "usage_percent_min": 46.6803
       },
       "oficios-modelos-motivo-lista": {
-        "usage_percent_min": 41.6185
+        "usage_percent_min": 42.06
       },
       "oficios-modelos-motivo-novo": {
-        "usage_percent_min": 47.9221
+        "usage_percent_min": 47.7876
       },
       "oficios-modelos-motivo-editar": {
-        "usage_percent_min": 42.0718
+        "usage_percent_min": 42.06
       },
       "roteiros-lista": {
-        "usage_percent_min": 38.7476
+        "usage_percent_min": 38.9341
       },
       "roteiros-novo": {
-        "usage_percent_min": 44.4602
+        "usage_percent_min": 44.2865
       },
       "prestacoes-contas-lista": {
-        "usage_percent_min": 44.7712
+        "usage_percent_min": 44.8132
       },
       "roteiros-editar": {
-        "usage_percent_min": 45.4449
+        "usage_percent_min": 45.2557
       },
       "termos-lista": {
-        "usage_percent_min": 38.6602
+        "usage_percent_min": 38.8455
       },
       "termos-preview-oficio": {
-        "usage_percent_min": 48.0555
+        "usage_percent_min": 47.7991
       },
       "justificativas-lista": {
         "usage_percent_min": 35.0
       },
       "justificativas-novo": {
-        "usage_percent_min": 47.9221
+        "usage_percent_min": 47.7876
       },
       "justificativas-editar": {
-        "usage_percent_min": 47.9221
+        "usage_percent_min": 47.7876
       },
       "planos-trabalho-lista": {
-        "usage_percent_min": 40.83
+        "usage_percent_min": 41.0424
       },
       "ordens-servico-lista": {
-        "usage_percent_min": 40.6963
+        "usage_percent_min": 40.907
       },
       "configuracao": {
-        "usage_percent_min": 37.0394
+        "usage_percent_min": 37.3195
       },
       "servidores-lista": {
-        "usage_percent_min": 45.6192
+        "usage_percent_min": 45.7432
       },
       "servidor-novo": {
-        "usage_percent_min": 41.019
+        "usage_percent_min": 41.0956
       },
       "servidor-editar": {
-        "usage_percent_min": 41.0598
+        "usage_percent_min": 41.1368
       },
       "viaturas-lista": {
-        "usage_percent_min": 45.6192
+        "usage_percent_min": 45.7432
       },
       "viatura-nova": {
-        "usage_percent_min": 43.9022
+        "usage_percent_min": 44.0066
       },
       "viatura-editar": {
-        "usage_percent_min": 51.0561
+        "usage_percent_min": 51.1429
       },
       "unidades-lista": {
-        "usage_percent_min": 41.0913
+        "usage_percent_min": 41.5271
       },
       "unidade-nova": {
-        "usage_percent_min": 47.317
+        "usage_percent_min": 47.1838
       },
       "unidade-editar": {
-        "usage_percent_min": 41.0913
+        "usage_percent_min": 41.5271
       },
       "cargos-lista": {
-        "usage_percent_min": 41.3866
+        "usage_percent_min": 41.8256
       },
       "cargo-novo": {
-        "usage_percent_min": 47.6559
+        "usage_percent_min": 47.522
       },
       "cargo-editar": {
-        "usage_percent_min": 41.3866
+        "usage_percent_min": 41.8256
       },
       "combustiveis-lista": {
-        "usage_percent_min": 41.057
+        "usage_percent_min": 41.4924
       },
       "combustivel-novo": {
-        "usage_percent_min": 47.2776
+        "usage_percent_min": 47.1445
       },
       "combustivel-editar": {
-        "usage_percent_min": 41.057
+        "usage_percent_min": 41.5964
       }
     }
   },
