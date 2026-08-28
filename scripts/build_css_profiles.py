@@ -330,6 +330,64 @@ UI_SOURCE = "ui.bundle.css"
 # Conserto de fundo, fora desta etapa: derivar as classes dos TEMPLATES que cada
 # rota renderiza (`response.templates` do test client) em vez de só do DOM
 # capturado, que resolve toda marcação condicional de uma vez.
+STATIC_JS = ROOT / "static" / "js"
+# Espelha `SHELL_JS` do `build_shell_bundles.py`: o JS que TODA tela carrega.
+_JS_GLOBAL: tuple[str, ...] = (
+    "js/theme-toggle.js",
+    "js/core/http.js",
+    "js/core/app.js",
+    "js/core/component-loader.js",
+    "js/autosave.js",
+    "js/components/sidebar.js",
+    "js/components/masks.js",
+    "js/components/state-toggle.js",
+    "js/components/collection.js",
+    "js/components/icon-tooltips.js",
+    "js/components/overlay.js",
+    "js/components/fields-init.js",
+    "js/components/document-download.js",
+    "js/components/fit-text.js",
+    "js/components/notice-auto-dismiss.js",
+    "js/components/server-filter.js",
+)
+# `className = "x"` e `class="x"` dentro de string de template no JS: as classes
+# que o JavaScript CRIA. Toggle (`classList.add`) não entra — esse mexe em
+# elemento que já está no DOM, e `_nasce_de` mais `_INTERACTIVE_STATE` já cobrem.
+_CLASSE_EM_JS = re.compile(r'(?:className\s*=\s*"([^"]+)"|class="([^"{]+)")')
+
+
+def classes_criadas_por_js() -> frozenset[str]:
+    """Raízes de componente que o JS monta e nenhuma captura enxerga.
+
+    O caso que obrigou isto: `icon-tooltips.js` cria `<div class="global-tooltip">`
+    no primeiro hover. O `static/css/v2/tooltip.css` documenta, no topo do
+    arquivo, que esse desenho foi PARA o `ui.bundle.css` justamente porque "o
+    `ui.bundle.css` não é podado" — quando ele morava numa folha podada, sobrava
+    só a regra que desliga o tooltip de `::after`, o `<div>` caía no fim do corpo
+    com `position: static` e o texto aparecia solto embaixo da página.
+
+    Este PR passou a podar o `ui.bundle.css`, ou seja, quebrou a premissa daquele
+    comentário. Ler as classes do JS é o que devolve a garantia sem depender de
+    lista escrita à mão: componente novo criado por JS entra sozinho.
+
+    Só o JS do SHELL, que carrega em toda tela. O JS por página cria classes
+    próprias (`folder-row`, `pdf-viewer__thumb`, `route-destinos-trechos__*`) e
+    pôr todas em todo perfil custa caro onde dói: o `login` saltaria de 30 KB
+    para 44 KB e o uso dele cairia de 35,4% para ~24%, abaixo do aceite do
+    PF-02. Mapear JS de página para família de rota é o passo seguinte, e está
+    em `NOVO-20260826-124840-50a3e47836ae`.
+    """
+    encontradas: set[str] = set()
+    for relativo in _JS_GLOBAL:
+        arquivo = ROOT / "static" / relativo
+        for grupo in _CLASSE_EM_JS.findall(arquivo.read_text(encoding="utf-8")):
+            for trecho in grupo:
+                encontradas.update(
+                    nome for nome in trecho.split() if re.fullmatch(r"[a-z][\w-]*", nome)
+                )
+    return frozenset(encontradas)
+
+
 CLASSES_DE_FEEDBACK = frozenset(
     {
         "alert",
@@ -598,7 +656,13 @@ def build(manifest: dict) -> dict[Path, str]:
             UI_SOURCE,
             config.get("ui_rule_ids", []),
             set(config.get("ui_dom_classes", config.get("dom_classes", [])))
-            | CLASSES_DE_FEEDBACK,
+            | CLASSES_DE_FEEDBACK
+            # O `login` não carrega `shell.bundle.js` — só `theme-shared.js` e
+            # `theme-init.js` —, então nada do JS do shell roda ali e nenhuma
+            # dessas classes pode existir naquela tela. É a mesma razão de ele não
+            # ter perfil de casca: ele não tem casca. Incluí-las custava 2 pontos
+            # percentuais de uso numa rota que entrega 21 KB.
+            | (frozenset() if profile in PERFIS_SEM_SHELL else classes_criadas_por_js()),
             incluir_base=True,
         )
         outputs[OUTPUT_DIR / f"{profile}.ui.css"] = banner + ui_body + "\n"

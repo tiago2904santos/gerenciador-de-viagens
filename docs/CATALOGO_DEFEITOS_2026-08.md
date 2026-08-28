@@ -11006,13 +11006,30 @@ devolve os dois bundles. Família nova `login`, a única rota sem casca.
 
 | | antes | depois |
 |---|---:|---:|
-| uso médio das 43 rotas | 13,60% | **46,63%** |
+| uso médio das 43 rotas | 13,60% | **46,03%** |
 | pior rota | 4,22% (`login`) | **35,44%** (`login`) |
-| CSS entregue somando as 43 rotas | 25,73 MB | **5,91 MB** |
+| CSS entregue somando as 43 rotas | 25,73 MB | **5,99 MB** |
 
-Os dois lados fecham: o gate `NOVO-70` passa contra pisos regravados e o
+Os dois lados fecham, e o número que fecha o segundo é apertado: o gate
+`NOVO-70` passa contra os pisos regravados, e o
 `test_todas_as_rotas_cumprem_o_aceite_pf02_de_35_por_cento` passa porque o menor
-piso é **38,26%**.
+piso é **35,00%** — o mínimo do critério, não uma folga sobre ele.
+
+**Piso e medição são coisas diferentes, e aqui a distância entre os dois é o que
+protege a etapa.** O piso é `max(min(3 rodadas) − 1,0 pp, 35,0)`; a margem de
+1,0 pp existe porque medições repetidas variam até 0,55 pp entre si, e o teto de
+35,0 existe porque um piso abaixo dele reprovaria o aceite. Nas duas rotas mais
+apertadas o piso encosta no mínimo:
+
+| rota | medido | piso | folga |
+|---|---:|---:|---:|
+| `login` | 35,44% | 35,00% | 0,44 pp |
+| `justificativas-lista` | 35,84% | 35,00% | 0,84 pp |
+
+Quem for mexer nisto precisa saber: **mais uma família preservada no perfil do
+`login` derruba aquela rota abaixo do aceite.** Ela entrega 19 KB, dos quais
+3,3 KB são `@font-face` que a cobertura nunca marca como usada — a 19 KB, cada
+KB preservado custa quase dois pontos percentuais.
 
 **O caminho até aqui produziu três achados que valem mais que o número.**
 
@@ -11073,6 +11090,25 @@ download compartilhado em várias telas. DOM novo que a captura não conhecia �
 o `termo-preview` perdia 45 elementos das famílias `modal__*` e
 `download-picker`. **Perfil por cobertura tem prazo de validade: mudou marcação,
 recaptura.** Os 16 relatórios foram refeitos contra o DOM de hoje.
+
+**O quinto fecha o padrão, e o próprio código já tinha avisado.**
+`icon-tooltips.js` cria `<div class="global-tooltip">` no primeiro hover, e as
+4 regras dele não estavam em nenhum dos 16 perfis. O topo de
+`static/css/v2/tooltip.css` documenta que esse desenho foi PARA o
+`ui.bundle.css` justamente porque **"o `ui.bundle.css` não é podado"** — quando
+morava numa folha podada, sobrava só a regra que desliga o tooltip de `::after`,
+o `<div>` caía no fim do corpo com `position: static` e o texto aparecia solto
+embaixo da página, com barra de rolagem. Este PR passou a podar o
+`ui.bundle.css` e quebrou a premissa daquele comentário sem notar.
+
+`classes_criadas_por_js()` lê as classes que o JS do shell CRIA
+(`className = "…"`, `class="…"` em template) e as trata como presentes. É
+automático de propósito: componente novo criado por JS entra sozinho, sem lista
+à mão. **Só o JS do shell**, e só nos perfis que têm casca — o `login` carrega
+apenas `theme-shared.js` e `theme-init.js`, então nada disso pode existir lá, e
+incluí-las custava 2 pontos percentuais numa rota que entrega 19 KB. Mapear JS
+de página para família de rota é o passo seguinte, em
+`NOVO-20260826-124840-50a3e47836ae`.
 
 **O quarto, também do Codex, é o que teria doído mais em produção:** a marcação
 que só existe DEPOIS de uma requisição malsucedida. Senha errada no login

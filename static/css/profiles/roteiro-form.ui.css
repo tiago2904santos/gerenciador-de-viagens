@@ -1248,6 +1248,44 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 :is(html[data-theme]) .alert--list::before {
   content: none;
 }
+:is(html[data-theme]) .menu {
+  background: var(--surface-rail);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 20px 52px rgb(5 22 38 / 0.28);
+  display: grid;
+  gap: 4px;
+  min-width: 260px;
+  padding: 8px;
+  
+  z-index: calc(var(--z-sticky-stepper, 1100) + 10);
+}
+:is(html[data-theme]) .menu[hidden] {
+  display: none;
+}
+:is(html[data-theme]) .menu[data-menu-v2] {
+  --surface: var(--surface-rail);
+  --surface-contrast: var(--surface-field);
+}
+:is(html[data-theme]) .menu__erro {
+  color: var(--status-late);
+  margin: 0;
+  max-width: 34ch;
+  padding: 10px 12px;
+}
+:is(html[data-theme="dark"]) .menu {
+  
+  box-shadow: 0 22px 58px rgb(0 0 0 / 0.5);
+}
+:is(html:not([data-theme="dark"])) .menu,
+:is(html[data-theme="light"]) .menu {
+  background: var(--surface-field);
+}
+:is(html:not([data-theme="dark"])) .menu[data-menu-v2],
+:is(html[data-theme="light"]) .menu[data-menu-v2] {
+  --surface: var(--surface-field);
+  --surface-contrast: var(--surface-rail);
+}
 :is(html[data-theme]) :is(.prestacao-card__facts, .oficio-card__facts, .evento-card__docs) .form-block--v2 {
   grid-column: auto;
 }
@@ -3413,6 +3451,39 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   src: url("../../vendor/fonts/HerrVonMuellerhoff-Regular.ttf") format("truetype");
   font-weight: 400;
   font-display: swap;
+}
+:is(html[data-theme]) .global-tooltip {
+  background: var(--surface-field);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  box-shadow: 0 12px 28px rgb(5 22 38 / 0.24);
+  color: var(--text-strong);
+  font-size: 11px;
+  font-weight: var(--weight-strong);
+  line-height: 1.2;
+  max-width: min(260px, calc(100vw - 16px));
+  opacity: 0;
+  padding: 5px 9px;
+  pointer-events: none;
+  position: fixed;
+  text-align: center;
+  transform: translateY(4px);
+  transition: opacity var(--ease), transform var(--ease);
+  white-space: nowrap;
+  
+  z-index: calc(var(--z-modal, 1000) + 20);
+}
+:is(html[data-theme="dark"]) .global-tooltip {
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.45);
+}
+:is(html[data-theme]) .global-tooltip.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+:is(html[data-theme]) .global-tooltip.global-tooltip--accent {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-on-accent);
 }
 :is(html[data-theme]) .sidebar {
   background: var(--surface-brand);
