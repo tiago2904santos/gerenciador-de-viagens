@@ -10935,7 +10935,7 @@ passada: são helpers exportados (o `_build_abas` está no `__all__` de
 `prestacoes_contas.views`) e há outra branch em voo no mesmo repositório.
 Apagá-los é limpeza própria, não ajuste de aparência.
 
-### NOVO-20260820-171008-7afb74d82d2c ✅ RESOLVIDO (26/08/2026) · `NOVO` O v2 entrega 517 KB de CSS em toda página: NOVO-70 e o aceite PF-02 ficam incompatíveis · FE/PERF · risco médio
+### NOVO-20260820-171008-7afb74d82d2c 🟠 EM ANDAMENTO · `NOVO` O v2 entrega 517 KB de CSS em toda página: NOVO-70 e o aceite PF-02 ficam incompatíveis · FE/PERF · risco médio
 
 O `NOVO-70` mede quanto do CSS entregue numa rota é de fato usado, e é catraca:
 o uso só pode subir. Nas 43 rotas ele caiu de **48,9% em média para 12,9%** — o
@@ -10994,8 +10994,10 @@ métrica continua certa em apontar — o desperdício de parse e de bytes existe
 
 ---
 
-**RESOLVIDO em 26/08/2026 — o conserto foi o previsto acima: aplicar ao v2 o
-mesmo PF-02 que a casca já tinha.**
+**TENTATIVA DE 26–28/08/2026 (PR #430), e o que ela ensinou.** O conserto
+previsto acima — aplicar ao v2 o mesmo PF-02 da casca — foi implementado,
+medido e **não fecha**. O registro fica porque o valor está no diagnóstico, não
+no resultado.
 
 `build_css_profiles.py` passou a emitir DUAS entregas por família —
 `<família>.css` (poda da casca, como antes) e `<família>.ui.css` (poda do
@@ -11006,14 +11008,16 @@ devolve os dois bundles. Família nova `login`, a única rota sem casca.
 
 | | antes | depois |
 |---|---:|---:|
-| uso médio das 43 rotas | 13,60% | **46,03%** |
-| pior rota | 4,22% (`login`) | **35,44%** (`login`) |
-| CSS entregue somando as 43 rotas | 25,73 MB | **5,99 MB** |
+| uso médio das 43 rotas | 13,60% | **46,14%** |
+| pior rota | 4,22% (`login`) | **34,9989%** (`login`) |
+| CSS entregue somando as 43 rotas | 25,73 MB | **5,94 MB** |
 
-Os dois lados fecham, e o número que fecha o segundo é apertado: o gate
-`NOVO-70` passa contra os pisos regravados, e o
-`test_todas_as_rotas_cumprem_o_aceite_pf02_de_35_por_cento` passa porque o menor
-piso é **35,00%** — o mínimo do critério, não uma folga sobre ele.
+**Os dois lados NÃO fecham.** O gate `NOVO-70` passa contra os pisos regravados,
+mas o `login` mede **34,9989%** — abaixo do aceite de 35% do `PF-02`. Não é
+ruído: as três rodadas dão o mesmo valor. A rota entrega ~32 KB (3,3 KB de
+`fonts.css` que a cobertura NUNCA conta como usada, 8,6 KB de `v2/auth.css` a
+51%, e o perfil do v2), e cada família que a correção obriga a preservar custa
+quase dois pontos percentuais ali.
 
 **Piso e medição são coisas diferentes, e aqui a distância entre os dois é o que
 protege a etapa.** O piso é `max(min(3 rodadas) − 1,0 pp, 35,0)`; a margem de
@@ -11021,10 +11025,10 @@ protege a etapa.** O piso é `max(min(3 rodadas) − 1,0 pp, 35,0)`; a margem de
 35,0 existe porque um piso abaixo dele reprovaria o aceite. Nas duas rotas mais
 apertadas o piso encosta no mínimo:
 
-| rota | medido | piso | folga |
-|---|---:|---:|---:|
-| `login` | 35,44% | 35,00% | 0,44 pp |
-| `justificativas-lista` | 35,84% | 35,00% | 0,84 pp |
+| rota | medido | aceite | situação |
+|---|---:|---:|---|
+| `login` | **34,9989%** | 35% | **reprova** |
+| `justificativas-lista` | 35,82% | 35% | passa por 0,82 pp |
 
 Quem for mexer nisto precisa saber: **mais uma família preservada no perfil do
 `login` derruba aquela rota abaixo do aceite.** Ela entrega 19 KB, dos quais
@@ -11155,6 +11159,40 @@ tratava como conjunção — um ramo morto derrubava o vivo. Corrigido no caminh
 v2; a casca tem o mesmo defeito e ele está em
 `NOVO-20260826-124840-50a3e47836ae`, porque consertá-lo aqui mudaria os 15
 perfis do PF-02.
+
+**O achado que vale mais que o número: podar por DOM observado não converge.**
+A revisão automática do Codex encontrou **17** casos, em sete rodadas, e cada
+correção puxou outro da mesma forma. Todos são marcação que existe, mas não no
+retrato:
+
+| como escapa da captura | exemplos |
+|---|---|
+| só depois de um clique | `date-picker__day--selected`, `menu__item` (buscado por fetch), `download-picker__queue-*` |
+| só depois de um POST que falha | `form-errors__*`, `field__error` |
+| só depois de um redirect com mensagem | `alert-stack`, `alert__title`, `alert__lead` |
+| só com dado que a demo não tem | `pagination__*` (lista de uma página só) |
+| criada por JS | `global-tooltip`, `oficio-viatura-selected-card`, `.modal__*` via helper `element()` |
+| dirigida por atributo, sem classe | `[data-document-download-active]` |
+
+Cada remendo fecha um caso e custa uso%, porque regra preservada que a medição
+estática não vê casar entra no denominador. Foi assim que o `login` desceu de
+39,8% para 34,9989% ao longo das correções: **a correção e a métrica puxam para
+lados opostos**, e o aceite de 35% é o ponto onde elas se encontram.
+
+**O conserto convergente é trocar a fonte da poda:** derivar o conjunto de
+classes do CÓDIGO — os templates que cada rota renderiza (via
+`response.templates` do test client) e o JS que ela carrega — em vez de um
+retrato do DOM. Isso cobre de uma vez as seis linhas da tabela, porque todas
+estão escritas em algum template ou em algum `.js`; nenhuma depende de o
+navegador ter passado por aquele estado. É trabalho de etapa própria, e é o que
+esta linha passa a pedir.
+
+**Enquanto isso não existir, o PR #430 não deve ser mesclado.** Não por causa do
+número: por causa do que o número esconde. Sete rodadas de revisão adversarial
+acharam 17 buracos; não há razão para crer que a oitava não acharia o
+décimo-oitavo, e a conferência de estilo computado que eu usei dá **zero
+divergências** em todos eles — ela lê o DOM parado, que é exatamente o ponto
+cego.
 
 **O que este PR NÃO fez:** a captura da casca continua sendo a do PF-02, byte a
 byte (`cmp` confere que os 15 perfis de casca saem idênticos). Ela envelheceu, e
