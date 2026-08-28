@@ -373,6 +373,24 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
     "socket_connect_timeout": CELERY_BROKER_CONNECTION_TIMEOUT,
     "socket_timeout": CELERY_BROKER_CONNECTION_TIMEOUT,
 }
+# Fila própria para o Google Drive. Antes, tudo dividia a fila padrão e o mesmo
+# worker: finalizar um ofício enfileira `organizar_oficio`, que gera de verdade
+# ofício + justificativa + OS + um termo POR SERVIDOR — e o job de download que
+# o usuário acabou de pedir ficava atrás dessas conversões, no mesmo worker e no
+# mesmo unoserver (LibreOffice residente, uma conversão por vez).
+#
+# Com a rota abaixo, geração documental fica na fila padrão e o Drive vai para a
+# sua; em produção são dois workers (ver docs/DEPLOY_VPS.md §5.3). ATENÇÃO: sem o
+# segundo worker consumindo `CELERY_DRIVE_QUEUE`, as tarefas do Drive param na
+# fila. Para voltar ao comportamento antigo (um worker só), defina
+# CELERY_DRIVE_QUEUE=celery.
+CELERY_TASK_DEFAULT_QUEUE = (os.getenv("CELERY_TASK_DEFAULT_QUEUE") or "celery").strip()
+CELERY_DRIVE_QUEUE = (os.getenv("CELERY_DRIVE_QUEUE") or "drive").strip()
+CELERY_TASK_ROUTES = (
+    {"integracoes.google_drive.tasks.*": {"queue": CELERY_DRIVE_QUEUE}}
+    if CELERY_DRIVE_QUEUE and CELERY_DRIVE_QUEUE != CELERY_TASK_DEFAULT_QUEUE
+    else {}
+)
 
 EPROTOCOLO = {
     "AMBIENTE": (os.getenv("EPROTOCOLO_AMBIENTE") or "mock").strip().lower(),

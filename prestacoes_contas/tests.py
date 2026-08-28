@@ -174,7 +174,8 @@ class RelatorioTecnicoDiariaTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "Salvar texto")
-        self.assertContains(response, "Ir para Diário de Bordo")
+        # O RT é a etapa 2 desde 2026-08-28: adiante ficam os Documentos.
+        self.assertContains(response, "Ir para Documentos")
 
     def test_salvar_oficio_sincroniza_prestacoes_para_equipe_existente(self):
         oficio = Oficio.objects.create(area=area_de_teste(), 
@@ -370,7 +371,14 @@ class PrestacaoServidorDiariaOverrideTests(TestCase):
         )
         response = self.client.get(reverse("prestacoes_contas:index"))
         self.assertContains(response, 'aria-label="Escolher documentos para baixar"')
-        self.assertContains(response, f'id="prestacao-downloads-{self.ps_a.pk}"')
+        # `NOVO-20260826-111043-802915c4fd6a` (`PF-07`): o gatilho não tem mais
+        # diálogo próprio — ele carrega o `data-src` do seu cartão, e a página
+        # inteira compartilha um único `<dialog>`.
+        self.assertContains(
+            response,
+            f'data-src="{reverse("prestacoes_contas:prestacao_downloads", args=[self.ps_a.pk])}"',
+        )
+        self.assertContains(response, "data-download-picker>", count=1)
 
     def test_downloads_lista_origens_e_disponibilidade_por_documento(self):
         DiarioBordo.objects.create(prestacao=self.prestacao)

@@ -194,9 +194,13 @@ def _build_prestacao_steps(ps, atual: str) -> list:
     rt_url = reverse("prestacoes_contas:rt_servidor", args=[ps.pk])
     diario_url = reverse("prestacoes_contas:diario_servidor", args=[ps.pk])
     consolidado_url = reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk])
+    # O diário abre o fluxo desde 2026-08-28: ele é o documento que nasce do
+    # roteiro executado, e o relatório técnico descreve a viagem que o diário
+    # já registrou. É também a ordem em que o pacote final empilha as peças
+    # (`download_services.payload_downloads`), que antes divergia do wizard.
     etapas = [
-        ("rt", "Etapa 1", "Relatório Técnico", rt_url),
-        ("diario", "Etapa 2", "Diário de Bordo", diario_url),
+        ("diario", "Etapa 1", "Diário de Bordo", diario_url),
+        ("rt", "Etapa 2", "Relatório Técnico", rt_url),
         ("documentos", "Etapa 3", "Documentos", documentos_url),
         ("consolidado", "Etapa 4", "PDF Final", consolidado_url),
     ]
@@ -245,8 +249,8 @@ def _build_prestacao_steps(ps, atual: str) -> list:
 # já é dado por `_build_prestacao_steps`, ele sai daqui — o template deixa de
 # carregar copy do módulo e a chave da etapa passa a ter um dono só.
 _ROTULO_DA_ETAPA = {
-    "rt": "Relatório Técnico",
     "diario": "Diário de Bordo",
+    "rt": "Relatório Técnico",
     "documentos": "Documentos",
     "consolidado": "PDF Final",
 }

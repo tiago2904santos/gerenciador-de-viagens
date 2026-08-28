@@ -164,6 +164,19 @@ def _diaria_por_servidor(roteiro) -> Decimal | None:
     return None
 
 
+def _diaria_por_servidor_legado(roteiro, total_servidores: int) -> Decimal | None:
+    """O valor dividido que este módulo produzia antes da correção.
+
+    Serve só para reconhecer um `RelatorioTecnico.diaria` preenchido
+    automaticamente naquela época e substituí-lo — sem isso, o texto errado já
+    gravado sobreviveria à correção, porque deixa de bater com o padrão atual.
+    """
+    valor = _diaria_por_servidor(roteiro)
+    if valor is None:
+        return None
+    return valor / Decimal(total_servidores or 1)
+
+
 def diaria_inicial_do_oficio(prestacao) -> str:
     """Diária por servidor conforme o roteiro original do ofício (sem ajustes)."""
     try:
@@ -185,6 +198,24 @@ def diaria_inicial_da_prestacao(prestacao) -> str:
     except Exception as exc:
         capture(exc, "prestacoes.diaria_efetiva", prestacao_id=prestacao.pk)
     return ""
+
+
+def _diarias_automaticas_legadas(prestacao) -> set[str]:
+    """Textos que o preenchimento automático antigo poderia ter gravado."""
+    try:
+        total_servidores = prestacao.oficio.servidores.count() or 1
+        if total_servidores == 1:
+            return set()
+        roteiros = (getattr(prestacao.oficio, "roteiro", None), roteiro_efetivo(prestacao))
+        valores = set()
+        for roteiro in roteiros:
+            valor = _diaria_por_servidor_legado(roteiro, total_servidores)
+            if valor is not None:
+                valores.add(normalize_spaces(format_currency_br(valor)))
+        return valores
+    except Exception as exc:
+        capture(exc, "prestacoes.diaria_legada", prestacao_id=prestacao.pk)
+        return set()
 
 
 def _ajustes_roteiro_itens(prestacao) -> list[str]:
@@ -321,6 +352,7 @@ def garantir_campos_padrao_relatorio_tecnico(relatorio: RelatorioTecnico) -> lis
     prestacao = relatorio.prestacao
     defaults = relatorio_tecnico_default_values(prestacao)
     valor_default_oficio = normalize_spaces(diaria_inicial_do_oficio(prestacao))
+    valores_automaticos_legados = _diarias_automaticas_legadas(prestacao)
 
     update_fields = []
     for campo in ("diaria", "translado", "combustivel", "passagem", "info_complementares"):
@@ -330,9 +362,13 @@ def garantir_campos_padrao_relatorio_tecnico(relatorio: RelatorioTecnico) -> lis
         valor_atual = normalize_spaces(getattr(relatorio, campo, "") or "")
 
         deve_atualizar = not valor_atual
-        if campo == "diaria" and valor_atual and valor_atual == valor_default_oficio:
+        if campo == "diaria" and valor_atual and (
+            valor_atual == valor_default_oficio
+            or valor_atual in valores_automaticos_legados
+        ):
             # Ainda é o valor automático anterior (não editado manualmente):
-            # sincroniza com o novo valor ajustado do roteiro.
+            # sincroniza com o novo valor ajustado do roteiro. `legados` cobre o
+            # texto dividido pela equipe que a versão anterior gravava sozinha.
             deve_atualizar = valor_atual != normalize_spaces(valor_padrao)
 
         if campo == "info_complementares" and valor_atual and not valor_padrao.endswith("Justificativa:"):

@@ -6,6 +6,7 @@ Não invocar fora de Windows; use `is_word_pdf_available()` antes.
 
 from __future__ import annotations
 
+import importlib.util
 import logging
 import platform
 import tempfile
@@ -19,29 +20,47 @@ _WORD_ERR = (
 )
 
 
+def word_progid_registrado() -> bool:
+    """Word instalado, lendo o registro — sem abrir o programa.
+
+    ``Word.Application\\CLSID`` só existe quando o Office registrou o servidor
+    COM: é a mesma informação que o ``DispatchEx`` confirmava, obtida por uma
+    leitura de registro em vez de um processo novo.
+    """
+    try:
+        import winreg
+    except ImportError:  # fora do Windows
+        return False
+    try:
+        winreg.CloseKey(
+            winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, r"Word.Application\CLSID")
+        )
+    except OSError:
+        logger.debug("ProgID Word.Application não registrado", exc_info=True)
+        return False
+    return True
+
+
 def is_word_pdf_available() -> bool:
+    """Sonda barata: NÃO abre o Word.
+
+    A versão anterior fazia ``DispatchEx("Word.Application")`` só para
+    responder "sim": 4,5 s no primeiro uso e ~0,8 s nos seguintes, pagos no
+    caminho crítico da geração (a cadeia de motores entra na chave de cache do
+    documento). Como ``DocumentoFacade`` tenta os motores em ordem e cai para o
+    seguinte quando um falha, uma sonda otimista custa no pior caso uma
+    tentativa perdida — não um Word aberto a cada janela de sondagem.
+    """
     if platform.system() != "Windows":
         return False
     try:
-        import win32com.client  # noqa: F401
-    except ImportError:
+        pywin32_presente = importlib.util.find_spec("win32com") is not None
+    except (ImportError, ValueError):
+        logger.debug("find_spec de win32com falhou", exc_info=True)
         return False
-    word = None
-    try:
-        import win32com.client
-
-        word = win32com.client.DispatchEx("Word.Application")
-        word.Visible = False
-        return True
-    except Exception:
-        logger.debug("Word COM indisponível", exc_info=True)
+    if not pywin32_presente:
         return False
-    finally:
-        if word is not None:
-            try:
-                word.Quit(SaveChanges=0)
-            except Exception:
-                logger.debug("Falha ao encerrar Word após probe", exc_info=True)
+    return word_progid_registrado()
 
 
 def convert_docx_to_pdf_word_com(docx_bytes: bytes) -> bytes:

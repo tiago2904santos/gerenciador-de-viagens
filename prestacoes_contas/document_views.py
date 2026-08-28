@@ -24,6 +24,7 @@ from .carimbo_services import caixas_para_ajuste
 from .carimbo_services import preparar_e_carimbar
 from .carimbo_services import salvar_posicoes
 from .presenters import kinds_de_anexo_assinado
+from .presenters import kinds_de_anexo_assinado_json
 from .services import marcar_servidor_em_preenchimento
 from .services import marcar_servidores_pendentes
 from .view_common import (
@@ -217,12 +218,13 @@ def documentos_servidor(request, ps_pk):
             "attach_kinds": attach_kinds,
             # Um payload só, no gatilho, em vez de 30 atributos planos. Sai como
             # string e o template escapa: quem monta o HTML não é o Python.
-            "attach_kinds_json": json.dumps(attach_kinds, ensure_ascii=False),
+            "attach_kinds_json": kinds_de_anexo_assinado_json(attach_kinds),
             # `contexto_do_fluxo` já entrega `wizard_page_steps` junto com os
             # metadados de cabeçalho (H-02).
             **contexto_do_fluxo(ps, "documentos"),
             "back_url": reverse("prestacoes_contas:index"),
-            "diario_url": reverse("prestacoes_contas:diario_servidor", args=[ps.pk]),
+            # A etapa anterior é o RT desde a inversão de 2026-08-28 (diário → RT → documentos).
+            "rt_url": reverse("prestacoes_contas:rt_servidor", args=[ps.pk]),
             "consolidado_url": reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk]),
         },
     )

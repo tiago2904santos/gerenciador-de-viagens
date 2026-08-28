@@ -46,14 +46,17 @@ class TermosSpacingTests(SimpleTestCase):
                     "pdf_url": "/termo/pdf/",
                     "docx_url": "/termo/docx/",
                     "downloads_url": "/termo/downloads/",
-                    "download_picker_id": "evento-termo-downloads-12",
                 },
                 "row_index": 1,
             },
         )
         self.assertIn("data-download-picker-trigger", html)
-        self.assertIn('id="evento-termo-downloads-12"', html)
+        # `NOVO-20260826-111043-802915c4fd6a` (`PF-07`): a linha renderiza só o
+        # gatilho, com o `data-src` do termo. O `<dialog>` é um por página e
+        # mora em `eventos/detalhe.html`.
         self.assertIn('data-src="/termo/downloads/"', html)
+        self.assertNotIn("<dialog", html)
+        self.assertIn("<c-v2.download_picker_dialogo />", pagina)
         self.assertNotIn('id="evento-termo-document-menu-1"', html)
 
     def test_linha_individual_preserva_menu_do_documento_especifico(self):

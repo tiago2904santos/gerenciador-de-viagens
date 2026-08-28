@@ -12076,3 +12076,173 @@ em documento novo; por isso o seed não tinha por onde chegar. Passou a chegar p
 Evento de destino único não muda: sem `destinos_seed`, o caminho antigo continua valendo, e o campo
 legado segue apontando para o primeiro destino. As etapas 2 (roteiro) e 3 (ofício) já liam a lista
 inteira — ficaram congeladas no mesmo teste para não regredirem junto.
+
+### NOVO-20260826-111043-802915c4fd6a ✅ RESOLVIDO · `NOVO` Um diálogo de download escondido por cartão · PF · risco médio
+
+A régua do `PF-07` reprovava a `main` havia semanas: `prestacoes_contas:index @ 200` media
+**334,6 KB** contra teto de 271,9 KB. Como o `deploy.yml` só dispara com o `Tests` verde, **nenhum
+deploy automático saía do repositório** enquanto isso durasse — os dois últimos PRs foram para
+produção por `workflow_dispatch`.
+
+Medido no HTML renderizado da rota, com os 20 cartões da primeira página:
+
+| bloco | ocorrências | peso | % da página |
+|---|---:|---:|---:|
+| `<dialog>` do seletor de downloads | 21 | 76,7 KB | 23,0% |
+| `data-attach-signed-kinds` (payload JSON) | 20 | 53,8 KB | 16,1% |
+| painel do `date-picker` | 20 | 18,1 KB | 5,4% |
+
+O `<dialog>` do seletor é **idêntico em toda instância** — hint, alerta, três `fieldset` de origem/
+formato/saída, seis rádios e a fila. Só o `data-src` variava, e a lista de documentos chega vazia,
+montada pelo JS a partir dele. Vinte cartões carregavam vinte cópias de markup que nasce escondido e
+do qual só um pode estar aberto por vez.
+
+**Correção:** o componente virou dois. `v2/download_picker.html` renderiza só o gatilho, com o
+`data-src` na montagem; `v2/download_picker_dialogo.html` é o diálogo, incluído **uma vez por
+página**, junto dos outros modais únicos (`attach_signed_modal`, `delete_modal`) — nunca dentro da
+lista de cartões, que é markup descartável. O `abrir()` do
+`download-queue.js` passou a resolver o diálogo compartilhado e a ler o `src` do gatilho clicado; se
+a página esquecer de incluí-lo, o motor registra erro em vez de falhar mudo.
+
+Segunda frente, no mesmo HTML: o payload de `data-attach-signed-kinds` viaja **escapado** dentro de
+um atributo, onde cada aspa custa `&quot;` — seis bytes. Os campos `current_*` vazios (o caso comum,
+nada anexado) somavam 13,5 KB de `&quot;&quot;` por página. `kinds_de_anexo_assinado_json` passou a
+omitir campo vazio; é seguro porque todo leitor no `attach-signed-modal.js` já tem valor padrão, e a
+lista Python continua intacta para a etapa Documentos, que conta com as chaves presentes.
+
+**Resultado medido** (PostgreSQL, mesma régua do CI):
+
+| rota | antes | depois | teto |
+|---|---:|---:|---:|
+| `prestacoes_contas:index @ 200` | 334,6 KB | **255,2 KB** | 271,9 → 268,0 |
+| `prestacoes_contas:index @ 20.000` | — | **256,3 KB** | 360,0 → 269,1 |
+| `termos:index @ 200` | 134,6 KB | **86,5 KB** | 155,3 → 90,8 |
+
+Os tetos de `prestacoes_contas` e `termos` desceram junto, que é a catraca fazendo o seu trabalho.
+Os das outras rotas ficaram como estavam: `--atualizar-tetos` propôs baixar seis delas, mas são
+melhoras de trabalhos anteriores que este PR não fez, e apertar gate alheio é mistura de escopo. Os
+tetos de **consulta** também ficaram intactos — este trabalho mexe em bytes, não em queries.
+
+Ficou de fora, medido e não feito: o painel do `date-picker` (18,1 KB, um por linha de servidor) tem
+a mesma forma de desperdício e resolve pelo mesmo caminho. Não entrou porque a régua já passa com
+6% de folga e o `AGENTS.md` §3.1 não quer duas mudanças estruturais no mesmo PR.
+
+### NOVO-20260826-121500-6bdb9b6c4e27 ✅ RESOLVIDO · `NOVO` Drive e geração documental disputam o mesmo worker · PF · risco médio
+
+`config/celery.py` não declara rota alguma: toda tarefa cai na fila padrão e é servida pelo único
+worker de produção (`docs/DEPLOY_VPS.md` §5.3, sem `-Q`). As tarefas do Google Drive não são só
+upload — `organizar_oficio` chama os `_garantir_*` de `integracoes/google_drive/organizer.py:984`,
+que geram de verdade ofício, justificativa, ordem de serviço e **um termo por servidor**. Ao
+finalizar um ofício, o `post_save` enfileira essa organização; o download que o usuário pede em
+seguida entra atrás dela no mesmo worker e no mesmo unoserver, que converte uma por vez. Com
+`autoretry_for=(Exception,)` e `max_retries=8`, um Drive fora do ar reocupa o worker por até 1 h de
+backoff.
+
+`CELERY_TASK_ROUTES` passa a mandar `integracoes.google_drive.tasks.*` para a fila
+`CELERY_DRIVE_QUEUE` (padrão `drive`), e a produção sobe dois workers: `-Q celery` para a geração
+documental e `-Q drive` para o Drive. `CELERY_DRIVE_QUEUE=celery` volta ao comportamento anterior.
+`integracoes/google_drive/tests/test_fila_celery.py` prova que toda tarefa do módulo do Drive
+resolve para a fila do Drive e que as de `documentos.tasks` continuam na padrão. **Deploy:** sem o
+segundo worker as tarefas do Drive param na fila — a seção 5.3 e o checklist final do
+`DEPLOY_VPS.md` foram atualizados.
+
+### NOVO-20260826-121500-1110928b1cfc ✅ RESOLVIDO · `NOVO` Carimbo de `updated_at` enfileira organização inteira do ofício · PF · risco baixo
+
+`_organizar_oficio_ao_salvar` dispara em qualquer `post_save` de ofício fora de rascunho, sem olhar
+`update_fields` — ao contrário de `_organizar_prestacao`, que já ignora saves de flags de listagem.
+`oficios/wizard_document_views.py:160` salva só `["updated_at"]` no "salvar rascunho" da etapa de
+documentos; num ofício já finalizado isso agenda `organizar_oficio`, que percorre a árvore de pastas
+pela API do Drive mesmo quando não há nada novo para gerar.
+
+O signal ganhou `_OFICIO_CAMPOS_SEM_DRIVE = {"updated_at"}`, no mesmo formato do guard de prestação.
+A lista é deliberadamente mínima: quase todo campo do Ofício alimenta o conteúdo do documento ou o
+nome de pasta/arquivo em `integracoes/google_drive/naming.py`. Finalização
+(`status`/`data_criacao`) e saves completos continuam enfileirando, coberto em
+`integracoes/google_drive/tests/test_signals_oficio.py`.
+
+### NOVO-20260826-121500-b85b49c28b81 ✅ RESOLVIDO · `NOVO` Sonda de motor PDF abre o Word a cada janela · PF · risco baixo
+
+`is_word_pdf_available()` fazia `DispatchEx("Word.Application")` — abria e fechava o Word — só para
+responder se o motor existe. A sonda está no caminho crítico: a cadeia de motores entra na chave de
+cache do documento (`oficios/services.py:70`), então toda geração a paga, e
+`DOCUMENTOS_ENGINE_PROBE_CACHE_SECONDS` (60 s) fazia isso se repetir a cada minuto. Medido em
+`auto` no Windows: sonda 4,5 s a frio e 0,8 s depois; `_document_cache_key` 3,72 s; geração fria
+completa 11,9 s. O import do WeasyPrint que falha também repetia a cada janela, porque import com
+erro não fica em `sys.modules`.
+
+A sonda passou a ler o ProgID `Word.Application\CLSID` no registro, sem abrir processo — o
+`DocumentoFacade` já tenta os motores em ordem e cai para o seguinte, então uma sonda otimista custa
+no máximo uma tentativa perdida. E `_scan_availability` ganhou duas camadas: `unoserver` e
+`libreoffice` continuam sondados por janela (sobem e caem em runtime), enquanto `word_com`,
+`weasyprint` e `simple_fallback` — que dependem de instalação — são memorizados por configuração,
+não por janela. Depois: sonda 0,00 s, `_document_cache_key` 0,38 s, geração fria 3,7–6,0 s.
+Produção usa `DOCUMENTOS_DEFAULT_PDF_ENGINE=unoserver`, que já pulava a varredura por
+`_fast_unoserver_chain`; o ganho é do modo `auto` (desenvolvimento e qualquer instalação sem
+unoserver).
+
+### NOVO-20260826-124301-1799c62a400b ✅ RESOLVIDO · `NOVO` Busca dos modelos do RT não ocupa a largura do rail · UI · risco baixo
+
+Relatado pelo usuário na lista de modelos de texto do relatório técnico. O slot `controls` do
+`list_page` já cria a fila externa `.rail__controls`, mas o formulário de busca repetia essa mesma
+classe como filho. Como a regra de expansão pertence a `.rail__form`, o formulário ficava na
+largura intrínseca de 264 px e deixava vazia a maior parte da faixa.
+
+O formulário passou ao contrato canônico `.rail__form`, já usado nas demais listas com filtro de
+servidor, e recebeu `role="search"`. Medido no navegador após a correção: rail interno, formulário
+e componente de input têm a mesma largura, **861,13 px** no viewport de **1186 × 698 px** do relato.
+O teste de regressão exige a classe de geometria no HTML renderizado.
+
+---
+
+### NOVO-20260826-124037-4fedd7ed1e61 ✅ RESOLVIDO · 🔴 `COR` RT divide entre a equipe a diária que é de cada servidor · BE · risco baixo
+
+Relatado pelo usuário com o caso real: diária de **R$ 624,68** saindo no RT como **R$ 312,34**,
+com dois servidores no ofício.
+
+`prestacoes_contas/services.py:_diaria_por_servidor` fazia
+`roteiro.valor_diarias / oficio.servidores.count()`. Isso valia enquanto o roteiro guardava o total
+do grupo; desde o `NOVO-39` o roteiro é calculado e persistido **para 1 servidor**
+(`roteiros/services/roteiro_editor.py` fixa `quantidade_servidores=1`) e a multiplicação pelo
+efetivo acontece uma única vez, no ofício, com o snapshot `Oficio.diarias_quantidade_servidores`.
+A divisão sobreviveu àquela correção do outro lado do sistema: o ofício passou a imprimir o total
+certo e o RT — que é individual — passou a imprimir a fração.
+
+**Alcance:** o valor inicial do RT (`diaria_inicial_do_oficio`/`_da_prestacao`) e, silenciosamente,
+o **teto** de `valor_diaria_liberado`: quem tivesse recebido o valor cheio era barrado ao digitá-lo,
+com a mensagem de que não pode passar do liberado. O presenter da prestação (`whatsapp_diaria`) e o
+diário já usavam o valor sem dividir — a divisão era só deste módulo.
+
+**Correção:** `_diaria_por_servidor(roteiro)` devolve o valor persistido, sem dividir.
+`garantir_campos_padrao_relatorio_tecnico` reconhece também o texto dividido que a versão anterior
+gravava sozinha (`_diarias_automaticas_legadas`) e o substitui no próximo acesso — sem isso o valor
+errado já gravado sobreviveria à correção, por deixar de bater com o padrão atual. Valor digitado à
+mão continua intocado.
+
+`prestacoes_contas/test_diaria_por_servidor.py` trava os quatro limites com o valor do relato
+(624,68 com equipe de 2). O caso de caracterização antigo em `tests.py`
+(`test_diaria_inicial_e_valor_por_servidor_da_prestacao`) travava a divisão — R$ 200,00 → R$ 100,00
+— e foi reescrito para a regra correta.
+
+---
+
+### NOVO-20260828-101500-3c7a5d19e4b2 ✅ RESOLVIDO · `NOVO` Wizard da prestação abria pelo RT, não pelo diário · UI · risco baixo
+
+Relatado pelo usuário: a ordem das etapas da prestação de contas está errada — o Diário de Bordo
+tem de vir antes do Relatório Técnico. O fluxo nasceu como RT (Etapa 1) → Diário (Etapa 2) →
+Documentos → PDF Final, mas o diário é o documento que registra o roteiro executado e o relatório
+descreve a viagem que o diário já registrou. O pacote final (`download_services.payload_downloads`
+e `_originais`) sempre empilhou ofício → despacho → **diário → RT** → comprovante: o wizard era o
+único lugar do sistema com a ordem invertida.
+
+**Correção:** `_build_prestacao_steps` passa a listar `diario` como Etapa 1 e `rt` como Etapa 2 — o
+stepper é navegável, então a numeração é o que muda de fato para quem opera. Os três rodapés
+acompanham: o diário deixa de oferecer "Voltar ao Relatório Técnico" e volta à lista (é o começo do
+fluxo), o RT deixa de mandar para o diário e segue para Documentos, e Documentos volta ao RT. As
+views passaram a receber o `*_url` que o novo vizinho exige (`document_views` ganhou `rt_url` no
+lugar de `diario_url`). O botão de editar do card, cujo `aria-label` promete "etapa 1", passou a
+abrir o diário. A descrição do pacote final no consolidado foi alinhada à ordem real de montagem.
+
+Dois testes travavam a ordem antiga e foram reescritos para a nova:
+`tests.test_rodape_do_rt_nao_exibe_botao_salvar_texto` e
+`test_componentes_v2.test_rodape_do_diario_nao_repete_downloads_da_pre_visualizacao`.
+Suíte completa: **2.755 testes verdes** (64s, `--parallel 4`).

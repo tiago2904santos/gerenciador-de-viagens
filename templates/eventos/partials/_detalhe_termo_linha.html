@@ -14,7 +14,7 @@
   <c-slot name="meta">{{ row.meta_line }}</c-slot>
   <c-slot name="actions">
     {% if row.downloads_url %}
-      <c-v2.download_picker :picker_id="row.download_picker_id" :src="row.downloads_url" />
+      <c-v2.download_picker :src="row.downloads_url" />
     {% elif row.visualizar_url or row.pdf_url or row.docx_url %}
       {% with row_index|stringformat:"s" as row_index_text %}
         {% with menu_id="evento-termo-document-menu-"|add:row_index_text %}
