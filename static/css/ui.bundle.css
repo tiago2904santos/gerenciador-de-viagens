@@ -140,10 +140,23 @@
   /* Anel de foco: 7.01:1 no claro · 6.49:1 no escuro. O piso para indicador de
      foco é 3:1; o accent do claro dava 1.26 e sumia. */
   --focus-ring-on-brand: var(--text-on-brand);
-  /* Rótulo apagado sobre a faixa. 76%, e não os 62% do primeiro corte: aquilo
-     media 3.75:1 no claro, abaixo dos 4.5:1 que texto de 12px exige. Agora
-     4.80:1 no claro e 9.16:1 no escuro. */
-  --text-muted-on-brand: color-mix(in srgb, var(--text-on-brand) 76%, transparent);
+  /* Rótulo apagado sobre a faixa. Os 76% do corte anterior foram medidos contra
+     `--surface-brand`, a faixa NUA — mas os três usuários do token não vivem
+     sobre ela: `.sidebar-account__label` e `.app-theme-grid__btn small` estão
+     sobre `--surface-on-brand` e sobre `--surface-selected-on-brand`, que sobem
+     a superfície e derrubam o contraste. Medido pelo axe no tema claro: 4.13:1
+     sobre a caixa da conta e 3.77:1 sobre o botão de tema escolhido, os dois
+     abaixo dos 4.5:1 que texto de 12px exige.
+
+     O valor agora é calibrado pela PIOR superfície em que o token pousa, não
+     pela faixa: `--surface-selected-on-brand`, onde o branco
+     puro é o teto em 5.23:1. 90% mede 4.59:1 ali, 5.09:1 sobre a caixa da conta
+     e 5.42:1 sobre a faixa nua — AA nos três.
+
+     O escuro fica nos 76%: lá a faixa de marca é bem mais escura e o token já
+     media 7.18:1 na pior superfície. Subi-lo só lavaria o rótulo sem ganho de
+     contraste. */
+  --text-muted-on-brand: color-mix(in srgb, var(--text-on-brand) 90%, transparent);
 
   /* Vermelho de TEXTO, separado do `--danger` de superfície.
      `--danger` é o mesmo nos dois temas por decisão do dono, e como fundo de
@@ -154,7 +167,16 @@
 
   /* ---- texto ---------------------------------------------------------- */
   --text-strong: #223348;
-  --text-muted: #52657a;
+  /* Escurecido em 2026-08-31. O valor antigo passava em AA sobre o
+     branco (6,0:1) e reprovava em tudo que fosse tingido — que é onde ele mais
+     aparece: 4,39:1 no `.person-row__meta` da linha de motorista, 4,08:1 no
+     `.search-picker__selected-meta` do cartão escolhido e 3,61:1 como chip
+     neutro sobre `--surface-page`. Medir só contra o branco é a mesma
+     armadilha do `--text-muted-on-brand` logo acima.
+     O novo valor é um azul-ardósia que o sistema já usava, e não um hex
+     inventado — ver a nota dos tons de estado acima sobre `audit_paleta.py`.
+     Agora: 5,25:1 no pior texto direto e 4,52:1 no pior chip neutro. */
+  --text-muted: #44546a;
   --text-on-brand: #ffffff;
   --text-on-accent: #ffffff;
 
@@ -188,6 +210,32 @@
   --status-progress: #d8a21b;
   --status-late: #c0392b;
   --status-info: #2b6cb0;
+
+  /* Os quatro acima são cor de SUPERFÍCIE: o chip e o alert os usam no
+     `color-mix(… 16%, transparent)` que desenha a tinta e a fitinha. Como cor
+     de TEXTO sobre a própria tinta nenhum deles passa em AA, e o pior é o
+     dourado do `progress`: o axe mediu 2,03:1 no aviso de mapa da etapa de
+     roteiro e no selo "Cálculo atualizado" — dourado sobre creme, ilegível.
+     Medido sobre as três superfícies do tema claro (`--surface-field`, `-rail`
+     e `-page`), nenhum tom chega a 4,5:1; o `info` para em 3,27:1 sobre a
+     página e o `late` em 3,20:1.
+
+     Este é o mesmo movimento que `--text-danger` já fazia sozinho logo acima:
+     separar o vermelho de TEXTO do vermelho de SUPERFÍCIE. Aqui ele vira regra
+     para os quatro tons, em vez de exceção para um.
+
+     Cada valor é o tom escurecido até passar em AA sobre a tinta na PIOR das
+     três superfícies. Três dos quatro são cores que o sistema JÁ tinha, e não
+     valores novos: `audit_paleta.py` reprova cor perceptualmente igual a outra
+     escrita com hex diferente, e o primeiro corte deste bloco criou exatamente
+     isso — o azul batia com o anel de foco e o vermelho com o vermelho escuro
+     do legado. Reusar é o que a catraca pede. Medidos com luminância relativa
+     da WCAG, na pior superfície:
+       done 4,58:1 · progress 4,87:1 · late 4,96:1 · info 5,11:1  */
+  --status-done-text: #156237;
+  --status-progress-text: #6b531a;
+  --status-late-text: #951f18;
+  --status-info-text: #12507f;
 
   /* ---- cor por FUNÇÃO da ação (2026-08-20) -------------------------------
    *
@@ -304,9 +352,29 @@
   --focus-ring-on-brand: var(--focus-ring);
   --text-danger: #ef7d77;
 
+  /* Ver o comentário dos quatro tons no bloco claro. Os tons de superfície
+     seguem fixos entre os temas — estado é significado —, mas a variante de
+     TEXTO precisa inverter o sentido do ajuste: no escuro a tinta é escura e o
+     texto tem de CLAREAR, não escurecer. Medidos sobre a pior das três
+     superfícies do escuro (`--surface-field`):
+       done 4,58:1 · progress 4,72:1 · late 4,51:1 · info 4,54:1
+     O dourado do `progress` reusa o `#e0ab3c` que o tema escuro já tem: a
+     primeira tentativa clareou o tom em 7%, o que passa em AA e é
+     perceptualmente a MESMA cor — a duplicata que `audit_paleta.py` reprova. */
+  --status-done-text: #6fb78e;
+  --status-progress-text: #e0ab3c;
+  --status-late-text: #da8a82;
+  --status-info-text: #82a8d0;
+
   --text-strong: #ffffff;
   --text-muted: #afc0d3;
   --text-on-brand: #ffffff;
+  /* Ver o comentário do token no bloco claro: os 90% de lá são a correção de
+     uma conta feita contra a faixa nua. Aqui a conta não estava errada — sobre
+     a faixa escura o token mede 7.18:1 na pior superfície —, então o escuro
+     mantém os
+     76% e preserva a distinção entre rótulo e nome. */
+  --text-muted-on-brand: color-mix(in srgb, var(--text-on-brand) 76%, transparent);
   /* O accent escuro é dourado: texto sobre ele é ESCURO, não branco. */
   --text-on-accent: #062847;
 
@@ -3695,13 +3763,18 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
  * A cor vem por `--chip-tone`, declarada por quem usa; sem tom, o chip é
  * neutro. NÃO existe uma classe por cor — era assim que nasciam as 18
  * variantes do botão legado, das quais 8 acabaram mortas.
+ *
+ * `--chip-tone` pinta a TINTA; `--chip-tone-text` pinta o RÓTULO. São dois
+ * porque o tom puro sobre a própria tinta a 16% não passa em AA (o `info`
+ * media 3,96:1, medido pelo axe na lista de Ofícios). Quem declara só o tom
+ * continua funcionando: o rótulo cai no tom, como antes.
  */
 
 :is(html[data-theme]) .chip--v2 {
   align-items: center;
   background: color-mix(in srgb, var(--chip-tone, var(--text-muted)) 16%, transparent);
   border-radius: var(--radius-pill);
-  color: var(--chip-tone, var(--text-muted));
+  color: var(--chip-tone-text, var(--chip-tone, var(--text-muted)));
   display: inline-flex;
   font-size: var(--text-size-eyebrow);
   font-weight: var(--weight-strong);
@@ -3714,31 +3787,38 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 /* O chamador nomeia o estado; o sistema decide a cor. */
 :is(html[data-theme]) .chip--v2[data-tone="done"] {
   --chip-tone: var(--status-done);
+  --chip-tone-text: var(--status-done-text);
 }
 
 :is(html[data-theme]) .chip--v2[data-tone="progress"] {
   --chip-tone: var(--status-progress);
+  --chip-tone-text: var(--status-progress-text);
 }
 
 :is(html[data-theme]) .chip--v2[data-tone="late"] {
   --chip-tone: var(--status-late);
+  --chip-tone-text: var(--status-late-text);
 }
 
 :is(html[data-theme]) .chip--v2[data-tone="info"] {
   --chip-tone: var(--status-info);
+  --chip-tone-text: var(--status-info-text);
 }
 
 :is(html[data-theme]) .chip--v2[data-tone="success"] {
   --chip-tone: var(--status-done);
+  --chip-tone-text: var(--status-done-text);
 }
 
 :is(html[data-theme]) .chip--v2[data-tone="pending"] {
   --chip-tone: var(--status-progress);
+  --chip-tone-text: var(--status-progress-text);
 }
 
 :is(html[data-theme]) .chip--v2[data-tone="warning"],
 :is(html[data-theme]) .chip--v2[data-tone="danger"] {
   --chip-tone: var(--status-late);
+  --chip-tone-text: var(--status-late-text);
 }
 
 :is(html[data-theme]) .chip--v2[data-tone="entity"],
@@ -3886,7 +3966,11 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   border: 0;
   border-left: 3px solid var(--alert-tone, var(--status-info));
   border-radius: var(--radius-field);
-  color: var(--alert-tone, var(--status-info));
+  /* A fitinha e a tinta usam o tom; o TEXTO usa a variante escurecida. Com o
+     tom puro o aviso dourado media 2,03:1 sobre a própria tinta — o pior
+     contraste que o axe achou no sistema. Ver `--status-*-text` em
+     `v2/tokens.css`. */
+  color: var(--alert-tone-text, var(--alert-tone, var(--status-info)));
   font-size: var(--text-size-base);
   margin: 0;
   /* Recuo menor à esquerda: a fitinha já ocupa parte do espaço, e o padding
@@ -3918,18 +4002,22 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
 
 :is(html[data-theme]) .alert[data-tone="success"] {
   --alert-tone: var(--status-done);
+  --alert-tone-text: var(--status-done-text);
 }
 
 :is(html[data-theme]) .alert[data-tone="warning"] {
   --alert-tone: var(--status-progress);
+  --alert-tone-text: var(--status-progress-text);
 }
 
 :is(html[data-theme]) .alert[data-tone="error"] {
   --alert-tone: var(--status-late);
+  --alert-tone-text: var(--status-late-text);
 }
 
 :is(html[data-theme]) .alert[data-tone="info"] {
   --alert-tone: var(--status-info);
+  --alert-tone-text: var(--status-info-text);
 }
 
 /* O aviso que um motor preenche existe VAZIO, para haver onde escrever quando a
@@ -6728,6 +6816,17 @@ html[data-theme="dark"] :is(.custom-select__option--selected:hover, .custom-sele
   background: var(--accent);
   border-color: var(--accent);
   color: var(--text-on-accent);
+}
+
+/* O selo NÃO repete a tinta dentro da linha do motorista. `--surface-driver` já
+   é o accent a 16%; o `color-mix` do selo somava um segundo 16% em cima do
+   primeiro e o texto perdia o fundo de que precisava. Medido pelo axe no tema
+   escuro o dourado do accent sobre a tinta dobrada dá 3,75:1, abaixo dos
+   4,5:1. Sem a segunda camada o mesmo dourado mede 4,94:1 sobre a linha, e o
+   selo para de desenhar uma caixa dourada dentro de uma faixa dourada. */
+:is(html[data-theme]) .person-row--driver .person-row__badge {
+  background: transparent;
+  padding-inline: 0;
 }
 
 /* O botão da linha no RAIL, e SEM contorno: a linha está no degrau `field`, e o
@@ -10125,6 +10224,19 @@ html[data-theme="dark"] :is(.search-picker__selected-panel, .search-picker__sele
 :is(html[data-theme]) .picker .search-picker--detailed .search-picker__selected-card--vehicle {
   background: var(--surface-selected);
   box-shadow: inset 3px 0 0 0 var(--accent);
+}
+
+/* O comentário do selo, quinze regras acima, afirma que "sobre o cartão do
+   motorista, que JÁ está na cor da escolha, o translúcido continua legível".
+   Medido, não continua: `--surface-selected` é o accent a 16% e o selo soma
+   outro 16% por cima; sobre essa tinta dobrada o dourado do tema escuro mede
+   3,75:1. É o mesmo empilhamento de tinta da linha de motorista, e a correção
+   é a mesma: sobre o cartão já tingido o selo larga o próprio fundo e fica só
+   com a cor do texto, que aí mede 4,94:1. */
+:is(html[data-theme]) .picker .search-picker__selected-card--driver .search-picker__driver-chip,
+:is(html[data-theme]) .picker .search-picker__selected-card--vehicle .search-picker__vehicle-chip {
+  background: transparent;
+  padding-inline: 0;
 }
 
 /* Âncora CHEIA só nesses dois: na lista de opções ela concorre com as irmãs e
@@ -15690,8 +15802,9 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
   background: var(--surface-selected-on-brand);
 }
 
-:is(html[data-theme]) .app-theme-grid__btn[aria-checked="true"],
-:is(html[data-theme]) .app-theme-grid__btn[aria-pressed="true"] {
+/* Só `[aria-checked]`: o `aria-pressed` saiu da marcação por ser proibido em
+   `role="radio"`, e o seletor que o casava ficou sem alvo. */
+:is(html[data-theme]) .app-theme-grid__btn[aria-checked="true"] {
   background: var(--surface-selected-on-brand);
   border-color: var(--accent);
 }

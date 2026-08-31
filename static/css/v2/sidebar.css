@@ -410,8 +410,9 @@
   background: var(--surface-selected-on-brand);
 }
 
-:is(html[data-theme]) .app-theme-grid__btn[aria-checked="true"],
-:is(html[data-theme]) .app-theme-grid__btn[aria-pressed="true"] {
+/* Só `[aria-checked]`: o `aria-pressed` saiu da marcação por ser proibido em
+   `role="radio"`, e o seletor que o casava ficou sem alvo. */
+:is(html[data-theme]) .app-theme-grid__btn[aria-checked="true"] {
   background: var(--surface-selected-on-brand);
   border-color: var(--accent);
 }

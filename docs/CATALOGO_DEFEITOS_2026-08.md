@@ -10985,6 +10985,14 @@ passa pelo podador... e o orçamento de dois arquivos do NOVO-12 fica
 preservado"). Isso devolveria o uso para a casa dos 40-60%. Enquanto não for
 feito, o `NOVO-70` fica vermelho e a `main` só deploya por dispatch manual.
 
+**Remedido em 31/08/2026, na auditoria visual e funcional.** A dívida não parou de pé: o
+`ui.bundle.css` foi de **517 KB para 572 KB** nos onze dias seguintes, e o uso médio nas 43 rotas
+está em **13,60%** (pior: `login` com 4,22%; melhor: `oficios-detalhe` com 20,81%). O gate segue
+vermelho pela decisão registrada acima, e continua sendo **a única dívida estrutural aberta do
+sistema** — a auditoria de 31/08 não encontrou nenhum defeito funcional nas 43 rotas. Vale o
+registro para quem for abrir módulo novo: cada folha que o módulo trouxer entra neste bundle e é
+servida em toda página do sistema, inclusive nas que não a usam.
+
 **Nuance que pesou na decisão:** 517 KB é o tamanho cru. O WhiteNoise entrega
 comprimido e o arquivo é UM só, cacheado uma vez para o app inteiro, enquanto os
 perfis são um por família de rota. Pela métrica de regra não usada está muito
@@ -12123,3 +12131,125 @@ Dois testes travavam a ordem antiga e foram reescritos para a nova:
 `tests.test_rodape_do_rt_nao_exibe_botao_salvar_texto` e
 `test_componentes_v2.test_rodape_do_diario_nao_repete_downloads_da_pre_visualizacao`.
 Suíte completa: **2.755 testes verdes** (64s, `--parallel 4`).
+
+---
+
+## Auditoria visual e funcional de 31/08/2026
+
+Reauditoria completa pedida pelo dono antes de abrir o sistema a módulos novos: **43 rotas, dois
+temas, 86 medições**, com `axe-core` (`scripts/audit_accessibility.py`), varredura própria de
+console/rede em Chromium e as onze catracas do CI. O funcional saiu limpo — as 43 rotas respondem
+**200** nos dois temas, sem erro de JS e sem estouro horizontal; os únicos pedidos de rede que
+falham são os *tiles* do OpenStreetMap, bloqueados pelo proxy da sessão, não pelo sistema.
+
+A dívida estava toda na acessibilidade: **411 violações WCAG AA medidas**, das quais a baseline
+registrava 292 e **217 eram regressões novas**, não catalogadas. Quatro causas-raiz respondiam por
+394 delas, e todas as quatro eram do mesmo tipo — **cor calibrada contra a superfície errada, ou
+nome acessível que existe na marcação e não chega ao controle visível**.
+
+Depois das correções abaixo: **411 → 17 violações**, `aria-allowed-attr` 168 → 0, `color-contrast`
+187 → 7, `button-name` 28 → 0, `label` 18 → 0. As 17 restantes estão nos três IDs abertos ao fim
+desta seção.
+
+---
+
+### NOVO-20260831-133233-479222d735b2 ✅ RESOLVIDO · `NOVO` Quatro causas-raiz de contraste e nome acessível somam 394 violações WCAG AA · UI/HT · risco médio
+
+Medido em 31/08/2026 nas 43 rotas, nos dois temas. As quatro:
+
+**1. `aria-pressed` num `role="radio"` — 168 violações, 87% do total.** Os dois botões do seletor de
+tema em `cotton/v2/sidebar.html` carregavam `aria-pressed` **e** `aria-checked`. São um `radio`
+dentro de um `radiogroup`, e a ARIA não permite `aria-pressed` ali. Como a barra lateral está em
+toda página, o defeito se multiplicava por 43 rotas × 2 temas. Saíram o atributo da marcação, o
+`setAttribute` de `theme-toggle.js` e o seletor órfão de `v2/sidebar.css`; o estado escolhido
+continua em `aria-checked`, que é o correto para `radio` e é o que o CSS já casava.
+
+**2. Cor de texto calibrada contra a superfície errada — 187 violações.** Três tokens tinham a conta
+feita contra um fundo em que não pousam:
+
+- `--text-muted-on-brand` foi medido contra `--surface-brand`, a faixa **nua**, mas seus três
+  usuários vivem sobre `--surface-on-brand` e `--surface-selected-on-brand`, que sobem a superfície:
+  4,13:1 na caixa da conta e 3,77:1 no botão de tema escolhido. Recalibrado pela pior superfície
+  (76% → 90% no tema claro; o escuro fica em 76%, onde já media 7,18:1).
+- `--text-muted` passava sobre o branco e reprovava em tudo que fosse tingido: 4,39:1 no
+  `.person-row__meta`, 4,08:1 no `.search-picker__selected-meta`, 3,61:1 como chip neutro sobre
+  `--surface-page`.
+- `--color-text-soft`, cujo único consumidor vivo é `--color-input-placeholder`, media 3,88:1 sobre
+  o campo. No filtro de situação de sete listas o *placeholder* não é decorativo: com nada
+  escolhido, "Filtrar por situação" é o único nome visível do controle.
+
+Na mesma família, dois defeitos de **tinta empilhada**: `.person-row__badge` e os selos do
+`search-picker` desenham `color-mix(accent 16%)` **dentro** de uma linha que já é o accent a 16%,
+e o dourado do tema escuro caía para 3,75:1 sobre a soma. Os selos largaram o próprio fundo sobre a
+superfície já tingida — sobem para 4,94:1 e param de desenhar uma caixa dourada dentro de uma faixa
+dourada. O comentário de `v2/picker.css` afirmava que "sobre o cartão do motorista, que JÁ está na
+cor da escolha, o translúcido continua legível"; medido, não continuava.
+
+E a pior medição isolada do sistema: `.alert` e `.chip--v2` pintam o **texto** com o mesmo token que
+pinta a **tinta**. Sobre a própria tinta a 16% nenhum dos quatro tons de estado chega a 4,5:1, e o
+dourado do `progress` mede **2,03:1** — o aviso de mapa da etapa de roteiro e o selo "Cálculo
+atualizado" eram dourado sobre creme. Nasceram `--status-{done,progress,late,info}-text`, que é o
+mesmo movimento que `--text-danger` já fazia sozinho: separar a cor de TEXTO da cor de SUPERFÍCIE,
+agora como regra para os quatro tons em vez de exceção para um.
+
+> **Nota de método.** O primeiro corte destes tokens inventou seis hex novos e reprovou em
+> `audit_paleta.py --max 0`: cinco eram perceptualmente iguais (ΔE2000 ≤ 2,5) a cores que o sistema
+> já tinha — o azul batia com o anel de foco, o vermelho com o vermelho escuro do legado, e o
+> dourado do escuro era o próprio tom clareado em 7%, indistinguível. Quatro dos valores finais são
+> **reuso** da paleta existente. Vale registrar também que `audit_paleta.py` conta hex dentro de
+> comentário: anotar "medido: `#5f5732`" numa folha que não é de token cria uma cor no inventário.
+
+**3. Nome acessível preso ao `<select>` oculto — 28 violações.** `c-v2.select` renderiza
+`aria-label` no `<select>` nativo, mas `picker-select.js` marca esse nativo `aria-hidden` e constrói
+um `<button role="combobox">` separado, que só herdava nome quando existia um `label[for]`. Nos
+filtros de lista, que não têm rótulo visível, o gatilho nascia mudo. O nome agora acompanha o
+controle visível — mesmo movimento que a linha vizinha já fazia com o `for=`.
+
+**4. Rótulo apontando para id inexistente — 18 violações.** `c-v2.document_number` fixava
+`label_for` no id do modo COMPOSTO. No modo simples — o número do ofício — esse input não é
+renderizado por ninguém, e o número ficava sem rótulo. E os cartões de trecho construídos por
+`roteiros/editor/trechos.js` traziam quatro `<label>` sem `for`, ao lado de um `buildTimeField` que
+já fazia certo; passaram a seguir a convenção do próprio arquivo.
+
+**Verificação:** suíte completa **2.755 testes verdes, 11 skips, 26,6 s** (`--parallel 4`,
+PostgreSQL); 15 arquivos e 70 testes de JS verdes no vitest; as onze catracas do CI verdes, com
+`audit_frontend_standards` estável em **72 avisos** e `audit_paleta` em **0**.
+
+---
+
+### NOVO-20260831-133234-824d27c12b58 🔴 ABERTO · `NOVO` Ações dentro do `<summary>` do documento inline são interativo aninhado · HT · risco baixo
+
+8 violações `nested-interactive` em `oficios-wizard-resumo` e `oficios-wizard-documentos`, nos dois
+temas. `c-v2.document_inline` põe o menu de ações **dentro** do `<summary>` do `<details>`, e o
+comentário do componente registra que é deliberado: o script para o clique das ações antes que ele
+alterne o cartão. O `<summary>` é interativo, então botões focáveis dentro dele são um controle
+dentro de outro — a tecnologia assistiva não consegue expor os dois.
+
+Não corrigido junto com o ID acima de propósito: o `<summary>` tem de ser filho direto do
+`<details>`, então tirar as ações de dentro dele exige refazer a linha do cabeçalho no CSS. É
+mudança de desenho com risco visual, e merece PR próprio com print de antes e depois.
+
+---
+
+### NOVO-20260831-133235-b288e75f803a 🔴 ABERTO · `NOVO` `--color-success` no tema escuro mede 4,49:1 sobre a linha do motorista · UI · risco baixo
+
+3 violações, só no tema escuro, no botão "Com termo"
+(`.field-side-action--toggle.field-side-action--success.is-active`) de `oficios-detalhe`,
+`oficios-editar` e `oficios-wizard-dados-viajantes`. O verde `--color-success` do escuro mede
+**4,49:1** sobre a superfície oliva da linha escolhida — 0,01 abaixo do piso.
+
+Fica aberto porque `--color-success` é usado também como fundo e como borda, e clareá-lo melhora o
+texto sobre ele e piora o texto branco em cima dele. A escolha precisa da medição das duas pontas,
+e o ganho aqui é de três nós.
+
+---
+
+### NOVO-20260831-133236-1025e515099b 🔴 ABERTO · `NOVO` A atribuição do Leaflet reprova em contraste e em link sem sublinhado · UI · risco baixo
+
+3 violações em `roteiros-novo`: `color-contrast` no escuro (2,55:1 e 3,25:1) e `link-in-text-block`
+nos dois temas — o link da atribuição não tem sublinhado nem contraste suficiente com o texto ao
+redor. O CSS é do Leaflet, de terceiro, servido junto com o mapa.
+
+A correção é uma folha de sobreposição própria que repinte `.leaflet-control-attribution` com os
+tokens do sistema. Fora do escopo desta auditoria por ser CSS de terceiro; a atribuição é exigida
+pela licença do OpenStreetMap e **não** pode simplesmente sumir.

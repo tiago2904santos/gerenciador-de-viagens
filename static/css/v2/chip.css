@@ -11,13 +11,18 @@
  * A cor vem por `--chip-tone`, declarada por quem usa; sem tom, o chip é
  * neutro. NÃO existe uma classe por cor — era assim que nasciam as 18
  * variantes do botão legado, das quais 8 acabaram mortas.
+ *
+ * `--chip-tone` pinta a TINTA; `--chip-tone-text` pinta o RÓTULO. São dois
+ * porque o tom puro sobre a própria tinta a 16% não passa em AA (o `info`
+ * media 3,96:1, medido pelo axe na lista de Ofícios). Quem declara só o tom
+ * continua funcionando: o rótulo cai no tom, como antes.
  */
 
 :is(html[data-theme]) .chip--v2 {
   align-items: center;
   background: color-mix(in srgb, var(--chip-tone, var(--text-muted)) 16%, transparent);
   border-radius: var(--radius-pill);
-  color: var(--chip-tone, var(--text-muted));
+  color: var(--chip-tone-text, var(--chip-tone, var(--text-muted)));
   display: inline-flex;
   font-size: var(--text-size-eyebrow);
   font-weight: var(--weight-strong);
@@ -30,31 +35,38 @@
 /* O chamador nomeia o estado; o sistema decide a cor. */
 :is(html[data-theme]) .chip--v2[data-tone="done"] {
   --chip-tone: var(--status-done);
+  --chip-tone-text: var(--status-done-text);
 }
 
 :is(html[data-theme]) .chip--v2[data-tone="progress"] {
   --chip-tone: var(--status-progress);
+  --chip-tone-text: var(--status-progress-text);
 }
 
 :is(html[data-theme]) .chip--v2[data-tone="late"] {
   --chip-tone: var(--status-late);
+  --chip-tone-text: var(--status-late-text);
 }
 
 :is(html[data-theme]) .chip--v2[data-tone="info"] {
   --chip-tone: var(--status-info);
+  --chip-tone-text: var(--status-info-text);
 }
 
 :is(html[data-theme]) .chip--v2[data-tone="success"] {
   --chip-tone: var(--status-done);
+  --chip-tone-text: var(--status-done-text);
 }
 
 :is(html[data-theme]) .chip--v2[data-tone="pending"] {
   --chip-tone: var(--status-progress);
+  --chip-tone-text: var(--status-progress-text);
 }
 
 :is(html[data-theme]) .chip--v2[data-tone="warning"],
 :is(html[data-theme]) .chip--v2[data-tone="danger"] {
   --chip-tone: var(--status-late);
+  --chip-tone-text: var(--status-late-text);
 }
 
 :is(html[data-theme]) .chip--v2[data-tone="entity"],

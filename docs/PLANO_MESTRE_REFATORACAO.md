@@ -809,3 +809,15 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       memoriza por configuração as sondas que dependem de instalação (Word, WeasyPrint, fpdf).
 - [x] `NOVO-20260826-124301-1799c62a400b` faz a busca dos modelos do RT consumir toda a largura
       interna do rail pelo contrato canônico `rail__form`, com teste estrutural e medição visual.
+- [x] `NOVO-20260831-133233-479222d735b2` fecha as quatro causas-raiz de acessibilidade achadas na
+      reauditoria de 31/08: `aria-pressed` proibido no seletor de tema, três tokens de cor
+      calibrados contra a superfície errada, tinta de selo empilhada sobre superfície já tingida,
+      tom de estado usado como cor de texto, nome acessível preso ao `<select>` oculto e rótulo
+      apontando para id inexistente. Medido nas 43 rotas nos dois temas: **411 → 17 violações
+      WCAG AA**, com a baseline de `audit_accessibility.py` descendo de 292 para 17 alvos.
+- [ ] `NOVO-20260831-133234-824d27c12b58` tira as ações de dentro do `<summary>` do documento
+      inline sem perder a linha do cabeçalho (8 nós de `nested-interactive`).
+- [ ] `NOVO-20260831-133235-b288e75f803a` decide o verde do tema escuro medindo as duas pontas —
+      texto sobre ele e texto branco em cima dele (3 nós a 4,49:1).
+- [ ] `NOVO-20260831-133236-1025e515099b` repinta a atribuição do Leaflet com os tokens do sistema
+      (3 nós, CSS de terceiro).

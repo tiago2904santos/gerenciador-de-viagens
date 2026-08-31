@@ -521,13 +521,15 @@ html[data-theme="light"] {
   --color-border-strong: #afc0d3;
   --color-text: #132238;
   --color-text-muted: #52657a;
-  --color-text-soft: #71839a;
+  
+  --color-text-soft: #606f83;
   --shadow-card: 0 14px 34px rgba(7, 26, 51, 0.16);
   --shadow-soft: 0 6px 16px rgba(7, 26, 51, 0.1);
   --color-input-bg: var(--color-white);
   --color-input-disabled-bg: #e3eaf2;
   --color-input-text: #132238;
-  --color-input-placeholder: #71839a;
+  
+  --color-input-placeholder: #606f83;
   --color-input-border: rgba(31, 76, 125, 0.22);
 
   --app-body-bg: var(--color-white);  

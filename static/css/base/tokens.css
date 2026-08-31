@@ -599,13 +599,22 @@ html[data-theme="light"] {
   --color-border-strong: #afc0d3;
   --color-text: #132238;
   --color-text-muted: #52657a;
-  --color-text-soft: #71839a;
+  /* Escurecido em 2026-08-31. O token tem um consumidor vivo só —
+     `--color-input-placeholder`, logo abaixo —, e ali o valor antigo media
+     3,88:1 sobre o campo branco. No filtro de situação das sete listas o
+     placeholder NÃO é decorativo: com nada escolhido, "Filtrar por situação" é
+     o único nome visível do controle, e é o que o axe reprovou em
+     `.custom-select__value--placeholder`. Agora 5,10:1 sobre o campo e 4,62:1
+     sobre a faixa de controles. */
+  --color-text-soft: #606f83;
   --shadow-card: 0 14px 34px rgba(7, 26, 51, 0.16);
   --shadow-soft: 0 6px 16px rgba(7, 26, 51, 0.1);
   --color-input-bg: var(--color-white);
   --color-input-disabled-bg: #e3eaf2;
   --color-input-text: #132238;
-  --color-input-placeholder: #71839a;
+  /* Mesmo valor de `--color-text-soft` acima, repetido como literal desde o
+     tema legado. Os dois andam juntos. */
+  --color-input-placeholder: #606f83;
   --color-input-border: rgba(31, 76, 125, 0.22);
 
   --app-body-bg: var(--color-white);  /* ver nota no :root */
