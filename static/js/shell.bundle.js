@@ -18,7 +18,8 @@
     document.querySelectorAll("[data-theme-mode]").forEach(function (btn) {
       var mode = btn.getAttribute("data-theme-mode");
       var checked = mode === theme;
-      btn.setAttribute("aria-pressed", checked ? "true" : "false");
+      // Só `aria-checked`: os botões são `role="radio"`, e a ARIA não permite
+      // `aria-pressed` ali. Ver o comentário em `cotton/v2/sidebar.html`.
       btn.setAttribute("aria-checked", checked ? "true" : "false");
       btn.setAttribute("tabindex", checked ? "0" : "-1");
     });

@@ -2461,6 +2461,19 @@ html[data-theme="dark"] :is(.search-picker__selected-panel, .search-picker__sele
   box-shadow: inset 3px 0 0 0 var(--accent);
 }
 
+/* O comentário do selo, quinze regras acima, afirma que "sobre o cartão do
+   motorista, que JÁ está na cor da escolha, o translúcido continua legível".
+   Medido, não continua: `--surface-selected` é o accent a 16% e o selo soma
+   outro 16% por cima; sobre essa tinta dobrada o dourado do tema escuro mede
+   3,75:1. É o mesmo empilhamento de tinta da linha de motorista, e a correção
+   é a mesma: sobre o cartão já tingido o selo larga o próprio fundo e fica só
+   com a cor do texto, que aí mede 4,94:1. */
+:is(html[data-theme]) .picker .search-picker__selected-card--driver .search-picker__driver-chip,
+:is(html[data-theme]) .picker .search-picker__selected-card--vehicle .search-picker__vehicle-chip {
+  background: transparent;
+  padding-inline: 0;
+}
+
 /* Âncora CHEIA só nesses dois: na lista de opções ela concorre com as irmãs e
    precisa ser translúcida; aqui ela aponta um item só. */
 :is(html[data-theme]) .picker .search-picker__selected-card--driver .search-picker__selected-avatar,

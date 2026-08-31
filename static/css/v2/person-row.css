@@ -200,6 +200,17 @@
   color: var(--text-on-accent);
 }
 
+/* O selo NÃO repete a tinta dentro da linha do motorista. `--surface-driver` já
+   é o accent a 16%; o `color-mix` do selo somava um segundo 16% em cima do
+   primeiro e o texto perdia o fundo de que precisava. Medido pelo axe no tema
+   escuro o dourado do accent sobre a tinta dobrada dá 3,75:1, abaixo dos
+   4,5:1. Sem a segunda camada o mesmo dourado mede 4,94:1 sobre a linha, e o
+   selo para de desenhar uma caixa dourada dentro de uma faixa dourada. */
+:is(html[data-theme]) .person-row--driver .person-row__badge {
+  background: transparent;
+  padding-inline: 0;
+}
+
 /* O botão da linha no RAIL, e SEM contorno: a linha está no degrau `field`, e o
    botão desce um degrau — a diferença de superfície já o separa do que está
    atrás. O contorno em cima disso era a segunda vez que a mesma borda era dita,

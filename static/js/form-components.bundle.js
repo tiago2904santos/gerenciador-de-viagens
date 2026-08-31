@@ -1344,6 +1344,21 @@
       labelEl.setAttribute('for', triggerId);
     }
 
+    // Sem `<label for>`, o nome acessível do controle está no PRÓPRIO select —
+    // é o `aria_label` que `c-v2.select` renderiza nos filtros de lista, que não
+    // têm rótulo visível. Como o passo 1 acabou de marcar o nativo
+    // `aria-hidden`, esse nome deixa de existir para o leitor de tela e o botão
+    // nasce mudo: o axe reprova em `button-name` nos gatilhos de "Filtrar por
+    // situação" e "Ordenação" de sete listas. Transferir é o mesmo movimento
+    // que a linha acima faz com o `for=`: o nome segue o controle visível.
+    var nomeHerdado = null;
+    var rotuladoPor = null;
+    if (!labelEl) {
+      nomeHerdado = native.getAttribute('aria-label');
+      rotuladoPor = native.getAttribute('aria-labelledby');
+      if (!nomeHerdado && !rotuladoPor) nomeHerdado = native.getAttribute('title');
+    }
+
     // 3. Construir trigger
     var trigger = document.createElement('button');
     trigger.type = 'button';
@@ -1354,6 +1369,8 @@
     trigger.setAttribute('aria-expanded', 'false');
     trigger.setAttribute('aria-controls', this._id + '-menu');
     if (labelEl) trigger.setAttribute('aria-labelledby', labelEl.id);
+    else if (rotuladoPor) trigger.setAttribute('aria-labelledby', rotuladoPor);
+    else if (nomeHerdado) trigger.setAttribute('aria-label', nomeHerdado);
     if (native.disabled) {
       trigger.disabled = true;
       this.root.classList.add('custom-select--disabled');

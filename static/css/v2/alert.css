@@ -25,7 +25,11 @@
   border: 0;
   border-left: 3px solid var(--alert-tone, var(--status-info));
   border-radius: var(--radius-field);
-  color: var(--alert-tone, var(--status-info));
+  /* A fitinha e a tinta usam o tom; o TEXTO usa a variante escurecida. Com o
+     tom puro o aviso dourado media 2,03:1 sobre a própria tinta — o pior
+     contraste que o axe achou no sistema. Ver `--status-*-text` em
+     `v2/tokens.css`. */
+  color: var(--alert-tone-text, var(--alert-tone, var(--status-info)));
   font-size: var(--text-size-base);
   margin: 0;
   /* Recuo menor à esquerda: a fitinha já ocupa parte do espaço, e o padding
@@ -57,18 +61,22 @@
 
 :is(html[data-theme]) .alert[data-tone="success"] {
   --alert-tone: var(--status-done);
+  --alert-tone-text: var(--status-done-text);
 }
 
 :is(html[data-theme]) .alert[data-tone="warning"] {
   --alert-tone: var(--status-progress);
+  --alert-tone-text: var(--status-progress-text);
 }
 
 :is(html[data-theme]) .alert[data-tone="error"] {
   --alert-tone: var(--status-late);
+  --alert-tone-text: var(--status-late-text);
 }
 
 :is(html[data-theme]) .alert[data-tone="info"] {
   --alert-tone: var(--status-info);
+  --alert-tone-text: var(--status-info-text);
 }
 
 /* O aviso que um motor preenche existe VAZIO, para haver onde escrever quando a

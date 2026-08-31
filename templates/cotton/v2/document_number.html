@@ -24,9 +24,17 @@
   inteiro, que o script então concatenava outra vez.
 {% endcomment %}
 {% with erro=field.errors.0 erro_id=field.id_for_label|add:"_error" numero_id=field.id_for_label|add:"_numero" aria_numero=label|add:" — só o número" %}
+{% comment %}
+  O `for=` do rótulo segue o input que EXISTE em cada modo. No composto é o
+  `numero_id`, criado logo abaixo; no simples esse id não é renderizado por
+  ninguém — quem se edita é o `{{ field }}`, com o id do próprio formulário. O
+  `for=` fixo em `numero_id` apontava para elemento inexistente no modo simples
+  e deixava o número do ofício sem rótulo nenhum (axe `label` em `#id_numero`,
+  na etapa Dados e viajantes).
+{% endcomment %}
 <c-v2.field
   :label="label"
-  :label_for="numero_id"
+  label_for="{% if year %}{{ numero_id }}{% else %}{{ field.id_for_label }}{% endif %}"
   :error="erro"
   :error_id="erro_id"
   :extra_class="extra_class"

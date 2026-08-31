@@ -84,8 +84,8 @@ function buildLegPanel(ordem, role, title, cityName, dateValue, timeValue, esc) 
     '</div>' +
     '<div class="route-return__leg-fields">' +
     '<div class="field route-return__city">' +
-    '<label class="field__label">Cidade</label>' +
-    '<input type="text" class="input__control" value="' +
+    '<label class="field__label" for="trecho_' + ordem + '_' + role + '_cidade">Cidade</label>' +
+    '<input type="text" id="trecho_' + ordem + '_' + role + '_cidade" class="input__control" value="' +
     esc(cityName) +
     '" readonly tabindex="-1" aria-readonly="true">' +
     '</div>' +
@@ -208,8 +208,8 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
     '</div>' +
     '<div class="route-return__times">' +
     '<div class="field">' +
-    '<label class="field__label">Tempo de viagem</label>' +
-    '<input type="text" class="input__control trecho-tempo-viagem-hhmm" data-route-time-kind="travel" value="' +
+    '<label class="field__label" for="trecho_' + o + '_tempo_viagem">Tempo de viagem</label>' +
+    '<input type="text" id="trecho_' + o + '_tempo_viagem" class="input__control trecho-tempo-viagem-hhmm" data-route-time-kind="travel" value="' +
     esc(fmt(cru)) +
     '" placeholder="00:00" data-mask="time" inputmode="numeric" maxlength="5" autocomplete="off">' +
     '<input type="hidden" name="trecho_' +
@@ -219,9 +219,9 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
     '">' +
     '</div>' +
     '<div class="field">' +
-    '<label class="field__label">Tempo adicional</label>' +
+    '<label class="field__label" for="trecho_' + o + '_tempo_adicional">Tempo adicional</label>' +
     '<div class="route-return__stepper">' +
-    '<input type="text" class="input__control trecho-tempo-adicional-hhmm" data-route-time-kind="additional" value="' +
+    '<input type="text" id="trecho_' + o + '_tempo_adicional" class="input__control trecho-tempo-adicional-hhmm" data-route-time-kind="additional" value="' +
     esc(add ? fmt(add) : '') +
     '" placeholder="00:00" data-mask="time" inputmode="numeric" maxlength="5" autocomplete="off">' +
     '<button type="button" class="button button--secondary button--icon trecho-tempo-add-btn" data-tempo-add-delta="-15" aria-label="Menos 15 minutos">−</button>' +
@@ -234,8 +234,8 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
     '">' +
     '</div>' +
     '<div class="field">' +
-    '<label class="field__label">Tempo total</label>' +
-    '<input type="text" class="input__control trecho-tempo-total" value="" readonly tabindex="-1" aria-readonly="true">' +
+    '<label class="field__label" for="trecho_' + o + '_tempo_total">Tempo total</label>' +
+    '<input type="text" id="trecho_' + o + '_tempo_total" class="input__control trecho-tempo-total" value="" readonly tabindex="-1" aria-readonly="true">' +
     '</div></div>' +
     '<input type="hidden" name="trecho_' +
     o +

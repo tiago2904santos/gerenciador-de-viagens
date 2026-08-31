@@ -141,11 +141,20 @@
     <div class="sidebar-theme" role="group" aria-label="Tema visual da área principal">
       <span class="sidebar-theme__label" id="sidebar-theme-label">Tema</span>
       <div class="app-theme-grid" role="radiogroup" aria-labelledby="sidebar-theme-label">
-        <button type="button" class="app-theme-grid__btn" role="radio" data-theme-mode="dark" aria-pressed="false" aria-checked="false" tabindex="-1">
+        {% comment %}
+          `aria-checked` e NÃO `aria-pressed`: os dois botões são um
+          `role="radio"` dentro do `radiogroup` acima, e `aria-pressed` é do
+          botão de alternância — a ARIA não o permite em `radio`. Carregar os
+          dois fazia o axe reprovar `aria-allowed-attr` nas 43 rotas e nos dois
+          temas: 168 violações, 87% de toda a dívida de acessibilidade medida
+          em 31/08/2026, saídas destas duas linhas. O estado escolhido continua
+          o mesmo para o CSS e para o leitor de tela.
+        {% endcomment %}
+        <button type="button" class="app-theme-grid__btn" role="radio" data-theme-mode="dark" aria-checked="false" tabindex="-1">
           Escuro
           <small>Contraste reforçado</small>
         </button>
-        <button type="button" class="app-theme-grid__btn" role="radio" data-theme-mode="light" aria-pressed="false" aria-checked="false" tabindex="-1">
+        <button type="button" class="app-theme-grid__btn" role="radio" data-theme-mode="light" aria-checked="false" tabindex="-1">
           Claro
           <small>Contraste suave</small>
         </button>
