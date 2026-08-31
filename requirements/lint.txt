@@ -10,4 +10,4 @@
 # Pino exato, não faixa: subir de minor num linter costuma trazer regra nova, e
 # regra nova reprova PR que não tem nada a ver com ela. A atualização entra pelo
 # PR do Dependabot, onde alguém zera os achados novos junto.
-ruff==0.15.8
+ruff==0.16.5
