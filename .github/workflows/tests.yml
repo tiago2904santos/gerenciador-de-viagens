@@ -366,7 +366,7 @@ jobs:
 
       - name: Publish unoserver diagnostic (NOVO-43)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unoserver-${{ github.run_id }}
           if-no-files-found: warn
@@ -475,7 +475,7 @@ jobs:
 
       - name: Publish frontend measurements and recalibrated ceilings (NOVO-91)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: frontend-route-metrics-${{ github.run_id }}
           if-no-files-found: warn
